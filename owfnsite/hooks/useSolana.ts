@@ -4,7 +4,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -59,27 +59,12 @@ export const useSolana = (): UseSolanaReturn => {
     setLoading(true);
     try {
         const ownerAddress = new PublicKey(walletAddress);
-        const heliusConnection = new Connection(HELIUS_RPC_URL, 'confirmed');
 
-        const [solBalanceRes, assetsRes] = await Promise.all([
-             heliusConnection.getBalance(ownerAddress),
-             fetch(HELIUS_RPC_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    jsonrpc: '2.0',
-                    id: 'get-assets-by-owner',
-                    method: 'getAssetsByOwner',
-                    params: { ownerAddress: walletAddress, page: 1, limit: 1000 },
-                }),
-            })
-        ]);
-        
-        const assetsData = await assetsRes.json();
-        
+        // 1. Fetch SOL balance
+        const solBalance = await connection.getBalance(ownerAddress);
         const solToken: Token = {
             mintAddress: 'So11111111111111111111111111111111111111112',
-            balance: solBalanceRes / LAMPORTS_PER_SOL,
+            balance: solBalance / LAMPORTS_PER_SOL,
             name: 'Solana',
             symbol: 'SOL',
             logo: React.createElement(SolIcon, null),
@@ -88,56 +73,59 @@ export const useSolana = (): UseSolanaReturn => {
             decimals: 9,
         };
 
-        if (!assetsData.result || !assetsData.result.items) {
-            console.warn("Failed to fetch token assets from Helius for wallet:", walletAddress, assetsData.error || '');
-            const allTokensOnError = [solToken];
-             try {
-                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${solToken.mintAddress}`);
-                const priceData = await priceRes.json();
-                if (priceData.data?.[solToken.mintAddress]) {
-                    const price = priceData.data[solToken.mintAddress].price;
-                    solToken.pricePerToken = price;
-                    solToken.usdValue = solToken.balance * price;
-                }
-            } catch(e) { console.error("Price fetch failed on error path", e)}
-            return allTokensOnError;
-        }
-        
-        const splTokens: Token[] = assetsData.result.items
-            .filter((asset: any) => (asset.interface === 'FungibleToken' || asset.interface === 'FungibleAsset') && asset.token_info?.balance > 0)
-            .map((asset: any) => {
-                const metadata = asset.content?.metadata;
-                const links = asset.content?.links;
-                const mint = asset.id;
+        // 2. Fetch SPL token balances using a standard and reliable method
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(ownerAddress, {
+            programId: TOKEN_PROGRAM_ID,
+        });
 
+        const splTokens: Token[] = tokenAccounts.value
+            .filter(accountInfo => {
+                const parsedInfo = accountInfo.account.data.parsed.info;
+                return parsedInfo.tokenAmount.uiAmount > 0;
+            })
+            .map(accountInfo => {
+                const parsedInfo = accountInfo.account.data.parsed.info;
+                const mintAddress = parsedInfo.mint;
+
+                const knownTokenSymbol = Object.keys(KNOWN_TOKEN_MINT_ADDRESSES).find(
+                    key => KNOWN_TOKEN_MINT_ADDRESSES[key] === mintAddress
+                );
+                
                 return {
-                    mintAddress: mint,
-                    balance: Number(asset.token_info.balance) / Math.pow(10, asset.token_info.decimals),
-                    decimals: asset.token_info.decimals,
-                    name: metadata?.name || 'Unknown Token',
-                    symbol: metadata?.symbol || `${mint.slice(0, 4)}..${mint.slice(-4)}`,
-                    logo: KNOWN_TOKEN_ICONS[mint] || React.createElement(GenericTokenIcon, { uri: links?.image }),
+                    mintAddress: mintAddress,
+                    balance: parsedInfo.tokenAmount.uiAmount,
+                    decimals: parsedInfo.tokenAmount.decimals,
+                    name: knownTokenSymbol || 'Unknown Token',
+                    symbol: knownTokenSymbol || `${mintAddress.slice(0, 4)}..${mintAddress.slice(-4)}`,
+                    logo: KNOWN_TOKEN_ICONS[mintAddress] || React.createElement(GenericTokenIcon, {}),
                     usdValue: 0,
                     pricePerToken: 0,
                 };
             });
 
         const allTokens = [solToken, ...splTokens];
+
+        // 3. Fetch prices from Jupiter API for all tokens at once
         if (allTokens.length > 0) {
             const mints = allTokens.map(t => t.mintAddress).join(',');
             
             try {
                 const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mints}`);
+                if (!priceRes.ok) {
+                    throw new Error(`Jupiter API failed with status ${priceRes.status}`);
+                }
                 const priceData = await priceRes.json();
 
                 if (priceData.data) {
                     allTokens.forEach(token => {
                         if (priceData.data[token.mintAddress]) {
                             const price = priceData.data[token.mintAddress].price;
-                            token.pricePerToken = price;
-                            token.usdValue = token.balance * price;
+                            token.pricePerToken = price || 0;
+                            token.usdValue = token.balance * (price || 0);
                         }
                     });
+                } else {
+                     console.warn("No price data returned from Jupiter API for mints:", mints, priceData);
                 }
             } catch (priceError) {
                 console.error("Could not fetch token prices from Jupiter API:", priceError);
@@ -152,7 +140,7 @@ export const useSolana = (): UseSolanaReturn => {
     } finally {
         setLoading(false);
     }
-  }, []);
+  }, [connection]);
 
   useEffect(() => {
     if (connected && address) {
