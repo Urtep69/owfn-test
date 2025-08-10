@@ -87,39 +87,48 @@ export const useSolana = (): UseSolanaReturn => {
 
         const { result } = await response.json();
         
-        if (!result || !result.items) {
+        if (!result) {
              return [];
         }
        
-        const allTokens: Token[] = result.items.map((asset: any): Token | null => {
-            if (asset.interface === 'Native' && asset.nativeBalance?.lamports > 0) {
-                return {
-                    mintAddress: 'So11111111111111111111111111111111111111112',
-                    balance: asset.nativeBalance.lamports / LAMPORTS_PER_SOL,
-                    decimals: 9,
-                    name: 'Solana',
-                    symbol: 'SOL',
-                    logo: React.createElement(SolIcon, null),
-                    usdValue: 0,
-                    pricePerToken: 0,
-                };
+        // Process SPL tokens from the 'items' array
+        const splTokens: Token[] = (result.items || [])
+            .map((asset: any): Token | null => {
+                if (asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
+                    return {
+                        mintAddress: asset.id,
+                        balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
+                        decimals: asset.token_info.decimals,
+                        name: asset.content?.metadata?.name || 'Unknown Token',
+                        symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
+                        logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
+                        usdValue: 0,
+                        pricePerToken: 0,
+                    };
+                }
+                return null;
+            })
+            .filter((token: Token | null): token is Token => token !== null);
+
+        const allTokens: Token[] = [...splTokens];
+
+        // Separately process native SOL balance from the 'nativeBalance' field
+        if (result.nativeBalance && result.nativeBalance.lamports > 0) {
+            const solToken: Token = {
+                mintAddress: 'So11111111111111111111111111111111111111112',
+                balance: result.nativeBalance.lamports / LAMPORTS_PER_SOL,
+                decimals: 9,
+                name: 'Solana',
+                symbol: 'SOL',
+                logo: React.createElement(SolIcon, null),
+                usdValue: 0,
+                pricePerToken: 0,
+            };
+            // Avoid adding duplicate SOL if it's already somehow in the list
+            if (!allTokens.some(t => t.mintAddress === solToken.mintAddress)) {
+                allTokens.push(solToken);
             }
-            
-            if (asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
-                return {
-                    mintAddress: asset.id,
-                    balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
-                    decimals: asset.token_info.decimals,
-                    name: asset.content?.metadata?.name || 'Unknown Token',
-                    symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
-                    logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
-                    usdValue: 0,
-                    pricePerToken: 0,
-                };
-            }
-            
-            return null;
-        }).filter((token: Token | null): token is Token => token !== null);
+        }
         
         if (allTokens.length === 0) return [];
 
