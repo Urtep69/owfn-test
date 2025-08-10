@@ -8,7 +8,7 @@ import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconCompone
 // This hook simulates interactions with the Solana blockchain.
 // In a real application, you would replace this with @solana/wallet-adapter and @solana/web3.js.
 
-const MOCK_USER_ADDRESS = 'Am3R8zL7qV9k3yP5tW1sX4nB6mJ7fG9cE2dF8hK0gR'; // Regular user wallet address
+const MOCK_USER_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Regular user wallet address set to ADMIN for demonstration
 const MOCK_ADMIN_ADDRESS = ADMIN_WALLET_ADDRESS;
 
 const MOCK_USER_TOKENS: Token[] = [
