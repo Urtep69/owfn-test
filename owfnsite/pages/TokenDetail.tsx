@@ -2,13 +2,13 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
 import { PublicKey } from '@solana/web3.js';
 import { 
-    Star, Share2, Search, Settings2, Shield, BarChartHorizontal, LineChart, 
-    CandlestickChart, Waves, PenLine, Text, MoreHorizontal, ExternalLink
+    Star, Share2, Search, Settings2, Shield, Loader2
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { MOCK_TOKEN_DETAILS, TOKEN_DETAILS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
+import { MOCK_TOKEN_DETAILS, TOKEN_DETAILS, HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import { GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- Sub-components defined within the page for locality ---
 const TokenDetailHeader = ({ token }: { token: TokenDetails }) => (
@@ -54,7 +54,7 @@ const TokenInfoPanel = ({ token, price }: { token: TokenDetails, price: number }
     
     useEffect(() => {
         const fetchSupply = async () => {
-            if (token.mintAddress && token.mintAddress !== KNOWN_TOKEN_MINT_ADDRESSES.SOL) {
+            if (token.mintAddress && token.symbol !== 'SOL') {
                  try {
                     const supply = await solana.connection.getTokenSupply(new PublicKey(token.mintAddress));
                     setCirculatingSupply(supply.value.uiAmount || 0);
@@ -75,7 +75,7 @@ const TokenInfoPanel = ({ token, price }: { token: TokenDetails, price: number }
                 {marketCap > 0 && <InfoItem label="Market Cap" value={`$${(marketCap / 1_000_000).toFixed(2)}M`} />}
                 {circulatingSupply > 0 && <InfoItem label="Circ. Supply" value={`${(circulatingSupply / 1_000_000_000).toFixed(2)}B`} />}
                 {totalSupply > 0 && <InfoItem label="Total Supply" value={`${(totalSupply / 1_000_000_000).toFixed(2)}B`} />}
-                {token.poolCreated !== 'N/A' && <InfoItem label="Pool Created" value={token.poolCreated!} />}
+                {token.poolCreated && token.poolCreated !== 'N/A' && <InfoItem label="Pool Created" value={token.poolCreated} />}
             </div>
             {token.pairAddress && 
              <div className="border-t border-primary-700 pt-2">
@@ -90,30 +90,119 @@ const TokenInfoPanel = ({ token, price }: { token: TokenDetails, price: number }
 export default function TokenDetail() {
     const { t, currentLanguage } = useAppContext();
     const params = useParams();
-    const symbol = params?.['symbol'];
     const [location] = useLocation();
     const searchParams = new URLSearchParams(location.split('?')[1] || '');
     const from = searchParams.get('from');
+    
+    const mintAddress = params?.['mint'];
+
+    const [token, setToken] = useState<TokenDetails | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [chartUrl, setChartUrl] = useState('');
     const [price, setPrice] = useState(0);
 
-    const token = useMemo(() => MOCK_TOKEN_DETAILS[symbol as string], [symbol]);
-    
     useEffect(() => {
-        const fetchPrice = async () => {
-            if (!token) return;
+        if (!mintAddress) {
+            setLoading(false);
+            return;
+        }
+
+        const fetchTokenData = async () => {
+            setLoading(true);
             try {
-                const res = await fetch(`https://price.jup.ag/v4/price?ids=${token.mintAddress}`);
-                const data = await res.json();
-                if (data.data[token.mintAddress]) {
-                    setPrice(data.data[token.mintAddress].price);
+                // 1. Fetch metadata from Helius
+                const url = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 'my-id',
+                        method: 'getAsset',
+                        params: { id: mintAddress },
+                    }),
+                });
+                if (!response.ok) throw new Error('Failed to fetch asset from Helius');
+                const { result: asset } = await response.json();
+
+                // 2. Fetch price from Jupiter
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mintAddress}`);
+                const priceData = await priceRes.json();
+                const currentPrice = priceData.data?.[mintAddress]?.price || 0;
+                setPrice(currentPrice);
+
+                // 3. Fetch pair info from Dexscreener
+                const dexscreenerRes = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`);
+                let pairAddress = '';
+                if (dexscreenerRes.ok) {
+                    const dexscreenerData = await dexscreenerRes.json();
+                    if (dexscreenerData.pairs && dexscreenerData.pairs.length > 0) {
+                        const sortedPairs = dexscreenerData.pairs
+                            .filter((p: any) => p.quoteToken.symbol === 'SOL' || p.quoteToken.symbol === 'USDC')
+                            .sort((a: any, b: any) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0));
+                        pairAddress = sortedPairs.length > 0 ? sortedPairs[0].pairAddress : dexscreenerData.pairs[0].pairAddress;
+                    }
                 }
-            } catch (e) {
-                console.error("Failed to fetch price", e);
+                
+                if (pairAddress) {
+                    setChartUrl(`https://dexscreener.com/solana/${pairAddress}?embed=1&theme=dark&info=0`);
+                }
+
+                // 4. Combine data
+                const symbol = asset.content?.metadata?.symbol;
+                const mockDetails = symbol ? MOCK_TOKEN_DETAILS[symbol] : undefined;
+
+                const tokenData: TokenDetails = {
+                    mintAddress: asset.id,
+                    name: asset.content?.metadata?.name || mockDetails?.name || 'Unknown Token',
+                    symbol: symbol || mockDetails?.symbol || `${asset.id.slice(0,4)}...`,
+                    logo: <GenericTokenIcon uri={asset.content?.links?.image} />,
+                    description: { en: asset.content?.metadata?.description || mockDetails?.description?.en || '' },
+                    pricePerToken: currentPrice,
+                    balance: 0, // Not relevant here
+                    usdValue: 0, // Not relevant here
+                    decimals: asset.token_info?.decimals || mockDetails?.decimals || 0,
+                    pairAddress: pairAddress || mockDetails?.pairAddress,
+                    // Add missing properties with defaults
+                    security: mockDetails?.security || { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
+                    marketCap: mockDetails?.marketCap || 0,
+                    volume24h: mockDetails?.volume24h || 0,
+                    price24hChange: mockDetails?.price24hChange || 0,
+                    holders: mockDetails?.holders || 0,
+                    circulatingSupply: mockDetails?.circulatingSupply || 0,
+                    // Add optional properties from mock if they exist
+                    audit: mockDetails?.audit,
+                    dextScore: mockDetails?.dextScore,
+                    communityTrust: mockDetails?.communityTrust,
+                    poolCreated: mockDetails?.poolCreated,
+                };
+                setToken(tokenData);
+
+            } catch (error) {
+                console.error("Failed to fetch token details:", error);
+                const mockToken = Object.values(MOCK_TOKEN_DETAILS).find(t => t.mintAddress === mintAddress);
+                if (mockToken) {
+                    setToken(mockToken);
+                    if (mockToken.pairAddress) {
+                        setChartUrl(`https://dexscreener.com/solana/${mockToken.pairAddress}?embed=1&theme=dark&info=0`);
+                    }
+                }
+            } finally {
+                setLoading(false);
             }
         };
-        fetchPrice();
-    }, [token]);
 
+        fetchTokenData();
+    }, [mintAddress]);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-96">
+                <Loader2 className="w-12 h-12 animate-spin text-accent-500" />
+            </div>
+        );
+    }
+    
     if (!token) {
         return (
             <div className="text-center py-10 animate-fade-in-up">
@@ -124,10 +213,6 @@ export default function TokenDetail() {
     }
     
     const description = token.description[currentLanguage.code] || token.description['en'] || '';
-
-    const chartUrl = token.pairAddress 
-        ? `https://dexscreener.com/solana/${token.pairAddress}?embed=1&theme=dark&info=0`
-        : '';
 
     return (
         <div className="animate-fade-in text-primary-100 -mt-8 -mx-8 p-1 bg-primary-950">

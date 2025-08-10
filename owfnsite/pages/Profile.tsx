@@ -118,7 +118,7 @@ export default function Profile() {
                         </div>
                         {/* Token List */}
                         {userTokens.map(token => (
-                            <Link to={`/dashboard/token/${token.symbol}?from=/profile`} key={token.mintAddress}>
+                            <Link to={`/dashboard/token/${token.mintAddress}?from=/profile`} key={token.mintAddress}>
                                 <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-700/50 transition-colors duration-200 cursor-pointer">
                                     {/* Column 1: Asset Info */}
                                     <div className="flex items-center space-x-4">

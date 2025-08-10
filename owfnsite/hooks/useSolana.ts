@@ -4,7 +4,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_API_KEY } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -73,35 +73,51 @@ export const useSolana = (): UseSolanaReturn => {
             decimals: 9,
         };
 
-        // 2. Fetch SPL token balances using a standard and reliable method
-        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(ownerAddress, {
-            programId: TOKEN_PROGRAM_ID,
+        // 2. Fetch SPL tokens using Helius getAssetsByOwner
+        let splTokens: Token[] = [];
+        const url = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 'my-id',
+                method: 'getAssetsByOwner',
+                params: {
+                    ownerAddress: walletAddress,
+                    page: 1,
+                    limit: 1000,
+                    displayOptions: {
+                        showFungible: true,
+                        showNativeBalance: false,
+                    }
+                },
+            }),
         });
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch assets from Helius');
+        }
 
-        const splTokens: Token[] = tokenAccounts.value
-            .filter(accountInfo => {
-                const parsedInfo = accountInfo.account.data.parsed.info;
-                return parsedInfo.tokenAmount.uiAmount > 0;
-            })
-            .map(accountInfo => {
-                const parsedInfo = accountInfo.account.data.parsed.info;
-                const mintAddress = parsedInfo.mint;
-
-                const knownTokenSymbol = Object.keys(KNOWN_TOKEN_MINT_ADDRESSES).find(
-                    key => KNOWN_TOKEN_MINT_ADDRESSES[key] === mintAddress
-                );
-                
-                return {
-                    mintAddress: mintAddress,
-                    balance: parsedInfo.tokenAmount.uiAmount,
-                    decimals: parsedInfo.tokenAmount.decimals,
-                    name: knownTokenSymbol || 'Unknown Token',
-                    symbol: knownTokenSymbol || `${mintAddress.slice(0, 4)}..${mintAddress.slice(-4)}`,
-                    logo: KNOWN_TOKEN_ICONS[mintAddress] || React.createElement(GenericTokenIcon, {}),
+        const { result } = await response.json();
+        
+        if (result && result.items) {
+            splTokens = result.items
+                .filter((asset: any) => asset.token_info?.balance > 0 && !asset.compression?.compressed)
+                .map((asset: any) => ({
+                    mintAddress: asset.id,
+                    balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
+                    decimals: asset.token_info.decimals,
+                    name: asset.content?.metadata?.name || 'Unknown Token',
+                    symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..${asset.id.slice(-4)}`,
+                    logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
                     usdValue: 0,
                     pricePerToken: 0,
-                };
-            });
+                }));
+        }
 
         const allTokens = [solToken, ...splTokens];
 

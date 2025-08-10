@@ -54,7 +54,7 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
 
                     <div className="space-y-1 max-h-60 overflow-y-auto pr-2">
                         {balances.length > 0 ? balances.map(token => (
-                            <Link to={`/dashboard/token/${token.symbol}?from=/dashboard`} key={token.mintAddress}>
+                            <Link to={`/dashboard/token/${token.mintAddress}?from=/dashboard`} key={token.mintAddress}>
                                 <a className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md hover:bg-primary-700/50 cursor-pointer transition-colors duration-200">
                                     {/* Asset Info */}
                                     <div className="flex items-center space-x-3">

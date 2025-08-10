@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { OWFN_LOGO_URL } from '../constants.ts';
 import { Image } from 'lucide-react';
 
@@ -36,13 +36,15 @@ export const UsdtIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
 );
 
 export const GenericTokenIcon = ({ uri, className = 'w-6 h-6' }: { uri?: string, className?: string }) => {
-    if (uri) {
+    const [hasError, setHasError] = useState(false);
+
+    if (uri && !hasError) {
         return (
             <img 
                 src={uri} 
                 alt="Token Logo" 
-                className={`${className} rounded-full object-cover`} 
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                className={`${className} rounded-full object-cover bg-primary-700`} 
+                onError={() => setHasError(true)}
             />
         );
     }
