@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Star, Share2, Loader2, ArrowLeft } from 'lucide-react';
+import { Star, Share2, Loader2, ArrowLeft, BarChart2 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
@@ -216,8 +216,12 @@ export default function TokenDetail() {
                             />
                         </div>
                     ) : (
-                        <div className="flex-grow flex items-center justify-center text-primary-400">
-                            <p>No chart data available for this token.</p>
+                        <div className="flex-grow flex flex-col items-center justify-center text-center text-primary-400 bg-primary-900/50 rounded-b-lg p-4">
+                            <BarChart2 className="w-16 h-16 text-primary-600 mb-4" />
+                            <h3 className="text-xl font-bold text-primary-200">No Chart Data Available</h3>
+                            <p className="max-w-xs mt-2 text-sm">
+                                This token may not be publicly traded yet. Live market data will appear here once it is listed on a supported DEX.
+                            </p>
                         </div>
                     )}
                 </div>

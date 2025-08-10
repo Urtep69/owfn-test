@@ -90,16 +90,23 @@ export const useSolana = (): UseSolanaReturn => {
              return [];
         }
        
-        let processedTokens: Token[] = [];
-
-        // Process SPL tokens from the items array
-        result.items.forEach((asset: any) => {
-            if (
-                asset.interface === 'FungibleToken' &&
-                asset.token_info?.balance > 0 &&
-                !asset.compression?.compressed
-            ) {
-                processedTokens.push({
+        const allTokens: Token[] = result.items.map((asset: any) => {
+            // Check for native SOL balance
+            if (asset.nativeBalance && asset.nativeBalance.lamports > 0) {
+                return {
+                    mintAddress: 'So11111111111111111111111111111111111111112',
+                    balance: asset.nativeBalance.lamports / LAMPORTS_PER_SOL,
+                    decimals: 9,
+                    name: 'Solana',
+                    symbol: 'SOL',
+                    logo: React.createElement(SolIcon, null),
+                    usdValue: 0,
+                    pricePerToken: 0,
+                };
+            }
+            // Check for SPL Fungible token
+            if (asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
+                return {
                     mintAddress: asset.id,
                     balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
                     decimals: asset.token_info.decimals,
@@ -108,27 +115,11 @@ export const useSolana = (): UseSolanaReturn => {
                     logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
                     usdValue: 0,
                     pricePerToken: 0,
-                });
+                };
             }
-        });
-
-        // Helius returns native SOL balance as a special item in the array.
-        const solAsset = result.items.find((asset: any) => asset.nativeBalance);
-        if (solAsset && solAsset.nativeBalance.lamports > 0) {
-            processedTokens.push({
-                mintAddress: 'So11111111111111111111111111111111111111112',
-                balance: solAsset.nativeBalance.lamports / LAMPORTS_PER_SOL,
-                decimals: 9,
-                name: 'Solana',
-                symbol: 'SOL',
-                logo: React.createElement(SolIcon, null),
-                usdValue: 0,
-                pricePerToken: 0,
-            });
-        }
+            return null;
+        }).filter((token): token is Token => token !== null && token.balance > 0);
         
-        let allTokens = processedTokens.filter(token => token.balance > 0);
-
         if (allTokens.length === 0) return [];
 
         let solPrice = 0;
@@ -147,7 +138,7 @@ export const useSolana = (): UseSolanaReturn => {
                         token.pricePerToken = price;
                         token.usdValue = token.balance * price;
 
-                        if (token.mintAddress === 'So1111111111111111111111111111111111111111112') {
+                        if (token.mintAddress === 'So11111111111111111111111111111111111111112') {
                             solPrice = price;
                         }
                     }
