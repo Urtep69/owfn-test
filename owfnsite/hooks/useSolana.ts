@@ -38,10 +38,10 @@ const MOCK_USER_ADDRESS = 'Am3R8zL7qV9k3yP5tW1sX4nB6mJ7fG9cE2dF8hK0gR'; // Examp
 const MOCK_ADMIN_ADDRESS = ADMIN_WALLET_ADDRESS;
 
 const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
-    [OWFN_MINT_ADDRESS]: <OwfnIcon />,
-    'So11111111111111111111111111111111111111112': <SolIcon />,
-    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': <UsdcIcon />,
-    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': <UsdtIcon />,
+    [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon, null),
+    'So11111111111111111111111111111111111111112': React.createElement(SolIcon, null),
+    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon, null),
+    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
 };
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -93,7 +93,7 @@ export const useSolana = (): UseSolanaReturn => {
                 balance: Number(asset.token_info.balance) / Math.pow(10, asset.token_info.decimals),
                 name: asset.content.metadata.name || 'Unknown Token',
                 symbol: asset.content.metadata.symbol || '???',
-                logo: KNOWN_TOKEN_ICONS[asset.id] || <GenericTokenIcon uri={asset.content?.links?.image} />,
+                logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
                 usdValue: 0, // will be populated by price API
             }));
 
@@ -102,7 +102,7 @@ export const useSolana = (): UseSolanaReturn => {
             balance: solData.result.value / 1e9,
             name: 'Solana',
             symbol: 'SOL',
-            logo: <SolIcon />,
+            logo: React.createElement(SolIcon, null),
             usdValue: 0,
         };
         
