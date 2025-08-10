@@ -4,11 +4,19 @@
   "private": true,
   "description": "A global network united by the vision to build a better world through technology and humanity.",
   "scripts": {
-    "build": "mkdir -p public && cp index.html public/index.html && esbuild index.tsx --bundle --outfile=public/bundle.js --loader:.ts=ts --loader:.tsx=tsx --jsx=automatic --external:react --external:\"react-dom/*\" --external:\"react/*\" --external:@google/genai --external:lucide-react --external:recharts --external:react-router-dom --external:wouter --external:\"wouter/*\""
+    "build": "mkdir -p public && cp index.html public/index.html && esbuild index.tsx --bundle --outfile=public/bundle.js --loader:.ts=ts --loader:.tsx=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"'"
   },
   "author": "OWFN",
   "license": "UNLICENSED",
   "dependencies": {
+    "@google/genai": "^0.12.0",
+    "lucide-react": "^0.395.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7",
+    "wouter": "^3.2.0"
+  },
+  "devDependencies": {
     "esbuild": "^0.23.0"
   }
 }
