@@ -32,20 +32,29 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
             </div>
             {loading ? (
                 <div className="space-y-3 animate-pulse">
-                    <div className="h-8 bg-primary-700 rounded w-1/2 mb-4"></div>
-                    <div className="h-4 bg-primary-700 rounded w-3/4"></div>
-                    <div className="h-4 bg-primary-700 rounded w-1/2"></div>
-                    <div className="h-4 bg-primary-700 rounded w-5/6"></div>
-                    <div className="h-4 bg-primary-700 rounded w-2/3"></div>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="h-12 bg-primary-700 rounded"></div>
+                        <div className="h-12 bg-primary-700 rounded"></div>
+                    </div>
+                    <div className="h-8 bg-primary-700 rounded w-full"></div>
+                    <div className="h-8 bg-primary-700 rounded w-full"></div>
+                    <div className="h-8 bg-primary-700 rounded w-full"></div>
                 </div>
             ) : (
                 <>
-                    <div className="mb-4">
-                        <span className="font-bold text-2xl">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                        <span className="text-primary-400 ml-2">{t('total_value')}</span>
+                    <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-primary-900/50 rounded-lg">
+                        <div>
+                            <p className="text-sm text-primary-400">{t('token_types')}</p>
+                            <p className="text-2xl font-bold">{balances.length}</p>
+                        </div>
+                        <div className="text-right">
+                             <p className="text-sm text-primary-400">{t('total_value')}</p>
+                            <p className="text-2xl font-bold text-green-400">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        </div>
                     </div>
-                    <div className="space-y-1">
-                        {balances.slice(0, 5).map(token => (
+
+                    <div className="space-y-1 max-h-60 overflow-y-auto pr-2">
+                        {balances.length > 0 ? balances.map(token => (
                             <Link to={`/dashboard/token/${token.symbol}?from=/dashboard`} key={token.mintAddress} className="block -mx-2">
                                 <div className="flex justify-between items-center py-2 px-2 rounded-md hover:bg-primary-700/50 cursor-pointer transition-colors duration-200">
                                     <div className="flex items-center space-x-3">
@@ -58,7 +67,11 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                                     </div>
                                 </div>
                             </Link>
-                        ))}
+                        )) : (
+                             <div className="text-center py-8 text-primary-400">
+                                <p>{t('profile_no_tokens')}</p>
+                            </div>
+                        )}
                     </div>
                 </>
             )}

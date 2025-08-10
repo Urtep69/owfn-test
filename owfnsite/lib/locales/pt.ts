@@ -165,6 +165,7 @@ export const pt = {
     token_types: 'Tipos de Token',
     profile_loading_tokens: 'Carregando tokens...',
     profile_connect_prompt: 'Conecte sua carteira para ver seu perfil e saldos de tokens.',
+    profile_no_tokens: 'Nenhum token encontrado nesta carteira.',
     impact_dashboard_title: 'Meu Painel de Impacto',
     my_impact_stats: 'Minhas Estatísticas de Impacto',
     total_donated: 'Total Doado',

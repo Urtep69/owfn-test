@@ -165,6 +165,7 @@ export const ko = {
     token_types: '토큰 종류',
     profile_loading_tokens: '토큰 로드 중...',
     profile_connect_prompt: '프로필과 토큰 잔액을 보려면 지갑을 연결하세요.',
+    profile_no_tokens: '이 지갑에서 토큰을 찾을 수 없습니다.',
     impact_dashboard_title: '내 임팩트 대시보드',
     my_impact_stats: '내 임팩트 통계',
     total_donated: '총 기부액',

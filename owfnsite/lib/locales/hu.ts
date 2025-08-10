@@ -114,4 +114,25 @@ export const hu = {
     presale_buying_owfn: 'Vásárlás {amount} $OWFN',
     presale_estimate_tooltip: 'Ez egy becslés. A végső összeg változhat.',
     presale_whitelist_finished: 'Fehérlistás Értékesítés Befejeződött:',
+    
+    // Profile
+    my_profile: 'Profilom',
+    my_tokens: 'Tokenjeim',
+    token_types: 'Token Típusok',
+    profile_loading_tokens: 'Tokenek betöltése...',
+    profile_connect_prompt: 'Csatlakoztassa a pénztárcáját a profil és a tokenegyenlegek megtekintéséhez.',
+    profile_no_tokens: 'Nem található token ebben a pénztárcában.',
+    impact_dashboard_title: 'Hatás Irányítópultom',
+    my_impact_stats: 'Hatás Statisztikáim',
+    total_donated: 'Összesen Adományozva',
+    projects_supported: 'Támogatott Projektek',
+    votes_cast: 'Leadott Szavazatok',
+    impact_trophies_nfts: 'Hatás Trófeák (NFT-k)',
+    impact_badges: 'Hatás Jelvények',
+    badge_first_donation: 'Első Adományozó',
+    badge_first_donation_desc: 'Az első adományozásért járó kitüntetés.',
+    badge_community_voter: 'Közösségi Szavazó',
+    badge_community_voter_desc: '5 kormányzási szavazáson való részvételért járó kitüntetés.',
+    badge_diverse_donor: 'Változatos Adományozó',
+    badge_diverse_donor_desc: '3 különböző kategóriájú projektnek nyújtott adományért járó kitüntetés.'
 };

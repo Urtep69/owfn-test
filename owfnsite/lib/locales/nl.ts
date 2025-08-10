@@ -165,6 +165,7 @@ export const nl = {
     token_types: 'Token Types',
     profile_loading_tokens: 'Tokens laden...',
     profile_connect_prompt: 'Verbind uw wallet om uw profiel en tokensaldi te zien.',
+    profile_no_tokens: 'Geen tokens gevonden in deze wallet.',
     impact_dashboard_title: 'Mijn Impact Dashboard',
     my_impact_stats: 'Mijn Impactstatistieken',
     total_donated: 'Totaal Gedoneerd',

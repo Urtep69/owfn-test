@@ -165,6 +165,7 @@ export const ro = {
     token_types: 'Tipuri de Tokenuri',
     profile_loading_tokens: 'Se încarcă tokenurile...',
     profile_connect_prompt: 'Conectează-ți portofelul pentru a vedea profilul și soldurile tokenurilor.',
+    profile_no_tokens: 'Nu s-au găsit tokenuri în acest portofel.',
     impact_dashboard_title: 'Panoul Meu de Impact',
     my_impact_stats: 'Statisticile Mele de Impact',
     total_donated: 'Total Donat',

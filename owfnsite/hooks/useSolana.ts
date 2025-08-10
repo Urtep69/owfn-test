@@ -78,13 +78,13 @@ export const useSolana = (): UseSolanaReturn => {
         
         const assetsData = await assetsRes.json();
 
-        if (!assetsData.result) {
-            console.warn("Failed to fetch token assets from Helius for wallet:", walletAddress);
+        if (!assetsData.result || !assetsData.result.items) {
+            console.warn("Failed to fetch token assets from Helius for wallet:", walletAddress, assetsData.error || '');
             return [];
         }
         
         const splTokens: Token[] = assetsData.result.items
-            .filter((asset: any) => asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && asset.content?.metadata)
+            .filter((asset: any) => (asset.interface === 'FungibleToken' || asset.interface === 'FungibleAsset') && asset.token_info?.balance > 0 && asset.content?.metadata)
             .map((asset: any) => ({
                 mintAddress: asset.id,
                 balance: Number(asset.token_info.balance) / Math.pow(10, asset.token_info.decimals),
