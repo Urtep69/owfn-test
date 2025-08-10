@@ -2,7 +2,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, PROJECT_LINKS, ROADMAP_DATA, OWFN_MINT_ADDRESS } from '../constants.ts';
 import { translations } from '../lib/locales/index.ts';
-import type { ChatMessage } from '../types.ts';
 
 if (!process.env.API_KEY) {
   // In a real app, you'd want to handle this more gracefully.
@@ -106,19 +105,20 @@ ${ROADMAP_DATA.map(p => `*   **${p.quarter} (${enTranslations[p.key_prefix + '_t
     *   **A:** ${enTranslations['faq_a10']}
 `;
 
-export const getChatbotResponse = async (history: ChatMessage[], question: string): Promise<string> => {
+export const getChatbotResponse = async (history: { role: 'user' | 'model', parts: { text: string }[] }[], question: string): Promise<string> => {
   if (!process.env.API_KEY) {
     return "I can't connect to my brain right now. Please make sure the API key is configured by the developer.";
   }
   try {
-    const fullPrompt = `${KNOWLEDGE_BASE}\n\nHere is the conversation history:\n${history
-      .map(msg => `${msg.role}: ${msg.parts[0].text}`)
-      .join('\n')}\n\ncurrent user question: "${question}"\n\nAnswer the current user question based on all the information provided.`;
-
-    const response = await ai.models.generateContent({
-        model,
-        contents: fullPrompt,
+    const chat = ai.chats.create({
+      model,
+      config: {
+        systemInstruction: KNOWLEDGE_BASE,
+      },
+      history,
     });
+    
+    const response = await chat.sendMessage({ message: question });
 
     return response.text;
   } catch (error) {

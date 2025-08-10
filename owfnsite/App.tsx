@@ -1,5 +1,6 @@
 import React from 'react';
 import { Router, Switch, Route } from 'wouter';
+import { memoryLocation } from 'wouter/memory-location';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS } from './constants.ts';
@@ -26,6 +27,8 @@ import Airdrop from './pages/Airdrop.tsx';
 import Governance from './pages/Governance.tsx';
 import Maintenance from './pages/Maintenance.tsx';
 
+const { hook } = memoryLocation();
+
 const AppContent = () => {
   const { isMaintenanceActive, solana } = useAppContext();
   const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
@@ -35,7 +38,7 @@ const AppContent = () => {
   }
 
   return (
-    <Router>
+    <Router hook={hook}>
       <Layout>
         <Switch>
           <Route path="/presale"><Presale /></Route>

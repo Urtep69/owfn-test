@@ -33,7 +33,7 @@ export default function Tokenomics() {
                             label={t('total_supply')} 
                             value={
                                 <div className="flex items-center justify-end space-x-2">
-                                    <span>{(TOKEN_DETAILS.totalSupply / 1000000000).toLocaleString()} B</span>
+                                    <span>{TOKEN_DETAILS.totalSupply.toLocaleString()} B</span>
                                     <OwfnIcon className="w-5 h-5" />
                                     <span>OWFN</span>
                                 </div>
