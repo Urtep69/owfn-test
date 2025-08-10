@@ -85,6 +85,7 @@ export const useSolana = (): UseSolanaReturn => {
             symbol: 'SOL',
             logo: React.createElement(SolIcon, null),
             usdValue: 0,
+            pricePerToken: 0,
             decimals: 9,
         };
 
@@ -95,7 +96,9 @@ export const useSolana = (): UseSolanaReturn => {
                 const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${solToken.mintAddress}`);
                 const priceData = await priceRes.json();
                 if (priceData.data?.[solToken.mintAddress]) {
-                    solToken.usdValue = solToken.balance * priceData.data[solToken.mintAddress].price;
+                    const price = priceData.data[solToken.mintAddress].price;
+                    solToken.pricePerToken = price;
+                    solToken.usdValue = solToken.balance * price;
                 }
             } catch(e) { console.error("Price fetch failed on error path", e)}
             return allTokensOnError;
@@ -116,6 +119,7 @@ export const useSolana = (): UseSolanaReturn => {
                     symbol: metadata?.symbol || `${mint.slice(0, 4)}..${mint.slice(-4)}`,
                     logo: KNOWN_TOKEN_ICONS[mint] || React.createElement(GenericTokenIcon, { uri: links?.image }),
                     usdValue: 0,
+                    pricePerToken: 0,
                 };
             });
 
@@ -130,7 +134,9 @@ export const useSolana = (): UseSolanaReturn => {
                 if (priceData.data) {
                     allTokens.forEach(token => {
                         if (priceData.data[token.mintAddress]) {
-                            token.usdValue = token.balance * priceData.data[token.mintAddress].price;
+                            const price = priceData.data[token.mintAddress].price;
+                            token.pricePerToken = price;
+                            token.usdValue = token.balance * price;
                         }
                     });
                 }

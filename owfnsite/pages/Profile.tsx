@@ -117,12 +117,14 @@ export default function Profile() {
                                         <div className="w-10 h-10 flex items-center justify-center">{React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} />}</div>
                                         <div>
                                             <p className="font-bold">{token.name}</p>
-                                            <p className="text-sm text-primary-400">{token.symbol}</p>
+                                            <p className="text-sm text-primary-400">
+                                                @ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}
+                                            </p>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
-                                        <p className="text-sm text-primary-400">${token.usdValue.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
+                                        <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})} {token.symbol}</p>
+                                        <p className="text-sm text-primary-400">${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
                                     </div>
                                 </div>
                             </Link>

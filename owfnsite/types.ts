@@ -8,6 +8,7 @@ export interface Token {
   balance: number;
   usdValue: number;
   decimals: number;
+  pricePerToken: number;
 }
 
 export interface Wallet {

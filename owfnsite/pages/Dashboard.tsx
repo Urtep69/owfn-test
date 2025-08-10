@@ -59,11 +59,16 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                                 <div className="flex justify-between items-center py-2 px-2 rounded-md hover:bg-primary-700/50 cursor-pointer transition-colors duration-200">
                                     <div className="flex items-center space-x-3">
                                         <div className="w-8 h-8 flex items-center justify-center">{token.logo}</div>
-                                        <span className="font-semibold">{token.symbol}</span>
+                                        <div>
+                                            <p className="font-semibold">{token.symbol}</p>
+                                            <p className="text-xs text-primary-500">
+                                                @ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}
+                                            </p>
+                                        </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
-                                        <p className="text-xs text-primary-400">${token.usdValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                                        <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p>
+                                        <p className="text-xs text-primary-400">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                     </div>
                                 </div>
                             </Link>
