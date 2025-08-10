@@ -91,71 +91,69 @@ export const useSolana = (): UseSolanaReturn => {
              return [];
         }
        
-        // Process SPL tokens from the 'items' array
-        const splTokens: Token[] = (result.items || [])
-            .map((asset: any): Token | null => {
-                if (asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
-                    return {
-                        mintAddress: asset.id,
-                        balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
-                        decimals: asset.token_info.decimals,
-                        name: asset.content?.metadata?.name || 'Unknown Token',
-                        symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
-                        logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
-                        usdValue: 0,
-                        pricePerToken: 0,
-                    };
-                }
-                return null;
-            })
-            .filter((token: Token | null): token is Token => token !== null);
+        const allTokens: Token[] = [];
+        let solPrice = 0;
 
-        const allTokens: Token[] = [...splTokens];
-
-        // Separately process native SOL balance from the 'nativeBalance' field
+        // Process native SOL balance first using data directly from Helius
         if (result.nativeBalance && result.nativeBalance.lamports > 0) {
+            const pricePerSol = result.nativeBalance.price_per_sol || 0;
+            const balance = result.nativeBalance.lamports / LAMPORTS_PER_SOL;
+            solPrice = pricePerSol;
+
             const solToken: Token = {
                 mintAddress: 'So11111111111111111111111111111111111111112',
-                balance: result.nativeBalance.lamports / LAMPORTS_PER_SOL,
+                balance: balance,
                 decimals: 9,
                 name: 'Solana',
                 symbol: 'SOL',
                 logo: React.createElement(SolIcon, null),
+                pricePerToken: pricePerSol,
+                usdValue: result.nativeBalance.total_price || (balance * pricePerSol),
+            };
+            allTokens.push(solToken);
+        }
+
+        // Process SPL tokens from the 'items' array
+        const splTokens: Token[] = (result.items || [])
+            .filter((asset: any) => asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed)
+            .map((asset: any): Token => ({
+                mintAddress: asset.id,
+                balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
+                decimals: asset.token_info.decimals,
+                name: asset.content?.metadata?.name || 'Unknown Token',
+                symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
+                logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
                 usdValue: 0,
                 pricePerToken: 0,
-            };
-            // Avoid adding duplicate SOL if it's already somehow in the list
-            if (!allTokens.some(t => t.mintAddress === solToken.mintAddress)) {
-                allTokens.push(solToken);
-            }
-        }
-        
+            }));
+
+        allTokens.push(...splTokens);
+
         if (allTokens.length === 0) return [];
+        
+        const splMintsToFetch = splTokens.map(t => t.mintAddress).join(',');
 
-        let solPrice = 0;
-        const allMints = allTokens.map(t => t.mintAddress).join(',');
-        try {
-            const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${allMints}`);
-            if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
-            
-            const priceData = await priceRes.json();
-            
-            if (priceData.data) {
-                 allTokens.forEach(token => {
-                    const priceInfo = priceData.data[token.mintAddress];
-                    if (priceInfo && priceInfo.price) {
-                        const price = priceInfo.price;
-                        token.pricePerToken = price;
-                        token.usdValue = token.balance * price;
-
-                        if (token.mintAddress === 'So11111111111111111111111111111111111111112') {
-                            solPrice = price;
+        if (splMintsToFetch) {
+            try {
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${splMintsToFetch}`);
+                if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
+                
+                const priceData = await priceRes.json();
+                
+                if (priceData.data) {
+                     allTokens.forEach(token => {
+                        if (token.mintAddress === 'So11111111111111111111111111111111111111112') return; // Skip SOL
+                        const priceInfo = priceData.data[token.mintAddress];
+                        if (priceInfo && priceInfo.price) {
+                            const price = priceInfo.price;
+                            token.pricePerToken = price;
+                            token.usdValue = token.balance * price;
                         }
-                    }
-                });
+                    });
+                }
+            } catch (priceError) {
+                console.error("Could not fetch token prices from Jupiter API:", priceError);
             }
-        } catch (priceError) {
-            console.error("Could not fetch token prices from Jupiter API:", priceError);
         }
         
         const owfnToken = allTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS);
