@@ -1,0 +1,29 @@
+{
+  "name": "owfn-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A global network united by the vision to build a better world through technology and humanity.",
+  "scripts": {
+    "build": "mkdir -p public && cp index.html public/index.html && esbuild index.tsx --bundle --outfile=public/bundle.js --loader:.ts=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"'"
+  },
+  "author": "OWFN",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@google/genai": "^0.12.0",
+    "@solana/spl-token": "^0.4.7",
+    "@solana/wallet-adapter-base": "^0.9.23",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-react-ui": "^0.9.35",
+    "@solana/wallet-adapter-phantom": "^0.9.24",
+    "@solana/wallet-adapter-solflare": "^0.6.28",
+    "@solana/web3.js": "^1.95.1",
+    "lucide-react": "^0.395.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.12.7",
+    "wouter": "^3.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.23.0"
+  }
+}
