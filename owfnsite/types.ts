@@ -88,6 +88,7 @@ export interface TokenDetails extends Token {
     price24hChange: number;
     holders: number;
     circulatingSupply: number;
+    totalSupply?: number;
     liquidity?: number;
     totalMarketCap?: number;
     volatility?: number;

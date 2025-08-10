@@ -119,33 +119,43 @@ export const useSolana = (): UseSolanaReturn => {
                 }));
         }
 
-        const allTokens = [solToken, ...splTokens];
+        let allTokens = [solToken, ...splTokens];
 
-        // 3. Fetch prices from Jupiter API for all tokens at once
+        // 3. Fetch prices robustly from Jupiter API
+        let solPrice = 0;
         if (allTokens.length > 0) {
-            const mints = allTokens.map(t => t.mintAddress).join(',');
-            
+            const allMints = allTokens.map(t => t.mintAddress).join(',');
             try {
-                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mints}`);
-                if (!priceRes.ok) {
-                    throw new Error(`Jupiter API failed with status ${priceRes.status}`);
-                }
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${allMints}`);
+                if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
+                
                 const priceData = await priceRes.json();
-
+                
                 if (priceData.data) {
-                    allTokens.forEach(token => {
-                        if (priceData.data[token.mintAddress]) {
-                            const price = priceData.data[token.mintAddress].price;
-                            token.pricePerToken = price || 0;
-                            token.usdValue = token.balance * (price || 0);
+                     allTokens.forEach(token => {
+                        const priceInfo = priceData.data[token.mintAddress];
+                        if (priceInfo && priceInfo.price) {
+                            const price = priceInfo.price;
+                            token.pricePerToken = price;
+                            token.usdValue = token.balance * price;
+
+                            if (token.mintAddress === 'So11111111111111111111111111111111111111112') {
+                                solPrice = price;
+                            }
                         }
                     });
-                } else {
-                     console.warn("No price data returned from Jupiter API for mints:", mints, priceData);
                 }
             } catch (priceError) {
                 console.error("Could not fetch token prices from Jupiter API:", priceError);
             }
+        }
+        
+        // Special handling for OWFN presale price if market price isn't available from API
+        const owfnToken = allTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS);
+        if (owfnToken && owfnToken.pricePerToken === 0 && solPrice > 0) {
+            const presaleRate = 10000000; // 10,000,000 OWFN per SOL
+            owfnToken.pricePerToken = solPrice / presaleRate;
+            owfnToken.usdValue = owfnToken.balance * owfnToken.pricePerToken;
         }
         
         return allTokens.sort((a,b) => b.usdValue - a.usdValue);
