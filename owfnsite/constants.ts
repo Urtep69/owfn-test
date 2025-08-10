@@ -7,7 +7,7 @@ import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from './components/IconComponen
 
 export const OWFN_MINT_ADDRESS = 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B';
 export const OWFN_LOGO_URL = 'https://www.owfn.org/owfn.png';
-export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
+export const ADMIN_WALLET_ADDRESS = 'Am3R8zL7qV9k3yP5tW1sX4nB6mJ7fG9cE2dF8hK0gR'; // Admin wallet
 
 export const TOKEN_DETAILS = {
   totalSupply: 18_000_000_000,
