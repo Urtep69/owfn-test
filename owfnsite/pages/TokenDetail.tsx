@@ -22,22 +22,18 @@ interface HeliusAsset {
     };
     token_info?: {
         decimals: number;
-        supply: string; // Helius provides supply as a string
+        supply: string;
     };
 }
 
-interface BirdeyeData {
-    data?: {
-        price?: number;
-        liquidity?: number;
-        mc?: number; // Market Cap
-        supply?: number;
-        supplyCirculating?: number;
-        priceChange24h?: number;
-        volume24h?: number;
-    };
+interface DexScreenerPair {
+    pairAddress: string;
+    priceUsd?: string;
+    priceChange?: { h24?: number };
+    volume?: { h24?: number };
+    liquidity?: { usd?: number };
+    fdv?: number; // Fully Diluted Valuation (Market Cap)
 }
-
 
 const TokenDetailHeader = ({ token }: { token: TokenDetails }) => {
     return (
@@ -62,7 +58,7 @@ const TokenDetailHeader = ({ token }: { token: TokenDetails }) => {
 };
 
 const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) => {
-    if (value === null || value === undefined || value === 'N/A') return null;
+    if (value === null || value === undefined || value === 'N/A' || value === '$0') return null;
     return (
         <div className="flex justify-between items-center text-sm py-2 border-b border-primary-700/50 last:border-b-0">
             <span className="text-primary-400">{label}</span>
@@ -81,6 +77,7 @@ export default function TokenDetail() {
     const mintAddress = params?.['mint'];
 
     const [token, setToken] = useState<TokenDetails | null>(null);
+    const [bestPairAddress, setBestPairAddress] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -94,28 +91,33 @@ export default function TokenDetail() {
         const fetchTokenData = async () => {
             setLoading(true);
             setError(null);
-            setToken(null);
 
             try {
-                // --- Parallel Fetching from Helius and Birdeye ---
                 const heliusPromise = fetch(`https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ jsonrpc: '2.0', id: 'my-id', method: 'getAsset', params: { id: mintAddress } }),
-                }).then(res => res.ok ? res.json() : Promise.reject(`Helius API failed with status ${res.status}`));
+                });
 
-                const birdeyePromise = fetch(`https://public-api.birdeye.so/defi/token_overview?address=${mintAddress}`, {
-                    headers: {'X-API-KEY': '2a2339556814417d84811195a0471c69'} // Replace with your actual public Birdeye API key if needed
-                }).then(res => res.ok ? res.json() : Promise.resolve({ data: null })); // Don't fail if Birdeye has no data
-
-                const [heliusResponse, birdeyeResponse] = await Promise.all([heliusPromise, birdeyePromise]);
-
-                const asset: HeliusAsset = heliusResponse.result;
-                if (!asset) throw new Error("Could not fetch asset metadata from Helius.");
+                const dexscreenerPromise = fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`);
                 
-                const marketData: BirdeyeData['data'] = birdeyeResponse.data;
+                const [heliusRes, dexscreenerRes] = await Promise.all([heliusPromise, dexscreenerPromise]);
 
-                // --- Combine all live data ---
+                if (!heliusRes.ok) throw new Error(`Helius API failed with status ${heliusRes.status}`);
+                const heliusData = await heliusRes.json();
+                const asset: HeliusAsset = heliusData.result;
+                if (!asset) throw new Error("Could not fetch asset metadata from Helius.");
+
+                let bestPair: DexScreenerPair | null = null;
+                if (dexscreenerRes.ok) {
+                    const dexscreenerData = await dexscreenerRes.json();
+                    const pairs: DexScreenerPair[] = dexscreenerData.pairs;
+                    if (pairs && pairs.length > 0) {
+                        bestPair = pairs.sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
+                        setBestPairAddress(bestPair.pairAddress);
+                    }
+                }
+
                 const tokenData: TokenDetails = {
                     mintAddress: asset.id,
                     name: asset.content?.metadata?.name || 'Unknown Token',
@@ -123,18 +125,19 @@ export default function TokenDetail() {
                     logo: <GenericTokenIcon uri={asset.content?.links?.image} className="w-12 h-12" />,
                     description: { en: asset.content?.metadata?.description || '' },
                     decimals: asset.token_info?.decimals || 0,
-                    pricePerToken: marketData?.price ?? 0,
-                    price24hChange: marketData?.priceChange24h ?? 0,
-                    volume24h: marketData?.volume24h ?? 0,
-                    liquidity: marketData?.liquidity ?? 0,
-                    marketCap: marketData?.mc ?? 0,
-                    circulatingSupply: marketData?.supplyCirculating ?? 0,
-                    totalSupply: marketData?.supply ?? (asset.token_info ? parseFloat(asset.token_info.supply) / Math.pow(10, asset.token_info.decimals) : 0),
-                    // These are placeholders as the API doesn't provide them
+                    totalSupply: asset.token_info ? parseFloat(asset.token_info.supply) / Math.pow(10, asset.token_info.decimals || 0) : 0,
+                    pricePerToken: bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0,
+                    price24hChange: bestPair?.priceChange?.h24 ?? 0,
+                    volume24h: bestPair?.volume?.h24 ?? 0,
+                    liquidity: bestPair?.liquidity?.usd ?? 0,
+                    marketCap: bestPair?.fdv ?? 0,
+                    pairAddress: bestPair?.pairAddress,
+                    // --- Placeholder/default values for the rest of the interface ---
                     security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
                     holders: 0,
                     balance: 0,
                     usdValue: 0,
+                    circulatingSupply: 0, // Use totalSupply as the primary measure
                 };
                 
                 setToken(tokenData);
@@ -175,7 +178,6 @@ export default function TokenDetail() {
     }
     
     const description = token.description[currentLanguage.code] || token.description['en'];
-    const chartUrl = `https://birdeye.so/token/${mintAddress}/?embed=1&theme=dark&chart=1&trades=0`;
     const priceChangeColor = (token.price24hChange ?? 0) >= 0 ? 'text-green-400' : 'text-red-400';
     const formatNumber = (num?: number) => num ? num.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A';
     const formatCurrency = (num?: number) => num ? `$${formatNumber(num)}` : 'N/A';
@@ -186,7 +188,6 @@ export default function TokenDetail() {
         if (num >= 1_000) return `${(num / 1_000).toFixed(2)}K`;
         return num.toFixed(2);
     }
-
 
     return (
         <div className="animate-fade-in-up space-y-4">
@@ -204,15 +205,21 @@ export default function TokenDetail() {
                             </span>
                         </div>
                     </div>
-                    <div className="flex-grow rounded-b-lg overflow-hidden">
-                        <iframe
-                            src={chartUrl}
-                            className="w-full h-full"
-                            frameBorder="0"
-                            allowFullScreen
-                            title={`${token.symbol} Chart`}
-                        />
-                    </div>
+                    {bestPairAddress ? (
+                        <div className="flex-grow rounded-b-lg overflow-hidden">
+                            <iframe
+                                src={`https://dexscreener.com/solana/${bestPairAddress}?embed=1&theme=dark&info=0`}
+                                className="w-full h-full"
+                                frameBorder="0"
+                                allowFullScreen
+                                title={`${token.symbol} Chart`}
+                            />
+                        </div>
+                    ) : (
+                        <div className="flex-grow flex items-center justify-center text-primary-400">
+                            <p>No chart data available for this token.</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="lg:col-span-2 bg-primary-800 rounded-lg shadow-lg p-4 space-y-3 self-start">
@@ -221,7 +228,6 @@ export default function TokenDetail() {
                         <InfoItem label="Market Cap" value={formatCurrency(token.marketCap)} />
                         <InfoItem label="24h Volume" value={formatCurrency(token.volume24h)} />
                         <InfoItem label="Liquidity" value={formatCurrency(token.liquidity)} />
-                        <InfoItem label="Circulating Supply" value={formatSupply(token.circulatingSupply)} />
                         <InfoItem label="Total Supply" value={formatSupply(token.totalSupply)} />
                     </div>
                 </div>

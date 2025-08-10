@@ -58,12 +58,8 @@ export const useSolana = (): UseSolanaReturn => {
   const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
     setLoading(true);
     try {
-        const ownerPublicKey = new PublicKey(walletAddress);
-
-        // Helius API URL
         const url = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
         
-        // Fetch all assets (fungible tokens and native SOL) in one call
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -76,8 +72,8 @@ export const useSolana = (): UseSolanaReturn => {
                     page: 1,
                     limit: 1000,
                     displayOptions: {
-                        showFungible: true, // Fetch SPL tokens
-                        showNativeBalance: true, // Fetch SOL balance
+                        showFungible: true,
+                        showNativeBalance: true,
                     },
                 },
             }),
@@ -91,30 +87,19 @@ export const useSolana = (): UseSolanaReturn => {
         const { result } = await response.json();
         
         if (!result || !result.items) {
-             return []; // Return empty if no assets found
+             return [];
         }
        
-        let rawTokens: Token[] = result.items
-            .filter((asset: any) => 
-                (asset.interface === 'V1_NFT' && asset.content?.metadata?.name) || // Basic check for fungible-like NFTs
-                (asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed) ||
-                (asset.nativeBalance && asset.nativeBalance.lamports > 0)
-            )
-            .map((asset: any) => {
-                if (asset.nativeBalance) { // Handling SOL
-                    return {
-                        mintAddress: 'So11111111111111111111111111111111111111112',
-                        balance: asset.nativeBalance.lamports / LAMPORTS_PER_SOL,
-                        decimals: 9,
-                        name: 'Solana',
-                        symbol: 'SOL',
-                        logo: React.createElement(SolIcon, null),
-                        usdValue: 0,
-                        pricePerToken: 0,
-                    };
-                }
-                // Handling SPL Tokens
-                return {
+        let processedTokens: Token[] = [];
+
+        // Process SPL tokens from the items array
+        result.items.forEach((asset: any) => {
+            if (
+                asset.interface === 'FungibleToken' &&
+                asset.token_info?.balance > 0 &&
+                !asset.compression?.compressed
+            ) {
+                processedTokens.push({
                     mintAddress: asset.id,
                     balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
                     decimals: asset.token_info.decimals,
@@ -123,15 +108,29 @@ export const useSolana = (): UseSolanaReturn => {
                     logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
                     usdValue: 0,
                     pricePerToken: 0,
-                };
+                });
+            }
+        });
+
+        // Helius returns native SOL balance as a special item in the array.
+        const solAsset = result.items.find((asset: any) => asset.nativeBalance);
+        if (solAsset && solAsset.nativeBalance.lamports > 0) {
+            processedTokens.push({
+                mintAddress: 'So11111111111111111111111111111111111111112',
+                balance: solAsset.nativeBalance.lamports / LAMPORTS_PER_SOL,
+                decimals: 9,
+                name: 'Solana',
+                symbol: 'SOL',
+                logo: React.createElement(SolIcon, null),
+                usdValue: 0,
+                pricePerToken: 0,
             });
+        }
         
-        // Filter out tokens with zero balance just in case
-        let allTokens = rawTokens.filter(token => token.balance > 0);
+        let allTokens = processedTokens.filter(token => token.balance > 0);
 
         if (allTokens.length === 0) return [];
 
-        // Fetch prices robustly from Jupiter API
         let solPrice = 0;
         const allMints = allTokens.map(t => t.mintAddress).join(',');
         try {
@@ -148,7 +147,7 @@ export const useSolana = (): UseSolanaReturn => {
                         token.pricePerToken = price;
                         token.usdValue = token.balance * price;
 
-                        if (token.mintAddress === 'So11111111111111111111111111111111111111112') {
+                        if (token.mintAddress === 'So1111111111111111111111111111111111111111112') {
                             solPrice = price;
                         }
                     }
@@ -158,10 +157,9 @@ export const useSolana = (): UseSolanaReturn => {
             console.error("Could not fetch token prices from Jupiter API:", priceError);
         }
         
-        // Special handling for OWFN presale price if market price isn't available from API
         const owfnToken = allTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS);
         if (owfnToken && owfnToken.pricePerToken === 0 && solPrice > 0) {
-            const presaleRate = PRESALE_DETAILS.rate; // 10,000,000 OWFN per SOL
+            const presaleRate = PRESALE_DETAILS.rate;
             owfnToken.pricePerToken = solPrice / presaleRate;
             owfnToken.usdValue = owfnToken.balance * owfnToken.pricePerToken;
         }
@@ -230,7 +228,6 @@ export const useSolana = (): UseSolanaReturn => {
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
-        // Refetch balances after successful transaction
         getWalletBalances(address!).then(setUserTokens);
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
