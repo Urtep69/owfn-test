@@ -141,7 +141,7 @@ export const fr = {
     
     // Donations Page
     make_donation: 'Faire un don',
-    donation_desc: 'Soutenez nos initiatives à impact social en faisant un don en crypto. Tous les fonds vont directement à la Trésorerie d\'Impact.',
+    donation_desc: 'Soutenez nos initiatives à impact social en faisant un don en crypto. Tous les fonds vont directly à la Trésorerie d\'Impact.',
     donation_solana_warning: `IMPORTANT : Les dons en USDC et USDT ne sont actuellement acceptés QUE depuis le réseau Solana. N'envoyez pas depuis un autre réseau (par exemple, Ethereum) car les fonds seront perdus et n'atteindront pas leur destination.`,
     select_token: 'Sélectionner le jeton',
     amount: 'Montant',
@@ -182,6 +182,8 @@ export const fr = {
     badge_community_voter_desc: 'Décerné pour avoir participé à 5 votes de gouvernance.',
     badge_diverse_donor: 'Donateur Diversifié',
     badge_diverse_donor_desc: 'Décerné pour avoir fait un don à des projets dans 3 catégories différentes.',
+    asset: 'Actif',
+    value_usd: 'Valeur (USD)',
     
     // Impact Portal
     social_cases: 'Cas sociaux',

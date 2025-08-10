@@ -179,6 +179,8 @@ export const ja = {
     badge_community_voter_desc: 'ガバナンス投票に5回参加した際に授与されます。',
     badge_diverse_donor: '多様な寄付者',
     badge_diverse_donor_desc: '3つの異なるカテゴリーのプロジェクトに寄付した際に授与されます。',
+    asset: '資産',
+    value_usd: '価値 (USD)',
     
     // Impact Portal
     social_cases: '社会貢献ケース',

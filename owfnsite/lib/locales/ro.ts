@@ -179,6 +179,8 @@ export const ro = {
     badge_community_voter_desc: 'Acordat pentru participarea la 5 voturi de guvernanță.',
     badge_diverse_donor: 'Donator Divers',
     badge_diverse_donor_desc: 'Acordat pentru donații la proiecte din 3 categorii diferite.',
+    asset: 'Activ',
+    value_usd: 'Valoare (USD)',
 
     // Impact Portal
     social_cases: 'Cazuri Sociale',

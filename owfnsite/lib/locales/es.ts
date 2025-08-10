@@ -182,7 +182,9 @@ export const es = {
     badge_community_voter_desc: 'Otorgada por participar en 5 votaciones de gobernanza.',
     badge_diverse_donor: 'Donante Diverso',
     badge_diverse_donor_desc: 'Otorgada por donar a proyectos en 3 categorías diferentes.',
-    
+    asset: 'Activo',
+    value_usd: 'Valor (USD)',
+
     // Impact Portal
     social_cases: 'Casos Sociales',
     social_cases_desc: 'Explora y apoya los casos de impacto social financiados por la comunidad OWFN.',

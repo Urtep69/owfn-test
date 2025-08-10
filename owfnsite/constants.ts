@@ -289,6 +289,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         dextScore: { score: 99, maxScore: 99, points: [20, 25, 20, 20, 14] },
         audit: { contractVerified: true, isHoneypot: false, isFreezable: false, isMintable: false, alerts: 0 },
         communityTrust: { positiveVotes: 1200, negativeVotes: 50, tradeCount: 1, totalTrades: 1250 },
+        pairAddress: '8Vq82rQfT2nqzH8c4g8x9a2avp13aWv12t1nCvZ5X3qg',
     },
     'SOL': {
         name: 'Solana',
@@ -306,7 +307,8 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         price24hChange: 0,
         holders: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A'
+        poolCreated: 'N/A',
+        pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDC': {
         name: 'USD Coin',
@@ -324,7 +326,8 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         price24hChange: 0,
         holders: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A'
+        poolCreated: 'N/A',
+        pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDT': {
         name: 'Tether',
@@ -342,6 +345,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         price24hChange: 0,
         holders: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A'
+        poolCreated: 'N/A',
+        pairAddress: '7xKXtg2CW87d97TXJSD40M5M5gajNdkgdsDEsMmL2trn', // SOL/USDT
     }
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
 import { PublicKey } from '@solana/web3.js';
@@ -126,6 +125,10 @@ export default function TokenDetail() {
     
     const description = token.description[currentLanguage.code] || token.description['en'] || '';
 
+    const chartUrl = token.pairAddress 
+        ? `https://dexscreener.com/solana/${token.pairAddress}?embed=1&theme=dark&info=0`
+        : '';
+
     return (
         <div className="animate-fade-in text-primary-100 -mt-8 -mx-8 p-1 bg-primary-950">
             <div className="bg-primary-900 rounded-lg p-2 space-y-2">
@@ -133,14 +136,26 @@ export default function TokenDetail() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
                     <div className="lg:col-span-2 space-y-2">
-                        <div className="bg-primary-800 rounded-md h-96 flex flex-col">
-                             <div className="p-2 flex items-center justify-between border-b border-primary-700">
-                                <div className="text-2xl font-bold text-primary-100 p-4">
-                                    ${price.toPrecision(4)}
+                       <div className="bg-primary-800 rounded-md h-[450px] lg:h-auto lg:min-h-[450px] flex flex-col">
+                            <div className="p-4 flex items-center justify-between border-b border-primary-700">
+                                <div className="text-2xl font-bold text-primary-100">
+                                     ${price > 0.001 ? price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 }) : price.toPrecision(4)}
                                 </div>
                             </div>
-                            <div className="flex-grow flex items-center justify-center">
-                                <p className="text-primary-500">Live Chart Coming Soon</p>
+                            <div className="flex-grow">
+                               {chartUrl ? (
+                                    <iframe
+                                        src={chartUrl}
+                                        className="w-full h-full rounded-b-md"
+                                        frameBorder="0"
+                                        allowFullScreen
+                                        title={`${token.symbol} Chart`}
+                                    ></iframe>
+                                ) : (
+                                    <div className="flex-grow flex items-center justify-center">
+                                        <p className="text-primary-500">Live Chart Not Available</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

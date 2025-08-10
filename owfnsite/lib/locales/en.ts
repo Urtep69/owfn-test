@@ -182,7 +182,9 @@ export const en = {
     badge_community_voter_desc: 'Awarded for participating in 5 governance votes.',
     badge_diverse_donor: 'Diverse Donor',
     badge_diverse_donor_desc: 'Awarded for donating to projects in 3 different categories.',
-    
+    asset: 'Asset',
+    value_usd: 'Value (USD)',
+
     // Impact Portal
     social_cases: 'Social Cases',
     social_cases_desc: 'Explore and support the social impact cases funded by the OWFN community.',

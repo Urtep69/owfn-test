@@ -54,10 +54,11 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
 
                     <div className="space-y-1 max-h-60 overflow-y-auto pr-2">
                         {balances.length > 0 ? balances.map(token => (
-                            <Link to={`/dashboard/token/${token.symbol}?from=/dashboard`} key={token.mintAddress} className="block -mx-2">
-                                <div className="flex justify-between items-center py-2 px-2 rounded-md hover:bg-primary-700/50 cursor-pointer transition-colors duration-200">
+                            <Link to={`/dashboard/token/${token.symbol}?from=/dashboard`} key={token.mintAddress}>
+                                <a className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md hover:bg-primary-700/50 cursor-pointer transition-colors duration-200">
+                                    {/* Asset Info */}
                                     <div className="flex items-center space-x-3">
-                                        <div className="w-8 h-8 flex items-center justify-center">{token.logo}</div>
+                                        <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">{token.logo}</div>
                                         <div>
                                             <p className="font-semibold">{token.symbol}</p>
                                             <p className="text-xs text-primary-500">
@@ -65,11 +66,12 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                                             </p>
                                         </div>
                                     </div>
+                                    {/* Balance & Value */}
                                     <div className="text-right">
                                         <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p>
                                         <p className="text-xs text-primary-400">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                     </div>
-                                </div>
+                                </a>
                             </Link>
                         )) : (
                              <div className="text-center py-8 text-primary-400">

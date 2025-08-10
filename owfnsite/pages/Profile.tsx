@@ -102,38 +102,54 @@ export default function Profile() {
                         </p>
                     </div>
                 </div>
-                <div className="divide-y divide-primary-700">
-                    {loading ? (
-                        <div className="text-center py-8 text-primary-400 flex items-center justify-center gap-3">
-                            <Loader2 className="w-6 h-6 animate-spin" />
-                            <span>{t('profile_loading_tokens')}</span>
+                
+                {loading ? (
+                    <div className="text-center py-8 text-primary-400 flex items-center justify-center gap-3">
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <span>{t('profile_loading_tokens')}</span>
+                    </div>
+                ) : userTokens.length > 0 ? (
+                    <div className="space-y-2">
+                        {/* Header */}
+                        <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 font-bold uppercase">
+                            <span>{t('asset')}</span>
+                            <span className="text-right">{t('balance')}</span>
+                            <span className="text-right">{t('value_usd')}</span>
                         </div>
-                    ) : userTokens.length > 0 ? (
-                        userTokens.map(token => (
-                            <Link to={`/dashboard/token/${token.symbol}?from=/profile`} key={token.mintAddress} className="block -mx-2">
-                                <div className="flex items-center justify-between py-4 hover:bg-primary-700/50 px-2 rounded-md transition-colors duration-200 cursor-pointer">
+                        {/* Token List */}
+                        {userTokens.map(token => (
+                            <Link to={`/dashboard/token/${token.symbol}?from=/profile`} key={token.mintAddress}>
+                                <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-700/50 transition-colors duration-200 cursor-pointer">
+                                    {/* Column 1: Asset Info */}
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-10 h-10 flex items-center justify-center">{React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} />}</div>
+                                        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                                            {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
+                                        </div>
                                         <div>
-                                            <p className="font-bold">{token.name}</p>
-                                            <p className="text-sm text-primary-400">
-                                                @ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}
-                                            </p>
+                                            <p className="font-bold text-primary-100">{token.symbol}</p>
+                                            <p className="text-sm text-primary-400">{token.name}</p>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})} {token.symbol}</p>
-                                        <p className="text-sm text-primary-400">${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+
+                                    {/* Column 2: Balance */}
+                                    <div className="text-right font-mono">
+                                        <p className="font-semibold text-primary-100">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
+                                        <p className="text-sm text-primary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
                                     </div>
-                                </div>
+
+                                    {/* Column 3: Value */}
+                                    <div className="text-right font-semibold font-mono text-primary-100">
+                                        ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                    </div>
+                                </a>
                             </Link>
-                        ))
-                    ) : (
-                         <div className="text-center py-8 text-primary-400">
-                            <p>{t('profile_no_tokens')}</p>
-                        </div>
-                    )}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                     <div className="text-center py-8 text-primary-400">
+                        <p>{t('profile_no_tokens')}</p>
+                    </div>
+                )}
             </div>
             
             <ComingSoonWrapper>
