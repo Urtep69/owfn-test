@@ -3,15 +3,29 @@ import { GoogleGenAI } from "@google/genai";
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, PROJECT_LINKS, ROADMAP_DATA, OWFN_MINT_ADDRESS } from '../constants.ts';
 import { translations } from '../lib/locales/index.ts';
 
-if (!process.env.API_KEY) {
-  // In a real app, you'd want to handle this more gracefully.
-  // For this context, we'll alert the user and proceed,
-  // knowing the API calls will fail.
-  console.warn("API_KEY environment variable not set. Gemini API calls will fail.");
-}
+// Safely get the API key to prevent "process is not defined" error in browser environments.
+const getApiKey = (): string | undefined => {
+  try {
+    // This check is crucial for browser compatibility where `process` is not defined.
+    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+      return process.env.API_KEY;
+    }
+  } catch (e) {
+    console.warn("Could not access process.env.API_KEY", e);
+  }
+  return undefined;
+};
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+const apiKey = getApiKey();
+let ai: GoogleGenAI | null = null;
 const model = "gemini-2.5-flash";
+
+if (apiKey) {
+  ai = new GoogleGenAI({ apiKey });
+} else {
+  // This warning will appear in the developer console if the API key is not set up in the build environment.
+  console.warn("API_KEY environment variable not set. Gemini API features will be disabled.");
+}
 
 const enTranslations = translations['en'];
 
@@ -106,7 +120,7 @@ ${ROADMAP_DATA.map(p => `*   **${p.quarter} (${enTranslations[p.key_prefix + '_t
 `;
 
 export const getChatbotResponse = async (history: { role: 'user' | 'model', parts: { text: string }[] }[], question: string): Promise<string> => {
-  if (!process.env.API_KEY) {
+  if (!ai) {
     return "I can't connect to my brain right now. Please make sure the API key is configured by the developer.";
   }
   try {
@@ -128,7 +142,7 @@ export const getChatbotResponse = async (history: { role: 'user' | 'model', part
 };
 
 export const translateText = async (text: string, targetLanguage: string): Promise<string> => {
-  if (!process.env.API_KEY) {
+  if (!ai) {
     return `(Translation disabled) ${text}`;
   }
   try {
