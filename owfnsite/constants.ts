@@ -1,5 +1,4 @@
 
-
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, TokenDetails, LiveTransaction, VestingSchedule, PresaleTransaction } from './types.ts';
 import React from 'react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from './components/IconComponents.tsx';
@@ -7,7 +6,7 @@ import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from './components/IconComponen
 
 export const OWFN_MINT_ADDRESS = 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B';
 export const OWFN_LOGO_URL = 'https://www.owfn.org/owfn.png';
-export const ADMIN_WALLET_ADDRESS = 'Am3R8zL7qV9k3yP5tW1sX4nB6mJ7fG9cE2dF8hK0gR'; // Admin wallet
+export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 
 export const TOKEN_DETAILS = {
   totalSupply: 18_000_000_000,
@@ -128,7 +127,7 @@ export const INITIAL_SOCIAL_CASES: SocialCase[] = [
             pt: 'Financiamento para materiais de construção, mão de obra e material escolar.',
             ru: 'Финансирование строительных материалов, рабочей силы и школьных принадлежностей.',
             it: 'Fondi per materiali da costruzione, manodopera e materiale scolastico.',
-            nl: 'Financiering voor bouwmaterialen, arbeid en schoolbenodigdheden.',
+            nl: 'Financiering voor bouwmaterialien, arbeid en schoolbenodigdheden.',
             ro: 'Finanțare pentru materiale de construcție, forță de muncă și rechizite școlare.',
             hu: 'Finanszírozás építőanyagokra, munkaerőre és iskolaszerekre.',
             sr: 'Финансирање грађевинског материјала, радне снаге и школског прибора.',
