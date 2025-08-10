@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
 import { Star, Share2, Loader2, ArrowLeft, Briefcase } from 'lucide-react';
@@ -37,6 +36,8 @@ interface DexScreenerPair {
 }
 
 const TokenDetailHeader = ({ token }: { token: TokenDetails }) => {
+    const priceChangeColor = (token.price24hChange ?? 0) >= 0 ? 'text-green-400' : 'text-red-400';
+    
     return (
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -46,22 +47,32 @@ const TokenDetailHeader = ({ token }: { token: TokenDetails }) => {
                     <AddressDisplay address={token.mintAddress} type="token" />
                 </div>
             </div>
-            <div className="flex items-center gap-2 text-primary-400">
-                <button className="p-2 rounded-lg hover:bg-primary-700 hover:text-yellow-400 transition-colors" aria-label="Add to favorites">
-                    <Star size={20} />
-                </button>
-                <button className="p-2 rounded-lg hover:bg-primary-700 hover:text-primary-100 transition-colors" aria-label="Share">
-                    <Share2 size={20} />
-                </button>
+            <div className="flex items-center gap-4">
+                 <div className="flex items-baseline gap-3">
+                    <span className="text-3xl font-bold text-primary-100">
+                        ${token.pricePerToken < 0.001 ? token.pricePerToken.toPrecision(4) : token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                    </span>
+                    <span className={`font-semibold ${priceChangeColor}`}>
+                        {token.price24hChange?.toFixed(2)}% (24h)
+                    </span>
+                </div>
+                <div className="flex items-center gap-2 text-primary-400">
+                    <button className="p-2 rounded-lg hover:bg-primary-700 hover:text-yellow-400 transition-colors" aria-label="Add to favorites">
+                        <Star size={20} />
+                    </button>
+                    <button className="p-2 rounded-lg hover:bg-primary-700 hover:text-primary-100 transition-colors" aria-label="Share">
+                        <Share2 size={20} />
+                    </button>
+                </div>
             </div>
         </div>
     );
 };
 
 const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) => {
-    if (value === null || value === undefined || value === 'N/A' || value === '$0') return null;
+    if (value === null || value === undefined || value === 'N/A' || value === '$0.00' || value === '$0') return null;
     return (
-        <div className="flex justify-between items-center text-sm py-2 border-b border-primary-700/50 last:border-b-0">
+        <div className="flex justify-between items-center text-sm py-3 border-b border-primary-700/50 last:border-b-0">
             <span className="text-primary-400">{label}</span>
             <span className="font-mono font-semibold text-primary-100 text-right">{value}</span>
         </div>
@@ -69,6 +80,7 @@ const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) =
 };
 
 const NoMarketDataDisplay = ({ token }: { token: TokenDetails }) => {
+    const { t } = useAppContext();
     const formatSupply = (num?: number) => {
         if (!num) return 'N/A';
         if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(2)}B`;
@@ -78,21 +90,15 @@ const NoMarketDataDisplay = ({ token }: { token: TokenDetails }) => {
     };
 
     return (
-        <div className="flex-grow flex flex-col items-center justify-center text-center text-primary-400 bg-primary-900/50 rounded-b-lg p-6">
+        <div className="flex-grow flex flex-col items-center justify-center text-center text-primary-400 bg-primary-900/50 rounded-lg p-6 min-h-[500px]">
             <Briefcase className="w-16 h-16 text-primary-600 mb-4" />
             <h3 className="text-xl font-bold text-primary-200">Token Information</h3>
             <p className="max-w-xs mt-2 text-sm mb-6">
                 Live market data for this token is not yet available. This usually means the token has not been listed on a decentralized exchange.
             </p>
             <div className="w-full max-w-sm bg-primary-800 p-4 rounded-lg">
-                 <div className="flex justify-between items-center text-sm py-2 border-b border-primary-700/50">
-                    <span className="text-primary-400">Symbol</span>
-                    <span className="font-mono font-semibold text-primary-100">{token.symbol}</span>
-                </div>
-                 <div className="flex justify-between items-center text-sm py-2">
-                    <span className="text-primary-400">Total Supply</span>
-                    <span className="font-mono font-semibold text-primary-100">{formatSupply(token.totalSupply)}</span>
-                </div>
+                 <InfoItem label={t('token_symbol_label')} value={token.symbol} />
+                 <InfoItem label={t('total_supply')} value={formatSupply(token.totalSupply)} />
             </div>
         </div>
     );
@@ -164,12 +170,11 @@ export default function TokenDetail() {
                     liquidity: bestPair?.liquidity?.usd ?? 0,
                     marketCap: bestPair?.fdv ?? 0,
                     pairAddress: bestPair?.pairAddress,
-                    // --- Placeholder/default values for the rest of the interface ---
                     security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
                     holders: 0,
                     balance: 0,
                     usdValue: 0,
-                    circulatingSupply: 0, // Use totalSupply as the primary measure
+                    circulatingSupply: 0,
                 };
                 
                 setToken(tokenData);
@@ -210,7 +215,6 @@ export default function TokenDetail() {
     }
     
     const description = token.description[currentLanguage.code] || token.description['en'];
-    const priceChangeColor = (token.price24hChange ?? 0) >= 0 ? 'text-green-400' : 'text-red-400';
     const formatNumber = (num?: number) => num ? num.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A';
     const formatCurrency = (num?: number) => num ? `$${formatNumber(num)}` : 'N/A';
     const formatSupply = (num?: number) => {
@@ -222,25 +226,15 @@ export default function TokenDetail() {
     }
 
     return (
-        <div className="animate-fade-in-up space-y-4">
+        <div className="animate-fade-in-up space-y-6">
             <TokenDetailHeader token={token} />
             
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-                <div className="lg:col-span-3 bg-primary-800 rounded-lg shadow-lg flex flex-col min-h-[500px]">
-                    <div className="p-4 flex items-baseline justify-between border-b border-primary-700">
-                        <div className="flex items-baseline gap-3">
-                            <span className="text-3xl font-bold text-primary-100">
-                                ${token.pricePerToken < 0.001 ? token.pricePerToken.toPrecision(4) : token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
-                            </span>
-                            <span className={`font-semibold ${priceChangeColor}`}>
-                                {token.price24hChange?.toFixed(2)}% (24h)
-                            </span>
-                        </div>
-                    </div>
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div className="lg:col-span-3 bg-primary-800 rounded-lg shadow-lg flex flex-col min-h-[700px]">
                     {bestPairAddress ? (
-                        <div className="flex-grow rounded-b-lg overflow-hidden">
+                        <div className="flex-grow rounded-lg overflow-hidden">
                             <iframe
-                                src={`https://dexscreener.com/solana/${bestPairAddress}?embed=1&theme=dark&info=0`}
+                                src={`https://dexscreener.com/solana/${bestPairAddress}?embed=1&theme=dark`}
                                 className="w-full h-full"
                                 frameBorder="0"
                                 allowFullScreen
@@ -252,19 +246,19 @@ export default function TokenDetail() {
                     )}
                 </div>
 
-                <div className="lg:col-span-2 bg-primary-800 rounded-lg shadow-lg p-4 space-y-3 self-start">
-                    <h3 className="text-lg font-bold">Live Market Data</h3>
+                <div className="lg:col-span-2 bg-primary-800 rounded-lg shadow-lg p-6 space-y-3 self-start">
+                    <h3 className="text-xl font-bold text-primary-100">Live Market Data</h3>
                     <div className="space-y-1">
-                        <InfoItem label="Market Cap" value={formatCurrency(token.marketCap)} />
                         <InfoItem label="24h Volume" value={formatCurrency(token.volume24h)} />
                         <InfoItem label="Liquidity" value={formatCurrency(token.liquidity)} />
-                        <InfoItem label="Total Supply" value={formatSupply(token.totalSupply)} />
+                        <InfoItem label="Market Cap" value={formatCurrency(token.marketCap)} />
+                        <InfoItem label={t('total_supply')} value={formatSupply(token.totalSupply)} />
                     </div>
                 </div>
             </div>
 
             {description && (
-                <div className="bg-primary-800 rounded-lg shadow-lg p-4">
+                <div className="bg-primary-800 rounded-lg shadow-lg p-6">
                     <h3 className="text-lg font-bold mb-2">{t('token_description_title')}</h3>
                     <p className="text-sm text-primary-400 whitespace-pre-wrap">{description}</p>
                 </div>
