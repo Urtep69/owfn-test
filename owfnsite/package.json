@@ -4,7 +4,7 @@
   "private": true,
   "description": "A global network united by the vision to build a better world through technology and humanity.",
   "scripts": {
-    "build": "echo \"No build step required. This is a static site deployed directly.\""
+    "build": "mkdir public && cp -r App.tsx components constants.ts contexts hooks index.html index.tsx lib metadata.json pages services types.ts public/"
   },
   "author": "OWFN",
   "license": "UNLICENSED"
