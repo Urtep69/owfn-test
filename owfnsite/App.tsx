@@ -1,8 +1,13 @@
-import React from 'react';
+
+import React, { useMemo } from 'react';
 import { Router, Switch, Route } from 'wouter';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter, SolflareWalletAdapter, TorusWalletAdapter, LedgerWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
-import { ADMIN_WALLET_ADDRESS } from './constants.ts';
+import { ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
 
 import Home from './pages/Home.tsx';
@@ -58,25 +63,13 @@ const AppContent = () => {
               <Airdrop />
             </ComingSoonWrapper>
           </Route>
-          <Route path="/donations">
-            <ComingSoonWrapper>
-              <Donations />
-            </ComingSoonWrapper>
-          </Route>
+          <Route path="/donations"><Donations /></Route>
           <Route path="/dashboard/token/:symbol"><TokenDetail /></Route>
           <Route path="/dashboard"><Dashboard /></Route>
           <Route path="/profile"><Profile /></Route>
           <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
-          <Route path="/impact/category/:category">
-            <ComingSoonWrapper>
-              <ImpactCategory />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/impact">
-            <ComingSoonWrapper>
-              <ImpactPortal />
-            </ComingSoonWrapper>
-          </Route>
+          <Route path="/impact/category/:category"><ImpactCategory /></Route>
+          <Route path="/impact"><ImpactPortal /></Route>
           <Route path="/partnerships"><Partnerships /></Route>
           <Route path="/faq"><FAQ /></Route>
           <Route path="/governance">
@@ -93,10 +86,29 @@ const AppContent = () => {
 };
 
 function App() {
+  const network = WalletAdapterNetwork.Mainnet;
+  const endpoint = useMemo(() => HELIUS_RPC_URL, []);
+  
+  const wallets = useMemo(
+    () => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new TorusWalletAdapter(),
+      new LedgerWalletAdapter(),
+    ],
+    []
+  );
+
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <AppProvider>
+            <AppContent />
+          </AppProvider>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   );
 }
 

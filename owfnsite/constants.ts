@@ -266,29 +266,6 @@ export const KNOWN_TOKEN_MINT_ADDRESSES: { [key: string]: string } = {
   USDT: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
 };
 
-export const MOCK_PRESALE_TRANSACTIONS: PresaleTransaction[] = Array.from({ length: 20 }, (_, i) => ({
-    id: Date.now() - i * 1000 * 60 * (Math.random() * 10 + 1),
-    address: `User...${Math.random().toString(36).substring(2, 6)}`,
-    solAmount: parseFloat((Math.random() * (PRESALE_DETAILS.maxBuy - PRESALE_DETAILS.minBuy) + PRESALE_DETAILS.minBuy).toFixed(2)),
-    owfnAmount: 0, // This will be calculated based on solAmount
-    time: new Date(Date.now() - i * 1000 * 60 * (Math.random() * 20 + 5)),
-})).map(tx => ({...tx, owfnAmount: tx.solAmount * PRESALE_DETAILS.rate}));
-
-export const MOCK_LIVE_TRANSACTIONS: LiveTransaction[] = Array.from({ length: 50 }, (_, i) => {
-    const type = Math.random() > 0.5 ? 'buy' : 'sell';
-    const price = 0.00001234 + (Math.random() - 0.5) * 0.000001;
-    const amount = Math.random() * 1000000;
-    return {
-        id: Date.now() - i * 1000 * (Math.random() * 5 + 1),
-        time: new Date(Date.now() - i * 1000 * (Math.random() * 5 + 1)).toLocaleTimeString('en-US', { hour12: false }),
-        type,
-        price,
-        amount,
-        totalUsd: price * amount,
-        maker: `xxxx...${Math.random().toString(36).substring(2, 6)}`,
-    };
-});
-
 export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
     'OWFN': {
         name: 'Official World Family Network',
@@ -296,28 +273,22 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         mintAddress: OWFN_MINT_ADDRESS,
         logo: React.createElement(OwfnIcon),
         balance: 0,
-        usdValue: 0.00001234,
+        usdValue: 0,
+        decimals: 9,
         description: {
             en: 'OWFN (Official World Family Network) is a Solana-based token designed to unite families globally through blockchain technology, focusing on social impact, education, health, and humanitarian aid with full transparency.',
             // Add other languages as needed
         },
         security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
-        marketCap: 2221200,
-        volume24h: 158370,
-        price24hChange: 5.2,
-        holders: 3500,
-        circulatingSupply: 180000000000,
-        liquidity: 500000,
-        totalMarketCap: 2221200,
-        volatility: 0.15,
-        totalTx24h: 703,
-        pooledSol: 3000,
-        pooledToken: 1100000000,
+        marketCap: 0,
+        volume24h: 0,
+        price24hChange: 0,
+        holders: 0,
+        circulatingSupply: 0,
         poolCreated: '2024-07-20',
         dextScore: { score: 99, maxScore: 99, points: [20, 25, 20, 20, 14] },
         audit: { contractVerified: true, isHoneypot: false, isFreezable: false, isMintable: false, alerts: 0 },
         communityTrust: { positiveVotes: 1200, negativeVotes: 50, tradeCount: 1, totalTrades: 1250 },
-        pairAddress: 'pair_address_here'
     },
     'SOL': {
         name: 'Solana',
@@ -325,14 +296,15 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         mintAddress: 'So11111111111111111111111111111111111111112',
         logo: React.createElement(SolIcon),
         balance: 0,
-        usdValue: 150.00,
+        usdValue: 0,
+        decimals: 9,
         description: { en: 'Solana is a high-performance blockchain supporting builders around the world creating crypto apps that scale today.' },
         security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
-        marketCap: 69000000000,
-        volume24h: 2500000000,
-        price24hChange: -1.5,
-        holders: 1000000,
-        circulatingSupply: 460000000,
+        marketCap: 0,
+        volume24h: 0,
+        price24hChange: 0,
+        holders: 0,
+        circulatingSupply: 0,
         poolCreated: 'N/A'
     },
      'USDC': {
@@ -341,14 +313,15 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a',
         logo: React.createElement(UsdcIcon),
         balance: 0,
-        usdValue: 1.00,
+        usdValue: 0,
+        decimals: 6,
         description: { en: 'USDC is a fully collateralized US dollar stablecoin. It is an Ethereum-powered coin and is the product of a collaboration between Circle and Coinbase.' },
         security: { isMutable: false, mintAuthorityRevoked: false, freezeAuthorityRevoked: false },
-        marketCap: 33000000000,
-        volume24h: 5000000000,
-        price24hChange: 0.01,
-        holders: 2000000,
-        circulatingSupply: 33000000000,
+        marketCap: 0,
+        volume24h: 0,
+        price24hChange: 0,
+        holders: 0,
+        circulatingSupply: 0,
         poolCreated: 'N/A'
     },
      'USDT': {
@@ -357,14 +330,15 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
         logo: React.createElement(UsdtIcon),
         balance: 0,
-        usdValue: 1.00,
+        usdValue: 0,
+        decimals: 6,
         description: { en: 'Tether (USDT) is a stablecoin pegged to the U.S. dollar. It is issued by the Hong Kong-based company Tether Limited.' },
         security: { isMutable: false, mintAuthorityRevoked: false, freezeAuthorityRevoked: false },
-        marketCap: 112000000000,
-        volume24h: 53000000000,
-        price24hChange: -0.02,
-        holders: 4000000,
-        circulatingSupply: 112000000000,
+        marketCap: 0,
+        volume24h: 0,
+        price24hChange: 0,
+        holders: 0,
+        circulatingSupply: 0,
         poolCreated: 'N/A'
     }
 };

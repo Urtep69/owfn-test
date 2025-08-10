@@ -1,8 +1,7 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
-import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info } from 'lucide-react';
+import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
 import { 
@@ -13,45 +12,61 @@ import {
     OWFN_LOGO_URL, 
     TOKEN_ALLOCATIONS, 
     ROADMAP_DATA,
-    MOCK_PRESALE_TRANSACTIONS,
     DISTRIBUTION_WALLETS,
+    HELIUS_API_BASE_URL,
+    HELIUS_API_KEY,
 } from '../constants.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { PresaleTransaction } from '../types.ts';
-
-const timeAgo = (date: Date, t: (key: string) => string) => {
-    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-    if (seconds < 5) return t('just_now');
-    if (seconds < 60) return `${seconds}s ago`;
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
-};
+import { useConnection } from '@solana/wallet-adapter-react';
+import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransaction | null }) => {
     const { t } = useAppContext();
-    const [transactions, setTransactions] = useState<PresaleTransaction[]>(
-        MOCK_PRESALE_TRANSACTIONS.slice(0, 10).sort((a, b) => b.time.getTime() - a.time.getTime())
-    );
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const randomTx = MOCK_PRESALE_TRANSACTIONS[Math.floor(Math.random() * MOCK_PRESALE_TRANSACTIONS.length)];
-            const newTx: PresaleTransaction = { ...randomTx, id: Date.now(), time: new Date() };
-            setTransactions(prev => [newTx, ...prev.slice(0, 19)]);
-        }, 8000); // Add a new transaction every 8 seconds
-
-        return () => clearInterval(interval);
-    }, []);
+    const [transactions, setTransactions] = useState<PresaleTransaction[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (newTransaction) {
             setTransactions(prev => [newTransaction, ...prev.slice(0, 19)]);
         }
     }, [newTransaction]);
+    
+    useEffect(() => {
+        const fetchTransactions = async () => {
+            setLoading(true);
+            try {
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch transactions');
+                const data = await response.json();
+                
+                const parsedTxs: PresaleTransaction[] = data
+                    .filter((tx: any) => 
+                        tx.type === 'NATIVE_TRANSFER' && 
+                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
+                    )
+                    .map((tx: any) => ({
+                        id: tx.signature,
+                        address: tx.nativeTransfers[0].fromUserAccount,
+                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
+                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                        time: new Date(tx.timestamp * 1000),
+                    }));
+                
+                setTransactions(parsedTxs.slice(0, 20));
+            } catch (error) {
+                console.error("Failed to fetch presale transactions:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTransactions();
+        const interval = setInterval(fetchTransactions, 30000); // refresh every 30 seconds
+        return () => clearInterval(interval);
+    }, []);
+
 
     return (
         <div className="bg-primary-950 border border-primary-700/50 rounded-lg p-4 h-full flex flex-col">
@@ -65,8 +80,12 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                 <span className="text-right">{t('owfn_received')}</span>
             </div>
             <div className="flex-grow overflow-y-auto space-y-1 pr-1 -mr-2 mt-2">
-                {transactions.map((tx) => (
-                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 2000 ? 'bg-accent-500/10' : ''}`}>
+                {loading ? (
+                     <div className="flex justify-center items-center h-full">
+                        <Loader2 className="w-6 h-6 animate-spin text-accent-500" />
+                    </div>
+                ) : transactions.map((tx) => (
+                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 5000 ? 'bg-accent-500/10' : ''}`}>
                         <div className="col-span-2 flex items-center gap-2">
                            <AddressDisplay address={tx.address} className="text-xs" />
                         </div>
@@ -128,10 +147,27 @@ const calculateTimeLeft = (endDate: Date) => {
 
 export default function Presale() {
   const { t, solana } = useAppContext();
+  const { connection } = useConnection();
   const [solAmount, setSolAmount] = useState(PRESALE_DETAILS.minBuy.toFixed(2));
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(PRESALE_DETAILS.endDate));
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
+  const [soldSOL, setSoldSOL] = useState(0);
+  
+  useEffect(() => {
+    const fetchPresaleBalance = async () => {
+        try {
+            const publicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
+            const balance = await connection.getBalance(publicKey);
+            setSoldSOL(balance / LAMPORTS_PER_SOL);
+        } catch (error) {
+            console.error("Failed to fetch presale balance:", error);
+        }
+    };
+    fetchPresaleBalance();
+    const interval = setInterval(fetchPresaleBalance, 60000); // refresh every minute
+    return () => clearInterval(interval);
+  }, [connection]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -158,13 +194,14 @@ export default function Presale() {
   };
 
   const owfnAmount = parseFloat(solAmount) * PRESALE_DETAILS.rate;
-  const soldSOL = 45.3; // Simulated value for display
   const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
   const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) <= 0;
 
   const handleBuy = async () => {
         if (!solana.connected) {
-            solana.connectWallet();
+            // The WalletMultiButton in the header will handle connection.
+            // We could add a pop-up here, but it's better UX to rely on the main button.
+            alert(t('connect_wallet_first'));
             return;
         }
 
@@ -174,13 +211,13 @@ export default function Presale() {
         const owfnToReceive = numAmount * PRESALE_DETAILS.rate;
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numAmount, 'SOL');
 
-        if (result.success) {
+        if (result.success && result.signature) {
             alert(t('presale_purchase_success_alert', { 
                 amount: numAmount.toFixed(2), 
                 owfnAmount: owfnToReceive.toLocaleString() 
             }));
             const newTx: PresaleTransaction = {
-                id: Date.now(),
+                id: result.signature,
                 address: solana.address!,
                 solAmount: numAmount,
                 owfnAmount: owfnToReceive,
@@ -188,6 +225,8 @@ export default function Presale() {
             };
             setLatestPurchase(newTx);
             setSolAmount(PRESALE_DETAILS.minBuy.toFixed(2));
+            // Manually update SOL collected to give instant feedback
+            setSoldSOL(prev => prev + numAmount);
         } else {
             alert(t(result.messageKey));
         }

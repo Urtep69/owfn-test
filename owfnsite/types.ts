@@ -7,6 +7,7 @@ export interface Token {
   logo: string | React.ReactNode;
   balance: number;
   usdValue: number;
+  decimals: number;
 }
 
 export interface Wallet {
@@ -101,7 +102,7 @@ export interface TokenDetails extends Token {
 }
 
 export interface LiveTransaction {
-    id: number;
+    id: string;
     time: string;
     type: 'buy' | 'sell';
     price: number;
@@ -149,7 +150,7 @@ export interface ImpactBadge {
 }
 
 export interface PresaleTransaction {
-  id: number;
+  id: string;
   address: string;
   solAmount: number;
   owfnAmount: number;

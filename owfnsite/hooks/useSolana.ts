@@ -1,7 +1,11 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -19,23 +23,16 @@ export interface UseSolanaReturn {
   };
   stakedBalance: number;
   earnedRewards: number;
-  connectWallet: (isAdmin?: boolean) => Promise<void>;
-  disconnectWallet: () => void;
+  connection: Connection;
+  connectWallet: () => void;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
-  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; params?: Record<string, string | number> }>;
+  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
   stakeTokens: (amount: number) => Promise<any>;
   unstakeTokens: (amount: number) => Promise<any>;
   claimRewards: () => Promise<any>;
   claimVestedTokens: (amount: number) => Promise<any>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
-
-
-// --- LIVE DATA HOOK ---
-// This hook interacts with the Helius RPC and Jupiter API for live Solana data.
-
-const MOCK_USER_ADDRESS = 'Am3R8zL7qV9k3yP5tW1sX4nB6mJ7fG9cE2dF8hK0gR'; // Example user wallet address
-const MOCK_ADMIN_ADDRESS = ADMIN_WALLET_ADDRESS;
 
 const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
     [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon, null),
@@ -44,29 +41,30 @@ const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
     'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
 };
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 export const useSolana = (): UseSolanaReturn => {  
-  const [connected, setConnected] = useState(false);
-  const [address, setAddress] = useState<string | null>(null);
+  const { connection } = useConnection();
+  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction } = useWallet();
+  const { setVisible } = useWalletModal();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
+
+  const connectWallet = useCallback(() => {
+    if (!connected) {
+      setVisible(true);
+    }
+  }, [connected, setVisible]);
 
   const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
     setLoading(true);
     try {
+        const ownerAddress = new PublicKey(walletAddress);
+        const heliusConnection = new Connection(HELIUS_RPC_URL, 'confirmed');
+
         const [solBalanceRes, assetsRes] = await Promise.all([
+             heliusConnection.getBalance(ownerAddress),
              fetch(HELIUS_RPC_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    jsonrpc: '2.0',
-                    id: 'get-sol-balance',
-                    method: 'getBalance',
-                    params: [walletAddress],
-                }),
-            }),
-            fetch(HELIUS_RPC_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -77,12 +75,11 @@ export const useSolana = (): UseSolanaReturn => {
                 }),
             })
         ]);
-
-        const solData = await solBalanceRes.json();
+        
         const assetsData = await assetsRes.json();
 
-        if (!assetsData.result || !solData.result) {
-            console.warn("Failed to fetch data from Helius for wallet:", walletAddress);
+        if (!assetsData.result) {
+            console.warn("Failed to fetch token assets from Helius for wallet:", walletAddress);
             return [];
         }
         
@@ -91,19 +88,21 @@ export const useSolana = (): UseSolanaReturn => {
             .map((asset: any) => ({
                 mintAddress: asset.id,
                 balance: Number(asset.token_info.balance) / Math.pow(10, asset.token_info.decimals),
+                decimals: asset.token_info.decimals,
                 name: asset.content.metadata.name || 'Unknown Token',
                 symbol: asset.content.metadata.symbol || '???',
                 logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
-                usdValue: 0, // will be populated by price API
+                usdValue: 0,
             }));
 
         const solToken: Token = {
             mintAddress: 'So11111111111111111111111111111111111111112',
-            balance: solData.result.value / 1e9,
+            balance: solBalanceRes / LAMPORTS_PER_SOL,
             name: 'Solana',
             symbol: 'SOL',
             logo: React.createElement(SolIcon, null),
             usdValue: 0,
+            decimals: 9,
         };
         
         const allTokens = [solToken, ...splTokens];
@@ -130,43 +129,75 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, []);
 
-  const connectWallet = useCallback(async (isAdmin: boolean = false) => {
-    setLoading(true);
-    await sleep(500);
-    const selectedAddress = isAdmin ? MOCK_ADMIN_ADDRESS : MOCK_USER_ADDRESS;
-    setAddress(selectedAddress);
-    const balances = await getWalletBalances(selectedAddress);
-    setUserTokens(balances);
-    setConnected(true);
-    setLoading(false);
-  }, [getWalletBalances]);
+  useEffect(() => {
+    if (connected && address) {
+      getWalletBalances(address).then(setUserTokens);
+    } else {
+      setUserTokens([]);
+    }
+  }, [connected, address, getWalletBalances]);
 
-  const disconnectWallet = useCallback(() => {
-    setConnected(false);
-    setAddress(null);
-    setUserTokens([]);
-  }, []);
-
-  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; params?: Record<string, string | number>}> => {
-    if (!connected) {
+  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
+    if (!connected || !publicKey) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
     setLoading(true);
-    console.log(`Simulating transaction of ${amount} ${tokenSymbol} to ${to}...`);
-    await sleep(1500);
-    
-    if (Math.random() < 0.1) {
+
+    try {
+        const toPublicKey = new PublicKey(to);
+        const transaction = new Transaction();
+        
+        if (tokenSymbol === 'SOL') {
+            transaction.add(
+                SystemProgram.transfer({
+                    fromPubkey: publicKey,
+                    toPubkey: toPublicKey,
+                    lamports: amount * LAMPORTS_PER_SOL,
+                })
+            );
+        } else {
+            const mintAddress = KNOWN_TOKEN_MINT_ADDRESSES[tokenSymbol];
+            if (!mintAddress) throw new Error(`Unknown token symbol: ${tokenSymbol}`);
+
+            const mintPublicKey = new PublicKey(mintAddress);
+            const tokenInfo = userTokens.find(t => t.symbol === tokenSymbol);
+            if (!tokenInfo) throw new Error(`Token ${tokenSymbol} not found in user's wallet.`);
+            
+            const decimals = tokenInfo.decimals;
+
+            const fromTokenAccount = await getAssociatedTokenAddress(mintPublicKey, publicKey);
+            const toTokenAccount = await getAssociatedTokenAddress(mintPublicKey, toPublicKey);
+            
+            transaction.add(
+                createTransferInstruction(
+                    fromTokenAccount,
+                    toTokenAccount,
+                    publicKey,
+                    amount * Math.pow(10, decimals) 
+                )
+            );
+        }
+
+        const signature = await walletSendTransaction(transaction, connection);
+        await connection.confirmTransaction(signature, 'processed');
+
+        console.log(`Transaction successful with signature: ${signature}`);
+        setLoading(false);
+        // Refetch balances after successful transaction
+        getWalletBalances(address!).then(setUserTokens);
+        return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
+
+    } catch (error) {
+        console.error("Transaction failed:", error);
         setLoading(false);
         return { success: false, messageKey: 'transaction_failed_alert' };
     }
-
-    setLoading(false);
-    return { success: true, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
-  }, [connected]);
+  }, [connected, publicKey, connection, walletSendTransaction, userTokens, address, getWalletBalances]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
+      console.warn("This feature is a placeholder and not implemented on-chain yet.");
       alert("This feature is coming soon and requires on-chain programs to be deployed.");
-      return Promise.reject({ success: false, messageKey: 'coming_soon_title'});
+      return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
   }
 
   return {
@@ -174,6 +205,7 @@ export const useSolana = (): UseSolanaReturn => {
     address,
     userTokens,
     loading,
+    connection,
     userStats: { 
         totalDonated: 0,
         projectsSupported: 0,
@@ -184,7 +216,6 @@ export const useSolana = (): UseSolanaReturn => {
     stakedBalance: 0,
     earnedRewards: 0,
     connectWallet,
-    disconnectWallet,
     getWalletBalances,
     sendTransaction,
     stakeTokens: notImplemented,
