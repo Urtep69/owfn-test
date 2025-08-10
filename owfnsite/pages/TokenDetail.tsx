@@ -1,22 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { PublicKey } from '@solana/web3.js';
 import { Star, Share2, Loader2, ArrowLeft } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { HELIUS_API_KEY, OWFN_MINT_ADDRESS, TOKEN_DETAILS } from '../constants.ts';
+import { HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
 
+// --- API Interfaces ---
+interface HeliusAsset {
+    id: string;
+    content?: {
+        metadata?: {
+            name?: string;
+            symbol?: string;
+            description?: string;
+        };
+        links?: {
+            image?: string;
+        };
+    };
+    token_info?: {
+        decimals: number;
+        supply: string; // Helius provides supply as a string
+    };
+}
+
+interface BirdeyeData {
+    data?: {
+        price?: number;
+        liquidity?: number;
+        mc?: number; // Market Cap
+        supply?: number;
+        supplyCirculating?: number;
+        priceChange24h?: number;
+        volume24h?: number;
+    };
+}
+
+
 const TokenDetailHeader = ({ token }: { token: TokenDetails }) => {
-    const pairSymbol = token.symbol === 'SOL' ? 'USDC' : 'SOL'; // Best guess for display
     return (
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 flex-shrink-0">{token.logo}</div>
                 <div>
-                    <h1 className="text-2xl font-bold text-primary-100">{`${token.symbol} / ${pairSymbol}`}</h1>
-                    <p className="text-sm text-primary-400">{token.name}</p>
+                    <h1 className="text-2xl font-bold text-primary-100">{token.name} ({token.symbol})</h1>
+                    <AddressDisplay address={token.mintAddress} type="token" />
                 </div>
             </div>
             <div className="flex items-center gap-2 text-primary-400">
@@ -31,16 +61,18 @@ const TokenDetailHeader = ({ token }: { token: TokenDetails }) => {
     );
 };
 
-const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) => (
-    <div className="flex justify-between items-center text-sm py-2 border-b border-primary-700/50 last:border-b-0">
-        <span className="text-primary-400">{label}</span>
-        <span className="font-mono font-semibold text-primary-100">{value}</span>
-    </div>
-);
-
+const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) => {
+    if (value === null || value === undefined || value === 'N/A') return null;
+    return (
+        <div className="flex justify-between items-center text-sm py-2 border-b border-primary-700/50 last:border-b-0">
+            <span className="text-primary-400">{label}</span>
+            <span className="font-mono font-semibold text-primary-100 text-right">{value}</span>
+        </div>
+    );
+};
 
 export default function TokenDetail() {
-    const { t, currentLanguage, solana } = useAppContext();
+    const { t, currentLanguage } = useAppContext();
     const params = useParams();
     const [location] = useLocation();
     const searchParams = new URLSearchParams(location.split('?')[1] || '');
@@ -65,46 +97,25 @@ export default function TokenDetail() {
             setToken(null);
 
             try {
-                // --- Parallel Fetching ---
+                // --- Parallel Fetching from Helius and Birdeye ---
                 const heliusPromise = fetch(`https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ jsonrpc: '2.0', id: 'my-id', method: 'getAsset', params: { id: mintAddress } }),
-                }).then(res => {
-                    if (!res.ok) throw new Error(`Helius API failed with status ${res.status}`);
-                    return res.json();
-                });
+                }).then(res => res.ok ? res.json() : Promise.reject(`Helius API failed with status ${res.status}`));
 
-                const dexscreenerPromise = fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`)
-                    .then(res => {
-                        if (!res.ok) throw new Error(`Dexscreener API failed with status ${res.status}`);
-                        return res.json();
-                    });
+                const birdeyePromise = fetch(`https://public-api.birdeye.so/defi/token_overview?address=${mintAddress}`, {
+                    headers: {'X-API-KEY': '2a2339556814417d84811195a0471c69'} // Replace with your actual public Birdeye API key if needed
+                }).then(res => res.ok ? res.json() : Promise.resolve({ data: null })); // Don't fail if Birdeye has no data
 
-                const [heliusResponse, dexscreenerResponse] = await Promise.all([heliusPromise, dexscreenerPromise]);
+                const [heliusResponse, birdeyeResponse] = await Promise.all([heliusPromise, birdeyePromise]);
 
-                const asset = heliusResponse.result;
+                const asset: HeliusAsset = heliusResponse.result;
                 if (!asset) throw new Error("Could not fetch asset metadata from Helius.");
                 
-                // --- Process Dexscreener Data to find the best trading pair ---
-                let bestPair = null;
-                if (dexscreenerResponse.pairs && dexscreenerResponse.pairs.length > 0) {
-                    bestPair = dexscreenerResponse.pairs
-                        .filter((p: any) => p.liquidity?.usd > 1000) // Filter for minimum liquidity
-                        .sort((a: any, b: any) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
-                }
-
-                // --- Fetch On-chain Supply ---
-                let circulatingSupply = 0;
-                if (mintAddress !== 'So11111111111111111111111111111111111111112') { // Not SOL
-                     try {
-                        const supply = await solana.connection.getTokenSupply(new PublicKey(mintAddress));
-                        circulatingSupply = supply.value.uiAmount || 0;
-                     } catch (e) { console.error("Failed to fetch token supply", e); }
-                }
+                const marketData: BirdeyeData['data'] = birdeyeResponse.data;
 
                 // --- Combine all live data ---
-                const price = parseFloat(bestPair?.priceUsd || '0');
                 const tokenData: TokenDetails = {
                     mintAddress: asset.id,
                     name: asset.content?.metadata?.name || 'Unknown Token',
@@ -112,15 +123,14 @@ export default function TokenDetail() {
                     logo: <GenericTokenIcon uri={asset.content?.links?.image} className="w-12 h-12" />,
                     description: { en: asset.content?.metadata?.description || '' },
                     decimals: asset.token_info?.decimals || 0,
-                    pricePerToken: price,
-                    price24hChange: bestPair?.priceChange?.h24 || 0,
-                    volume24h: bestPair?.volume?.h24 || 0,
-                    liquidity: bestPair?.liquidity?.usd || 0,
-                    pairAddress: bestPair?.pairAddress || '',
-                    poolCreated: bestPair ? new Date(bestPair.pairCreatedAt).toLocaleDateString() : 'N/A',
-                    circulatingSupply: circulatingSupply,
-                    marketCap: circulatingSupply * price,
-                    totalSupply: asset.id === OWFN_MINT_ADDRESS ? TOKEN_DETAILS.totalSupply : circulatingSupply,
+                    pricePerToken: marketData?.price ?? 0,
+                    price24hChange: marketData?.priceChange24h ?? 0,
+                    volume24h: marketData?.volume24h ?? 0,
+                    liquidity: marketData?.liquidity ?? 0,
+                    marketCap: marketData?.mc ?? 0,
+                    circulatingSupply: marketData?.supplyCirculating ?? 0,
+                    totalSupply: marketData?.supply ?? (asset.token_info ? parseFloat(asset.token_info.supply) / Math.pow(10, asset.token_info.decimals) : 0),
+                    // These are placeholders as the API doesn't provide them
                     security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
                     holders: 0,
                     balance: 0,
@@ -138,7 +148,7 @@ export default function TokenDetail() {
         };
 
         fetchTokenData();
-    }, [mintAddress, solana.connection]);
+    }, [mintAddress]);
 
     if (loading) {
         return (
@@ -165,8 +175,18 @@ export default function TokenDetail() {
     }
     
     const description = token.description[currentLanguage.code] || token.description['en'];
-    const chartUrl = token.pairAddress ? `https://dexscreener.com/solana/${token.pairAddress}?embed=1&theme=dark&info=0&trades=0` : '';
-    const priceChangeColor = token.price24hChange >= 0 ? 'text-green-400' : 'text-red-400';
+    const chartUrl = `https://birdeye.so/token/${mintAddress}/?embed=1&theme=dark&chart=1&trades=0`;
+    const priceChangeColor = (token.price24hChange ?? 0) >= 0 ? 'text-green-400' : 'text-red-400';
+    const formatNumber = (num?: number) => num ? num.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A';
+    const formatCurrency = (num?: number) => num ? `$${formatNumber(num)}` : 'N/A';
+    const formatSupply = (num?: number) => {
+        if (!num) return 'N/A';
+        if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(2)}B`;
+        if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
+        if (num >= 1_000) return `${(num / 1_000).toFixed(2)}K`;
+        return num.toFixed(2);
+    }
+
 
     return (
         <div className="animate-fade-in-up space-y-4">
@@ -180,39 +200,29 @@ export default function TokenDetail() {
                                 ${token.pricePerToken < 0.001 ? token.pricePerToken.toPrecision(4) : token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                             </span>
                             <span className={`font-semibold ${priceChangeColor}`}>
-                                {token.price24hChange.toFixed(2)}% (24h)
+                                {token.price24hChange?.toFixed(2)}% (24h)
                             </span>
                         </div>
                     </div>
-                    <div className="flex-grow">
-                        {chartUrl ? (
-                            <iframe
-                                src={chartUrl}
-                                className="w-full h-full rounded-b-lg"
-                                frameBorder="0"
-                                allowFullScreen
-                                title={`${token.symbol} Chart`}
-                            />
-                        ) : (
-                            <div className="flex-grow flex items-center justify-center p-4 text-center">
-                                <p className="text-primary-500">A live chart could not be loaded for this token as it does not appear to have an active trading pair on a decentralized exchange.</p>
-                            </div>
-                        )}
+                    <div className="flex-grow rounded-b-lg overflow-hidden">
+                        <iframe
+                            src={chartUrl}
+                            className="w-full h-full"
+                            frameBorder="0"
+                            allowFullScreen
+                            title={`${token.symbol} Chart`}
+                        />
                     </div>
                 </div>
 
                 <div className="lg:col-span-2 bg-primary-800 rounded-lg shadow-lg p-4 space-y-3 self-start">
                     <h3 className="text-lg font-bold">Live Market Data</h3>
                     <div className="space-y-1">
-                        <InfoItem label="Market Cap" value={token.marketCap > 1 ? `$${(token.marketCap / 1_000_000).toFixed(2)}M` : 'N/A'} />
-                        <InfoItem label="24h Volume" value={token.volume24h > 1 ? `$${token.volume24h.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} />
-                        <InfoItem label="Liquidity" value={token.liquidity > 1 ? `$${token.liquidity.toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} />
-                        <InfoItem label="Circulating Supply" value={token.circulatingSupply > 0 ? `${(token.circulatingSupply / 1_000_000_000).toFixed(2)}B` : 'N/A'} />
-                        <InfoItem label="Total Supply" value={token.totalSupply > 0 ? `${(token.totalSupply / 1_000_000_000).toFixed(2)}B` : 'N/A'} />
-                        <InfoItem label="Pool Created" value={token.poolCreated} />
-                        <div className="pt-2">
-                             <AddressDisplay address={token.pairAddress} />
-                        </div>
+                        <InfoItem label="Market Cap" value={formatCurrency(token.marketCap)} />
+                        <InfoItem label="24h Volume" value={formatCurrency(token.volume24h)} />
+                        <InfoItem label="Liquidity" value={formatCurrency(token.liquidity)} />
+                        <InfoItem label="Circulating Supply" value={formatSupply(token.circulatingSupply)} />
+                        <InfoItem label="Total Supply" value={formatSupply(token.totalSupply)} />
                     </div>
                 </div>
             </div>
