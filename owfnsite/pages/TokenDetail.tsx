@@ -291,7 +291,7 @@ export default function TokenDetail() {
         );
     }
     
-    const description = token.description[currentLanguage.code] || token.description['en'];
+    const description = token.description[currentLanguage.code] || token.description['en'] || '';
 
     return (
         <div className="animate-fade-in text-primary-100 -mt-8 -mx-8 p-1 bg-primary-950">

@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -6,11 +7,6 @@ import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { ImpactBadge, ImpactNFT } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
-
-const MOCK_NFTS: ImpactNFT[] = [
-    { id: 'nft1', caseId: '1', caseTitle: 'Build a School in Rural Ghana', imageUrl: 'https://picsum.photos/seed/nft1/300/300', date: '2024-07-20' },
-    { id: 'nft2', caseId: '2', caseTitle: 'Medical Supplies for a Clinic in Syria', imageUrl: 'https://picsum.photos/seed/nft2/300/300', date: '2024-06-15' },
-];
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -122,8 +118,8 @@ export default function Profile() {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold">{token.balance.toLocaleString()}</p>
-                                        <p className="text-sm text-primary-400">${token.usdValue.toLocaleString()}</p>
+                                        <p className="font-semibold">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
+                                        <p className="text-sm text-primary-400">${token.usdValue.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
                                     </div>
                                 </div>
                             </Link>
@@ -148,15 +144,7 @@ export default function Profile() {
                     <div className="bg-primary-800 p-6 rounded-lg shadow-3d">
                         <h2 className="text-2xl font-bold mb-4">{t('impact_trophies_nfts')}</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {MOCK_NFTS.map(nft => (
-                                <div key={nft.id} className="group relative rounded-lg overflow-hidden border-2 border-transparent hover:border-accent-500 transition-all">
-                                    <img src={nft.imageUrl} alt={nft.caseTitle} className="aspect-square object-cover w-full" />
-                                    <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2 text-white">
-                                        <p className="font-bold text-sm">{nft.caseTitle}</p>
-                                        <p className="text-xs">{nft.date}</p>
-                                    </div>
-                                </div>
-                            ))}
+                           {/* Live NFT data would be populated here */}
                         </div>
                     </div>
                 </ComingSoonWrapper>

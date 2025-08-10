@@ -1,8 +1,7 @@
 
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { DISTRIBUTION_WALLETS, MOCK_TOKEN_DETAILS } from '../constants.ts';
+import { DISTRIBUTION_WALLETS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { AlertTriangle } from 'lucide-react';
@@ -46,9 +45,32 @@ export default function Donations() {
     const { t, solana } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
+    const [tokenPrice, setTokenPrice] = useState(0);
 
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
-    const tokenPrice = useMemo(() => MOCK_TOKEN_DETAILS[selectedToken]?.usdValue || 0, [selectedToken]);
+
+    useEffect(() => {
+        const fetchPrice = async () => {
+            const mintAddress = KNOWN_TOKEN_MINT_ADDRESSES[selectedToken];
+            if (!mintAddress) {
+                setTokenPrice(0);
+                return;
+            }
+            try {
+                const res = await fetch(`https://price.jup.ag/v4/price?ids=${mintAddress}`);
+                const data = await res.json();
+                if(data.data[mintAddress]) {
+                    setTokenPrice(data.data[mintAddress].price);
+                } else {
+                    setTokenPrice(0);
+                }
+            } catch (e) {
+                console.error("Failed to fetch price", e);
+                setTokenPrice(0);
+            }
+        };
+        fetchPrice();
+    }, [selectedToken]);
 
     const usdValue = useMemo(() => {
         const numAmount = parseFloat(amount);

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { OWFN_LOGO_URL } from '../constants.ts';
+import { Image } from 'lucide-react';
 
 export const OwfnIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
@@ -33,6 +34,25 @@ export const UsdtIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
     className={`${className} rounded-full object-cover`} 
   />
 );
+
+export const GenericTokenIcon = ({ uri, className = 'w-6 h-6' }: { uri?: string, className?: string }) => {
+    if (uri) {
+        return (
+            <img 
+                src={uri} 
+                alt="Token Logo" 
+                className={`${className} rounded-full object-cover`} 
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+        );
+    }
+    return (
+        <div className={`${className} rounded-full bg-primary-700 flex items-center justify-center`}>
+            <Image className="w-4/6 h-4/6 text-primary-500" />
+        </div>
+    );
+};
+
 
 export const DiscordIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
     <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor" className={className}>

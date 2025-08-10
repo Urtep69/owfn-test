@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -8,15 +7,8 @@ import type { Wallet, Token } from '../types.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 
-const walletDisplayTokens = [
-    { symbol: 'OWFN', name: 'OWFN', icon: <OwfnIcon /> },
-    { symbol: 'SOL', name: 'Solana', icon: <SolIcon /> },
-    { symbol: 'USDC', name: 'USD Coin', icon: <UsdcIcon /> },
-    { symbol: 'USDT', name: 'Tether', icon: <UsdtIcon /> },
-];
-
-const WalletCard = ({ wallet }: { wallet: Wallet }) => {
-    const { t } = useAppContext();
+const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'> }) => {
+    const { t, solana } = useAppContext();
     const [loading, setLoading] = useState(true);
     const [balances, setBalances] = useState<Token[]>([]);
     const [totalValue, setTotalValue] = useState(0);
@@ -24,32 +16,23 @@ const WalletCard = ({ wallet }: { wallet: Wallet }) => {
     useEffect(() => {
         const fetchBalances = async () => {
             setLoading(true);
-            await new Promise(res => setTimeout(res, 500 + Math.random() * 1000));
-            
-            const mockBalances = walletDisplayTokens.map(displayToken => ({
-                name: displayToken.name,
-                symbol: displayToken.symbol,
-                mintAddress: '...', // Mock address
-                logo: displayToken.icon,
-                balance: Math.random() * (displayToken.symbol === 'SOL' ? 100 : 1e8),
-                usdValue: Math.random() * (displayToken.symbol === 'SOL' ? 15000 : 1e5),
-            }));
-
-            setBalances(mockBalances);
-            setTotalValue(mockBalances.reduce((sum, token) => sum + token.usdValue, 0));
+            const fetchedBalances = await solana.getWalletBalances(walletInfo.address);
+            setBalances(fetchedBalances);
+            setTotalValue(fetchedBalances.reduce((sum, token) => sum + token.usdValue, 0));
             setLoading(false);
         };
         fetchBalances();
-    }, [wallet.address]);
+    }, [walletInfo.address, solana.getWalletBalances]);
 
     return (
         <div className="bg-primary-800 p-6 rounded-lg shadow-3d">
-            <h3 className="text-xl font-bold mb-1">{wallet.name}</h3>
+            <h3 className="text-xl font-bold mb-1">{walletInfo.name}</h3>
             <div className="mb-4">
-                <AddressDisplay address={wallet.address} />
+                <AddressDisplay address={walletInfo.address} />
             </div>
             {loading ? (
                 <div className="space-y-3 animate-pulse">
+                    <div className="h-8 bg-primary-700 rounded w-1/2 mb-4"></div>
                     <div className="h-4 bg-primary-700 rounded w-3/4"></div>
                     <div className="h-4 bg-primary-700 rounded w-1/2"></div>
                     <div className="h-4 bg-primary-700 rounded w-5/6"></div>
@@ -62,8 +45,8 @@ const WalletCard = ({ wallet }: { wallet: Wallet }) => {
                         <span className="text-primary-400 ml-2">{t('total_value')}</span>
                     </div>
                     <div className="space-y-1">
-                        {balances.map(token => (
-                            <Link to={`/dashboard/token/${token.symbol}?from=/dashboard`} key={token.symbol} className="block -mx-2">
+                        {balances.slice(0, 5).map(token => (
+                            <Link to={`/dashboard/token/${token.symbol}?from=/dashboard`} key={token.mintAddress} className="block -mx-2">
                                 <div className="flex justify-between items-center py-2 px-2 rounded-md hover:bg-primary-700/50 cursor-pointer transition-colors duration-200">
                                     <div className="flex items-center space-x-3">
                                         <div className="w-8 h-8 flex items-center justify-center">{token.logo}</div>
@@ -104,7 +87,7 @@ export default function Dashboard() {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {wallets.map(wallet => (
-                    <WalletCard key={wallet.address} wallet={{...wallet, balances: [], totalUsdValue: 0}} />
+                    <WalletCard key={wallet.address} walletInfo={wallet} />
                 ))}
             </div>
         </div>

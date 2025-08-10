@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, CheckCircle, XCircle, Gift, Loader2 } from 'lucide-react';
-import { MOCK_AIRDROP_ELIGIBLE_WALLETS, MOCK_AIRDROP_AMOUNT } from '../constants.ts';
+
+const MOCK_AIRDROP_AMOUNT = 5000;
 
 const ConnectWalletPrompt = () => {
     const { t, solana } = useAppContext();
@@ -31,11 +33,9 @@ const EligibilityChecker = () => {
         setEligibilityStatus('idle');
 
         setTimeout(() => {
-            if (solana.address && MOCK_AIRDROP_ELIGIBLE_WALLETS.includes(solana.address)) {
-                setEligibilityStatus('eligible');
-            } else {
-                setEligibilityStatus('not_eligible');
-            }
+            // This is a placeholder for a real eligibility check API call.
+            // For now, we simulate a "not eligible" status for any connected wallet.
+            setEligibilityStatus('not_eligible');
             setIsChecking(false);
         }, 1500); // Simulate network request
     };

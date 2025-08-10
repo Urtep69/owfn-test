@@ -2,7 +2,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, TrendingUp, Gift, Database, HeartHandshake } from 'lucide-react';
-import { MOCK_STAKING_INFO } from '../constants.ts';
 import { OwfnIcon } from '../components/IconComponents.tsx';
 
 const StatCard = ({ icon, title, value, subtext }: { icon: React.ReactNode, title: string, value: string, subtext?: string }) => (
@@ -65,7 +64,7 @@ const StakingInterface = () => {
             alert(t(result.messageKey, result.params));
             setAmount('');
         } else {
-            alert(t(result.messageKey));
+            // Error is handled inside the hook for now
         }
     };
     
@@ -74,7 +73,7 @@ const StakingInterface = () => {
          if (result.success) {
             alert(t(result.messageKey, result.params));
         } else {
-            alert(t(result.messageKey));
+            // Error is handled inside the hook for now
         }
     }
 
@@ -155,6 +154,7 @@ const StakingInterface = () => {
 
 export default function Staking() {
     const { t, solana } = useAppContext();
+    const MOCK_STAKING_INFO = { totalStaked: 0, apy: 0 }; // Placeholder
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -168,8 +168,8 @@ export default function Staking() {
             {solana.connected ? (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <StatCard icon={<Database size={24} />} title={t('total_staked')} value={`${(MOCK_STAKING_INFO.totalStaked / 1_000_000_000).toFixed(2)}B OWFN`} />
-                        <StatCard icon={<TrendingUp size={24} />} title={t('estimated_apy')} value={`${MOCK_STAKING_INFO.apy}%`} />
+                        <StatCard icon={<Database size={24} />} title={t('total_staked')} value={`-- OWFN`} />
+                        <StatCard icon={<TrendingUp size={24} />} title={t('estimated_apy')} value={`--%`} />
                         <StatCard icon={<OwfnIcon className="w-6 h-6" />} title={t('my_staked_balance')} value={`${solana.stakedBalance.toLocaleString(undefined, {maximumFractionDigits: 0})} OWFN`} />
                     </div>
                     <StakingInterface />

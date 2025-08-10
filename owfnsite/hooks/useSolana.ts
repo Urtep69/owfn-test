@@ -1,90 +1,150 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-import type { Token, Wallet, GovernanceProposal } from '../types.ts';
-import { OWFN_MINT_ADDRESS, DISTRIBUTION_WALLETS, ADMIN_WALLET_ADDRESS } from '../constants.ts';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
+import type { Token } from '../types.ts';
+import { OWFN_MINT_ADDRESS, ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from '../constants.ts';
+import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
-// --- MOCK DATA AND SIMULATION ---
-// This hook simulates interactions with the Solana blockchain.
-// In a real application, you would replace this with @solana/wallet-adapter and @solana/web3.js.
+// --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
+export interface UseSolanaReturn {
+  connected: boolean;
+  address: string | null;
+  userTokens: Token[];
+  loading: boolean;
+  userStats: {
+    totalDonated: number;
+    projectsSupported: number;
+    votesCast: number;
+    donations: any[]; 
+    votedProposalIds: string[];
+  };
+  stakedBalance: number;
+  earnedRewards: number;
+  connectWallet: (isAdmin?: boolean) => Promise<void>;
+  disconnectWallet: () => void;
+  getWalletBalances: (walletAddress: string) => Promise<Token[]>;
+  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; params?: Record<string, string | number> }>;
+  stakeTokens: (amount: number) => Promise<any>;
+  unstakeTokens: (amount: number) => Promise<any>;
+  claimRewards: () => Promise<any>;
+  claimVestedTokens: (amount: number) => Promise<any>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
+}
 
-const MOCK_USER_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Regular user wallet address set to ADMIN for demonstration
+
+// --- LIVE DATA HOOK ---
+// This hook interacts with the Helius RPC and Jupiter API for live Solana data.
+
+const MOCK_USER_ADDRESS = 'Am3R8zL7qV9k3yP5tW1sX4nB6mJ7fG9cE2dF8hK0gR'; // Example user wallet address
 const MOCK_ADMIN_ADDRESS = ADMIN_WALLET_ADDRESS;
 
-const MOCK_USER_TOKENS: Token[] = [
-  { name: 'OWFN', symbol: 'OWFN', mintAddress: OWFN_MINT_ADDRESS, logo: React.createElement(OwfnIcon), balance: 12500000, usdValue: 150.50 },
-  { name: 'Solana', symbol: 'SOL', mintAddress: 'So11111111111111111111111111111111111111112', logo: React.createElement(SolIcon), balance: 2.5, usdValue: 375.21 },
-  { name: 'USD Coin', symbol: 'USDC', mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a', logo: React.createElement(UsdcIcon), balance: 542.11, usdValue: 542.11 },
-];
-
-const MOCK_USER_STATS = {
-    totalDonated: 125.50, // USD
-    projectsSupported: 3,
-    votesCast: 5,
-    donations: [
-        { caseId: '1', amount: 50, token: 'USDC' },
-        { caseId: '2', amount: 0.25, token: 'SOL' },
-        { caseId: '3', amount: 25, token: 'USDC' },
-    ],
-    votedProposalIds: ['prop1', 'prop3']
-}
+const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
+    [OWFN_MINT_ADDRESS]: <OwfnIcon />,
+    'So11111111111111111111111111111111111111112': <SolIcon />,
+    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': <UsdcIcon />,
+    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': <UsdtIcon />,
+};
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export const useSolana = () => {  
+export const useSolana = (): UseSolanaReturn => {  
   const [connected, setConnected] = useState(false);
   const [address, setAddress] = useState<string | null>(null);
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
-  const [stakedBalance, setStakedBalance] = useState(0);
-  const [earnedRewards, setEarnedRewards] = useState(0);
-  const [userStats, setUserStats] = useState(MOCK_USER_STATS);
 
-  useEffect(() => {
-    let interval: any;
-    if (connected && stakedBalance > 0) {
-      interval = setInterval(() => {
-        // Simulate rewards based on 15% APY
-        const rewardPerSecond = (stakedBalance * 0.15) / 31536000;
-        setEarnedRewards(prev => prev + rewardPerSecond);
-      }, 1000);
+  const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
+    setLoading(true);
+    try {
+        const [solBalanceRes, assetsRes] = await Promise.all([
+             fetch(HELIUS_RPC_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 'get-sol-balance',
+                    method: 'getBalance',
+                    params: [walletAddress],
+                }),
+            }),
+            fetch(HELIUS_RPC_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 'get-assets-by-owner',
+                    method: 'getAssetsByOwner',
+                    params: { ownerAddress: walletAddress, page: 1, limit: 1000 },
+                }),
+            })
+        ]);
+
+        const solData = await solBalanceRes.json();
+        const assetsData = await assetsRes.json();
+
+        if (!assetsData.result || !solData.result) {
+            console.warn("Failed to fetch data from Helius for wallet:", walletAddress);
+            return [];
+        }
+        
+        const splTokens: Token[] = assetsData.result.items
+            .filter((asset: any) => asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && asset.content?.metadata)
+            .map((asset: any) => ({
+                mintAddress: asset.id,
+                balance: Number(asset.token_info.balance) / Math.pow(10, asset.token_info.decimals),
+                name: asset.content.metadata.name || 'Unknown Token',
+                symbol: asset.content.metadata.symbol || '???',
+                logo: KNOWN_TOKEN_ICONS[asset.id] || <GenericTokenIcon uri={asset.content?.links?.image} />,
+                usdValue: 0, // will be populated by price API
+            }));
+
+        const solToken: Token = {
+            mintAddress: 'So11111111111111111111111111111111111111112',
+            balance: solData.result.value / 1e9,
+            name: 'Solana',
+            symbol: 'SOL',
+            logo: <SolIcon />,
+            usdValue: 0,
+        };
+        
+        const allTokens = [solToken, ...splTokens];
+        const mints = allTokens.map(t => t.mintAddress).join(',');
+        
+        const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mints}`);
+        const priceData = await priceRes.json();
+
+        if (priceData.data) {
+             allTokens.forEach(token => {
+                if (priceData.data[token.mintAddress]) {
+                    token.usdValue = token.balance * priceData.data[token.mintAddress].price;
+                }
+            });
+        }
+        
+        return allTokens.sort((a,b) => b.usdValue - a.usdValue);
+
+    } catch (error) {
+        console.error("Error fetching wallet balances:", error);
+        return [];
+    } finally {
+        setLoading(false);
     }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [connected, stakedBalance]);
+  }, []);
 
   const connectWallet = useCallback(async (isAdmin: boolean = false) => {
     setLoading(true);
     await sleep(500);
-    setConnected(true);
     const selectedAddress = isAdmin ? MOCK_ADMIN_ADDRESS : MOCK_USER_ADDRESS;
     setAddress(selectedAddress);
-    setUserTokens(MOCK_USER_TOKENS);
-    setUserStats(MOCK_USER_STATS);
-    // Give some initial staked balance for demonstration
-    setStakedBalance(2500000); 
-    setEarnedRewards(12345.67);
+    const balances = await getWalletBalances(selectedAddress);
+    setUserTokens(balances);
+    setConnected(true);
     setLoading(false);
-  }, []);
+  }, [getWalletBalances]);
 
   const disconnectWallet = useCallback(() => {
     setConnected(false);
     setAddress(null);
     setUserTokens([]);
-    setStakedBalance(0);
-    setEarnedRewards(0);
-  }, []);
-
-  const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
-    setLoading(true);
-    await sleep(700);
-    setLoading(false);
-    return [
-        { name: 'OWFN', symbol: 'OWFN', mintAddress: OWFN_MINT_ADDRESS, logo: React.createElement(OwfnIcon), balance: Math.random() * 1e9, usdValue: Math.random() * 1e5 },
-        { name: 'Solana', symbol: 'SOL', mintAddress: 'So11111111111111111111111111111111111111112', logo: React.createElement(SolIcon), balance: Math.random() * 100, usdValue: Math.random() * 15000 },
-        { name: 'USD Coin', symbol: 'USDC', mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a', logo: React.createElement(UsdcIcon), balance: Math.random() * 1e6, usdValue: Math.random() * 1e6 },
-    ]
   }, []);
 
   const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; params?: Record<string, string | number>}> => {
@@ -95,82 +155,42 @@ export const useSolana = () => {
     console.log(`Simulating transaction of ${amount} ${tokenSymbol} to ${to}...`);
     await sleep(1500);
     
-    // Simulate potential failure
-    if (Math.random() < 0.1) { // 10% chance of failure
+    if (Math.random() < 0.1) {
         setLoading(false);
-        console.log("Transaction failed (simulation).");
         return { success: false, messageKey: 'transaction_failed_alert' };
     }
 
     setLoading(false);
-    console.log("Transaction successful (simulation).");
     return { success: true, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
   }, [connected]);
-
-  const stakeTokens = useCallback(async (amount: number): Promise<{ success: boolean; messageKey: string; params?: Record<string, string | number>}> => {
-    setLoading(true);
-    await sleep(1500);
-    setUserTokens(prev => prev.map(t => t.symbol === 'OWFN' ? { ...t, balance: t.balance - amount } : t));
-    setStakedBalance(prev => prev + amount);
-    setLoading(false);
-    return { success: true, messageKey: 'stake_success_alert', params: { amount: amount.toLocaleString() } };
-  }, []);
-
-  const unstakeTokens = useCallback(async (amount: number): Promise<{ success: boolean; messageKey: string; params?: Record<string, string | number>}> => {
-    setLoading(true);
-    await sleep(1500);
-    setUserTokens(prev => prev.map(t => t.symbol === 'OWFN' ? { ...t, balance: t.balance + amount } : t));
-    setStakedBalance(prev => prev - amount);
-    setLoading(false);
-    return { success: true, messageKey: 'unstake_success_alert', params: { amount: amount.toLocaleString() } };
-  }, []);
-
-  const claimRewards = useCallback(async (): Promise<{ success: boolean; messageKey: string; params?: Record<string, string | number>}> => {
-    setLoading(true);
-    await sleep(1500);
-    const rewardsToClaim = earnedRewards;
-    setUserTokens(prev => prev.map(t => t.symbol === 'OWFN' ? { ...t, balance: t.balance + rewardsToClaim } : t));
-    setEarnedRewards(0);
-    setLoading(false);
-    return { success: true, messageKey: 'claim_success_alert', params: { amount: rewardsToClaim.toFixed(4) } };
-  }, [earnedRewards]);
   
-  const claimVestedTokens = useCallback(async (amount: number): Promise<{ success: boolean; messageKey: string; params?: Record<string, string | number>}> => {
-    setLoading(true);
-    await sleep(1500);
-    setUserTokens(prev => prev.map(t => t.symbol === 'OWFN' ? { ...t, balance: t.balance + amount } : t));
-    setLoading(false);
-    return { success: true, messageKey: 'vesting_claim_success', params: { amount: amount.toLocaleString() } };
-  }, []);
-  
-  const voteOnProposal = useCallback(async (proposalId: string, vote: 'for' | 'against'): Promise<{ success: boolean; messageKey: string; }> => {
-    setLoading(true);
-    await sleep(1000);
-    setUserStats(prev => ({
-        ...prev,
-        votedProposalIds: [...prev.votedProposalIds, proposalId]
-    }))
-    setLoading(false);
-    return { success: true, messageKey: 'vote_success_alert' };
-  }, []);
-
+  const notImplemented = async (..._args: any[]): Promise<any> => {
+      alert("This feature is coming soon and requires on-chain programs to be deployed.");
+      return Promise.reject({ success: false, messageKey: 'coming_soon_title'});
+  }
 
   return {
     connected,
     address,
     userTokens,
     loading,
-    stakedBalance,
-    earnedRewards,
-    userStats,
+    userStats: { 
+        totalDonated: 0,
+        projectsSupported: 0,
+        votesCast: 0,
+        donations: [],
+        votedProposalIds: []
+    },
+    stakedBalance: 0,
+    earnedRewards: 0,
     connectWallet,
     disconnectWallet,
     getWalletBalances,
     sendTransaction,
-    stakeTokens,
-    unstakeTokens,
-    claimRewards,
-    claimVestedTokens,
-    voteOnProposal,
+    stakeTokens: notImplemented,
+    unstakeTokens: notImplemented,
+    claimRewards: notImplemented,
+    claimVestedTokens: notImplemented,
+    voteOnProposal: notImplemented,
   };
 };
