@@ -302,6 +302,13 @@ export const fr = {
     sell: 'Vente',
     top_holders: 'Principaux détenteurs',
     market_sentiment: 'Sentiment du marché',
+    token_info: 'Infos sur le jeton',
+    market_cap: 'Capitalisation boursière',
+    liquidity: 'Liquidité',
+    volume_24h: 'Volume 24h',
+    pool_created: 'Pool créé',
+    buys_sells_24h: 'Achats / Ventes 24h',
+    pair_address: 'Adresse de la paire',
     
     // Staking & Vesting
     staking_title: 'Stakez OWFN, gagnez des récompenses',

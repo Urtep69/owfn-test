@@ -302,6 +302,13 @@ export const de = {
     sell: 'Verkauf',
     top_holders: 'Top-Inhaber',
     market_sentiment: 'Marktstimmung',
+    token_info: 'Token-Info',
+    market_cap: 'Marktkapitalisierung',
+    liquidity: 'Liquidität',
+    volume_24h: '24h-Volumen',
+    pool_created: 'Pool erstellt',
+    buys_sells_24h: '24h Käufe / Verkäufe',
+    pair_address: 'Paar-Adresse',
 
     // Staking & Vesting
     staking_title: 'OWFN staken, Belohnungen verdienen',

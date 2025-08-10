@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Star, Share2, Loader2, ArrowLeft, Briefcase } from 'lucide-react';
+import { Star, Share2, Loader2, ArrowLeft, Briefcase, TrendingUp, Droplets, Info } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
@@ -32,7 +32,11 @@ interface DexScreenerPair {
     priceChange?: { h24?: number };
     volume?: { h24?: number };
     liquidity?: { usd?: number };
-    fdv?: number; // Fully Diluted Valuation (Market Cap)
+    fdv?: number;
+    pairCreatedAt?: number;
+    txns?: {
+        h24: { buys: number, sells: number };
+    };
 }
 
 const TokenDetailHeader = ({ token }: { token: TokenDetails }) => {
@@ -69,12 +73,13 @@ const TokenDetailHeader = ({ token }: { token: TokenDetails }) => {
     );
 };
 
-const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) => {
+const InfoItem = ({ label, value, subtext }: { label: string, value: React.ReactNode, subtext?: string }) => {
     if (value === null || value === undefined || value === 'N/A' || value === '$0.00' || value === '$0') return null;
     return (
-        <div className="flex justify-between items-center text-sm py-3 border-b border-primary-700/50 last:border-b-0">
-            <span className="text-primary-400">{label}</span>
-            <span className="font-mono font-semibold text-primary-100 text-right">{value}</span>
+        <div className="bg-primary-900/50 p-3 rounded-lg">
+            <div className="text-xs text-primary-400 mb-1">{label}</div>
+            <div className="font-mono font-semibold text-primary-100 text-lg">{value}</div>
+            {subtext && <div className="text-xs text-primary-500 mt-1">{subtext}</div>}
         </div>
     );
 };
@@ -97,8 +102,14 @@ const NoMarketDataDisplay = ({ token }: { token: TokenDetails }) => {
                 Live market data for this token is not yet available. This usually means the token has not been listed on a decentralized exchange.
             </p>
             <div className="w-full max-w-sm bg-primary-800 p-4 rounded-lg">
-                 <InfoItem label={t('token_symbol_label')} value={token.symbol} />
-                 <InfoItem label={t('total_supply')} value={formatSupply(token.totalSupply)} />
+                 <div className="flex justify-between items-center py-2 border-b border-primary-700/50">
+                     <span className="text-primary-400 text-sm">{t('token_symbol_label')}</span>
+                     <span className="font-semibold">{token.symbol}</span>
+                 </div>
+                 <div className="flex justify-between items-center py-2">
+                    <span className="text-primary-400 text-sm">{t('total_supply')}</span>
+                    <span className="font-semibold">{formatSupply(token.totalSupply)}</span>
+                </div>
             </div>
         </div>
     );
@@ -118,6 +129,24 @@ export default function TokenDetail() {
     const [bestPairAddress, setBestPairAddress] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const formatNumber = (num?: number, style: 'currency' | 'decimal' = 'decimal', maximumFractionDigits = 0) => {
+        if (num === null || num === undefined) return 'N/A';
+        const isCurrency = style === 'currency';
+
+        if (Math.abs(num) >= 1_000_000_000) {
+            return `${isCurrency ? '$' : ''}${(num / 1_000_000_000).toFixed(2)}B`;
+        }
+        if (Math.abs(num) >= 1_000_000) {
+            return `${isCurrency ? '$' : ''}${(num / 1_000_000).toFixed(2)}M`;
+        }
+        if (Math.abs(num) >= 1_000) {
+            return `${isCurrency ? '$' : ''}${(num / 1_000).toFixed(2)}K`;
+        }
+        return isCurrency 
+            ? num.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits }) 
+            : num.toLocaleString('en-US', { maximumFractionDigits });
+    };
 
     useEffect(() => {
         if (!mintAddress) {
@@ -169,7 +198,10 @@ export default function TokenDetail() {
                     volume24h: bestPair?.volume?.h24 ?? 0,
                     liquidity: bestPair?.liquidity?.usd ?? 0,
                     marketCap: bestPair?.fdv ?? 0,
+                    fdv: bestPair?.fdv,
                     pairAddress: bestPair?.pairAddress,
+                    pairCreatedAt: bestPair?.pairCreatedAt,
+                    txns: bestPair?.txns,
                     security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
                     holders: 0,
                     balance: 0,
@@ -215,26 +247,45 @@ export default function TokenDetail() {
     }
     
     const description = token.description[currentLanguage.code] || token.description['en'];
-    const formatNumber = (num?: number) => num ? num.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A';
-    const formatCurrency = (num?: number) => num ? `$${formatNumber(num)}` : 'N/A';
-    const formatSupply = (num?: number) => {
-        if (!num) return 'N/A';
-        if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(2)}B`;
-        if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
-        if (num >= 1_000) return `${(num / 1_000).toFixed(2)}K`;
-        return num.toFixed(2);
-    }
 
     return (
         <div className="animate-fade-in-up space-y-6">
             <TokenDetailHeader token={token} />
             
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                <div className="lg:col-span-3 bg-primary-800 rounded-lg shadow-lg flex flex-col min-h-[700px]">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 bg-primary-800 rounded-lg shadow-lg p-4 space-y-3 self-start">
+                    <h3 className="text-xl font-bold text-primary-100 px-2">{t('token_info')}</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                        <InfoItem label={t('market_cap')} value={formatNumber(token.marketCap, 'currency')} />
+                        <InfoItem label={t('liquidity')} value={formatNumber(token.liquidity, 'currency')} />
+                        <InfoItem label={t('volume_24h')} value={formatNumber(token.volume24h, 'currency')} />
+                        <InfoItem label={t('total_supply')} value={formatNumber(token.totalSupply, 'decimal')} />
+                    </div>
+                    {token.txns && (
+                        <InfoItem 
+                            label={t('buys_sells_24h')} 
+                            value={<><span className="text-green-400">{token.txns.h24.buys}</span> / <span className="text-red-400">{token.txns.h24.sells}</span></>} 
+                        />
+                    )}
+                    {token.pairCreatedAt && (
+                         <InfoItem 
+                            label={t('pool_created')} 
+                            value={new Date(token.pairCreatedAt).toLocaleDateString()} 
+                        />
+                    )}
+                    {token.pairAddress && (
+                        <div className="bg-primary-900/50 p-3 rounded-lg">
+                            <div className="text-xs text-primary-400 mb-1">{t('pair_address')}</div>
+                            <AddressDisplay address={token.pairAddress} />
+                        </div>
+                    )}
+                </div>
+
+                <div className="lg:col-span-2 bg-primary-800 rounded-lg shadow-lg flex flex-col min-h-[700px]">
                     {bestPairAddress ? (
                         <div className="flex-grow rounded-lg overflow-hidden">
                             <iframe
-                                src={`https://dexscreener.com/solana/${bestPairAddress}?embed=1&theme=dark`}
+                                src={`https://dexscreener.com/solana/${bestPairAddress}?embed=1&theme=dark&info=0`}
                                 className="w-full h-full"
                                 frameBorder="0"
                                 allowFullScreen
@@ -244,16 +295,6 @@ export default function TokenDetail() {
                     ) : (
                         <NoMarketDataDisplay token={token} />
                     )}
-                </div>
-
-                <div className="lg:col-span-2 bg-primary-800 rounded-lg shadow-lg p-6 space-y-3 self-start">
-                    <h3 className="text-xl font-bold text-primary-100">Live Market Data</h3>
-                    <div className="space-y-1">
-                        <InfoItem label="24h Volume" value={formatCurrency(token.volume24h)} />
-                        <InfoItem label="Liquidity" value={formatCurrency(token.liquidity)} />
-                        <InfoItem label="Market Cap" value={formatCurrency(token.marketCap)} />
-                        <InfoItem label={t('total_supply')} value={formatSupply(token.totalSupply)} />
-                    </div>
                 </div>
             </div>
 

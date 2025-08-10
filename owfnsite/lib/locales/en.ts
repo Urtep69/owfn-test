@@ -302,6 +302,13 @@ export const en = {
     sell: 'Sell',
     top_holders: 'Top Holders',
     market_sentiment: 'Market Sentiment',
+    token_info: 'Token Info',
+    market_cap: 'Market Cap',
+    liquidity: 'Liquidity',
+    volume_24h: '24h Volume',
+    pool_created: 'Pool Created',
+    buys_sells_24h: '24h Buys / Sells',
+    pair_address: 'Pair Address',
     
     // Staking & Vesting
     staking_title: 'Stake OWFN, Earn Rewards',

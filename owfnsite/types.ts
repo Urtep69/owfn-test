@@ -100,6 +100,11 @@ export interface TokenDetails extends Token {
     audit?: TokenAudit;
     communityTrust?: CommunityTrust;
     pairAddress?: string;
+    fdv?: number;
+    pairCreatedAt?: number;
+    txns?: {
+        h24: { buys: number, sells: number };
+    };
 }
 
 export interface LiveTransaction {

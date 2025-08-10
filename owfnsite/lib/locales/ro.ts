@@ -299,6 +299,13 @@ export const ro = {
     sell: 'Vânzare',
     top_holders: 'Top Deținători',
     market_sentiment: 'Sentimentul Pieței',
+    token_info: 'Informații Token',
+    market_cap: 'Capitalizare de Piață',
+    liquidity: 'Lichiditate',
+    volume_24h: 'Volum 24h',
+    pool_created: 'Pool Creat',
+    buys_sells_24h: 'Cumpărări / Vânzări 24h',
+    pair_address: 'Adresă Pereche',
 
     // Staking & Vesting
     staking_title: 'Depune OWFN, Câștigă Recompense',
