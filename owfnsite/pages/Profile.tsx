@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Wrench, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Wrench, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { ImpactBadge, ImpactNFT } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
@@ -94,19 +94,22 @@ export default function Profile() {
                 <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-primary-900/50 rounded-lg">
                     <div>
                         <p className="text-sm text-primary-400">{t('token_types')}</p>
-                        <p className="text-2xl font-bold">{userTokens.length}</p>
+                        <p className="text-2xl font-bold">{loading ? '-' : userTokens.length}</p>
                     </div>
                     <div className="text-right">
                         <p className="text-sm text-primary-400">{t('total_value')}</p>
                         <p className="text-2xl font-bold text-green-400">
-                            ${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {loading ? '-' : `$${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                         </p>
                     </div>
                 </div>
                 <div className="divide-y divide-primary-700">
                     {loading ? (
-                        <p>{t('profile_loading_tokens')}</p>
-                    ) : (
+                        <div className="text-center py-8 text-primary-400 flex items-center justify-center gap-3">
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                            <span>{t('profile_loading_tokens')}</span>
+                        </div>
+                    ) : userTokens.length > 0 ? (
                         userTokens.map(token => (
                             <Link to={`/dashboard/token/${token.symbol}?from=/profile`} key={token.mintAddress} className="block -mx-2">
                                 <div className="flex items-center justify-between py-4 hover:bg-primary-700/50 px-2 rounded-md transition-colors duration-200 cursor-pointer">
@@ -124,6 +127,10 @@ export default function Profile() {
                                 </div>
                             </Link>
                         ))
+                    ) : (
+                         <div className="text-center py-8 text-primary-400">
+                            <p>{t('profile_no_tokens')}</p>
+                        </div>
                     )}
                 </div>
             </div>

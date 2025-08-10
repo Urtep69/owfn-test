@@ -1,3 +1,4 @@
+
 export const fr = {
     // Navigation
     home: 'Accueil',
@@ -108,6 +109,7 @@ export const fr = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: 'Vendu {progress}%',
     presale_buy_info: 'Acheter (Min: {min} SOL, Max: {max} SOL)',
+    presale_buy_info_max_only: 'Acheter (Max : {max} SOL par portefeuille)',
     buy: 'Acheter',
     presale_buying_owfn: 'Achat de {amount} $OWFN',
     presale_estimate_tooltip: 'Ceci est une estimation. Le montant final peut varier.',
@@ -129,6 +131,7 @@ export const fr = {
     presale_dyor_nfa_desc: 'Faites vos propres recherches. Pas de conseil financier.',
     presale_footer_copyright: '© {year} Official World Family Network | Tous droits réservés.',
     presale_amount_error: 'Le montant doit être compris entre {min} et {max} SOL.',
+    presale_max_amount_error: 'Le montant ne doit pas dépasser {max} SOL.',
     live_presale_feed: 'Flux de prévente en direct',
     wallet: 'Portefeuille',
     sol_spent: 'SOL Dépensé',
@@ -165,6 +168,7 @@ export const fr = {
     token_types: 'Types de Jetons',
     profile_loading_tokens: 'Chargement des jetons...',
     profile_connect_prompt: 'Connectez votre portefeuille pour voir votre profil et le solde de vos jetons.',
+    profile_no_tokens: 'Aucun jeton trouvé dans ce portefeuille.',
     impact_dashboard_title: 'Mon tableau de bord d\'impact',
     my_impact_stats: 'Mes statistiques d\'impact',
     total_donated: 'Total des dons',

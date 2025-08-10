@@ -1,3 +1,4 @@
+
 export const en = {
     // Navigation
     home: 'Home',
@@ -108,6 +109,7 @@ export const en = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: 'Sold {progress}%',
     presale_buy_info: 'Buy (Min: {min} SOL, Max: {max} SOL)',
+    presale_buy_info_max_only: 'Buy (Max: {max} SOL per wallet)',
     buy: 'Buy',
     presale_buying_owfn: 'Buying {amount} $OWFN',
     presale_estimate_tooltip: 'This is an estimate. The final amount may vary.',
@@ -129,6 +131,7 @@ export const en = {
     presale_dyor_nfa_desc: 'Do Your Own Research. Not Financial Advice.',
     presale_footer_copyright: '© {year} Official World Family Network | All rights reserved.',
     presale_amount_error: 'Amount must be between {min} and {max} SOL.',
+    presale_max_amount_error: 'Amount must not exceed {max} SOL.',
     live_presale_feed: 'Live Presale Feed',
     wallet: 'Wallet',
     sol_spent: 'SOL Spent',
@@ -165,6 +168,7 @@ export const en = {
     token_types: 'Token Types',
     profile_loading_tokens: 'Loading tokens...',
     profile_connect_prompt: 'Connect your wallet to see your profile and token balances.',
+    profile_no_tokens: 'No tokens found in this wallet.',
     impact_dashboard_title: 'My Impact Dashboard',
     my_impact_stats: 'My Impact Stats',
     total_donated: 'Total Donated',

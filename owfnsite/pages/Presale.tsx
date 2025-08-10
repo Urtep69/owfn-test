@@ -148,7 +148,7 @@ const calculateTimeLeft = (endDate: Date) => {
 export default function Presale() {
   const { t, solana } = useAppContext();
   const { connection } = useConnection();
-  const [solAmount, setSolAmount] = useState(PRESALE_DETAILS.minBuy.toFixed(2));
+  const [solAmount, setSolAmount] = useState('');
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(PRESALE_DETAILS.endDate));
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -186,8 +186,8 @@ export default function Presale() {
     }
 
     const numValue = parseFloat(value);
-    if (numValue > 0 && (numValue < PRESALE_DETAILS.minBuy || numValue > PRESALE_DETAILS.maxBuy)) {
-        setError(t('presale_amount_error', { min: PRESALE_DETAILS.minBuy.toFixed(2), max: PRESALE_DETAILS.maxBuy.toFixed(2) }));
+    if (numValue > PRESALE_DETAILS.maxBuy) {
+        setError(t('presale_max_amount_error', { max: PRESALE_DETAILS.maxBuy.toFixed(2) }));
     } else {
         setError('');
     }
@@ -224,7 +224,7 @@ export default function Presale() {
                 time: new Date(),
             };
             setLatestPurchase(newTx);
-            setSolAmount(PRESALE_DETAILS.minBuy.toFixed(2));
+            setSolAmount('');
             // Manually update SOL collected to give instant feedback
             setSoldSOL(prev => prev + numAmount);
         } else {
@@ -367,7 +367,7 @@ export default function Presale() {
                      {/* Buy Section */}
                     <div className="bg-primary-950 border border-primary-700/50 rounded-lg p-6">
                         <p className="text-sm text-primary-300 mb-2 text-center">
-                            {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy.toFixed(2), max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
+                            {t('presale_buy_info_max_only', { max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
                         <div className="flex gap-2">
                             <div className="flex-grow relative">
@@ -377,7 +377,7 @@ export default function Presale() {
                                     value={solAmount}
                                     onChange={handleAmountChange}
                                     className={`w-full bg-primary-800 border rounded-lg p-3 text-primary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-600 focus:ring-accent-500'}`}
-                                    placeholder="0.10"
+                                    placeholder="0.00"
                                 />
                             </div>
                             <button 

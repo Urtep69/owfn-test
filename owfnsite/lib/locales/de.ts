@@ -1,3 +1,4 @@
+
 export const de = {
     // Navigation
     home: 'Startseite',
@@ -108,6 +109,7 @@ export const de = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: 'Verkauft {progress}%',
     presale_buy_info: 'Kaufen (Min: {min} SOL, Max: {max} SOL)',
+    presale_buy_info_max_only: 'Kaufen (Max: {max} SOL pro Wallet)',
     buy: 'Kaufen',
     presale_buying_owfn: 'Kaufe {amount} $OWFN',
     presale_estimate_tooltip: 'Dies ist eine Schätzung. Der endgültige Betrag kann abweichen.',
@@ -129,6 +131,7 @@ export const de = {
     presale_dyor_nfa_desc: 'Eigene Recherche betreiben. Keine Finanzberatung.',
     presale_footer_copyright: '© {year} Official World Family Network | Alle Rechte vorbehalten.',
     presale_amount_error: 'Der Betrag muss zwischen {min} und {max} SOL liegen.',
+    presale_max_amount_error: 'Der Betrag darf {max} SOL nicht überschreiten.',
     live_presale_feed: 'Live-Vorverkaufs-Feed',
     wallet: 'Wallet',
     sol_spent: 'Ausgegebenes SOL',
@@ -165,6 +168,7 @@ export const de = {
     token_types: 'Token-Arten',
     profile_loading_tokens: 'Tokens werden geladen...',
     profile_connect_prompt: 'Verbinden Sie Ihre Wallet, um Ihr Profil und Ihre Token-Guthaben zu sehen.',
+    profile_no_tokens: 'Keine Token in dieser Wallet gefunden.',
     impact_dashboard_title: 'Mein Impact-Dashboard',
     my_impact_stats: 'Meine Impact-Statistiken',
     total_donated: 'Insgesamt gespendet',

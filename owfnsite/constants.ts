@@ -58,7 +58,7 @@ export const ROADMAP_DATA: RoadmapPhase[] = [
 export const PRESALE_DETAILS = {
   softCap: 50,
   hardCap: 180,
-  minBuy: 0.1,
+  minBuy: 0,
   maxBuy: 5,
   rate: 10000000,
   endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
