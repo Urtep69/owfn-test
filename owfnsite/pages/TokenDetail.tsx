@@ -284,12 +284,12 @@ export default function TokenDetail() {
                 <div className="lg:col-span-2 bg-primary-800 rounded-lg shadow-lg flex flex-col min-h-[700px]">
                     {bestPairAddress ? (
                         <div className="flex-grow rounded-lg overflow-hidden">
-                            <iframe
-                                src={`https://dexscreener.com/solana/${bestPairAddress}?embed=1&theme=dark&info=0`}
+                           <iframe
+                                src={`https://www.dextools.io/widget/en/solana/pair-explorer/${bestPairAddress}?theme=dark&chartType=2&chartResolution=15&info=false`}
                                 className="w-full h-full"
                                 frameBorder="0"
                                 allowFullScreen
-                                title={`${token.symbol} Chart`}
+                                title="DEXTools Live Chart"
                             />
                         </div>
                     ) : (
