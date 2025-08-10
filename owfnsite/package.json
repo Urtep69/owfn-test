@@ -4,7 +4,7 @@
   "private": true,
   "description": "A global network united by the vision to build a better world through technology and humanity.",
   "scripts": {
-    "build": "mkdir -p public && cp index.html public/index.html && esbuild index.tsx --bundle --outfile=public/bundle.js --loader:.ts=ts --loader:.tsx=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"'"
+    "build": "mkdir -p public && cp index.html public/index.html && esbuild index.tsx --bundle --outfile=public/bundle.js --loader:.ts=tsx --loader:.tsx=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"'"
   },
   "author": "OWFN",
   "license": "UNLICENSED",
