@@ -62,8 +62,8 @@ export const PRESALE_DETAILS = {
   minBuy: 0,
   maxBuy: 5,
   rate: 10000000,
-  startDate: new Date('2024-07-31T00:00:00Z'),
-  endDate: new Date('2024-08-30T00:00:00Z')
+  startDate: new Date('2025-08-11T00:00:00Z'),
+  endDate: new Date('2025-09-12T00:00:00Z')
 };
 
 export const SUPPORTED_LANGUAGES: Language[] = [
