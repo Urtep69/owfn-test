@@ -160,10 +160,6 @@ Remember to be helpful, positive, and stick to the information provided. If a us
   `;
 };
 
-export const config = {
-  runtime: 'edge',
-};
-
 export default async function handler(request: Request) {
     if (request.method !== 'POST') {
         return new Response('Method Not Allowed', { status: 405 });
