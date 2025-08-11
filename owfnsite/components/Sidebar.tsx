@@ -5,10 +5,11 @@ import { Link, useRoute } from 'wouter';
 import { 
     Home, Info, FileText, Map, Handshake, HelpCircle, 
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
-    Heart, TrendingUp, Lock, Award, User, Vote
+    Heart, TrendingUp, Lock, Award, User, Vote, Shield
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
+import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -41,7 +42,8 @@ const NavGroup = ({ title, isOpen, children }: { title: string, isOpen: boolean,
 );
 
 export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
-    const { t } = useAppContext();
+    const { t, solana } = useAppContext();
+    const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
 
     const handleLinkClick = () => {
         if (window.innerWidth < 768) {
@@ -99,6 +101,17 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                         ))}
                     </NavGroup>
                 ))}
+                 {isAdmin && (
+                    <NavGroup title="Admin" isOpen={isOpen}>
+                        <NavItem 
+                            to="/admin/presale" 
+                            icon={<Shield size={20} />} 
+                            label={t('presale_admin_title')} 
+                            isOpen={isOpen} 
+                            onClick={handleLinkClick} 
+                        />
+                    </NavGroup>
+                )}
             </nav>
             
             <div className="px-2 py-4 border-t border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">

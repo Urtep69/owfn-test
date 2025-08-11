@@ -1,0 +1,342 @@
+
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useAppContext } from '../contexts/AppContext.tsx';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
+
+import { 
+    DISTRIBUTION_WALLETS, 
+    HELIUS_API_KEY, 
+    HELIUS_API_BASE_URL, 
+    PRESALE_DETAILS,
+    OWFN_MINT_ADDRESS
+} from '../constants.ts';
+import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User } from 'lucide-react';
+import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import type { Token } from '../types.ts';
+
+interface PresaleTx {
+    signature: string;
+    from: string;
+    solAmount: number;
+    owfnAmount: number;
+    timestamp: number;
+}
+
+interface AggregatedContributor {
+    address: string;
+    totalSol: number;
+    totalOwfn: number;
+}
+
+const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md flex items-center space-x-4">
+        <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-full p-3">
+            {icon}
+        </div>
+        <div>
+            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+            <p className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">{value}</p>
+        </div>
+    </div>
+);
+
+export default function AdminPresale() {
+    const { t, solana } = useAppContext();
+    const { connection } = useConnection();
+    const wallet = useWallet();
+
+    const [loading, setLoading] = useState(true);
+    const [transactions, setTransactions] = useState<PresaleTx[]>([]);
+    const [stats, setStats] = useState({ sol: 0, count: 0, contributors: 0 });
+
+    const [isAirdropping, setIsAirdropping] = useState(false);
+    const [airdropProgress, setAirdropProgress] = useState({ current: 0, total: 0 });
+    const [airdropLogs, setAirdropLogs] = useState<string[]>([]);
+    
+    const adminOwfnBalance = useMemo(() => solana.userTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS)?.balance ?? 0, [solana.userTokens]);
+    const adminSolBalance = useMemo(() => solana.userTokens.find(t => t.symbol === 'SOL')?.balance ?? 0, [solana.userTokens]);
+
+    const fetchAllTransactions = useCallback(async () => {
+        setLoading(true);
+        let allTxs: PresaleTx[] = [];
+        let lastSignature: string | undefined = undefined;
+
+        try {
+            while (true) {
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
+                const data = await response.json();
+
+                const parsedTxs: PresaleTx[] = data
+                    .filter((tx: any) => 
+                        tx.type === 'NATIVE_TRANSFER' && 
+                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                        tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111' // System Program
+                    )
+                    .map((tx: any): PresaleTx => ({
+                        signature: tx.signature,
+                        from: tx.nativeTransfers[0].fromUserAccount,
+                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
+                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                        timestamp: tx.timestamp,
+                    }));
+                
+                allTxs.push(...parsedTxs);
+
+                if (data.length < 100) {
+                    break; 
+                } else {
+                    lastSignature = data[data.length - 1].signature;
+                }
+            }
+            setTransactions(allTxs);
+        } catch (error) {
+            console.error("Failed to fetch all presale transactions:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [connection]);
+
+    useEffect(() => {
+        fetchAllTransactions();
+    }, [fetchAllTransactions]);
+
+    useEffect(() => {
+        if (transactions.length > 0) {
+            const totalSol = transactions.reduce((sum, tx) => sum + tx.solAmount, 0);
+            const uniqueContributors = new Set(transactions.map(tx => tx.from)).size;
+            setStats({ sol: totalSol, count: transactions.length, contributors: uniqueContributors });
+        }
+    }, [transactions]);
+
+    const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
+        const contributorMap = new Map<string, { totalSol: number, totalOwfn: number }>();
+        transactions.forEach(tx => {
+            const existing = contributorMap.get(tx.from) ?? { totalSol: 0, totalOwfn: 0 };
+            existing.totalSol += tx.solAmount;
+            existing.totalOwfn += tx.owfnAmount;
+            contributorMap.set(tx.from, existing);
+        });
+        return Array.from(contributorMap.entries()).map(([address, data]) => ({ address, ...data }));
+    }, [transactions]);
+
+    const exportToCsv = useCallback(() => {
+        const headers = ['contributor_address', 'total_sol_spent', 'total_owfn_to_receive'];
+        const rows = aggregatedContributors.map(c => [c.address, c.totalSol.toFixed(9), c.totalOwfn.toFixed(9)]);
+        const csvContent = "data:text/csv;charset=utf-8," 
+            + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+        
+        const link = document.createElement('a');
+        link.setAttribute('href', encodeURI(csvContent));
+        link.setAttribute('download', `owfn_presale_contributors_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }, [aggregatedContributors]);
+
+    const handleAirdrop = useCallback(async () => {
+        if (!wallet.publicKey || !wallet.signAllTransactions) return;
+
+        const confirmation = window.confirm(t('airdrop_confirmation_prompt', { count: aggregatedContributors.length }));
+        if (!confirmation) return;
+
+        setIsAirdropping(true);
+        setAirdropLogs([]);
+        setAirdropProgress({ current: 0, total: aggregatedContributors.length });
+
+        const BATCH_SIZE = 10;
+        const sourceOwner = wallet.publicKey;
+        const tokenMint = new PublicKey(OWFN_MINT_ADDRESS);
+        const sourceAta = await getAssociatedTokenAddress(tokenMint, sourceOwner);
+        
+        let successfulAirdrops = 0;
+
+        for (let i = 0; i < aggregatedContributors.length; i += BATCH_SIZE) {
+            const batch = aggregatedContributors.slice(i, i + BATCH_SIZE);
+            setAirdropLogs(prev => [...prev, t('processing_batch', { current: (i/BATCH_SIZE) + 1, total: Math.ceil(aggregatedContributors.length / BATCH_SIZE) })]);
+            
+            try {
+                const transactions: Transaction[] = [];
+                const latestBlockhash = await connection.getLatestBlockhash();
+
+                for (const contributor of batch) {
+                    const transaction = new Transaction().add(
+                        ...(await (async () => {
+                            const instructions = [];
+                            const recipient = new PublicKey(contributor.address);
+                            const destinationAta = await getAssociatedTokenAddress(tokenMint, recipient);
+                            
+                            try {
+                                await getAccount(connection, destinationAta);
+                            } catch (error) {
+                                // If ATA does not exist, add instruction to create it
+                                instructions.push(createAssociatedTokenAccountInstruction(sourceOwner, destinationAta, recipient, tokenMint));
+                            }
+                            
+                            instructions.push(
+                                createTransferInstruction(
+                                    sourceAta,
+                                    destinationAta,
+                                    sourceOwner,
+                                    BigInt(Math.floor(contributor.totalOwfn)) // Use whole numbers for tokens
+                                )
+                            );
+                            return instructions;
+                        })())
+                    );
+                    transaction.recentBlockhash = latestBlockhash.blockhash;
+                    transaction.feePayer = sourceOwner;
+                    transactions.push(transaction);
+                }
+
+                const signedTxs = await wallet.signAllTransactions(transactions);
+                
+                for (let j = 0; j < signedTxs.length; j++) {
+                    const tx = signedTxs[j];
+                    const contributor = batch[j];
+                    try {
+                        const signature = await connection.sendRawTransaction(tx.serialize());
+                        await connection.confirmTransaction(signature, 'confirmed');
+                        setAirdropLogs(prev => [...prev, `✅ Success for ${contributor.address.slice(0,6)}... | Signature: ${signature.slice(0,10)}...`]);
+                        successfulAirdrops++;
+                    } catch (err) {
+                        console.error(`Airdrop failed for ${contributor.address}:`, err);
+                        setAirdropLogs(prev => [...prev, `❌ Failed for ${contributor.address.slice(0,6)}... | Error: ${(err as Error).message}`]);
+                    } finally {
+                        setAirdropProgress(prev => ({ ...prev, current: prev.current + 1 }));
+                    }
+                }
+            } catch (batchError) {
+                 console.error(`Error processing batch starting at index ${i}:`, batchError);
+                 setAirdropLogs(prev => [...prev, `❌ Critical error in batch ${(i/BATCH_SIZE) + 1}: ${(batchError as Error).message}`]);
+                 // Also update progress for the whole failed batch
+                 setAirdropProgress(prev => ({ ...prev, current: prev.current + batch.length }));
+            }
+        }
+        
+        setIsAirdropping(false);
+        setAirdropLogs(prev => [...prev, t('airdrop_complete') + ` - ${t('airdrop_summary', { success: successfulAirdrops, failed: aggregatedContributors.length - successfulAirdrops })}`]);
+
+    }, [wallet, connection, aggregatedContributors, t]);
+    
+    const totalOwfnToDistribute = useMemo(() => aggregatedContributors.reduce((sum, c) => sum + c.totalOwfn, 0), [aggregatedContributors]);
+    const estimatedFees = useMemo(() => aggregatedContributors.length * 0.000005, [aggregatedContributors]); // 5000 lamports per signature
+
+    return (
+        <div className="animate-fade-in-up space-y-8">
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold">{t('presale_admin_title')}</h1>
+                    <p className="text-primary-600 dark:text-darkPrimary-400 mt-1">{t('presale_admin_subtitle')}</p>
+                </div>
+                <button onClick={fetchAllTransactions} disabled={loading} className="flex items-center gap-2 bg-primary-200 dark:bg-darkPrimary-700 px-4 py-2 rounded-lg font-semibold hover:bg-primary-300 dark:hover:bg-darkPrimary-600 disabled:opacity-50">
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
+                    {t('refresh_data')}
+                </button>
+            </div>
+            
+            {loading ? (
+                <div className="flex justify-center items-center py-20"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>
+            ) : (
+                <>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<img src="https://www.owfn.org/solana.png" className="w-6 h-6"/>} />
+                        <StatCard title={t('total_transactions')} value={stats.count} icon={<FileText />} />
+                        <StatCard title={t('unique_contributors')} value={stats.contributors} icon={<User />} />
+                    </div>
+
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold">{t('presale_purchases')}</h2>
+                            <button onClick={exportToCsv} className="flex items-center gap-2 bg-primary-200 dark:bg-darkPrimary-700 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary-300 dark:hover:bg-darkPrimary-600">
+                                <Download size={16} /> {t('export_csv')}
+                            </button>
+                        </div>
+                        <div className="overflow-x-auto max-h-[50vh] relative">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-primary-700 dark:text-darkPrimary-300 uppercase bg-primary-100 dark:bg-darkPrimary-700 sticky top-0">
+                                    <tr>
+                                        <th scope="col" className="px-6 py-3">{t('contributor')}</th>
+                                        <th scope="col" className="px-6 py-3 text-right">{t('sol_amount')}</th>
+                                        <th scope="col" className="px-6 py-3 text-right">{t('owfn_to_receive')}</th>
+                                        <th scope="col" className="px-6 py-3">{t('date')}</th>
+                                        <th scope="col" className="px-6 py-3">{t('transaction')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {transactions.map(tx => (
+                                        <tr key={tx.signature} className="border-b dark:border-darkPrimary-700 hover:bg-primary-50 dark:hover:bg-darkPrimary-700/50">
+                                            <td className="px-6 py-4"><AddressDisplay address={tx.from} /></td>
+                                            <td className="px-6 py-4 text-right font-mono">{tx.solAmount.toFixed(4)}</td>
+                                            <td className="px-6 py-4 text-right font-mono">{tx.owfnAmount.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                                            <td className="px-6 py-4">{new Date(tx.timestamp * 1000).toLocaleString()}</td>
+                                            <td className="px-6 py-4"><AddressDisplay address={tx.signature} type="tx"/></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md space-y-4">
+                         <h2 className="text-xl font-bold">{t('airdrop_tool_title')}</h2>
+                         <div className="bg-red-500/10 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-r-lg flex items-start gap-3">
+                            <AlertTriangle className="w-8 h-8 flex-shrink-0"/>
+                            <p className="text-sm font-semibold">{t('airdrop_warning')}</p>
+                         </div>
+
+                         <div className="grid md:grid-cols-2 gap-4">
+                            <div className="bg-primary-100 dark:bg-darkPrimary-700 p-4 rounded-lg">
+                                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_owfn_to_distribute')}</p>
+                                <p className="text-lg font-bold font-mono">{totalOwfnToDistribute.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
+                            </div>
+                             <div className={`bg-primary-100 dark:bg-darkPrimary-700 p-4 rounded-lg ${adminOwfnBalance < totalOwfnToDistribute ? 'border border-red-500' : ''}`}>
+                                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('your_owfn_balance')}</p>
+                                <p className="text-lg font-bold font-mono">{adminOwfnBalance.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
+                                {adminOwfnBalance < totalOwfnToDistribute && <p className="text-xs text-red-500 mt-1">{t('insufficient_owfn_balance')}</p>}
+                            </div>
+                             <div className={`bg-primary-100 dark:bg-darkPrimary-700 p-4 rounded-lg ${adminSolBalance < estimatedFees ? 'border border-red-500' : ''}`}>
+                                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('your_sol_balance')}</p>
+                                <p className="text-lg font-bold font-mono">{adminSolBalance.toFixed(6)}</p>
+                                <p className="text-xs text-primary-500 dark:text-darkPrimary-500 mt-1">{t('estimated_tx_fees')}: ~{estimatedFees.toFixed(6)} SOL</p>
+                                {adminSolBalance < estimatedFees && <p className="text-xs text-red-500 mt-1">{t('insufficient_sol_balance')}</p>}
+                            </div>
+                         </div>
+                        
+                         <button 
+                            onClick={handleAirdrop}
+                            disabled={isAirdropping || loading || adminOwfnBalance < totalOwfnToDistribute || adminSolBalance < estimatedFees}
+                            className="w-full flex items-center justify-center gap-2 bg-accent-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                         >
+                            {isAirdropping ? <Loader2 className="w-6 h-6 animate-spin"/> : <Send className="w-6 h-6" />}
+                            {isAirdropping ? t('airdrop_in_progress') : t('start_airdrop')}
+                         </button>
+                        
+                         {isAirdropping && (
+                             <div className="w-full bg-primary-200 dark:bg-darkPrimary-700 rounded-full h-4">
+                                <div className="bg-green-500 h-4 rounded-full" style={{width: `${(airdropProgress.current / airdropProgress.total) * 100}%`}}></div>
+                             </div>
+                         )}
+
+                         {airdropLogs.length > 0 && (
+                             <div className="bg-primary-50 dark:bg-darkPrimary-950 p-4 rounded-lg max-h-64 overflow-y-auto">
+                                <h3 className="font-bold mb-2">{t('airdrop_log')}</h3>
+                                <div className="space-y-1 text-xs font-mono">
+                                    {airdropLogs.map((log, i) => (
+                                        <div key={i} className="flex items-center gap-2">
+                                            {log.startsWith('✅') ? <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0"/> : (log.startsWith('❌') ? <XCircle className="w-3 h-3 text-red-500 flex-shrink-0"/> : <div className="w-3 h-3"></div>)}
+                                            <p>{log}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                             </div>
+                         )}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}

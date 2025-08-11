@@ -4,7 +4,7 @@ import { Copy, Check, ExternalLink } from 'lucide-react';
 
 interface AddressDisplayProps {
   address: string;
-  type?: 'address' | 'token';
+  type?: 'address' | 'token' | 'tx';
   className?: string;
 }
 
@@ -21,8 +21,20 @@ export const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, type = 
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+  
+  const getPath = () => {
+      switch (type) {
+          case 'token':
+              return 'token';
+          case 'tx':
+              return 'tx';
+          case 'address':
+          default:
+              return 'account';
+      }
+  };
 
-  const solscanUrl = `https://solscan.io/${type}/${address}`;
+  const solscanUrl = `https://solscan.io/${getPath()}/${address}`;
 
   return (
     <div className={`flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 ${className}`}>

@@ -31,6 +31,7 @@ import Whitepaper from './pages/Whitepaper.tsx';
 import Airdrop from './pages/Airdrop.tsx';
 import Governance from './pages/Governance.tsx';
 import Maintenance from './pages/Maintenance.tsx';
+import AdminPresale from './pages/AdminPresale.tsx';
 
 const AppContent = () => {
   const { isMaintenanceActive, solana } = useAppContext();
@@ -79,6 +80,7 @@ const AppContent = () => {
               <Governance />
             </ComingSoonWrapper>
           </Route>
+          {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
           <Route path="/maintenance"><Maintenance /></Route>
           <Route path="/"><Home /></Route>
         </Switch>

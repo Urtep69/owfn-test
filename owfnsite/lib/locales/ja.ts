@@ -1,3 +1,4 @@
+
 export const ja = {
     // Navigation
     home: 'ホーム',
@@ -401,4 +402,34 @@ export const ja = {
     // Coming Soon
     coming_soon_title: '近日公開',
     coming_soon_desc: 'この機能は現在開発中です。できるだけ早く皆様にお届けできるよう努めております。ご不便をおかけしますが、ご理解とご協力をお願いいたします。',
+
+    // Admin Presale
+    presale_admin_title: 'プレセール管理者',
+    presale_admin_subtitle: 'トランザクションを監視し、プレセール後のトークンエアドロップを管理します。',
+    total_sol_raised: '総調達SOL',
+    total_transactions: '総トランザクション数',
+    unique_contributors: 'ユニークな貢献者',
+    refresh_data: 'データを更新',
+    export_csv: 'CSVとしてエクスポート',
+    presale_purchases: 'プレセール購入',
+    contributor: '貢献者',
+    sol_amount: 'SOL額',
+    owfn_to_receive: '受け取るOWFN',
+    date: '日付',
+    transaction: 'トランザクション',
+    airdrop_tool_title: 'エアドロップ配布ツール',
+    airdrop_warning: '警告：このツールは、すべてのプレセール貢献者にOWFNトークンの一斉配布を開始します。この操作は元に戻せません。プレセールが正式に終了し、すべてのデータが正しいことを確認してください。',
+    total_owfn_to_distribute: '配布するOWFN総額',
+    your_owfn_balance: 'あなたのOWFN残高',
+    insufficient_owfn_balance: 'エアドロップを実行するためのOWFN残高が不足しています。',
+    your_sol_balance: 'あなたのSOL残高（手数料用）',
+    insufficient_sol_balance: 'トランザクション手数料のためのSOL残高が不足しています。',
+    estimated_tx_fees: '推定トランザクション手数料',
+    start_airdrop: 'エアドロップを開始',
+    airdrop_confirmation_prompt: 'エアドロップを開始してもよろしいですか？これにより、{count}個のユニークなウォレットにOWFNトークンが送信され、元に戻すことはできません。',
+    airdrop_in_progress: 'エアドロップ進行中... このウィンドウを閉じないでください。',
+    processing_batch: 'バッチ{current}/{total}を処理中...',
+    airdrop_complete: 'エアドロップ完了',
+    airdrop_summary: '成功{success}件、失敗{failed}件。',
+    airdrop_log: 'エアドロップログ',
 };
