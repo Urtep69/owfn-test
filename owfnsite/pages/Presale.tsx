@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2 } from 'lucide-react';
@@ -37,6 +36,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
         const fetchTransactions = async () => {
             setLoading(true);
             try {
+                const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
                 const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch transactions');
@@ -44,6 +44,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                 
                 const parsedTxs: PresaleTransaction[] = data
                     .filter((tx: any) => 
+                        tx.timestamp >= presaleStartTimestamp &&
                         tx.type === 'NATIVE_TRANSFER' && 
                         tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
                     )
@@ -85,7 +86,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                      <div className="flex justify-center items-center h-full">
                         <Loader2 className="w-6 h-6 animate-spin text-accent-500 dark:text-darkAccent-500" />
                     </div>
-                ) : transactions.map((tx) => (
+                ) : transactions.length > 0 ? transactions.map((tx) => (
                     <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 5000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
                         <div className="col-span-2 flex items-center gap-2">
                            <AddressDisplay address={tx.address} className="text-xs" />
@@ -97,7 +98,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                              <OwfnIcon className="w-3.5 h-3.5" /> {(tx.owfnAmount / 1_000_000).toFixed(2)}M
                         </div>
                     </div>
-                ))}
+                )) : null}
             </div>
         </div>
     );
@@ -132,64 +133,112 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 );
 
 
-const calculateTimeLeft = (endDate: Date) => {
-    const difference = +endDate - +new Date();
-    let timeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
-    if (difference > 0) {
-        timeLeft = {
-            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-            minutes: Math.floor((difference / 1000 / 60) % 60),
-            seconds: Math.floor((difference / 1000) % 60),
-        };
-    }
-    return timeLeft;
-};
-
 export default function Presale() {
   const { t, solana } = useAppContext();
-  const { connection } = useConnection();
   const [solAmount, setSolAmount] = useState('');
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(PRESALE_DETAILS.endDate));
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
   const [soldSOL, setSoldSOL] = useState(0);
   const [userContribution, setUserContribution] = useState(0);
   const [isCheckingContribution, setIsCheckingContribution] = useState(false);
   
-  useEffect(() => {
-    const fetchPresaleBalance = async () => {
-        try {
-            const publicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
-            const balance = await connection.getBalance(publicKey);
-            setSoldSOL(balance / LAMPORTS_PER_SOL);
-        } catch (error) {
-            console.error("Failed to fetch presale balance:", error);
-        }
-    };
-    fetchPresaleBalance();
-    const interval = setInterval(fetchPresaleBalance, 60000); // refresh every minute
-    return () => clearInterval(interval);
-  }, [connection]);
+  const [presaleStatus, setPresaleStatus] = useState<'pending' | 'active' | 'ended'>('pending');
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setTimeLeft(calculateTimeLeft(PRESALE_DETAILS.endDate));
-    }, 1000);
-    return () => clearTimeout(timer);
-  });
+    const calculateState = () => {
+        const now = new Date();
+        const { startDate, endDate } = PRESALE_DETAILS;
+        let status: 'pending' | 'active' | 'ended' = 'pending';
+        let targetDate: Date;
+
+        if (now < startDate) {
+            status = 'pending';
+            targetDate = startDate;
+        } else if (now < endDate) {
+            status = 'active';
+            targetDate = endDate;
+        } else {
+            status = 'ended';
+            targetDate = endDate;
+        }
+        
+        setPresaleStatus(status);
+
+        const difference = +targetDate - +now;
+        let newTimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+        if (difference > 0) {
+            newTimeLeft = {
+                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                minutes: Math.floor((difference / 1000 / 60) % 60),
+                seconds: Math.floor((difference / 1000) % 60),
+            };
+        }
+        setTimeLeft(newTimeLeft);
+    };
+
+    calculateState();
+    const timer = setInterval(calculateState, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchPresaleProgress = async () => {
+        if (new Date() < PRESALE_DETAILS.startDate) {
+            setSoldSOL(0);
+            return;
+        }
+
+        try {
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            let allTxs: any[] = [];
+            let lastSignature: string | undefined = undefined;
+
+            while(true) {
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch transactions');
+                const data = await response.json();
+                
+                allTxs.push(...data);
+                
+                if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
+                    break;
+                }
+                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
+                if (!lastSignature) break;
+            }
+            
+            const presaleTxs = allTxs.filter((tx: any) => 
+                tx.timestamp >= presaleStartTimestamp &&
+                tx.type === 'NATIVE_TRANSFER' && 
+                tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111'
+            );
+
+            const totalContributed = presaleTxs.reduce((sum: number, tx: any) => sum + (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL), 0);
+            setSoldSOL(totalContributed);
+        } catch (error) {
+            console.error("Failed to fetch presale progress:", error);
+            setSoldSOL(0);
+        }
+    };
+    
+    fetchPresaleProgress();
+    const interval = setInterval(fetchPresaleProgress, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchUserContribution = async () => {
-        if (!solana.connected || !solana.address) {
+        if (!solana.connected || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
             setUserContribution(0);
             return;
         }
         setIsCheckingContribution(true);
         try {
-            // This logic fetches all transactions to the presale wallet and filters them client-side.
-            // For a very large number of transactions, this could be slow, but it is the most reliable way
-            // to get the total contribution without a dedicated backend API.
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
             let allTxs: any[] = [];
             let lastSignature: string | undefined = undefined;
             while(true) {
@@ -198,11 +247,15 @@ export default function Presale() {
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
                 allTxs.push(...data);
-                if (data.length < 100) break;
-                lastSignature = data[data.length - 1].signature;
+                if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
+                    break;
+                }
+                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
+                if (!lastSignature) break;
             }
 
             const userTxs = allTxs.filter((tx: any) => 
+                    tx.timestamp >= presaleStartTimestamp &&
                     tx.type === 'NATIVE_TRANSFER' && 
                     tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
                     tx.nativeTransfers[0]?.fromUserAccount === solana.address
@@ -246,9 +299,10 @@ export default function Presale() {
 
   const handleBuy = async () => {
         if (!solana.connected) {
-            alert(t('connect_wallet_first'));
+            solana.connectWallet();
             return;
         }
+        if (presaleStatus !== 'active') return;
 
         const numAmount = parseFloat(solAmount);
         if (isAmountInvalid) return;
@@ -279,10 +333,10 @@ export default function Presale() {
 
 
   const formatSaleDate = (date: Date) => {
-    return date.toUTCString().replace('GMT', 'GMT');
+    return date.toUTCString().replace('GMT', 'UTC');
   };
   
-  const saleStartDate = new Date(PRESALE_DETAILS.endDate.getTime() - (30 * 24 * 60 * 60 * 1000));
+  const saleStartDate = PRESALE_DETAILS.startDate;
 
   return (
     <div className="bg-primary-50 dark:bg-darkPrimary-950 text-primary-700 dark:text-darkPrimary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
@@ -336,9 +390,16 @@ export default function Presale() {
                             <p className="text-primary-800 dark:text-darkPrimary-100 text-2xl font-mono font-bold">--:--:--:--</p>
                         </div>
                         <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 text-center">
-                            <p className="text-primary-500 dark:text-darkPrimary-400 text-sm">{t('presale_public_ending_in')}</p>
+                            <p className="text-primary-500 dark:text-darkPrimary-400 text-sm">
+                                {presaleStatus === 'pending' && t('presale_sale_starts_in')}
+                                {presaleStatus === 'active' && t('presale_public_ending_in')}
+                                {presaleStatus === 'ended' && t('presale_sale_ended')}
+                            </p>
                             <p className="text-primary-800 dark:text-darkPrimary-100 text-2xl font-mono font-bold">
-                                {String(timeLeft.days).padStart(2, '0')}:{String(timeLeft.hours).padStart(2, '0')}:{String(timeLeft.minutes).padStart(2, '0')}:{String(timeLeft.seconds).padStart(2, '0')}
+                                {presaleStatus !== 'ended' ? 
+                                    `${String(timeLeft.days).padStart(2, '0')}:${String(timeLeft.hours).padStart(2, '0')}:${String(timeLeft.minutes).padStart(2, '0')}:${String(timeLeft.seconds).padStart(2, '0')}`
+                                    : '--:--:--:--'
+                                }
                             </p>
                         </div>
                     </div>
@@ -439,13 +500,13 @@ export default function Presale() {
                                     onChange={handleAmountChange}
                                     className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
                                     placeholder="0.00"
-                                    disabled={maxAllowedBuy <= 0 || isCheckingContribution}
+                                    disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
                                 />
                             </div>
                             <button 
                                 onClick={handleBuy}
                                 className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                                disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0))}
+                                disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
                             >
                                 {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
                             </button>

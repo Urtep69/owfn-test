@@ -62,7 +62,8 @@ export const PRESALE_DETAILS = {
   minBuy: 0,
   maxBuy: 5,
   rate: 10000000,
-  endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+  startDate: new Date('2024-07-31T00:00:00Z'),
+  endDate: new Date('2024-08-30T00:00:00Z')
 };
 
 export const SUPPORTED_LANGUAGES: Language[] = [

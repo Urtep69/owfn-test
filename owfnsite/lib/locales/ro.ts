@@ -115,6 +115,8 @@ export const ro = {
     presale_estimate_tooltip: 'Aceasta este o estimare. Suma finală poate varia.',
     presale_whitelist_finished: 'Vânzare Whitelist Încheiată:',
     presale_public_ending_in: 'Vânzarea Publică se încheie în:',
+    presale_sale_starts_in: 'Vânzarea Publică Începe în:',
+    presale_sale_ended: 'Vânzarea Publică s-a Încheiat',
     presale_project_info_title: 'Informații Proiect',
     token_name_label: 'Nume Token',
     token_symbol_label: 'Simbol Token',

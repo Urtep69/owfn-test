@@ -115,6 +115,8 @@ export const ja = {
     presale_estimate_tooltip: 'これは見積もりです。最終的な金額は異なる場合があります。',
     presale_whitelist_finished: 'ホワイトリストセール終了:',
     presale_public_ending_in: 'パブリックセール終了まで:',
+    presale_sale_starts_in: 'パブリックセール開始まで:',
+    presale_sale_ended: 'パブリックセール終了',
     presale_project_info_title: 'プロジェクト情報',
     token_name_label: 'トークン名',
     token_symbol_label: 'トークンシンボル',

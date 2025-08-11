@@ -115,6 +115,8 @@ export const es = {
     presale_estimate_tooltip: 'Esto es una estimación. La cantidad final puede variar.',
     presale_whitelist_finished: 'Venta de Lista Blanca Finalizada:',
     presale_public_ending_in: 'La Venta Pública termina en:',
+    presale_sale_starts_in: 'La Venta Pública comienza en:',
+    presale_sale_ended: 'Venta Pública Finalizada',
     presale_project_info_title: 'Información del Proyecto',
     token_name_label: 'Nombre del Token',
     token_symbol_label: 'Símbolo del Token',

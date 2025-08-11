@@ -115,6 +115,8 @@ export const en = {
     presale_estimate_tooltip: 'This is an estimate. The final amount may vary.',
     presale_whitelist_finished: 'Whitelist Sale Finished:',
     presale_public_ending_in: 'Public Sale Ending in:',
+    presale_sale_starts_in: 'Public Sale Starts in:',
+    presale_sale_ended: 'Public Sale Ended',
     presale_project_info_title: 'Project Information',
     token_name_label: 'Token Name',
     token_symbol_label: 'Token Symbol',
