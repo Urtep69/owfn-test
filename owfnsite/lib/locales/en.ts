@@ -382,6 +382,8 @@ export const en = {
     status_passed: 'Passed',
     status_failed: 'Failed',
     you_voted: 'You Voted',
+    no_active_proposals: 'There are currently no active proposals.',
+    no_past_proposals: 'There are no past proposals to display.',
 
     // Maintenance
     maintenance_heading: "We're making things better!",

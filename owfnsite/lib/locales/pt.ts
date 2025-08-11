@@ -382,6 +382,8 @@ export const pt = {
     status_passed: 'Aprovada',
     status_failed: 'Reprovada',
     you_voted: 'Você Votou',
+    no_active_proposals: 'Atualmente não há propostas ativas.',
+    no_past_proposals: 'Não há propostas passadas para exibir.',
 
     // Maintenance
     maintenance_heading: 'Estamos melhorando as coisas!',

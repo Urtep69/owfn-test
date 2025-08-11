@@ -382,6 +382,8 @@ export const ro = {
     status_passed: 'Aprobată',
     status_failed: 'Respinsă',
     you_voted: 'Ai Votat',
+    no_active_proposals: 'Momentan nu există propuneri active.',
+    no_past_proposals: 'Nu există propuneri anterioare de afișat.',
 
     // Maintenance
     maintenance_heading: "Facem lucrurile mai bune!",

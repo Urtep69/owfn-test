@@ -382,6 +382,8 @@ export const es = {
     status_passed: 'Aprobada',
     status_failed: 'Rechazada',
     you_voted: 'Ya Votaste',
+    no_active_proposals: 'Actualmente no hay propuestas activas.',
+    no_past_proposals: 'No hay propuestas pasadas para mostrar.',
 
     // Maintenance
     maintenance_heading: "¡Estamos mejorando las cosas!",

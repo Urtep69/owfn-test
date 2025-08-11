@@ -382,6 +382,8 @@ export const fr = {
     status_passed: 'Adoptée',
     status_failed: 'Rejetée',
     you_voted: 'Vous avez voté',
+    no_active_proposals: 'Il n\'y a actuellement aucune proposition active.',
+    no_past_proposals: 'Il n\'y a aucune proposition passée à afficher.',
     
     // Maintenance
     maintenance_heading: "Nous améliorons les choses !",

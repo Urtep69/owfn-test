@@ -382,6 +382,8 @@ export const de = {
     status_passed: 'Angenommen',
     status_failed: 'Abgelehnt',
     you_voted: 'Sie haben abgestimmt',
+    no_active_proposals: 'Derzeit gibt es keine aktiven Vorschläge.',
+    no_past_proposals: 'Es gibt keine vergangenen Vorschläge zum Anzeigen.',
     
     // Maintenance
     maintenance_heading: "Wir machen die Dinge besser!",

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Vote, PlusCircle, CheckCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Vote, PlusCircle, CheckCircle, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { GovernanceProposal } from '../types.ts';
 
@@ -117,18 +117,102 @@ export default function Governance() {
 
     const handleCreateProposal = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!newTitle || !newDescription) return;
         setIsSubmitting(true);
         const endDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000); // 14 days from now
-        await addProposal({ title: newTitle, description: newDescription, endDate });
-        setNewTitle('');
-        setNewDescription('');
-        setIsSubmitting(false);
-        setCreateModalOpen(false);
+        try {
+            await addProposal({ title: newTitle, description: newDescription, endDate });
+            setNewTitle('');
+            setNewDescription('');
+            setCreateModalOpen(false);
+        } catch (error) {
+            console.error("Failed to create proposal:", error);
+            // Optionally show an error to the user
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
         <div className="animate-fade-in-up space-y-8">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="text-center md:text-left">
-                    <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('governance')}</h1>
-                    <p className="mt-2 text-
+                    <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('governance_title')}</h1>
+                    <p className="mt-2 text-lg text-primary-600 dark:text-darkPrimary-400">{t('governance_subtitle')}</p>
+                </div>
+                {solana.connected && (
+                    <button 
+                        onClick={() => setCreateModalOpen(true)}
+                        className="flex items-center gap-2 bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors"
+                    >
+                        <PlusCircle size={20} /> {t('create_proposal')}
+                    </button>
+                )}
+            </div>
+
+            <div>
+                <h2 className="text-2xl font-bold mb-4">{t('active_proposals')}</h2>
+                {activeProposals.length > 0 ? (
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {activeProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
+                    </div>
+                ) : (
+                    <p className="text-primary-600 dark:text-darkPrimary-400">{t('no_active_proposals')}</p> 
+                )}
+            </div>
+
+            <div>
+                <h2 className="text-2xl font-bold mb-4">{t('past_proposals')}</h2>
+                {pastProposals.length > 0 ? (
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {pastProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
+                    </div>
+                ) : (
+                    <p className="text-primary-600 dark:text-darkPrimary-400">{t('no_past_proposals')}</p>
+                )}
+            </div>
+
+            {isCreateModalOpen && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-xl p-8 w-full max-w-2xl relative animate-fade-in-up" style={{ animationDuration: '300ms' }}>
+                        <button onClick={() => setCreateModalOpen(false)} className="absolute top-4 right-4 text-primary-500 hover:text-primary-800 dark:text-darkPrimary-400 dark:hover:text-darkPrimary-100">
+                            <X size={24} />
+                        </button>
+                        <h2 className="text-2xl font-bold mb-6">{t('create_proposal')}</h2>
+                        <form onSubmit={handleCreateProposal} className="space-y-4">
+                            <div>
+                                <label htmlFor="prop-title" className="block text-sm font-medium mb-1">{t('proposal_title')}</label>
+                                <input
+                                    id="prop-title"
+                                    type="text"
+                                    value={newTitle}
+                                    onChange={e => setNewTitle(e.target.value)}
+                                    required
+                                    className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="prop-desc" className="block text-sm font-medium mb-1">{t('proposal_description')}</label>
+                                <textarea
+                                    id="prop-desc"
+                                    value={newDescription}
+                                    onChange={e => setNewDescription(e.target.value)}
+                                    required
+                                    rows={5}
+                                    className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md"
+                                ></textarea>
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 py-3 rounded-lg font-bold hover:bg-accent-500 dark:hover:bg-darkAccent-600 disabled:opacity-50"
+                            >
+                                {isSubmitting ? t('processing') : t('submit_proposal')}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

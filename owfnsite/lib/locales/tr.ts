@@ -1,3 +1,4 @@
+
 export const tr = {
     // Navigation
     home: 'Anasayfa',
@@ -108,6 +109,7 @@ export const tr = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: 'Satıldı {progress}%',
     presale_buy_info: 'Satın Al (Min: {min} SOL, Maks: {max} SOL)',
+    presale_buy_info_max_only: 'Buy (Max: {max} SOL per wallet)',
     buy: 'Satın Al',
     presale_buying_owfn: '{amount} $OWFN alınıyor',
     presale_estimate_tooltip: 'Bu bir tahmindir. Nihai miktar değişebilir.',
@@ -129,6 +131,7 @@ export const tr = {
     presale_dyor_nfa_desc: 'Kendi Araştırmanızı Yapın. Finansal Tavsiye Değildir.',
     presale_footer_copyright: '© {year} Official World Family Network | Tüm hakları saklıdır.',
     presale_amount_error: 'Miktar {min} ile {max} SOL arasında olmalıdır.',
+    presale_max_amount_error: 'Amount must not exceed {max} SOL.',
     live_presale_feed: 'Canlı Ön Satış Akışı',
     wallet: 'Cüzdan',
     sol_spent: 'Harcanan SOL',
@@ -162,8 +165,10 @@ export const tr = {
     // Profile
     my_profile: 'Profilim',
     my_tokens: 'Tokenlerim',
+    token_types: 'Token Çeşitleri',
     profile_loading_tokens: 'Tokenler yükleniyor...',
     profile_connect_prompt: 'Profilinizi ve token bakiyelerinizi görmek için cüzdanınızı bağlayın.',
+    profile_no_tokens: 'Bu cüzdanda token bulunamadı.',
     impact_dashboard_title: 'Etki Panosu',
     my_impact_stats: 'Etki İstatistiklerim',
     total_donated: 'Toplam Bağış',
@@ -177,6 +182,8 @@ export const tr = {
     badge_community_voter_desc: '5 yönetişim oylamasına katıldığınız için verildi.',
     badge_diverse_donor: 'Çeşitli Bağışçı',
     badge_diverse_donor_desc: '3 farklı kategorideki projelere bağış yaptığınız için verildi.',
+    asset: 'Varlık',
+    value_usd: 'Değer (USD)',
 
     // Impact Portal
     social_cases: 'Sosyal Vakalar',
@@ -275,26 +282,27 @@ export const tr = {
     back_to_dashboard: 'Kontrol Paneline Geri Dön',
     back_to_profile: 'Profile Geri Dön',
     token_not_found: 'Token verileri bulunamadı.',
-    dextscore_title: 'DEXTscore',
-    project_reliability_score: 'Proje güvenilirlik puanı şunlara dayanmaktadır:',
-    audit_title: 'Denetim',
-    verify_external_audits: 'Harici denetimleri doğrulayın',
-    contract_verified: 'Sözleşme Doğrulandı',
-    honeypot: 'Bal Küpü',
-    freezable: 'Dondurulabilir',
-    mintable: 'Basılabilir',
-    check_audits: 'Denetimleri Kontrol Et (Uyarılar: {count})',
-    community_trust_title: 'Topluluk Güveni',
-    of_trades: '{total} işlemden',
     token_description_title: 'TOKEN AÇIKLAMASI',
-    live_transactions: 'Canlı İşlemler',
-    type: 'Tür',
-    price_usd: 'Fiyat USD',
-    amount_token: 'Miktar ({token})',
-    total_usd: 'Toplam USD',
     sell: 'Satış',
-    top_holders: 'En Büyük Sahipler',
-    market_sentiment: 'Piyasa Duyarlılığı',
+    market_cap: 'Piyasa Değeri',
+    liquidity: 'Likidite',
+    volume_24h: '24s Hacim',
+    pair_address: 'Çift Adresi',
+    mint_authority: 'Mint Yetkisi',
+    freeze_authority: 'Dondurma Yetkisi',
+    fully_diluted_valuation: 'Tamamen Seyreltilmiş Değerleme (FDV)',
+    market_stats: 'Piyasa İstatistikleri',
+    trading_activity: 'Ticaret Aktivitesi',
+    buys_24h: 'Alımlar (24s)',
+    sells_24h: 'Satışlar (24s)',
+    total_transactions_24h: 'Toplam İşlemler (24s)',
+    token_supply: 'Token Arzı',
+    decimals: 'Ondalıklar',
+    pool_info: 'Havuz Bilgisi',
+    exchange: 'Borsa',
+    pool_age: 'Havuz Yaşı',
+    on_chain_security: 'Zincir Üstü Güvenlik',
+    update_authority: 'Güncelleme Yetkisi',
     
     // Staking & Vesting
     staking_title: 'OWFN Stake Edin, Ödül Kazanın',
@@ -374,7 +382,9 @@ export const tr = {
     status_passed: 'Kabul Edildi',
     status_failed: 'Reddedildi',
     you_voted: 'Oy Verdiniz',
-
+    no_active_proposals: 'Şu anda aktif bir teklif bulunmamaktadır.',
+    no_past_proposals: 'Görüntülenecek geçmiş teklif bulunmamaktadır.',
+    
     // Maintenance
     maintenance_heading: 'İşleri daha iyi hale getiriyoruz!',
     maintenance_message: 'Platformumuz şu anda deneyiminizi iyileştirmek için planlı bakımdadır. Sabrınız ve anlayışınız için teşekkür ederiz. Kısa süre içinde tekrar çevrimiçi olacağız.',
@@ -386,7 +396,8 @@ export const tr = {
     activate_maintenance_mode: 'Bakımı Etkinleştir',
     deactivate_maintenance_mode: 'Bakımı Devre Dışı Bırak',
     admin_login: 'Yönetici Girişi',
-
+    maintenance_login_denied: 'Bağlantı reddedildi. Platform bakım modunda. Sadece yöneticiler giriş yapabilir.',
+    
     // Coming Soon
     coming_soon_title: 'Yakında',
     coming_soon_desc: 'Bu özellik şu anda geliştirme aşamasındadır. Yakında size sunmak için çok çalışıyoruz. Sabrınız ve desteğiniz için teşekkür ederiz.',

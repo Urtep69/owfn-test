@@ -1,3 +1,4 @@
+
 export const ko = {
     // Navigation
     home: '홈',
@@ -108,6 +109,7 @@ export const ko = {
     presale_header_subtitle: '공식 세계 가족 네트워크 - $OWFN',
     presale_sold_progress: '{progress}% 판매됨',
     presale_buy_info: '구매 (최소: {min} SOL, 최대: {max} SOL)',
+    presale_buy_info_max_only: 'Buy (Max: {max} SOL per wallet)',
     buy: '구매',
     presale_buying_owfn: '{amount} $OWFN 구매 중',
     presale_estimate_tooltip: '이것은 추정치입니다. 최종 금액은 다를 수 있습니다.',
@@ -129,6 +131,7 @@ export const ko = {
     presale_dyor_nfa_desc: '직접 조사하세요. 금융 조언이 아닙니다.',
     presale_footer_copyright: '© {year} 공식 세계 가족 네트워크 | 모든 권리 보유.',
     presale_amount_error: '금액은 {min}에서 {max} SOL 사이여야 합니다.',
+    presale_max_amount_error: 'Amount must not exceed {max} SOL.',
     live_presale_feed: '실시간 프리세일 피드',
     wallet: '지갑',
     sol_spent: '사용한 SOL',
@@ -179,6 +182,8 @@ export const ko = {
     badge_community_voter_desc: '거버넌스 투표에 5번 참여하시면 수여됩니다.',
     badge_diverse_donor: '다양한 기부자',
     badge_diverse_donor_desc: '3개의 다른 카테고리 프로젝트에 기부하시면 수여됩니다.',
+    asset: '자산',
+    value_usd: '가치 (USD)',
 
     // Impact Portal
     social_cases: '사회적 사례',
@@ -277,26 +282,27 @@ export const ko = {
     back_to_dashboard: '대시보드로 돌아가기',
     back_to_profile: '프로필로 돌아가기',
     token_not_found: '토큰 데이터를 찾을 수 없습니다.',
-    dextscore_title: 'DEXTscore',
-    project_reliability_score: '프로젝트 신뢰도 점수는 다음에 기반합니다:',
-    audit_title: '감사',
-    verify_external_audits: '외부 감사 확인',
-    contract_verified: '계약 검증됨',
-    honeypot: '허니팟',
-    freezable: '동결 가능',
-    mintable: '발행 가능',
-    check_audits: '감사 확인 (경고: {count})',
-    community_trust_title: '커뮤니티 신뢰',
-    of_trades: '{total} 거래 중',
     token_description_title: '토큰 설명',
-    live_transactions: '실시간 거래',
-    type: '유형',
-    price_usd: '가격 USD',
-    amount_token: '수량 ({token})',
-    total_usd: '총 USD',
     sell: '판매',
-    top_holders: '상위 보유자',
-    market_sentiment: '시장 심리',
+    market_cap: '시가 총액',
+    liquidity: '유동성',
+    volume_24h: '24시간 거래량',
+    pair_address: '페어 주소',
+    mint_authority: '민트 권한',
+    freeze_authority: '동결 권한',
+    fully_diluted_valuation: '완전 희석 가치 (FDV)',
+    market_stats: '시장 통계',
+    trading_activity: '거래 활동',
+    buys_24h: '매수 (24시간)',
+    sells_24h: '매도 (24시간)',
+    total_transactions_24h: '총 거래 (24시간)',
+    token_supply: '토큰 공급량',
+    decimals: '소수점',
+    pool_info: '풀 정보',
+    exchange: '거래소',
+    pool_age: '풀 연령',
+    on_chain_security: '온체인 보안',
+    update_authority: '업데이트 권한',
     
     // Staking & Vesting
     staking_title: 'OWFN 스테이킹하고 보상 받기',
@@ -376,7 +382,9 @@ export const ko = {
     status_passed: '통과',
     status_failed: '부결',
     you_voted: '투표함',
-
+    no_active_proposals: '현재 활성 제안이 없습니다.',
+    no_past_proposals: '표시할 과거 제안이 없습니다.',
+    
     // Maintenance
     maintenance_heading: '더 나은 서비스를 위해 노력하고 있습니다!',
     maintenance_message: '현재 더 나은 경험을 제공하기 위해 예정된 유지보수 작업을 진행하고 있습니다. 여러분의 양해와 인내에 감사드립니다. 곧 다시 온라인으로 돌아오겠습니다.',
@@ -388,6 +396,7 @@ export const ko = {
     activate_maintenance_mode: '유지보수 활성화',
     deactivate_maintenance_mode: '유지보수 비활성화',
     admin_login: '관리자 로그인',
+    maintenance_login_denied: '연결이 거부되었습니다. 플랫폼이 유지보수 모드입니다. 관리자만 로그인할 수 있습니다.',
 
     // Coming Soon
     coming_soon_title: '곧 출시 예정',

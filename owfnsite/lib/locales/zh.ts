@@ -1,3 +1,4 @@
+
 export const zh = {
     // Navigation
     home: '首页',
@@ -108,6 +109,7 @@ export const zh = {
     presale_header_subtitle: '官方世界家庭网络 - $OWFN',
     presale_sold_progress: '已售出 {progress}%',
     presale_buy_info: '购买（最小：{min} SOL，最大：{max} SOL）',
+    presale_buy_info_max_only: 'Buy (Max: {max} SOL per wallet)',
     buy: '购买',
     presale_buying_owfn: '正在购买 {amount} $OWFN',
     presale_estimate_tooltip: '这是一个估算值，最终金额可能会有所不同。',
@@ -129,6 +131,7 @@ export const zh = {
     presale_dyor_nfa_desc: '请自行研究。非财务建议。',
     presale_footer_copyright: '© {year} 官方世界家庭网络 | 保留所有权利。',
     presale_amount_error: '金额必须在 {min} 和 {max} SOL 之间。',
+    presale_max_amount_error: 'Amount must not exceed {max} SOL.',
     live_presale_feed: '实时预售动态',
     wallet: '钱包',
     sol_spent: '花费的 SOL',
@@ -153,7 +156,6 @@ export const zh = {
     wallet_monitor_desc: '为实现完全透明而对官方项目钱包进行实时监控。',
     total_value: '总价值',
     wallet_name_presale: '预售与流动性',
-
     wallet_name_impact_treasury: '影响力金库',
     wallet_name_community: '社区与生态系统',
     wallet_name_team: '团队与创始人',
@@ -163,8 +165,10 @@ export const zh = {
     // Profile
     my_profile: '我的个人资料',
     my_tokens: '我的代币',
+    token_types: '代币类型',
     profile_loading_tokens: '正在加载代币...',
     profile_connect_prompt: '连接您的钱包以查看您的个人资料和代币余额。',
+    profile_no_tokens: '此钱包中未找到任何代币。',
     impact_dashboard_title: '我的影响力仪表板',
     my_impact_stats: '我的影响力统计',
     total_donated: '总捐赠额',
@@ -178,6 +182,8 @@ export const zh = {
     badge_community_voter_desc: '为参与 5 次治理投票而颁发。',
     badge_diverse_donor: '多元化捐赠者',
     badge_diverse_donor_desc: '为向 3 个不同类别的项目捐赠而颁发。',
+    asset: '资产',
+    value_usd: '价值 (USD)',
     
     // Impact Portal
     social_cases: '社会案例',
@@ -276,26 +282,28 @@ export const zh = {
     back_to_dashboard: '返回仪表板',
     back_to_profile: '返回个人资料',
     token_not_found: '未找到代币数据。',
-    dextscore_title: 'DEXTscore',
-    project_reliability_score: '项目可靠性评分基于：',
-    audit_title: '审计',
-    verify_external_audits: '验证外部审计',
-    contract_verified: '合约已验证',
-    honeypot: '蜜罐',
-    freezable: '可冻结',
-    mintable: '可铸造',
-    check_audits: '检查审计（警报：{count}）',
-    community_trust_title: '社区信任',
-    of_trades: '在 {total} 笔交易中',
     token_description_title: '代币描述',
-    live_transactions: '实时交易',
-    type: '类型',
-    price_usd: '价格 (USD)',
-    amount_token: '数量 ({token})',
-    total_usd: '总计 (USD)',
     sell: '卖出',
-    top_holders: '主要持有者',
-    market_sentiment: '市场情绪',
+    market_cap: '市值',
+    liquidity: '流动性',
+    volume_24h: '24小时交易量',
+    pair_address: '交易对地址',
+    mint_authority: '铸币权',
+
+    freeze_authority: '冻结权',
+    fully_diluted_valuation: '完全稀释估值 (FDV)',
+    market_stats: '市场统计',
+    trading_activity: '交易活动',
+    buys_24h: '买入 (24小时)',
+    sells_24h: '卖出 (24小时)',
+    total_transactions_24h: '总交易数 (24小时)',
+    token_supply: '代币供应量',
+    decimals: '小数位数',
+    pool_info: '流动性池信息',
+    exchange: '交易所',
+    pool_age: '池子年龄',
+    on_chain_security: '链上安全',
+    update_authority: '更新权',
     
     // Staking & Vesting
     staking_title: '质押 OWFN，赚取奖励',
@@ -375,6 +383,8 @@ export const zh = {
     status_passed: '已通过',
     status_failed: '未通过',
     you_voted: '您已投票',
+    no_active_proposals: '目前没有进行中的提案。',
+    no_past_proposals: '没有可显示的过去提案。',
 
     // Maintenance
     maintenance_heading: '我们正在改进！',
@@ -387,6 +397,7 @@ export const zh = {
     activate_maintenance_mode: '激活维护模式',
     deactivate_maintenance_mode: '停用维护模式',
     admin_login: '管理员登录',
+    maintenance_login_denied: '连接被拒绝。平台处于维护模式。只有管理员可以登录。',
     
     // Coming Soon
     coming_soon_title: '即将推出',

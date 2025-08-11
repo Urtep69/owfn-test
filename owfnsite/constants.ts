@@ -1,3 +1,4 @@
+
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from './components/IconComponents.tsx';
@@ -66,20 +67,20 @@ export const PRESALE_DETAILS = {
 
 export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'de', name: 'German', flag: '🇩🇪' },
-  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
-  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
-  { code: 'fr', name: 'French', flag: '🇫🇷' },
-  { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
-  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
-  { code: 'it', name: 'Italian', flag: '🇮🇹' },
-  { code: 'nl', name: 'Dutch', flag: '🇳🇱' },
-  { code: 'ro', name: 'Romanian', flag: '🇷🇴' },
-  { code: 'hu', name: 'Hungarian', flag: '🇭🇺' },
-  { code: 'sr', name: 'Serbian', flag: '🇷🇸' },
-  { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
-  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
   { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'nl', name: 'Dutch', flag: '🇳🇱' },
+  { code: 'fr', name: 'French', flag: '🇫🇷' },
+  { code: 'de', name: 'German', flag: '🇩🇪' },
+  { code: 'hu', name: 'Hungarian', flag: '🇭🇺' },
+  { code: 'it', name: 'Italian', flag: '🇮🇹' },
+  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+  { code: 'pt', name: 'Portuguese', flag: '🇵🇹' },
+  { code: 'ro', name: 'Romanian', flag: '🇷🇴' },
+  { code: 'ru', name: 'Russian', flag: '🇷🇺' },
+  { code: 'sr', name: 'Serbian', flag: '🇷🇸' },
+  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+  { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
 ];
 
 export const INITIAL_SOCIAL_CASES: SocialCase[] = [];

@@ -1,3 +1,4 @@
+
 export const sr = {
     // Navigation
     home: 'Почетна',
@@ -108,6 +109,7 @@ export const sr = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: 'Продато {progress}%',
     presale_buy_info: 'Купи (Мин: {min} SOL, Макс: {max} SOL)',
+    presale_buy_info_max_only: 'Buy (Max: {max} SOL per wallet)',
     buy: 'Купи',
     presale_buying_owfn: 'Купујете {amount} $OWFN',
     presale_estimate_tooltip: 'Ово је процена. Коначан износ може варирати.',
@@ -129,6 +131,7 @@ export const sr = {
     presale_dyor_nfa_desc: 'Урадите сопствено истраживање. Није финансијски савет.',
     presale_footer_copyright: '© {year} Official World Family Network | Сва права задржана.',
     presale_amount_error: 'Износ мора бити између {min} и {max} SOL.',
+    presale_max_amount_error: 'Amount must not exceed {max} SOL.',
     live_presale_feed: 'Пренос претпродаје уживо',
     wallet: 'Новчаник',
     sol_spent: 'Потрошено SOL',
@@ -162,8 +165,10 @@ export const sr = {
     // Profile
     my_profile: 'Мој профил',
     my_tokens: 'Моји токени',
+    token_types: 'Типови токена',
     profile_loading_tokens: 'Учитавање токена...',
     profile_connect_prompt: 'Повежите свој новчаник да бисте видели свој профил и стања токена.',
+    profile_no_tokens: 'Нема токена у овом новчанику.',
     impact_dashboard_title: 'Моја контролна табла утицаја',
     my_impact_stats: 'Моја статистика утицаја',
     total_donated: 'Укупно донирано',
@@ -177,6 +182,8 @@ export const sr = {
     badge_community_voter_desc: 'Додељује се за учешће у 5 гласања о управљању.',
     badge_diverse_donor: 'Разноврсни донатор',
     badge_diverse_donor_desc: 'Додељује се за донације пројектима у 3 различите категорије.',
+    asset: 'Средство',
+    value_usd: 'Вредност (USD)',
 
     // Impact Portal
     social_cases: 'Друштвени случајеви',
@@ -275,26 +282,27 @@ export const sr = {
     back_to_dashboard: 'Назад на контролну таблу',
     back_to_profile: 'Назад на профил',
     token_not_found: 'Подаци о токену нису пронађени.',
-    dextscore_title: 'DEXTscore',
-    project_reliability_score: 'Оцена поузданости пројекта заснована на:',
-    audit_title: 'Ревизија',
-    verify_external_audits: 'Верификујте екстерне ревизије',
-    contract_verified: 'Уговор верификован',
-    honeypot: 'Медена клопка',
-    freezable: 'Замрзљиво',
-    mintable: 'Ковно',
-    check_audits: 'Провери ревизије (Упозорења: {count})',
-    community_trust_title: 'Поверење заједнице',
-    of_trades: 'од {total} трговина',
     token_description_title: 'ОПИС ТОКЕНА',
-    live_transactions: 'Трансакције уживо',
-    type: 'Тип',
-    price_usd: 'Цена УСД',
-    amount_token: 'Количина ({token})',
-    total_usd: 'Укупно УСД',
     sell: 'Продаја',
-    top_holders: 'Највећи власници',
-    market_sentiment: 'Расположење на тржишту',
+    market_cap: 'Тржишна капитализација',
+    liquidity: 'Ликвидност',
+    volume_24h: 'Обим 24ч',
+    pair_address: 'Адреса пара',
+    mint_authority: 'Овлашћење за ковање',
+    freeze_authority: 'Овлашћење за замрзавање',
+    fully_diluted_valuation: 'Потпуно разводњена вредност (FDV)',
+    market_stats: 'Тржишна статистика',
+    trading_activity: 'Трговинска активност',
+    buys_24h: 'Куповине (24ч)',
+    sells_24h: 'Продаје (24ч)',
+    total_transactions_24h: 'Укупно трансакција (24ч)',
+    token_supply: 'Понуда токена',
+    decimals: 'Децимале',
+    pool_info: 'Информације о базену',
+    exchange: 'Берза',
+    pool_age: 'Старост базена',
+    on_chain_security: 'Безбедност на ланцу',
+    update_authority: 'Овлашћење за ажурирање',
     
     // Staking & Vesting
     staking_title: 'Стејкујте OWFN, зарадите награде',
@@ -374,6 +382,8 @@ export const sr = {
     status_passed: 'Усвојен',
     status_failed: 'Одбијен',
     you_voted: 'Гласали сте',
+    no_active_proposals: 'Тренутно нема активних предлога.',
+    no_past_proposals: 'Нема прошлих предлога за приказ.',
 
     // Maintenance
     maintenance_heading: 'Побољшавамо ствари!',
@@ -386,6 +396,7 @@ export const sr = {
     activate_maintenance_mode: 'Активирај одржавање',
     deactivate_maintenance_mode: 'Деактивирај одржавање',
     admin_login: 'Пријава администратора',
+    maintenance_login_denied: 'Повезивање одбијено. Платформа је у режиму одржавања. Само администратори могу да се пријаве.',
 
     // Coming Soon
     coming_soon_title: 'Ускоро',
