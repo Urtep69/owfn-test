@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
 import { Star, Share2, Loader2, ArrowLeft, BarChart2, DollarSign, Users, Flame, UserCog, KeyRound, Lock, Unlock, TrendingUp, Briefcase } from 'lucide-react';
@@ -234,11 +233,11 @@ export default function TokenDetail() {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-primary-800 rounded-lg shadow-lg h-[500px]">
                        <iframe
-                            src={`https://solanatracker.io/embed/birdeye/${token.mintAddress}?chain=solana`}
+                            src={`https://www.dextools.io/widget/en/solana/pe-light/${token.pairAddress}?theme=dark&chart=true&info=true&trades=true`}
                             className="w-full h-full rounded-lg"
                             frameBorder="0"
                             allowFullScreen
-                            title="SolanaTracker Live Chart"
+                            title="DEXTools Live Chart"
                         />
                     </div>
                     <div className="bg-primary-800 rounded-lg shadow-lg p-4">
