@@ -142,6 +142,7 @@ export const en = {
     just_now: 'Just now',
     presale_you_contributed: 'You have already contributed: {amount} SOL.',
     presale_you_can_buy: 'You can contribute up to {amount} more SOL.',
+    presale_bonus_offer: '{percentage}% BONUS on purchases of {threshold} SOL or more!',
     
     // Donations Page
     make_donation: 'Make a Donation',

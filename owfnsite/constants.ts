@@ -20,7 +20,7 @@ export const TOKEN_DETAILS = {
   standard: 'SPL Token 2022',
   extensions: 'Transfer Fee (0.5% activated after presale concludes), Interest-Bearing (2% APR)',
   presalePrice: '1 SOL = 10,000,000 OWFN',
-  dexLaunchPrice: '1 SOL = 8,000,000 OWFN',
+  dexLaunchPrice: '1 SOL ≈ 6,670,000 OWFN',
 };
 
 export const DISTRIBUTION_WALLETS = {
@@ -57,11 +57,13 @@ export const ROADMAP_DATA: RoadmapPhase[] = [
 ];
 
 export const PRESALE_DETAILS = {
-  softCap: 50,
-  hardCap: 180,
+  softCap: 105,
+  hardCap: 200,
   minBuy: 0,
   maxBuy: 5,
   rate: 10000000,
+  bonusThreshold: 2, // Minimum SOL to get the bonus
+  bonusPercentage: 10, // 10% bonus
   startDate: new Date('2025-08-12T00:00:00Z'),
   endDate: new Date('2025-09-12T00:00:00Z')
 };

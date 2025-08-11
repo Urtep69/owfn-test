@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
-import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2 } from 'lucide-react';
+import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
 import { 
@@ -302,7 +302,24 @@ export default function Presale() {
     }
   };
 
-  const owfnAmount = parseFloat(solAmount) * PRESALE_DETAILS.rate;
+  const { owfnAmount, bonusApplied } = useMemo(() => {
+    const numAmount = parseFloat(solAmount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      return { owfnAmount: 0, bonusApplied: false };
+    }
+    
+    let finalOwfnAmount = numAmount * PRESALE_DETAILS.rate;
+    let isBonus = false;
+
+    if (numAmount >= PRESALE_DETAILS.bonusThreshold) {
+      finalOwfnAmount *= (1 + PRESALE_DETAILS.bonusPercentage / 100);
+      isBonus = true;
+    }
+
+    return { owfnAmount: finalOwfnAmount, bonusApplied: isBonus };
+  }, [solAmount]);
+
+
   const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
   const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) <= 0 || parseFloat(solAmount) > maxAllowedBuy;
 
@@ -316,19 +333,18 @@ export default function Presale() {
         const numAmount = parseFloat(solAmount);
         if (isAmountInvalid) return;
 
-        const owfnToReceive = numAmount * PRESALE_DETAILS.rate;
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numAmount, 'SOL');
 
         if (result.success && result.signature) {
             alert(t('presale_purchase_success_alert', { 
                 amount: numAmount.toFixed(2), 
-                owfnAmount: owfnToReceive.toLocaleString() 
+                owfnAmount: owfnAmount.toLocaleString() 
             }));
             const newTx: PresaleTransaction = {
                 id: result.signature,
                 address: solana.address!,
                 solAmount: numAmount,
-                owfnAmount: owfnToReceive,
+                owfnAmount: numAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
                 time: new Date(),
             };
             setLatestPurchase(newTx);
@@ -481,6 +497,11 @@ export default function Presale() {
                 <div className="lg:col-span-2 space-y-6 flex flex-col">
                      {/* Buy Section */}
                     <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6">
+                        <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center mb-4">
+                            <p className="font-bold text-accent-700 dark:text-darkAccent-200 flex items-center justify-center gap-2">
+                                <Gift size={18} /> {t('presale_bonus_offer', { threshold: PRESALE_DETAILS.bonusThreshold, percentage: PRESALE_DETAILS.bonusPercentage })}
+                            </p>
+                        </div>
                         <p className="text-sm text-primary-700 dark:text-darkPrimary-300 mb-2 text-center">
                             {t('presale_buy_info_max_only', { max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
@@ -523,6 +544,7 @@ export default function Presale() {
                         {error && <p className="text-red-500 dark:text-red-400 text-sm mt-2 text-center">{error}</p>}
                         <p className="text-sm text-primary-600 dark:text-darkPrimary-400 mt-2 text-center flex items-center justify-center">
                             {t('presale_buying_owfn', { amount: isNaN(owfnAmount) ? '0.00' : owfnAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) })}
+                            {bonusApplied && <span className="ml-1.5 text-xs font-bold text-green-500 dark:text-green-400">(+10% Bonus!)</span>}
                             <span className="ml-1.5 cursor-pointer" title={t('presale_estimate_tooltip')}>
                                 <Info size={14} />
                             </span>

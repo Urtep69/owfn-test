@@ -113,15 +113,22 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        const contributorMap = new Map<string, { totalSol: number, totalOwfn: number }>();
+        const contributorMap = new Map<string, { totalSol: number }>();
         transactions.forEach(tx => {
-            const existing = contributorMap.get(tx.from) ?? { totalSol: 0, totalOwfn: 0 };
+            const existing = contributorMap.get(tx.from) ?? { totalSol: 0 };
             existing.totalSol += tx.solAmount;
-            existing.totalOwfn += tx.owfnAmount;
             contributorMap.set(tx.from, existing);
         });
-        return Array.from(contributorMap.entries()).map(([address, data]) => ({ address, ...data }));
+        
+        return Array.from(contributorMap.entries()).map(([address, data]) => {
+            let owfnAmount = data.totalSol * PRESALE_DETAILS.rate;
+            if (data.totalSol >= PRESALE_DETAILS.bonusThreshold) {
+                owfnAmount *= (1 + PRESALE_DETAILS.bonusPercentage / 100);
+            }
+            return { address, totalSol: data.totalSol, totalOwfn: owfnAmount };
+        });
     }, [transactions]);
+
 
     const exportToCsv = useCallback(() => {
         const headers = ['contributor_address', 'total_sol_spent', 'total_owfn_to_receive'];

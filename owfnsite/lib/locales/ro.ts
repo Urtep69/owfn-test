@@ -142,6 +142,7 @@ export const ro = {
     just_now: 'Chiar acum',
     presale_you_contributed: 'Ați contribuit deja cu: {amount} SOL.',
     presale_you_can_buy: 'Puteți contribui cu până la încă {amount} SOL.',
+    presale_bonus_offer: 'BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!',
 
     // Donations Page
     make_donation: 'Fă o Donație',
