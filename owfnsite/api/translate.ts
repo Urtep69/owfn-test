@@ -15,14 +15,22 @@ export default async function handler(request: Request) {
     
     try {
         const { text, targetLanguage } = await request.json();
+
+        if (!text || !text.trim()) {
+            return new Response(JSON.stringify({ text: text || '' }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
         
         const ai = new GoogleGenAI({ apiKey });
-        const model = "gemini-2.5-flash";
-
-        const prompt = `Translate the following text to ${targetLanguage}:\n\n"${text}"`;
+        
         const response = await ai.models.generateContent({
-            model,
-            contents: prompt
+            model: "gemini-2.5-flash",
+            contents: text,
+            config: {
+                systemInstruction: `You are an expert translator. Translate the text to ${targetLanguage}. Respond with only the translated text, without any introductory phrases, explanations, or quotation marks.`,
+            }
         });
 
         return new Response(JSON.stringify({ text: response.text }), {
