@@ -191,6 +191,7 @@ export default async function handler(request: Request) {
             contents: contents,
             config: {
                 systemInstruction: knowledgeBase,
+                thinkingConfig: { thinkingBudget: 0 },
             }
         });
 
