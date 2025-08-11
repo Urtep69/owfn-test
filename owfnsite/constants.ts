@@ -18,7 +18,7 @@ export const TOKEN_DETAILS = {
   totalSupply: 18_000_000_000,
   decimals: 9,
   standard: 'SPL Token 2022',
-  extensions: 'Transfer Fee (0.5%), Interest-Bearing (2% APR)',
+  extensions: 'Transfer Fee (0.5% after presale), Interest-Bearing (2% APR)',
   presalePrice: '1 SOL = 10,000,000 OWFN',
   dexLaunchPrice: '1 SOL = 8,000,000 OWFN',
 };

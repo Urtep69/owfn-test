@@ -9,7 +9,7 @@ const TOKEN_DETAILS = {
   totalSupply: 18_000_000_000,
   decimals: 9,
   standard: 'SPL Token 2022',
-  extensions: 'Transfer Fee (0.5%), Interest-Bearing (2% APR)',
+  extensions: 'Transfer Fee (0.5% after presale), Interest-Bearing (2% APR)',
   presalePrice: '1 SOL = 10,000,000 OWFN',
   dexLaunchPrice: '1 SOL = 8,000,000 OWFN',
 };
@@ -295,7 +295,7 @@ const en = {
     faq_q7: `How does OWFN make a real-world difference?`,
     faq_a7: `OWFN directly funds initiatives in critical areas such as healthcare (e.g., covering surgery costs, hospital modernization), education (e.g., building and renovating schools, kindergartens), and basic needs (e.g., providing food, shelter, clothing for the homeless, establishing nursing homes). We also respond to disaster relief and invest in sustainable community development projects. Every token contributes to these concrete actions, ensuring 100% real support for humanity.`,
     faq_q8: `How does my contribution, through buying tokens, truly help?`,
-    faq_a8: `When you purchase OWFN tokens, a significant portion of the funds goes directly into the Impact Treasury. This treasury is specifically allocated to finance our social impact projects. The blockchain technology ensures complete transparency, meaning you can verify how funds are utilized. Your purchase isn't just an investment; it's a direct contribution to a fund dedicated to improving lives and communities worldwide.`,
+    faq_a8: `When you purchase OWFN tokens, a significant portion of the funds goes directly into the Impact Treasury to finance our social impact projects. Furthermore, to ensure continuous funding for these causes, a small 0.5% transfer fee will be activated on all transactions *after* the presale concludes. This fee acts as an automatic micro-donation, where 0.5% of every transaction is directed to the Impact Treasury. This transforms the simple act of using the token into a continuous contribution to the greater good. The blockchain technology ensures complete transparency for all these funding streams.`,
     faq_q9: `Beyond buying tokens, how else can I get involved and help OWFN?`,
     faq_a9: `Your involvement is crucial! Spreading the word about OWFN is incredibly powerful. Talk to your friends, family, and colleagues about our mission. Share our vision on social media, during your travels, or at work. Every conversation, every share, helps raise awareness and brings more people into our global family, amplifying our collective impact. Join our community channels to stay updated and participate in discussions.`,
     faq_q10: `Are there special instructions for donating USDC or USDT?`,
@@ -728,9 +728,9 @@ const zh = {
     faq_q6: '我在哪里可以找到 OWFN 白皮书？',
     faq_a6: '您可以通过点击我们网站页眉或主要部分的“白皮书”按钮找到详细的 OWFN 白皮书。',
     faq_q7: 'OWFN 如何在现实世界中产生影响？',
-    faq_a7: 'OWFN 直接资助健康（例如支付手术费用、现代化医院）、教育（例如建设和翻新学校、幼儿园）和基本需求（例如为无家可归者提供食物、住所、衣物，建立养老院）等关键领域的倡议。我们还应对灾难救援并投资于可持续的社区发展项目。每个代币都为这些具体行动做出贡献，确保为人类提供 100% 的真实支持。',
+    faq_a7: 'OWFN 直接资助健康（例如支付手术费用、现代化医院）、教育（例如建设和翻新学校、幼儿园）和基本需求（例如为无家可歸者提供食物、住所、衣物，建立养老院）等关键领域的倡议。我们还应对灾难救援并投资于可持续的社区发展项目。每个代币都为这些具体行动做出贡献，确保为人类提供 100% 的真实支持。',
     faq_q8: '通过购买代币，我的贡献如何真正提供帮助？',
-    faq_a8: '当您购买 OWFN 代币时，大部分资金将直接进入影响力金库。该金库专门用于资助我们的社会影响力项目。区块链技术确保了完全的透明度，这意味着您可以验证资金的使用方式。您的购买不仅仅是一项投资；它是对致力于改善全球生活和社区的基金的直接贡献。',
+    faq_a8: '当您购买 OWFN 代币时，大部分资金将直接进入影响力金库，用于资助我们的社会影响力项目。此外，为确保持续资助这些事业，预售结束后，所有交易将激活 0.5% 的小额转账费。该费用作为自动微型捐赠，每笔交易的 0.5% 将直接进入影响力金库。这将使用代币的简单行为转变为对更大利益的持续贡献。区块链技术确保了所有这些资金流的完全透明。',
     faq_q9: '除了购买代币，我还能如何参与并帮助 OWFN？',
     faq_a9: '您的参与至关重要！宣传 OWFN 的力量非常强大。向您的朋友、家人和同事讲述我们的使命。在社交媒体、旅行中或工作中分享我们的愿景。每一次对话、每一次分享都有助于提高认识，并将更多人带入我们的全球大家庭，从而扩大我们的集体影响力。加入我们的社区渠道以获取最新信息并参与讨论。',
     faq_q10: '捐赠 USDC 或 USDT 有什么特别说明吗？',
@@ -918,7 +918,7 @@ You are a helpful and friendly AI assistant for the "Official World Family Netwo
 *   **Token Standard:** ${TOKEN_DETAILS.standard} on the Solana blockchain.
 *   **Mint Address:** ${OWFN_MINT_ADDRESS}
 *   **Active Extensions:** The token utilizes Token 2022 extensions for advanced features:
-    *   **Transfer Fee (0.5%):** This is an on-chain mechanism that can be used to support the project's treasury and initiatives, ensuring transparency.
+    *   **Transfer Fee (0.5% after presale):** After the presale concludes, a small 0.5% fee will be activated on all transactions. This acts as an automatic micro-donation, with the full amount directed to the Impact Treasury to continuously fund social cases. This transforms token usage into a continuous contribution to the project's mission.
     *   **Interest-Bearing (2% APR):** This is a technical capability of the token standard. It's not a direct staking APY for holders but an on-chain feature demonstrating the token's advanced nature. The project rewards long-term holders through this mechanism, contributing to social good.
 *   **Security:** The OWFN token is designed for maximum security and decentralization.
     *   **Immutability:** The token's core metadata cannot be changed.
