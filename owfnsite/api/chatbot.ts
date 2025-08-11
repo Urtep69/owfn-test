@@ -179,21 +179,17 @@ export default async function handler(request: Request) {
         const ai = new GoogleGenAI({ apiKey });
         const knowledgeBase = generateKnowledgeBase(langCode);
 
-        // For Vercel Edge Functions, direct generateContent is more stable than chat.
-        // Reconstruct history for generateContent
-        const contents = [
-            ...history,
-            { role: 'user', parts: [{ text: question }] }
-        ];
-
-        const response = await ai.models.generateContent({
+        // Using a chat session is more robust for conversational history.
+        const chat = ai.chats.create({
             model: 'gemini-2.5-flash',
-            contents: contents,
             config: {
                 systemInstruction: knowledgeBase,
-                thinkingConfig: { thinkingBudget: 0 },
-            }
+                thinkingConfig: { thinkingBudget: 0 }
+            },
+            history: history,
         });
+
+        const response = await chat.sendMessage({ message: question });
 
         return new Response(JSON.stringify({ text: response.text }), {
             status: 200,
