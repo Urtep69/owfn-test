@@ -285,7 +285,7 @@ export default function TokenDetail() {
                     {bestPairAddress ? (
                         <div className="flex-grow rounded-lg overflow-hidden">
                            <iframe
-                                src={`https://www.dextools.io/widget/en/solana/pair-explorer/${bestPairAddress}?theme=dark&chartType=2&chartResolution=15&info=false`}
+                                src={`https://www.dextools.io/widget/en/solana/pair-explorer/${bestPairAddress}?theme=dark&chartType=2&chartResolution=15&info=true&trades=true`}
                                 className="w-full h-full"
                                 frameBorder="0"
                                 allowFullScreen
