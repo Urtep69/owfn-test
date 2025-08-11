@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 export default async function handler(request: Request) {
     if (request.method !== 'POST') {
@@ -22,9 +22,10 @@ export default async function handler(request: Request) {
         text = body.text;
         targetLanguage = body.targetLanguage;
         
-        console.log(`Translation request received. Target: ${targetLanguage}, Text: "${text.substring(0, 50)}..."`);
+        console.log(`Translation request (JSON mode). Target: ${targetLanguage}, Text: "${text.substring(0, 50)}..."`);
 
         if (!text || !text.trim()) {
+            // Return the original text if it's empty or just whitespace
             return new Response(JSON.stringify({ text: text || '' }), {
                 status: 200,
                 headers: { 'Content-Type': 'application/json' },
@@ -33,22 +34,36 @@ export default async function handler(request: Request) {
         
         const ai = new GoogleGenAI({ apiKey });
 
-        // A direct and explicit prompt structure without systemInstruction.
-        const prompt = `Translate the following text to ${targetLanguage}. Provide ONLY the translated text, without any additional comments, formatting, or quotation marks.\n\nText to translate:\n"""\n${text}\n"""`;
-        
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: prompt,
+            contents: `Please translate the following text into ${targetLanguage}:\n\n---\n${text}\n---`,
             config: {
-                temperature: 0, 
-                thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for speed and directness
-            }
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        translation: {
+                            type: Type.STRING,
+                            description: `The text translated into ${targetLanguage}.`
+                        }
+                    },
+                    propertyOrdering: ["translation"],
+                },
+                temperature: 0.1,
+            },
         });
         
-        const translatedText = response.text;
+        const jsonString = response.text;
+        if (!jsonString) {
+            console.error(`Translation API returned an empty response text. Target: ${targetLanguage}, Input: "${text.substring(0,100)}..."`);
+            throw new Error("API returned an empty response.");
+        }
+
+        const jsonObject = JSON.parse(jsonString);
+        const translatedText = jsonObject.translation;
 
         if (!translatedText || !translatedText.trim()) {
-             console.error(`Translation resulted in an empty string. Target: ${targetLanguage}, Input: "${text.substring(0,100)}..." Full API response:`, JSON.stringify(response, null, 2));
+             console.error(`Translation from JSON object was empty. Target: ${targetLanguage}, Input: "${text.substring(0,100)}..." Full API response:`, JSON.stringify(response, null, 2));
              throw new Error("Translation resulted in an empty string.");
         }
         
