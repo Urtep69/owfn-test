@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
 import { Star, Share2, Loader2, ArrowLeft, BarChart2, DollarSign, Users, Flame, UserCog, KeyRound, Lock, Unlock, TrendingUp, Briefcase } from 'lucide-react';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { HELIUS_API_KEY } from '../constants.ts';
-import type { TokenDetails, LiveTransaction } from '../types.ts';
+import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
-import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
-
 
 // --- API Interfaces ---
 interface HeliusAsset {
@@ -44,17 +43,6 @@ interface DexScreenerPair {
         h24: { buys: number, sells: number };
     };
 }
-
-const mockTransactions: LiveTransaction[] = Array.from({ length: 20 }).map((_, i) => ({
-    id: `tx${i}${Math.random()}`,
-    time: `${i + 1} minute ago`,
-    type: Math.random() > 0.5 ? 'buy' : 'sell',
-    price: 118890.123456 + Math.random() * 100,
-    totalUsd: Math.random() * 8000,
-    amount: (Math.random() * 8000) / 118890,
-    maker: `3h${Math.random().toString(16).slice(2, 6)}...${Math.random().toString(16).slice(2, 6)}`,
-}));
-
 
 const formatNumber = (num?: number, style: 'currency' | 'decimal' = 'decimal', maximumFractionDigits = 2) => {
     if (num === null || num === undefined) return 'N/A';
@@ -181,6 +169,20 @@ export default function TokenDetail() {
 
         fetchTokenData();
     }, [mintAddress]);
+    
+    const chartData = useMemo(() => {
+        if (!token || token.pricePerToken === 0) return [];
+        // Create a simple mock trend based on 24h change
+        const basePrice = token.pricePerToken / (1 + (token.price24hChange ?? 0) / 100);
+        const data = Array.from({ length: 8 }, (_, i) => {
+            const pricePoint = basePrice * (1 + ((token.price24hChange ?? 0) / 100) * (i/7) + (Math.random() - 0.5) * 0.05);
+            return {
+                name: i === 7 ? 'Now' : `${7-i}d ago`,
+                price: Math.max(0, pricePoint) // Ensure price isn't negative
+            };
+        });
+        return data;
+    }, [token]);
 
     if (loading) {
         return (
@@ -231,47 +233,26 @@ export default function TokenDetail() {
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-primary-800 rounded-lg shadow-lg h-[500px]">
-                       <iframe
-                            src={`https://www.dextools.io/widget/en/solana/pe-light/${token.pairAddress}?theme=dark&chart=true&info=true&trades=true`}
-                            className="w-full h-full rounded-lg"
-                            frameBorder="0"
-                            allowFullScreen
-                            title="DEXTools Live Chart"
-                        />
-                    </div>
-                    <div className="bg-primary-800 rounded-lg shadow-lg p-4">
-                        <div className="border-b border-primary-700/50 mb-2">
-                            <button className="py-2 px-4 text-sm font-semibold border-b-2 border-accent-400 text-primary-100">{t('live_transactions')}</button>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-primary-400 uppercase">
-                                    <tr>
-                                        <th scope="col" className="px-4 py-2">{t('time')}</th>
-                                        <th scope="col" className="px-4 py-2 text-center">{t('type')}</th>
-                                        <th scope="col" className="px-4 py-2 text-right">{t('price_usd')}</th>
-                                        <th scope="col" className="px-4 py-2 text-right">{t('volume_24h')}</th>
-                                        <th scope="col" className="px-4 py-2">{t('trader')}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {mockTransactions.map(tx => (
-                                        <tr key={tx.id} className="border-b border-primary-700/50 hover:bg-primary-700/50">
-                                            <td className="px-4 py-2 text-primary-400">{tx.time}</td>
-                                            <td className="px-4 py-2 text-center">
-                                                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${tx.type === 'buy' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                                                    {t(tx.type)}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2 text-right font-mono text-primary-100">${tx.price.toFixed(6)}</td>
-                                            <td className="px-4 py-2 text-right font-mono text-primary-100">${tx.totalUsd?.toFixed(2)}</td>
-                                            <td className="px-4 py-2"><AddressDisplay address={tx.maker!} /></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                    <div className="bg-primary-800 rounded-lg shadow-lg h-[500px] p-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#44403c" />
+                                <XAxis dataKey="name" stroke="#a8a29e" />
+                                <YAxis 
+                                    stroke="#a8a29e" 
+                                    domain={['auto', 'auto']} 
+                                    tickFormatter={(value) => `$${Number(value).toPrecision(4)}`} 
+                                    width={80}
+                                />
+                                <Tooltip 
+                                    contentStyle={{ backgroundColor: '#1c1917', border: '1px solid #44403c', borderRadius: '0.5rem' }} 
+                                    labelStyle={{ color: '#f5f5f4' }}
+                                    itemStyle={{ color: '#d2b48c' }}
+                                    formatter={(value: number) => [`$${value.toPrecision(6)}`, 'Price']}
+                                />
+                                <Line type="monotone" dataKey="price" stroke="#d2b48c" strokeWidth={2} dot={false} activeDot={{ r: 6 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
 
