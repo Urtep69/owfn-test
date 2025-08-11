@@ -246,7 +246,7 @@ export const pt = {
     faq_q7: 'Como a OWFN faz a diferença no mundo real?',
     faq_a7: 'A OWFN financia diretamente iniciativas em áreas críticas como saúde (ex: cobrindo custos de cirurgia, modernizando hospitais), educação (ex: construindo e reformando escolas, creches) e necessidades básicas (ex: fornecendo comida, abrigo, roupas para os sem-teto, estabelecendo asilos). Também respondemos a desastres e investimos em projetos de desenvolvimento comunitário sustentável. Cada token contribui para essas ações concretas, garantindo 100% de apoio real à humanidade.',
     faq_q8: 'Como minha contribuição, através da compra de tokens, realmente ajuda?',
-    faq_a8: `Quando você compra tokens OWFN, uma porção significativa dos fundos vai diretamente para a Tesouraria de Impacto para financiar nossos projetos de impacto social. Além disso, para garantir o financiamento contínuo para essas causas, uma pequena taxa de transferência de 0,5% será ativada em todas as transações *após* a conclusão da pré-venda. Essa taxa atua como uma microdoação automática, onde 0,5% de cada transação é direcionado para a Tesouraria de Impacto. Isso transforma o simples ato de usar o token em uma contribuição contínua para o bem maior. A tecnologia blockchain garante total transparência para todos esses fluxos de financiamento.`,
+    faq_a8: `A sua contribuição ajuda de duas formas fundamentais. Primeiro, quando compra tokens durante a pré-venda, uma parte significativa dos fundos vai diretamente para a Tesouraria de Impacto para lançar os nossos projetos sociais. Segundo, para criar uma fonte de financiamento sustentável a longo prazo, uma pequena taxa de transferência de 0,5% será ativada em todas as transações *após* a conclusão do período de pré-venda. Esta taxa foi concebida como uma microdoação automática para a Tesouraria de Impacto. Significa que cada vez que o token for usado no futuro, ele gerará apoio contínuo para as nossas causas humanitárias, transformando todo o ecossistema numa força perpétua para o bem. Todos estes fluxos financeiros são totalmente transparentes na blockchain.`,
     faq_q9: 'Além de comprar tokens, de que outra forma posso me envolver e ajudar a OWFN?',
     faq_a9: 'Seu envolvimento é crucial! Divulgar a OWFN é incrivelmente poderoso. Fale com seus amigos, familiares e colegas sobre nossa missão. Compartilhe nossa visão nas redes sociais, durante suas viagens ou no trabalho. Cada conversa, cada compartilhamento, ajuda a aumentar a conscientização e traz mais pessoas para nossa família global, ampliando nosso impacto coletivo. Junte-se aos nossos canais comunitários para se manter atualizado e participar das discussões.',
     faq_q10: 'Existem instruções especiais para doar USDC ou USDT?',
@@ -354,7 +354,7 @@ export const pt = {
     all_vesting_schedules: 'Todos os Cronogramas de Vesting',
 
     // Airdrop
-    airdrop_title: 'Airdrop de Token OWFN',
+    airdrop_title: 'Airdrop de Tokens OWFN',
     airdrop_subtitle: 'Verifique sua elegibilidade para nossos airdrops e recompensas da comunidade.',
     airdrop_check_eligibility: 'Verificar Minha Elegibilidade',
     airdrop_checking: 'Verificando elegibilidade...',
@@ -382,15 +382,15 @@ export const pt = {
     ends_in: 'Termina em',
     status_active: 'Ativa',
     status_passed: 'Aprovada',
-    status_failed: 'Reprovada',
+    status_failed: 'Rejeitada',
     you_voted: 'Você Votou',
     no_active_proposals: 'Atualmente não há propostas ativas.',
     no_past_proposals: 'Não há propostas anteriores para exibir.',
-    no_active_cases_in_category: 'Não há casos ativos nesta categoria no momento.',
-
+    no_active_cases_in_category: 'Nenhum caso ativo nesta categoria no momento.',
+    
     // Maintenance
     maintenance_heading: 'Estamos melhorando as coisas!',
-    maintenance_message: 'Nossa plataforma está atualmente em manutenção programada para melhorar sua experiência. Agradecemos sua paciência e compreensão. Estaremos de volta online em breve.',
+    maintenance_message: 'Nossa plataforma está atualmente passando por manutenção programada para melhorar sua experiência. Agradecemos sua paciência e compreensão. Estaremos de volta online em breve.',
     maintenance_stay_tuned: 'Fique atento às atualizações em nossos canais sociais:',
     admin_controls: 'Controles de Administrador',
     maintenance_status: 'Status',
@@ -404,9 +404,9 @@ export const pt = {
     // Coming Soon
     coming_soon_title: 'Em Breve',
     coming_soon_desc: 'Este recurso está atualmente em desenvolvimento. Estamos trabalhando duro para trazê-lo para você em breve. Obrigado por sua paciência e apoio.',
-    
+
     // Admin Presale
-    presale_admin_title: 'Administrador da Pré-venda',
+    presale_admin_title: 'Admin da Pré-venda',
     presale_admin_subtitle: 'Monitore transações e gerencie o airdrop de tokens pós-pré-venda.',
     total_sol_raised: 'Total de SOL Arrecadado',
     total_transactions: 'Total de Transações',
@@ -432,6 +432,6 @@ export const pt = {
     airdrop_in_progress: 'Airdrop em Andamento... Não feche esta janela.',
     processing_batch: 'Processando lote {current} de {total}...',
     airdrop_complete: 'Airdrop Concluído',
-    airdrop_summary: '{success} bem-sucedidas, {failed} falharam.',
+    airdrop_summary: '{success} bem-sucedidos, {failed} falharam.',
     airdrop_log: 'Log do Airdrop',
 };
