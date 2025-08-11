@@ -22,9 +22,8 @@ export default async function handler(request: Request) {
         text = body.text;
         targetLanguage = body.targetLanguage;
         
-        console.log(`Translation request (low-latency). Target: ${targetLanguage}, Text: "${text.substring(0, 50)}..."`);
-
         if (!text || !text.trim()) {
+            // If there's no text, just return it without calling the API.
             return new Response(JSON.stringify({ text: text || '' }), {
                 status: 200,
                 headers: { 'Content-Type': 'application/json' },
@@ -35,8 +34,9 @@ export default async function handler(request: Request) {
 
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: `Translate the following English text to ${targetLanguage}. Respond with ONLY the translated text. Do not include any introductory phrases, explanations, or markdown formatting.`,
+            contents: text,
             config: {
+                systemInstruction: `You are a highly skilled translator. Translate any text you receive into ${targetLanguage}. Respond with ONLY the translated text. Do not add any extra formatting, notes, or explanations.`,
                 temperature: 0.2,
                 thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for faster, direct translation
             },
@@ -45,7 +45,7 @@ export default async function handler(request: Request) {
         const translatedText = response.text;
 
         if (!translatedText || !translatedText.trim()) {
-             console.error(`[GRACEFUL FALLBACK] Translation result from Gemini was empty. Target: ${targetLanguage}, Input: "${text.substring(0,100)}...". Returning original text.`);
+             console.warn(`[GRACEFUL FALLBACK] Translation result from Gemini was empty. Target: ${targetLanguage}, Input: "${text.substring(0,100)}...". Returning original text.`);
              // Return the original text as a fallback instead of an error.
              return new Response(JSON.stringify({ text: text }), {
                 status: 200,
@@ -53,8 +53,6 @@ export default async function handler(request: Request) {
             });
         }
         
-        console.log(`Translation successful for target: ${targetLanguage}.`);
-
         return new Response(JSON.stringify({ text: translatedText.trim() }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
