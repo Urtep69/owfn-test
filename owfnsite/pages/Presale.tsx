@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -154,6 +154,8 @@ export default function Presale() {
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
   const [soldSOL, setSoldSOL] = useState(0);
+  const [userContribution, setUserContribution] = useState(0);
+  const [isCheckingContribution, setIsCheckingContribution] = useState(false);
   
   useEffect(() => {
     const fetchPresaleBalance = async () => {
@@ -177,6 +179,50 @@ export default function Presale() {
     return () => clearTimeout(timer);
   });
 
+  useEffect(() => {
+    const fetchUserContribution = async () => {
+        if (!solana.connected || !solana.address) {
+            setUserContribution(0);
+            return;
+        }
+        setIsCheckingContribution(true);
+        try {
+            // This logic fetches all transactions to the presale wallet and filters them client-side.
+            // For a very large number of transactions, this could be slow, but it is the most reliable way
+            // to get the total contribution without a dedicated backend API.
+            let allTxs: any[] = [];
+            let lastSignature: string | undefined = undefined;
+            while(true) {
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch transactions');
+                const data = await response.json();
+                allTxs.push(...data);
+                if (data.length < 100) break;
+                lastSignature = data[data.length - 1].signature;
+            }
+
+            const userTxs = allTxs.filter((tx: any) => 
+                    tx.type === 'NATIVE_TRANSFER' && 
+                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                    tx.nativeTransfers[0]?.fromUserAccount === solana.address
+                );
+
+            const totalContributed = userTxs.reduce((sum: number, tx: any) => sum + (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL), 0);
+            setUserContribution(totalContributed);
+        } catch (error) {
+            console.error("Failed to fetch user contribution:", error);
+            setUserContribution(0);
+        } finally {
+            setIsCheckingContribution(false);
+        }
+    };
+
+    fetchUserContribution();
+  }, [solana.connected, solana.address]);
+
+  const maxAllowedBuy = Math.max(0, PRESALE_DETAILS.maxBuy - userContribution);
+
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSolAmount(value);
@@ -187,8 +233,8 @@ export default function Presale() {
     }
 
     const numValue = parseFloat(value);
-    if (numValue > PRESALE_DETAILS.maxBuy) {
-        setError(t('presale_max_amount_error', { max: PRESALE_DETAILS.maxBuy.toFixed(2) }));
+    if (numValue > maxAllowedBuy) {
+        setError(t('presale_max_amount_error', { max: maxAllowedBuy.toFixed(4) }));
     } else {
         setError('');
     }
@@ -196,12 +242,10 @@ export default function Presale() {
 
   const owfnAmount = parseFloat(solAmount) * PRESALE_DETAILS.rate;
   const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
-  const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) <= 0;
+  const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) <= 0 || parseFloat(solAmount) > maxAllowedBuy;
 
   const handleBuy = async () => {
         if (!solana.connected) {
-            // The WalletMultiButton in the header will handle connection.
-            // We could add a pop-up here, but it's better UX to rely on the main button.
             alert(t('connect_wallet_first'));
             return;
         }
@@ -226,7 +270,7 @@ export default function Presale() {
             };
             setLatestPurchase(newTx);
             setSolAmount('');
-            // Manually update SOL collected to give instant feedback
+            setUserContribution(prev => prev + numAmount);
             setSoldSOL(prev => prev + numAmount);
         } else {
             alert(t(result.messageKey));
@@ -370,6 +414,22 @@ export default function Presale() {
                         <p className="text-sm text-primary-700 dark:text-darkPrimary-300 mb-2 text-center">
                             {t('presale_buy_info_max_only', { max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
+                        {solana.connected && (
+                            <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 mb-3 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
+                                {isCheckingContribution ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>Checking your contribution...</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span>{t('presale_you_contributed', { amount: userContribution.toFixed(4) })}</span>
+                                        <br/>
+                                        <span className="font-semibold">{t('presale_you_can_buy', { amount: maxAllowedBuy.toFixed(4) })}</span>
+                                    </>
+                                )}
+                            </div>
+                        )}
                         <div className="flex gap-2">
                             <div className="flex-grow relative">
                                 <input 
@@ -379,14 +439,15 @@ export default function Presale() {
                                     onChange={handleAmountChange}
                                     className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
                                     placeholder="0.00"
+                                    disabled={maxAllowedBuy <= 0 || isCheckingContribution}
                                 />
                             </div>
                             <button 
                                 onClick={handleBuy}
                                 className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                                disabled={solana.loading || (solana.connected && isAmountInvalid)}
+                                disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0))}
                             >
-                                {solana.loading ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
+                                {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
                             </button>
                         </div>
                         {error && <p className="text-red-500 dark:text-red-400 text-sm mt-2 text-center">{error}</p>}

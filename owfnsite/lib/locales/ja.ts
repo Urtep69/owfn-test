@@ -138,6 +138,8 @@ export const ja = {
     owfn_received: '受領OWFN',
     time: '時間',
     just_now: 'たった今',
+    presale_you_contributed: 'すでに貢献済み: {amount} SOL。',
+    presale_you_can_buy: 'あと最大 {amount} SOL 貢献できます。',
     
     // Donations Page
     make_donation: '寄付をする',

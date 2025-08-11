@@ -138,6 +138,8 @@ export const fr = {
     owfn_received: 'OWFN Reçu',
     time: 'Heure',
     just_now: 'À l\'instant',
+    presale_you_contributed: 'Vous avez déjà contribué : {amount} SOL.',
+    presale_you_can_buy: 'Vous pouvez contribuer jusqu\'à {amount} SOL de plus.',
     
     // Donations Page
     make_donation: 'Faire un don',

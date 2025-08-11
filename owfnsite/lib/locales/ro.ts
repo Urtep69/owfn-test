@@ -138,6 +138,8 @@ export const ro = {
     owfn_received: 'OWFN Primit',
     time: 'Timp',
     just_now: 'Chiar acum',
+    presale_you_contributed: 'Ați contribuit deja cu: {amount} SOL.',
+    presale_you_can_buy: 'Puteți contribui cu până la încă {amount} SOL.',
 
     // Donations Page
     make_donation: 'Fă o Donație',
