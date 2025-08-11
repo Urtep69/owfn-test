@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 
 export default async function handler(request: Request) {
     if (request.method !== 'POST') {
@@ -25,23 +25,22 @@ export default async function handler(request: Request) {
         
         const ai = new GoogleGenAI({ apiKey });
 
-        const prompt = `Translate the text below into ${targetLanguage}. Output ONLY the raw translated text. Do not add any extra commentary, introductions, explanations, or quotation marks.
-
-TEXT:
-"${text}"`;
-
-        const response = await ai.models.generateContent({
+        // Using the Chat API for a more robust, instruction-following translation task.
+        const chat: Chat = ai.chats.create({
             model: "gemini-2.5-flash",
-            contents: prompt,
             config: {
+                systemInstruction: `You are a professional translator. Your only task is to translate the user's text into the specified language. You must output ONLY the translated text, without any additional text, formatting, or quotation marks.`,
                 temperature: 0,
-                thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for faster, direct translation.
+                thinkingConfig: { thinkingBudget: 0 },
             }
         });
-        
+
+        const response: GenerateContentResponse = await chat.sendMessage({
+            message: `Translate the following text to ${targetLanguage}: "${text}"`
+        });
+
         const translatedText = response.text.trim();
         
-        // Add a check to ensure we didn't get an empty or failed response text
         if (!translatedText) {
              throw new Error("Translation resulted in an empty string.");
         }
