@@ -309,6 +309,14 @@ export const fr = {
     pool_created: 'Pool créé',
     buys_sells_24h: 'Achats / Ventes 24h',
     pair_address: 'Adresse de la paire',
+    trading_stats: 'Statistiques de Trading',
+    lp_burned: 'LP Brûlé',
+    deployer: 'Déployeur',
+    mint_authority: 'Autorité de Frappe',
+    freeze_authority: 'Autorité de Gel',
+    trader: 'Trader',
+    buys: 'Achats',
+    sells: 'Ventes',
     
     // Staking & Vesting
     staking_title: 'Stakez OWFN, gagnez des récompenses',

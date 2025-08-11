@@ -1,3 +1,4 @@
+
 export const ro = {
     // Navigation
     home: 'Acasă',
@@ -108,6 +109,7 @@ export const ro = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: 'Vândut {progress}%',
     presale_buy_info: 'Cumpără (Min: {min} SOL, Max: {max} SOL)',
+    presale_buy_info_max_only: 'Cumpără (Max: {max} SOL per portofel)',
     buy: 'Cumpără',
     presale_buying_owfn: 'Cumperi {amount} $OWFN',
     presale_estimate_tooltip: 'Aceasta este o estimare. Suma finală poate varia.',
@@ -129,6 +131,7 @@ export const ro = {
     presale_dyor_nfa_desc: 'Fă-ți Propria Cercetare. Nu este un Sfat Financiar.',
     presale_footer_copyright: '© {year} Official World Family Network | Toate drepturile rezervate.',
     presale_amount_error: 'Suma trebuie să fie între {min} și {max} SOL.',
+    presale_max_amount_error: 'Suma nu trebuie să depășească {max} SOL.',
     live_presale_feed: 'Feed Live Prevânzare',
     wallet: 'Portofel',
     sol_spent: 'SOL Cheltuit',
@@ -306,6 +309,14 @@ export const ro = {
     pool_created: 'Pool Creat',
     buys_sells_24h: 'Cumpărări / Vânzări 24h',
     pair_address: 'Adresă Pereche',
+    trading_stats: 'Statistici Tranzacționare',
+    lp_burned: 'LP Ars',
+    deployer: 'Implementator',
+    mint_authority: 'Autoritate Mint',
+    freeze_authority: 'Autoritate Înghețare',
+    trader: 'Trader',
+    buys: 'Cumpărări',
+    sells: 'Vânzări',
 
     // Staking & Vesting
     staking_title: 'Depune OWFN, Câștigă Recompense',

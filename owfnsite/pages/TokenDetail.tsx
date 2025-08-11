@@ -1,11 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Star, Share2, Loader2, ArrowLeft, Briefcase, TrendingUp, Droplets, Info } from 'lucide-react';
+import { Star, Share2, Loader2, ArrowLeft, BarChart2, DollarSign, Users, Flame, UserCog, KeyRound, Lock, Unlock, TrendingUp, Briefcase } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { HELIUS_API_KEY } from '../constants.ts';
-import type { TokenDetails } from '../types.ts';
+import type { TokenDetails, LiveTransaction } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
+import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
+
 
 // --- API Interfaces ---
 interface HeliusAsset {
@@ -23,7 +26,11 @@ interface HeliusAsset {
     token_info?: {
         decimals: number;
         supply: string;
+        token_program: string;
+        mint_authority?: string;
+        freeze_authority?: string;
     };
+    authorities?: { address: string, type: string }[];
 }
 
 interface DexScreenerPair {
@@ -39,85 +46,52 @@ interface DexScreenerPair {
     };
 }
 
-const TokenDetailHeader = ({ token }: { token: TokenDetails }) => {
-    const priceChangeColor = (token.price24hChange ?? 0) >= 0 ? 'text-green-400' : 'text-red-400';
-    
-    return (
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-                <div className="w-12 h-12 flex-shrink-0">{token.logo}</div>
-                <div>
-                    <h1 className="text-2xl font-bold text-primary-100">{token.name} ({token.symbol})</h1>
-                    <AddressDisplay address={token.mintAddress} type="token" />
-                </div>
-            </div>
-            <div className="flex items-center gap-4">
-                 <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-bold text-primary-100">
-                        ${token.pricePerToken < 0.001 ? token.pricePerToken.toPrecision(4) : token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
-                    </span>
-                    <span className={`font-semibold ${priceChangeColor}`}>
-                        {token.price24hChange?.toFixed(2)}% (24h)
-                    </span>
-                </div>
-                <div className="flex items-center gap-2 text-primary-400">
-                    <button className="p-2 rounded-lg hover:bg-primary-700 hover:text-yellow-400 transition-colors" aria-label="Add to favorites">
-                        <Star size={20} />
-                    </button>
-                    <button className="p-2 rounded-lg hover:bg-primary-700 hover:text-primary-100 transition-colors" aria-label="Share">
-                        <Share2 size={20} />
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
+const mockTransactions: LiveTransaction[] = Array.from({ length: 20 }).map((_, i) => ({
+    id: `tx${i}${Math.random()}`,
+    time: `${i + 1} minute ago`,
+    type: Math.random() > 0.5 ? 'buy' : 'sell',
+    price: 118890.123456 + Math.random() * 100,
+    totalUsd: Math.random() * 8000,
+    amount: (Math.random() * 8000) / 118890,
+    maker: `3h${Math.random().toString(16).slice(2, 6)}...${Math.random().toString(16).slice(2, 6)}`,
+}));
+
+
+const formatNumber = (num?: number, style: 'currency' | 'decimal' = 'decimal', maximumFractionDigits = 2) => {
+    if (num === null || num === undefined) return 'N/A';
+    const isCurrency = style === 'currency';
+    const prefix = isCurrency ? '$' : '';
+
+    if (Math.abs(num) >= 1_000_000_000) {
+        return `${prefix}${(num / 1_000_000_000).toFixed(2)}B`;
+    }
+    if (Math.abs(num) >= 1_000_000) {
+        return `${prefix}${(num / 1_000_000).toFixed(2)}M`;
+    }
+    if (Math.abs(num) >= 1_000) {
+        return `${prefix}${(num / 1_000).toFixed(2)}K`;
+    }
+    return isCurrency 
+        ? num.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits }) 
+        : num.toLocaleString('en-US', { maximumFractionDigits });
 };
 
-const InfoItem = ({ label, value, subtext }: { label: string, value: React.ReactNode, subtext?: string }) => {
-    if (value === null || value === undefined || value === 'N/A' || value === '$0.00' || value === '$0') return null;
+const AuthorityStatus = ({ enabled, t, labelKey }: { enabled?: boolean, t: Function, labelKey: string }) => {
+    const color = enabled ? 'text-red-400' : 'text-green-400';
+    const Icon = enabled ? Unlock : Lock;
     return (
-        <div className="bg-primary-900/50 p-3 rounded-lg">
-            <div className="text-xs text-primary-400 mb-1">{label}</div>
-            <div className="font-mono font-semibold text-primary-100 text-lg">{value}</div>
-            {subtext && <div className="text-xs text-primary-500 mt-1">{subtext}</div>}
-        </div>
-    );
-};
-
-const NoMarketDataDisplay = ({ token }: { token: TokenDetails }) => {
-    const { t } = useAppContext();
-    const formatSupply = (num?: number) => {
-        if (!num) return 'N/A';
-        if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(2)}B`;
-        if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
-        if (num >= 1_000) return `${(num / 1_000).toFixed(2)}K`;
-        return num.toFixed(2);
-    };
-
-    return (
-        <div className="flex-grow flex flex-col items-center justify-center text-center text-primary-400 bg-primary-900/50 rounded-lg p-6 min-h-[500px]">
-            <Briefcase className="w-16 h-16 text-primary-600 mb-4" />
-            <h3 className="text-xl font-bold text-primary-200">Token Information</h3>
-            <p className="max-w-xs mt-2 text-sm mb-6">
-                Live market data for this token is not yet available. This usually means the token has not been listed on a decentralized exchange.
-            </p>
-            <div className="w-full max-w-sm bg-primary-800 p-4 rounded-lg">
-                 <div className="flex justify-between items-center py-2 border-b border-primary-700/50">
-                     <span className="text-primary-400 text-sm">{t('token_symbol_label')}</span>
-                     <span className="font-semibold">{token.symbol}</span>
-                 </div>
-                 <div className="flex justify-between items-center py-2">
-                    <span className="text-primary-400 text-sm">{t('total_supply')}</span>
-                    <span className="font-semibold">{formatSupply(token.totalSupply)}</span>
-                </div>
+         <div className="flex justify-between items-center py-2 border-b border-primary-700/50">
+            <span className="text-primary-400 text-sm">{t(labelKey)}</span>
+            <div className={`flex items-center gap-2 font-semibold ${color}`}>
+                <Icon size={14} />
+                <span>{enabled ? 'Enabled' : 'Disabled'}</span>
             </div>
         </div>
     );
 };
-
 
 export default function TokenDetail() {
-    const { t, currentLanguage } = useAppContext();
+    const { t } = useAppContext();
     const params = useParams();
     const [location] = useLocation();
     const searchParams = new URLSearchParams(location.split('?')[1] || '');
@@ -126,27 +100,8 @@ export default function TokenDetail() {
     const mintAddress = params?.['mint'];
 
     const [token, setToken] = useState<TokenDetails | null>(null);
-    const [bestPairAddress, setBestPairAddress] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    const formatNumber = (num?: number, style: 'currency' | 'decimal' = 'decimal', maximumFractionDigits = 0) => {
-        if (num === null || num === undefined) return 'N/A';
-        const isCurrency = style === 'currency';
-
-        if (Math.abs(num) >= 1_000_000_000) {
-            return `${isCurrency ? '$' : ''}${(num / 1_000_000_000).toFixed(2)}B`;
-        }
-        if (Math.abs(num) >= 1_000_000) {
-            return `${isCurrency ? '$' : ''}${(num / 1_000_000).toFixed(2)}M`;
-        }
-        if (Math.abs(num) >= 1_000) {
-            return `${isCurrency ? '$' : ''}${(num / 1_000).toFixed(2)}K`;
-        }
-        return isCurrency 
-            ? num.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits }) 
-            : num.toLocaleString('en-US', { maximumFractionDigits });
-    };
 
     useEffect(() => {
         if (!mintAddress) {
@@ -178,12 +133,12 @@ export default function TokenDetail() {
                 let bestPair: DexScreenerPair | null = null;
                 if (dexscreenerRes.ok) {
                     const dexscreenerData = await dexscreenerRes.json();
-                    const pairs: DexScreenerPair[] = dexscreenerData.pairs;
-                    if (pairs && pairs.length > 0) {
-                        bestPair = pairs.sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
-                        setBestPairAddress(bestPair.pairAddress);
+                    if (dexscreenerData.pairs && dexscreenerData.pairs.length > 0) {
+                        bestPair = dexscreenerData.pairs.sort((a: any, b: any) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
                     }
                 }
+
+                const deployer = asset.authorities?.find(a => a.type === 'metadata_update_authority');
 
                 const tokenData: TokenDetails = {
                     mintAddress: asset.id,
@@ -202,11 +157,17 @@ export default function TokenDetail() {
                     pairAddress: bestPair?.pairAddress,
                     pairCreatedAt: bestPair?.pairCreatedAt,
                     txns: bestPair?.txns,
-                    security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
+                    security: { 
+                        isMutable: !!deployer,
+                        mintAuthorityRevoked: !asset.token_info?.mint_authority,
+                        freezeAuthorityRevoked: !asset.token_info?.freeze_authority,
+                    },
                     holders: 0,
                     balance: 0,
                     usdValue: 0,
                     circulatingSupply: 0,
+                    lpBurnedPercent: 0, // Mock data
+                    deployerAddress: deployer?.address ?? 't227c...4DR4', // Mock fallback
                 };
                 
                 setToken(tokenData);
@@ -226,7 +187,7 @@ export default function TokenDetail() {
         return (
             <div className="flex flex-col justify-center items-center h-96 space-y-4">
                 <Loader2 className="w-12 h-12 animate-spin text-accent-500" />
-                <p className="text-primary-400">Loading live token data...</p>
+                <p className="text-primary-400">{t('profile_loading_tokens')}</p>
             </div>
         );
     }
@@ -236,76 +197,141 @@ export default function TokenDetail() {
             <div className="text-center py-10 animate-fade-in-up">
                 <h2 className="text-2xl font-bold">{t('token_not_found')}</h2>
                 {error && <p className="text-red-400 mt-2">{error}</p>}
-                <Link to={from || '/dashboard'} className="text-accent-500 hover:underline mt-4 inline-block">
-                    <div className="flex items-center gap-2">
-                         <ArrowLeft size={16} />
-                         {from === '/profile' ? t('back_to_profile') : t('back_to_dashboard')}
-                    </div>
+                 <Link to={from || '/dashboard'} className="text-accent-500 hover:underline mt-4 inline-block flex items-center justify-center gap-2">
+                    <ArrowLeft size={16} />
+                    {from === '/profile' ? t('back_to_profile') : t('back_to_dashboard')}
                 </Link>
             </div>
         );
     }
-    
-    const description = token.description[currentLanguage.code] || token.description['en'];
 
+    const priceChangeColor = (token.price24hChange ?? 0) >= 0 ? 'text-green-400' : 'text-red-400';
+    
     return (
         <div className="animate-fade-in-up space-y-6">
-            <TokenDetailHeader token={token} />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-1 bg-primary-800 rounded-lg shadow-lg p-4 space-y-3 self-start">
-                    <h3 className="text-xl font-bold text-primary-100 px-2">{t('token_info')}</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                        <InfoItem label={t('market_cap')} value={formatNumber(token.marketCap, 'currency')} />
-                        <InfoItem label={t('liquidity')} value={formatNumber(token.liquidity, 'currency')} />
-                        <InfoItem label={t('volume_24h')} value={formatNumber(token.volume24h, 'currency')} />
-                        <InfoItem label={t('total_supply')} value={formatNumber(token.totalSupply, 'decimal')} />
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 flex-shrink-0">{token.logo}</div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-primary-100 flex items-center gap-2">
+                            {token.name} <span className="text-primary-400 text-lg">({token.symbol})</span>
+                        </h1>
                     </div>
-                    {token.txns && (
-                        <InfoItem 
-                            label={t('buys_sells_24h')} 
-                            value={<><span className="text-green-400">{token.txns.h24.buys}</span> / <span className="text-red-400">{token.txns.h24.sells}</span></>} 
-                        />
-                    )}
-                    {token.pairCreatedAt && (
-                         <InfoItem 
-                            label={t('pool_created')} 
-                            value={new Date(token.pairCreatedAt).toLocaleDateString()} 
-                        />
-                    )}
-                    {token.pairAddress && (
-                        <div className="bg-primary-900/50 p-3 rounded-lg">
-                            <div className="text-xs text-primary-400 mb-1">{t('pair_address')}</div>
-                            <AddressDisplay address={token.pairAddress} />
-                        </div>
-                    )}
                 </div>
-
-                <div className="lg:col-span-2 bg-primary-800 rounded-lg shadow-lg flex flex-col min-h-[700px]">
-                    {bestPairAddress ? (
-                        <div className="flex-grow rounded-lg overflow-hidden">
-                           <iframe
-                                src={`https://www.dextools.io/widget/en/solana/pair-explorer/${bestPairAddress}?theme=dark&chartType=2&chartResolution=15&info=true&trades=true`}
-                                className="w-full h-full"
-                                frameBorder="0"
-                                allowFullScreen
-                                title="DEXTools Live Chart"
-                            />
-                        </div>
-                    ) : (
-                        <NoMarketDataDisplay token={token} />
-                    )}
+                 <div className="flex items-center gap-4 self-end">
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-primary-100">
+                            ${token.pricePerToken < 0.0001 ? token.pricePerToken.toPrecision(4) : token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                        </span>
+                        <span className={`font-semibold ${priceChangeColor}`}>
+                            {token.price24hChange?.toFixed(2)}%
+                        </span>
+                    </div>
                 </div>
             </div>
-
-            {description && (
-                <div className="bg-primary-800 rounded-lg shadow-lg p-6">
-                    <h3 className="text-lg font-bold mb-2">{t('token_description_title')}</h3>
-                    <p className="text-sm text-primary-400 whitespace-pre-wrap">{description}</p>
-                </div>
-            )}
             
-            <Link to={from || '/dashboard'} className="inline-flex items-center gap-2 text-sm text-accent-400 hover:underline p-2 mt-2">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="bg-primary-800 rounded-lg shadow-lg h-[500px]">
+                       <iframe
+                            src={`https://solanatracker.io/embed/birdeye/${token.mintAddress}?chain=solana`}
+                            className="w-full h-full rounded-lg"
+                            frameBorder="0"
+                            allowFullScreen
+                            title="SolanaTracker Live Chart"
+                        />
+                    </div>
+                    <div className="bg-primary-800 rounded-lg shadow-lg p-4">
+                        <div className="border-b border-primary-700/50 mb-2">
+                            <button className="py-2 px-4 text-sm font-semibold border-b-2 border-accent-400 text-primary-100">{t('live_transactions')}</button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-primary-400 uppercase">
+                                    <tr>
+                                        <th scope="col" className="px-4 py-2">{t('time')}</th>
+                                        <th scope="col" className="px-4 py-2 text-center">{t('type')}</th>
+                                        <th scope="col" className="px-4 py-2 text-right">{t('price_usd')}</th>
+                                        <th scope="col" className="px-4 py-2 text-right">{t('volume_24h')}</th>
+                                        <th scope="col" className="px-4 py-2">{t('trader')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {mockTransactions.map(tx => (
+                                        <tr key={tx.id} className="border-b border-primary-700/50 hover:bg-primary-700/50">
+                                            <td className="px-4 py-2 text-primary-400">{tx.time}</td>
+                                            <td className="px-4 py-2 text-center">
+                                                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${tx.type === 'buy' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                                    {t(tx.type)}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-mono text-primary-100">${tx.price.toFixed(6)}</td>
+                                            <td className="px-4 py-2 text-right font-mono text-primary-100">${tx.totalUsd?.toFixed(2)}</td>
+                                            <td className="px-4 py-2"><AddressDisplay address={tx.maker!} /></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="lg:col-span-1 space-y-6">
+                    <div className="bg-primary-800 p-4 rounded-lg shadow-lg">
+                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><BarChart2 size={20} /> {t('trading_stats')}</h3>
+                        <div className="space-y-3 text-sm">
+                             <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
+                                <span className="text-primary-400">{t('buys')} (24h)</span>
+                                <span className="font-mono text-green-400">{token.txns?.h24.buys.toLocaleString() ?? 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
+                                <span className="text-primary-400">{t('sells')} (24h)</span>
+                                <span className="font-mono text-red-400">{token.txns?.h24.sells.toLocaleString() ?? 'N/A'}</span>
+                            </div>
+                             <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
+                                <span className="text-primary-400">{t('volume_24h')}</span>
+                                <span className="font-mono text-primary-100">{formatNumber(token.volume24h, 'currency')}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-primary-800 p-4 rounded-lg shadow-lg">
+                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><DollarSign size={20} /> {t('market_cap')}</h3>
+                         <div className="space-y-3 text-sm">
+                            <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
+                                <span className="text-primary-400">{t('market_cap')}</span>
+                                <span className="font-mono text-primary-100">{formatNumber(token.marketCap, 'currency')}</span>
+                            </div>
+                            <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
+                                <span className="text-primary-400">{t('liquidity')}</span>
+                                <span className="font-mono text-primary-100">{formatNumber(token.liquidity, 'currency')}</span>
+                            </div>
+                             <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
+                                <span className="text-primary-400">{t('total_supply')}</span>
+                                <span className="font-mono text-primary-100">{formatNumber(token.totalSupply)}</span>
+                            </div>
+                        </div>
+                    </div>
+                     <div className="bg-primary-800 p-4 rounded-lg shadow-lg">
+                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><KeyRound size={20} /> {t('token_info')}</h3>
+                         <div className="text-sm">
+                            <div className="flex justify-between items-center py-2 border-b border-primary-700/50">
+                                <span className="text-primary-400">{t('lp_burned')}</span>
+                                <div className="flex items-center gap-2 font-semibold">
+                                    <Flame size={14} />
+                                    <span>{token.lpBurnedPercent?.toFixed(2)}%</span>
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-primary-700/50">
+                                <span className="text-primary-400">{t('deployer')}</span>
+                                <AddressDisplay address={token.deployerAddress!} />
+                            </div>
+                            <AuthorityStatus enabled={!token.security.mintAuthorityRevoked} t={t} labelKey="mint_authority" />
+                            <AuthorityStatus enabled={!token.security.freezeAuthorityRevoked} t={t} labelKey="freeze_authority" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <Link to={from || '/dashboard'} className="inline-flex items-center gap-2 text-sm text-accent-400 hover:underline p-2 mt-2">
                 <ArrowLeft size={16} /> {from === '/profile' ? t('back_to_profile') : t('back_to_dashboard')}
             </Link>
         </div>

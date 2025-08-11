@@ -105,6 +105,8 @@ export interface TokenDetails extends Token {
     txns?: {
         h24: { buys: number, sells: number };
     };
+    lpBurnedPercent?: number;
+    deployerAddress?: string;
 }
 
 export interface LiveTransaction {

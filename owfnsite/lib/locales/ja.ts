@@ -1,3 +1,4 @@
+
 export const ja = {
     // Navigation
     home: 'ホーム',
@@ -108,6 +109,7 @@ export const ja = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: '販売済み {progress}%',
     presale_buy_info: '購入 (最小: {min} SOL, 最大: {max} SOL)',
+    presale_buy_info_max_only: '購入 (最大: {max} SOL/ウォレット)',
     buy: '購入',
     presale_buying_owfn: '{amount} $OWFNを購入中',
     presale_estimate_tooltip: 'これは見積もりです。最終的な金額は異なる場合があります。',
@@ -129,6 +131,7 @@ export const ja = {
     presale_dyor_nfa_desc: 'ご自身で調査してください。これは金融アドバイスではありません。',
     presale_footer_copyright: '© {year} Official World Family Network | 全著作権所有。',
     presale_amount_error: '金額は{min}から{max} SOLの間でなければなりません。',
+    presale_max_amount_error: '金額は{max} SOLを超えてはなりません。',
     live_presale_feed: 'ライブプレセールフィード',
     wallet: 'ウォレット',
     sol_spent: '使用SOL',
@@ -306,6 +309,14 @@ export const ja = {
     pool_created: 'プール作成日',
     buys_sells_24h: '24時間売買',
     pair_address: 'ペアアドレス',
+    trading_stats: '取引統計',
+    lp_burned: 'LPバーン',
+    deployer: 'デプロイヤー',
+    mint_authority: 'ミント権限',
+    freeze_authority: 'フリーズ権限',
+    trader: 'トレーダー',
+    buys: '買い',
+    sells: '売り',
     
     // Staking & Vesting
     staking_title: 'OWFNをステークして報酬を獲得',
