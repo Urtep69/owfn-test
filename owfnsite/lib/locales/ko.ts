@@ -1,4 +1,3 @@
-
 export const ko = {
     // Navigation
     home: '홈',

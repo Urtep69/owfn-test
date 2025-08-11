@@ -1,4 +1,3 @@
-
 export const zh = {
     // Navigation
     home: '首页',
@@ -385,7 +384,8 @@ export const zh = {
     you_voted: '您已投票',
     no_active_proposals: '目前没有进行中的提案。',
     no_past_proposals: '没有可显示的过去提案。',
-
+    no_active_cases_in_category: '此类别目前没有活动案例。',
+    
     // Maintenance
     maintenance_heading: '我们正在改进！',
     maintenance_message: '我们的平台目前正在进行定期维护，以改善您的体验。感谢您的耐心和理解。我们将很快恢复在线。',
