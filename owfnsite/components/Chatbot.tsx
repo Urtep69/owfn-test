@@ -5,6 +5,8 @@ import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
 
+const MAX_HISTORY_MESSAGES = 8; // Keep last 4 user/model pairs for context to prevent memory errors on the server.
+
 export const Chatbot = () => {
     const { t, currentLanguage } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
@@ -24,13 +26,15 @@ export const Chatbot = () => {
 
         const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }] };
         const currentInput = input;
-        const historyForApi = [...messages, userMessage];
+        // Truncate the history sent to the API to prevent server memory overload.
+        const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
 
         setMessages(prev => [...prev, userMessage, { role: 'model', parts: [{ text: '' }] }]);
         setInput('');
         setIsLoading(true);
 
         try {
+            // Pass the truncated history and the new question separately
             const stream = streamChatbotResponse(historyForApi, currentInput, currentLanguage.code);
 
             for await (const chunk of stream) {
