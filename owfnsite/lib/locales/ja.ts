@@ -1,4 +1,3 @@
-
 export const ja = {
     // Navigation
     home: 'ホーム',
@@ -142,6 +141,7 @@ export const ja = {
     just_now: 'たった今',
     presale_you_contributed: 'すでに貢献済み: {amount} SOL。',
     presale_you_can_buy: 'あと最大 {amount} SOL 貢献できます。',
+    presale_bonus_offer: '{threshold} SOL以上の購入で{percentage}%ボーナス！',
     
     // Donations Page
     make_donation: '寄付をする',

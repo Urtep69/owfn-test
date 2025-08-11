@@ -1,4 +1,3 @@
-
 export const fr = {
     // Navigation
     home: 'Accueil',
@@ -142,6 +141,7 @@ export const fr = {
     just_now: 'À l\'instant',
     presale_you_contributed: 'Vous avez déjà contribué : {amount} SOL.',
     presale_you_can_buy: 'Vous pouvez contribuer jusqu\'à {amount} SOL de plus.',
+    presale_bonus_offer: 'BONUS de {percentage}% pour les achats de {threshold} SOL ou plus !',
     
     // Donations Page
     make_donation: 'Faire un don',

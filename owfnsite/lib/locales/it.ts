@@ -1,4 +1,3 @@
-
 export const it = {
     // Navigation
     home: 'Home',
@@ -115,6 +114,8 @@ export const it = {
     presale_estimate_tooltip: 'Questa è una stima. L\'importo finale potrebbe variare.',
     presale_whitelist_finished: 'Vendita Whitelist Terminata:',
     presale_public_ending_in: 'La Vendita Pubblica termina tra:',
+    presale_sale_starts_in: 'La Vendita Pubblica inizia tra:',
+    presale_sale_ended: 'Vendita Pubblica Terminata',
     presale_project_info_title: 'Informazioni sul Progetto',
     token_name_label: 'Nome Token',
     token_symbol_label: 'Simbolo Token',
@@ -140,6 +141,7 @@ export const it = {
     just_now: 'Poco fa',
     presale_you_contributed: 'Hai già contribuito con: {amount} SOL.',
     presale_you_can_buy: 'Puoi contribuire con un massimo di altri {amount} SOL.',
+    presale_bonus_offer: '{percentage}% DI BONUS su acquisti di {threshold} SOL o più!',
     
     // Donations Page
     make_donation: 'Fai una Donazione',

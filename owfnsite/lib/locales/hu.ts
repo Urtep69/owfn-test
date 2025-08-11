@@ -114,6 +114,8 @@ export const hu = {
     presale_estimate_tooltip: 'Ez egy becslés. A végső összeg változhat.',
     presale_whitelist_finished: 'Whitelist Értékesítés Befejeződött:',
     presale_public_ending_in: 'Nyilvános Értékesítés Vége:',
+    presale_sale_starts_in: 'Nyilvános Értékesítés Kezdete:',
+    presale_sale_ended: 'Nyilvános Értékesítés Befejeződött',
     presale_project_info_title: 'Projekt Információk',
     token_name_label: 'Token Neve',
     token_symbol_label: 'Token Szimbóluma',
@@ -139,6 +141,7 @@ export const hu = {
     just_now: 'Épp most',
     presale_you_contributed: 'Ön már hozzájárult: {amount} SOL.',
     presale_you_can_buy: 'Ön még hozzájárulhat {amount} SOL-lal.',
+    presale_bonus_offer: '{percentage}% BÓNUSZ {threshold} SOL vagy annál nagyobb vásárlások esetén!',
     
     // Donations Page
     make_donation: 'Adományozz',
@@ -245,7 +248,7 @@ export const hu = {
     faq_q7: 'Hogyan tesz különbséget az OWFN a való világban?',
     faq_a7: 'Az OWFN közvetlenül finanszíroz kezdeményezéseket olyan kritikus területeken, mint az egészségügy (pl. műtéti költségek fedezése, kórházak modernizálása), az oktatás (pl. iskolák, óvodák építése és felújítása), és az alapvető szükségletek (pl. élelmiszer, menedék, ruházat biztosítása hajléktalanok számára, idősotthonok létrehozása). Katasztrófaelhárításra is reagálunk és fenntartható közösségfejlesztési projektekbe fektetünk. Minden token hozzájárul ezekhez a konkrét intézkedésekhez, 100%-ban valós támogatást biztosítva az emberiség számára.',
     faq_q8: 'Hogyan segít valójában a hozzájárulásom a tokenek vásárlásával?',
-    faq_a8: 'Amikor OWFN tokeneket vásárol, a pénzeszközök jelentős része közvetlenül a Hatás Kincstárba kerül a társadalmi hatású projektjeink finanszírozására. Továbbá, hogy biztosítsuk ezen ügyek folyamatos finanszírozását, egy kis, 0,5%-os átutalási díjat aktiválunk minden tranzakción *az elővásárlás lezárulta után*. Ez a díj automatikus mikro-adományként működik, ahol minden tranzakció 0,5%-a a Hatás Kincstárba kerül. Ez a token egyszerű használatát a közjóhoz való folyamatos hozzájárulássá alakítja. A blokklánc technológia teljes átláthatóságot biztosít mindezen finanszírozási folyamatokhoz.',
+    faq_a8: 'A hozzájárulása két alapvető módon segít. Először is, amikor az elővásárlás során tokeneket vásárol, a pénzeszközök jelentős része közvetlenül a Hatás Kincstárba kerül a társadalmi projektjeink elindításához. Másodszor, a fenntartható, hosszú távú finanszírozási forrás megteremtése érdekében egy kis, 0,5%-os átutalási díjat aktiválunk minden tranzakción *az elővásárlási időszak lezárulta után*. Ez a díj automatikus mikro-adományként szolgál a Hatás Kincstár számára. Ez azt jelenti, hogy minden alkalommal, amikor a tokent a jövőben használják, folyamatos támogatást generál humanitárius ügyeink számára, az egész ökoszisztémát egy örökös jó erővé alakítva. Mindezek a pénzügyi folyamatok teljesen átláthatóak a blokkláncon.',
     faq_q9: 'A tokenek vásárlásán túl hogyan vehetek még részt és segíthetek az OWFN-nek?',
     faq_a9: 'Az Ön részvétele kulcsfontosságú! Az OWFN hírének terjesztése hihetetlenül hatékony. Beszéljen barátaival, családjával és kollégáival a küldetésünkről. Ossza meg víziónkat a közösségi médiában, utazásai során vagy a munkahelyén. Minden beszélgetés, minden megosztás segít növelni a tudatosságot és több embert vonz be globális családunkba, felerősítve kollektív hatásunkat. Csatlakozzon közösségi csatornáinkhoz, hogy naprakész maradjon és részt vegyen a vitákban.',
     faq_q10: 'Vannak különleges utasítások az USDC vagy USDT adományozására?',

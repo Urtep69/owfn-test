@@ -114,6 +114,8 @@ export const zh = {
     presale_estimate_tooltip: '这是一个估算值，最终金额可能会有所不同。',
     presale_whitelist_finished: '白名单销售已结束：',
     presale_public_ending_in: '公售结束倒计时：',
+    presale_sale_starts_in: '公售开始倒计时：',
+    presale_sale_ended: '公售已结束',
     presale_project_info_title: '项目信息',
     token_name_label: '代币名称',
     token_symbol_label: '代币符号',
@@ -139,6 +141,7 @@ export const zh = {
     just_now: '刚刚',
     presale_you_contributed: '您已贡献：{amount} SOL。',
     presale_you_can_buy: '您最多还可以贡献 {amount} SOL。',
+    presale_bonus_offer: '购买 {threshold} SOL 或以上可获得 {percentage}% 奖励！',
     
     // Donations Page
     make_donation: '进行捐赠',

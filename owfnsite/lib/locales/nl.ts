@@ -114,6 +114,8 @@ export const nl = {
     presale_estimate_tooltip: 'Dit is een schatting. Het uiteindelijke bedrag kan variëren.',
     presale_whitelist_finished: 'Whitelist Verkoop Voltooid:',
     presale_public_ending_in: 'Openbare Verkoop Eindigt in:',
+    presale_sale_starts_in: 'Openbare Verkoop Begint in:',
+    presale_sale_ended: 'Openbare Verkoop Beëindigd',
     presale_project_info_title: 'Projectinformatie',
     token_name_label: 'Tokennaam',
     token_symbol_label: 'Tokensymbool',
@@ -139,6 +141,7 @@ export const nl = {
     just_now: 'Zojuist',
     presale_you_contributed: 'U heeft al bijgedragen: {amount} SOL.',
     presale_you_can_buy: 'U kunt nog tot {amount} SOL bijdragen.',
+    presale_bonus_offer: '{percentage}% BONUS bij aankopen van {threshold} SOL of meer!',
     
     // Donations Page
     make_donation: 'Doe een Donatie',

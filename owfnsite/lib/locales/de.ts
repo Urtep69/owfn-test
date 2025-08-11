@@ -1,4 +1,3 @@
-
 export const de = {
     // Navigation
     home: 'Startseite',
@@ -142,6 +141,7 @@ export const de = {
     just_now: 'Gerade jetzt',
     presale_you_contributed: 'Sie haben bereits beigetragen: {amount} SOL.',
     presale_you_can_buy: 'Sie können noch bis zu {amount} SOL beitragen.',
+    presale_bonus_offer: '{percentage}% BONUS bei Käufen von {threshold} SOL oder mehr!',
     
     // Donations Page
     make_donation: 'Spenden',

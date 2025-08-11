@@ -114,6 +114,8 @@ export const ko = {
     presale_estimate_tooltip: '이것은 추정치입니다. 최종 금액은 다를 수 있습니다.',
     presale_whitelist_finished: '화이트리스트 판매 종료:',
     presale_public_ending_in: '공개 판매 종료까지:',
+    presale_sale_starts_in: '공개 판매 시작까지:',
+    presale_sale_ended: '공개 판매 종료',
     presale_project_info_title: '프로젝트 정보',
     token_name_label: '토큰 이름',
     token_symbol_label: '토큰 심볼',
@@ -139,6 +141,7 @@ export const ko = {
     just_now: '방금',
     presale_you_contributed: '이미 기부한 금액: {amount} SOL.',
     presale_you_can_buy: '최대 {amount} SOL까지 더 기부할 수 있습니다.',
+    presale_bonus_offer: '{threshold} SOL 이상 구매 시 {percentage}% 보너스!',
     
     // Donations Page
     make_donation: '기부하기',
