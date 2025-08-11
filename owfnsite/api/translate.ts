@@ -7,6 +7,7 @@ export default async function handler(request: Request) {
 
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
+        console.error("API key is not configured in environment variables.");
         return new Response(JSON.stringify({ error: "API key not configured." }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
@@ -15,8 +16,8 @@ export default async function handler(request: Request) {
     
     try {
         const { text, targetLanguage } = await request.json();
+        console.log(`Translation request received. Target: ${targetLanguage}, Text: "${text.substring(0, 50)}..."`);
 
-        // If the text is empty or just whitespace, return it as is.
         if (!text || !text.trim()) {
             return new Response(JSON.stringify({ text: text || '' }), {
                 status: 200,
@@ -26,26 +27,24 @@ export default async function handler(request: Request) {
         
         const ai = new GoogleGenAI({ apiKey });
         
-        // This is a single-turn, stateless request, so generateContent is more appropriate and efficient.
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            // A very direct and structured prompt.
-            contents: `Translate the following text from English to ${targetLanguage}. Do not add any extra commentary, notes, or quotation marks. Return ONLY the translated text.\n\nText to translate:\n"""\n${text}\n"""`,
+            contents: `Translate the following English text to ${targetLanguage}:\n\n---\n${text}\n---`,
             config: {
-                // Keep temperature low for deterministic translation
+                systemInstruction: "You are an expert translator. Your sole purpose is to translate the text provided by the user to the specified target language. You must not add any extra text, explanations, notes, or quotation marks. Your entire response must be ONLY the translated text.",
                 temperature: 0, 
-                // Disable thinking to optimize for speed and reduce timeout risk on serverless functions.
                 thinkingConfig: { thinkingBudget: 0 },
             }
         });
         
         const translatedText = response.text;
 
-        // Check for an empty or null response from the model
         if (!translatedText || !translatedText.trim()) {
              console.error("Translation resulted in an empty string. Full API response:", JSON.stringify(response, null, 2));
              throw new Error("Translation resulted in an empty string.");
         }
+        
+        console.log(`Translation successful for target: ${targetLanguage}.`);
 
         return new Response(JSON.stringify({ text: translatedText.trim() }), {
             status: 200,
