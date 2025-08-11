@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, User } from 'lucide-react';
-import { getChatbotResponse } from '../services/geminiService.ts';
+import { streamChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
@@ -17,23 +17,42 @@ export const Chatbot = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(scrollToBottom, [messages]);
+    useEffect(scrollToBottom, [messages, isLoading]);
 
     const handleSend = async () => {
         if (input.trim() === '' || isLoading) return;
 
         const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }] };
-        setMessages(prev => [...prev, userMessage]);
+        const currentInput = input;
+        const historyForApi = [...messages, userMessage];
+
+        setMessages(prev => [...prev, userMessage, { role: 'model', parts: [{ text: '' }] }]);
         setInput('');
         setIsLoading(true);
 
         try {
-            const botResponseText = await getChatbotResponse(messages, input, currentLanguage.code);
-            const botMessage: ChatMessage = { role: 'model', parts: [{ text: botResponseText }] };
-            setMessages(prev => [...prev, botMessage]);
+            const stream = streamChatbotResponse(historyForApi, currentInput, currentLanguage.code);
+
+            for await (const chunk of stream) {
+                setMessages(prev => {
+                    const newMessages = [...prev];
+                    const lastMessage = newMessages[newMessages.length - 1];
+                    if (lastMessage && lastMessage.role === 'model') {
+                        lastMessage.parts[0].text += chunk;
+                    }
+                    return newMessages;
+                });
+            }
         } catch (error) {
-            const errorMessage: ChatMessage = { role: 'model', parts: [{ text: t('chatbot_error') }] };
-            setMessages(prev => [...prev, errorMessage]);
+            console.error("Error processing chatbot stream:", error);
+            setMessages(prev => {
+                const newMessages = [...prev];
+                const lastMessage = newMessages[newMessages.length - 1];
+                if (lastMessage && lastMessage.role === 'model') {
+                    lastMessage.parts[0].text = t('chatbot_error');
+                }
+                return newMessages;
+            });
         } finally {
             setIsLoading(false);
         }
@@ -74,12 +93,12 @@ export const Chatbot = () => {
                         <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
                             <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
-                                <p className="text-sm">{msg.parts[0].text}</p>
+                                <p className="text-sm whitespace-pre-wrap">{msg.parts[0].text}</p>
                             </div>
                             {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                         </div>
                     ))}
-                    {isLoading && (
+                    {isLoading && messages[messages.length - 1]?.parts[0].text === '' && (
                         <div className="flex items-start gap-3 justify-start">
                             <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />
                             <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-primary-100 dark:bg-darkPrimary-700 text-primary-800 dark:text-darkPrimary-200 rounded-bl-none">

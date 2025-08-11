@@ -174,12 +174,11 @@ export default async function handler(request: Request) {
     }
 
     try {
-        const { history, question, langCode } = await request.json();
+        const { history, question, langCode, stream } = await request.json();
         
         const ai = new GoogleGenAI({ apiKey });
         const knowledgeBase = generateKnowledgeBase(langCode);
 
-        // Using a chat session is more robust for conversational history.
         const chat = ai.chats.create({
             model: 'gemini-2.5-flash',
             config: {
@@ -189,8 +188,37 @@ export default async function handler(request: Request) {
             history: history,
         });
 
-        const response = await chat.sendMessage({ message: question });
+        if (stream) {
+            const streamResponse = await chat.sendMessageStream({ message: question });
+            const readableStream = new ReadableStream({
+                async start(controller) {
+                    try {
+                        for await (const chunk of streamResponse) {
+                            const text = chunk.text;
+                            if (text) {
+                                controller.enqueue(new TextEncoder().encode(text));
+                            }
+                        }
+                    } catch (error) {
+                         console.error("Error during Gemini stream processing:", error);
+                         controller.error(error);
+                    } finally {
+                        controller.close();
+                    }
+                }
+            });
 
+            return new Response(readableStream, {
+                status: 200,
+                headers: { 
+                    'Content-Type': 'text/plain; charset=utf-8',
+                    'X-Content-Type-Options': 'nosniff',
+                },
+            });
+        }
+
+        // Fallback for non-streaming requests
+        const response = await chat.sendMessage({ message: question });
         return new Response(JSON.stringify({ text: response.text }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
