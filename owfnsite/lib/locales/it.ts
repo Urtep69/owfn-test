@@ -382,6 +382,9 @@ export const it = {
     status_passed: 'Approvata',
     status_failed: 'Respinta',
     you_voted: 'Hai Votato',
+    no_active_proposals: 'Attualmente non ci sono proposte attive.',
+    no_past_proposals: 'Non ci sono proposte passate da visualizzare.',
+    no_active_cases_in_category: 'Nessun caso attivo in questa categoria al momento.',
 
     // Maintenance
     maintenance_heading: 'Stiamo migliorando le cose!',

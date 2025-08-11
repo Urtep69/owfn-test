@@ -1,4 +1,3 @@
-
 export const sr = {
     // Navigation
     home: 'Почетна',
@@ -109,7 +108,7 @@ export const sr = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: 'Продато {progress}%',
     presale_buy_info: 'Купи (Мин: {min} SOL, Макс: {max} SOL)',
-    presale_buy_info_max_only: 'Buy (Max: {max} SOL per wallet)',
+    presale_buy_info_max_only: 'Купи (Макс: {max} SOL по новчанику)',
     buy: 'Купи',
     presale_buying_owfn: 'Купујете {amount} $OWFN',
     presale_estimate_tooltip: 'Ово је процена. Коначан износ може варирати.',
@@ -131,7 +130,7 @@ export const sr = {
     presale_dyor_nfa_desc: 'Урадите сопствено истраживање. Није финансијски савет.',
     presale_footer_copyright: '© {year} Official World Family Network | Сва права задржана.',
     presale_amount_error: 'Износ мора бити између {min} и {max} SOL.',
-    presale_max_amount_error: 'Amount must not exceed {max} SOL.',
+    presale_max_amount_error: 'Износ не сме прећи {max} SOL.',
     live_presale_feed: 'Пренос претпродаје уживо',
     wallet: 'Новчаник',
     sol_spent: 'Потрошено SOL',
@@ -384,7 +383,8 @@ export const sr = {
     you_voted: 'Гласали сте',
     no_active_proposals: 'Тренутно нема активних предлога.',
     no_past_proposals: 'Нема прошлих предлога за приказ.',
-
+    no_active_cases_in_category: 'Тренутно нема активних случајева у овој категорији.',
+    
     // Maintenance
     maintenance_heading: 'Побољшавамо ствари!',
     maintenance_message: 'Наша платформа је тренутно на заказаном одржавању како бисмо побољшали ваше искуство. Ценимо ваше стрпљење и разумевање. Ускоро ћемо бити поново онлајн.',

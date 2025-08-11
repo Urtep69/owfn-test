@@ -1,4 +1,3 @@
-
 export const nl = {
     // Navigation
     home: 'Home',
@@ -109,7 +108,7 @@ export const nl = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: '{progress}% verkocht',
     presale_buy_info: 'Kopen (Min: {min} SOL, Max: {max} SOL)',
-    presale_buy_info_max_only: 'Buy (Max: {max} SOL per wallet)',
+    presale_buy_info_max_only: 'Kopen (Max: {max} SOL per wallet)',
     buy: 'Kopen',
     presale_buying_owfn: 'U koopt {amount} $OWFN',
     presale_estimate_tooltip: 'Dit is een schatting. Het uiteindelijke bedrag kan variëren.',
@@ -131,7 +130,7 @@ export const nl = {
     presale_dyor_nfa_desc: 'Doe uw eigen onderzoek. Geen financieel advies.',
     presale_footer_copyright: '© {year} Official World Family Network | Alle rechten voorbehouden.',
     presale_amount_error: 'Bedrag moet tussen {min} en {max} SOL zijn.',
-    presale_max_amount_error: 'Amount must not exceed {max} SOL.',
+    presale_max_amount_error: 'Bedrag mag niet hoger zijn dan {max} SOL.',
     live_presale_feed: 'Live Voorverkoop Feed',
     wallet: 'Wallet',
     sol_spent: 'Besteedde SOL',
@@ -384,7 +383,8 @@ export const nl = {
     you_voted: 'U heeft gestemd',
     no_active_proposals: 'Er zijn momenteel geen actieve voorstellen.',
     no_past_proposals: 'Er zijn geen afgelopen voorstellen om weer te geven.',
-
+    no_active_cases_in_category: 'Geen actieve zaken in deze categorie op dit moment.',
+    
     // Maintenance
     maintenance_heading: 'We maken dingen beter!',
     maintenance_message: 'Ons platform ondergaat momenteel gepland onderhoud om uw ervaring te verbeteren. We waarderen uw geduld en begrip. We zijn snel weer online.',

@@ -384,6 +384,7 @@ export const pt = {
     you_voted: 'Você Votou',
     no_active_proposals: 'Atualmente não há propostas ativas.',
     no_past_proposals: 'Não há propostas passadas para exibir.',
+    no_active_cases_in_category: 'Nenhum caso ativo nesta categoria no momento.',
 
     // Maintenance
     maintenance_heading: 'Estamos melhorando as coisas!',

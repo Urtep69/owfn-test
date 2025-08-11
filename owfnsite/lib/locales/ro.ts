@@ -384,6 +384,7 @@ export const ro = {
     you_voted: 'Ai Votat',
     no_active_proposals: 'Momentan nu există propuneri active.',
     no_past_proposals: 'Nu există propuneri anterioare de afișat.',
+    no_active_cases_in_category: 'Nu există cazuri active în această categorie în acest moment.',
 
     // Maintenance
     maintenance_heading: "Facem lucrurile mai bune!",

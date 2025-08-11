@@ -64,7 +64,7 @@ export default function ImpactCategory() {
                 </div>
             ) : (
                 <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner-3d">
-                    <p className="text-primary-600 dark:text-darkPrimary-400">No active cases in this category at the moment.</p>
+                    <p className="text-primary-600 dark:text-darkPrimary-400">{t('no_active_cases_in_category')}</p>
                 </div>
             )}
         </div>

@@ -384,6 +384,7 @@ export const es = {
     you_voted: 'Ya Votaste',
     no_active_proposals: 'Actualmente no hay propuestas activas.',
     no_past_proposals: 'No hay propuestas pasadas para mostrar.',
+    no_active_cases_in_category: 'No hay casos activos en esta categoría en este momento.',
 
     // Maintenance
     maintenance_heading: "¡Estamos mejorando las cosas!",
