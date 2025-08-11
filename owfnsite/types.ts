@@ -107,6 +107,7 @@ export interface TokenDetails extends Token {
     };
     lpBurnedPercent?: number;
     deployerAddress?: string;
+    dexId?: string;
 }
 
 export interface LiveTransaction {

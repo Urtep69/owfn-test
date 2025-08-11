@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Star, Share2, Loader2, ArrowLeft, BarChart2, DollarSign, Users, Flame, UserCog, KeyRound, Lock, Unlock, TrendingUp, Briefcase } from 'lucide-react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { Loader2, ArrowLeft, BarChart2, DollarSign, TrendingUp, Briefcase, KeyRound, Lock, Unlock, ShieldCheck, Database, Info } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
@@ -33,6 +33,7 @@ interface HeliusAsset {
 
 interface DexScreenerPair {
     pairAddress: string;
+    dexId: string;
     priceUsd?: string;
     priceChange?: { h24?: number };
     volume?: { h24?: number };
@@ -63,19 +64,43 @@ const formatNumber = (num?: number, style: 'currency' | 'decimal' = 'decimal', m
         : num.toLocaleString('en-US', { maximumFractionDigits });
 };
 
+const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) => (
+    <div className="flex justify-between items-center py-3 border-b border-primary-700/50">
+        <span className="text-primary-300 text-sm">{label}</span>
+        <div className="text-right">
+            <span className="font-semibold text-primary-100 text-sm font-mono">{value}</span>
+        </div>
+    </div>
+);
+
 const AuthorityStatus = ({ enabled, t, labelKey }: { enabled?: boolean, t: Function, labelKey: string }) => {
     const color = enabled ? 'text-red-400' : 'text-green-400';
     const Icon = enabled ? Unlock : Lock;
+    const text = enabled ? 'Enabled' : 'Disabled';
+
     return (
-         <div className="flex justify-between items-center py-2 border-b border-primary-700/50">
-            <span className="text-primary-400 text-sm">{t(labelKey)}</span>
-            <div className={`flex items-center gap-2 font-semibold ${color}`}>
-                <Icon size={14} />
-                <span>{enabled ? 'Enabled' : 'Disabled'}</span>
-            </div>
-        </div>
+        <InfoItem 
+            label={t(labelKey)} 
+            value={
+                <div className={`flex items-center justify-end gap-2 font-semibold ${color}`}>
+                    <Icon size={14} />
+                    <span>{text}</span>
+                </div>
+            } 
+        />
     );
 };
+
+const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
+    <div className="bg-primary-800 p-6 rounded-lg shadow-lg h-full">
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-accent-400">
+            {icon} {title}
+        </h3>
+        <div className="space-y-1">
+            {children}
+        </div>
+    </div>
+);
 
 export default function TokenDetail() {
     const { t } = useAppContext();
@@ -107,7 +132,6 @@ export default function TokenDetail() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ jsonrpc: '2.0', id: 'my-id', method: 'getAsset', params: { id: mintAddress } }),
                 });
-
                 const dexscreenerPromise = fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`);
                 
                 const [heliusRes, dexscreenerRes] = await Promise.all([heliusPromise, dexscreenerPromise]);
@@ -121,19 +145,33 @@ export default function TokenDetail() {
                 if (dexscreenerRes.ok) {
                     const dexscreenerData = await dexscreenerRes.json();
                     if (dexscreenerData.pairs && dexscreenerData.pairs.length > 0) {
-                        bestPair = dexscreenerData.pairs.sort((a: any, b: any) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
+                        bestPair = dexscreenerData.pairs
+                            .filter((p: any) => p.liquidity && p.liquidity.usd > 1000)
+                            .sort((a: any, b: any) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
                     }
                 }
 
-                const deployer = asset.authorities?.find(a => a.type === 'metadata_update_authority');
+                const updateAuthority = asset.authorities?.find(a => a.type === 'metadata_update_authority');
+
+                const formatAge = (timestamp?: number) => {
+                    if (!timestamp) return 'N/A';
+                    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+                    const intervals = { year: 31536000, month: 2592000, day: 86400, hour: 3600, minute: 60 };
+                    if (seconds < 60) return `${seconds} seconds ago`;
+                    if (seconds < intervals.hour) return `${Math.floor(seconds / intervals.minute)} minutes ago`;
+                    if (seconds < intervals.day) return `${Math.floor(seconds / intervals.hour)} hours ago`;
+                    if (seconds < intervals.month) return `${Math.floor(seconds / intervals.day)} days ago`;
+                    if (seconds < intervals.year) return `${Math.floor(seconds / intervals.month)} months ago`;
+                    return `${Math.floor(seconds / intervals.year)} years ago`;
+                };
 
                 const tokenData: TokenDetails = {
                     mintAddress: asset.id,
                     name: asset.content?.metadata?.name || 'Unknown Token',
                     symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}...`,
                     logo: <GenericTokenIcon uri={asset.content?.links?.image} className="w-12 h-12" />,
-                    description: { en: asset.content?.metadata?.description || '' },
-                    decimals: asset.token_info?.decimals || 0,
+                    description: { en: asset.content?.metadata?.description || 'No description provided.' },
+                    decimals: asset.token_info?.decimals ?? 0,
                     totalSupply: asset.token_info ? parseFloat(asset.token_info.supply) / Math.pow(10, asset.token_info.decimals || 0) : 0,
                     pricePerToken: bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0,
                     price24hChange: bestPair?.priceChange?.h24 ?? 0,
@@ -142,21 +180,19 @@ export default function TokenDetail() {
                     marketCap: bestPair?.fdv ?? 0,
                     fdv: bestPair?.fdv,
                     pairAddress: bestPair?.pairAddress,
-                    pairCreatedAt: bestPair?.pairCreatedAt,
                     txns: bestPair?.txns,
+                    totalTx24h: (bestPair?.txns?.h24.buys ?? 0) + (bestPair?.txns?.h24.sells ?? 0),
+                    poolCreated: formatAge(bestPair?.pairCreatedAt),
+                    dexId: bestPair?.dexId,
                     security: { 
-                        isMutable: !!deployer,
+                        isMutable: !!updateAuthority,
                         mintAuthorityRevoked: !asset.token_info?.mint_authority,
                         freezeAuthorityRevoked: !asset.token_info?.freeze_authority,
                     },
-                    holders: 0,
-                    balance: 0,
-                    usdValue: 0,
-                    circulatingSupply: 0,
-                    lpBurnedPercent: 0, // Mock data
-                    deployerAddress: deployer?.address ?? 't227c...4DR4', // Mock fallback
+                    deployerAddress: updateAuthority?.address,
+                    // Interface requirements
+                    balance: 0, usdValue: 0, holders: 0, circulatingSupply: 0,
                 };
-                
                 setToken(tokenData);
 
             } catch (err) {
@@ -169,20 +205,6 @@ export default function TokenDetail() {
 
         fetchTokenData();
     }, [mintAddress]);
-    
-    const chartData = useMemo(() => {
-        if (!token || token.pricePerToken === 0) return [];
-        // Create a simple mock trend based on 24h change
-        const basePrice = token.pricePerToken / (1 + (token.price24hChange ?? 0) / 100);
-        const data = Array.from({ length: 8 }, (_, i) => {
-            const pricePoint = basePrice * (1 + ((token.price24hChange ?? 0) / 100) * (i/7) + (Math.random() - 0.5) * 0.05);
-            return {
-                name: i === 7 ? 'Now' : `${7-i}d ago`,
-                price: Math.max(0, pricePoint) // Ensure price isn't negative
-            };
-        });
-        return data;
-    }, [token]);
 
     if (loading) {
         return (
@@ -210,7 +232,7 @@ export default function TokenDetail() {
     
     return (
         <div className="animate-fade-in-up space-y-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 flex-shrink-0">{token.logo}</div>
                     <div>
@@ -219,7 +241,7 @@ export default function TokenDetail() {
                         </h1>
                     </div>
                 </div>
-                 <div className="flex items-center gap-4 self-end">
+                 <div className="flex items-center gap-4 self-end sm:self-center">
                     <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-bold text-primary-100">
                             ${token.pricePerToken < 0.0001 ? token.pricePerToken.toPrecision(4) : token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
@@ -231,85 +253,47 @@ export default function TokenDetail() {
                 </div>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-primary-800 rounded-lg shadow-lg h-[500px] p-4">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#44403c" />
-                                <XAxis dataKey="name" stroke="#a8a29e" />
-                                <YAxis 
-                                    stroke="#a8a29e" 
-                                    domain={['auto', 'auto']} 
-                                    tickFormatter={(value) => `$${Number(value).toPrecision(4)}`} 
-                                    width={80}
-                                />
-                                <Tooltip 
-                                    contentStyle={{ backgroundColor: '#1c1917', border: '1px solid #44403c', borderRadius: '0.5rem' }} 
-                                    labelStyle={{ color: '#f5f5f4' }}
-                                    itemStyle={{ color: '#d2b48c' }}
-                                    formatter={(value: number) => [`$${value.toPrecision(6)}`, 'Price']}
-                                />
-                                <Line type="monotone" dataKey="price" stroke="#d2b48c" strokeWidth={2} dot={false} activeDot={{ r: 6 }} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InfoCard title={t('market_stats')} icon={<BarChart2 size={20} />}>
+                    <InfoItem label={t('market_cap')} value={formatNumber(token.marketCap, 'currency')} />
+                    <InfoItem label={t('fully_diluted_valuation')} value={formatNumber(token.fdv, 'currency')} />
+                    <InfoItem label={t('liquidity')} value={formatNumber(token.liquidity, 'currency')} />
+                    <InfoItem label={t('volume_24h')} value={formatNumber(token.volume24h, 'currency')} />
+                </InfoCard>
 
-                <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-primary-800 p-4 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><BarChart2 size={20} /> {t('trading_stats')}</h3>
-                        <div className="space-y-3 text-sm">
-                             <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
-                                <span className="text-primary-400">{t('buys')} (24h)</span>
-                                <span className="font-mono text-green-400">{token.txns?.h24.buys.toLocaleString() ?? 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
-                                <span className="text-primary-400">{t('sells')} (24h)</span>
-                                <span className="font-mono text-red-400">{token.txns?.h24.sells.toLocaleString() ?? 'N/A'}</span>
-                            </div>
-                             <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
-                                <span className="text-primary-400">{t('volume_24h')}</span>
-                                <span className="font-mono text-primary-100">{formatNumber(token.volume24h, 'currency')}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-primary-800 p-4 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><DollarSign size={20} /> {t('market_cap')}</h3>
-                         <div className="space-y-3 text-sm">
-                            <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
-                                <span className="text-primary-400">{t('market_cap')}</span>
-                                <span className="font-mono text-primary-100">{formatNumber(token.marketCap, 'currency')}</span>
-                            </div>
-                            <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
-                                <span className="text-primary-400">{t('liquidity')}</span>
-                                <span className="font-mono text-primary-100">{formatNumber(token.liquidity, 'currency')}</span>
-                            </div>
-                             <div className="flex justify-between items-center p-2 bg-primary-900/50 rounded-md">
-                                <span className="text-primary-400">{t('total_supply')}</span>
-                                <span className="font-mono text-primary-100">{formatNumber(token.totalSupply)}</span>
-                            </div>
-                        </div>
-                    </div>
-                     <div className="bg-primary-800 p-4 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><KeyRound size={20} /> {t('token_info')}</h3>
-                         <div className="text-sm">
-                            <div className="flex justify-between items-center py-2 border-b border-primary-700/50">
-                                <span className="text-primary-400">{t('lp_burned')}</span>
-                                <div className="flex items-center gap-2 font-semibold">
-                                    <Flame size={14} />
-                                    <span>{token.lpBurnedPercent?.toFixed(2)}%</span>
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-center py-2 border-b border-primary-700/50">
-                                <span className="text-primary-400">{t('deployer')}</span>
-                                <AddressDisplay address={token.deployerAddress!} />
-                            </div>
+                <InfoCard title={t('trading_activity')} icon={<TrendingUp size={20} />}>
+                    <InfoItem label={t('buys_24h')} value={token.txns?.h24.buys.toLocaleString() ?? 'N/A'} />
+                    <InfoItem label={t('sells_24h')} value={token.txns?.h24.sells.toLocaleString() ?? 'N/A'} />
+                    <InfoItem label={t('total_transactions_24h')} value={token.totalTx24h?.toLocaleString() ?? 'N/A'} />
+                </InfoCard>
+
+                <InfoCard title={t('token_supply')} icon={<Database size={20} />}>
+                    <InfoItem label={t('total_supply')} value={formatNumber(token.totalSupply)} />
+                    <InfoItem label={t('decimals')} value={token.decimals} />
+                </InfoCard>
+
+                <InfoCard title={t('pool_info')} icon={<Briefcase size={20} />}>
+                    <InfoItem label={t('exchange')} value={<span className="capitalize">{token.dexId ?? 'N/A'}</span>} />
+                    {token.pairAddress && <InfoItem label={t('pair_address')} value={<AddressDisplay address={token.pairAddress} type="address" />} />}
+                    <InfoItem label={t('pool_age')} value={token.poolCreated ?? 'N/A'} />
+                </InfoCard>
+
+                <div className="md:col-span-2">
+                    <InfoCard title={t('on_chain_security')} icon={<ShieldCheck size={20} />}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                             <AuthorityStatus enabled={!token.security.mintAuthorityRevoked} t={t} labelKey="mint_authority" />
                             <AuthorityStatus enabled={!token.security.freezeAuthorityRevoked} t={t} labelKey="freeze_authority" />
+                            {token.deployerAddress && <InfoItem label={t('update_authority')} value={<AddressDisplay address={token.deployerAddress} />} />}
                         </div>
-                    </div>
+                    </InfoCard>
                 </div>
+                 {token.description.en !== 'No description provided.' && (
+                    <div className="md:col-span-2">
+                        <InfoCard title={t('token_description_title')} icon={<Info size={20} />}>
+                            <p className="text-sm text-primary-300 whitespace-pre-wrap">{token.description.en}</p>
+                        </InfoCard>
+                    </div>
+                 )}
             </div>
              <Link to={from || '/dashboard'} className="inline-flex items-center gap-2 text-sm text-accent-400 hover:underline p-2 mt-2">
                 <ArrowLeft size={16} /> {from === '/profile' ? t('back_to_profile') : t('back_to_dashboard')}
