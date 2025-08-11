@@ -6,6 +6,7 @@ import { HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
+import { translateText } from '../services/geminiService.ts';
 
 // --- API Interfaces ---
 interface HeliusAsset {
@@ -90,7 +91,7 @@ const AuthorityStatus = ({ enabled, t, labelKey }: { enabled?: boolean, t: Funct
     );
 };
 
-const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
+const InfoCard = ({ title, icon, children }: { title: string | React.ReactNode, icon: React.ReactNode, children: React.ReactNode }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-lg h-full">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-accent-600 dark:text-darkAccent-400">
             {icon} {title}
@@ -102,7 +103,7 @@ const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactN
 );
 
 export default function TokenDetail() {
-    const { t } = useAppContext();
+    const { t, currentLanguage } = useAppContext();
     const params = useParams();
     // useLocation from wouter doesn't include search params, so we read them directly.
     const searchParams = new URLSearchParams(window.location.search);
@@ -113,6 +114,8 @@ export default function TokenDetail() {
     const [token, setToken] = useState<TokenDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [displayedDescription, setDisplayedDescription] = useState('');
+    const [isTranslating, setIsTranslating] = useState(false);
 
     useEffect(() => {
         if (!mintAddress) {
@@ -205,6 +208,37 @@ export default function TokenDetail() {
         fetchTokenData();
     }, [mintAddress]);
 
+    useEffect(() => {
+        if (!token) return;
+
+        const englishDescription = token.description.en;
+        // Show English immediately while waiting for translation
+        setDisplayedDescription(englishDescription); 
+        
+        const noDescriptionText = 'No description provided.';
+        if (currentLanguage.code === 'en' || englishDescription === noDescriptionText) {
+            setIsTranslating(false);
+            return;
+        }
+
+        const doTranslate = async () => {
+            setIsTranslating(true);
+            try {
+                const translatedText = await translateText(englishDescription, currentLanguage.name);
+                setDisplayedDescription(translatedText);
+            } catch (error) {
+                console.error("Translation failed:", error);
+                // Fallback to English if translation fails
+                setDisplayedDescription(englishDescription);
+            } finally {
+                setIsTranslating(false);
+            }
+        };
+
+        doTranslate();
+
+    }, [token, currentLanguage]);
+
     if (loading) {
         return (
             <div className="flex flex-col justify-center items-center h-96 space-y-4">
@@ -288,8 +322,16 @@ export default function TokenDetail() {
                 </div>
                  {token.description.en !== 'No description provided.' && (
                     <div className="md:col-span-2">
-                        <InfoCard title={t('token_description_title')} icon={<Info size={20} />}>
-                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 whitespace-pre-wrap">{token.description.en}</p>
+                        <InfoCard 
+                            title={
+                                <div className="flex items-center gap-2">
+                                    <span>{t('token_description_title')}</span>
+                                    {isTranslating && <Loader2 className="w-4 h-4 animate-spin"/>}
+                                </div>
+                            } 
+                            icon={<Info size={20} />}
+                        >
+                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 whitespace-pre-wrap">{displayedDescription}</p>
                         </InfoCard>
                     </div>
                  )}
