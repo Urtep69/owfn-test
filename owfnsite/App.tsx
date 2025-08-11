@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+
+import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
@@ -33,7 +34,8 @@ import Maintenance from './pages/Maintenance.tsx';
 
 const AppContent = () => {
   const { isMaintenanceActive, solana } = useAppContext();
-  const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
+  const { connected, address } = solana;
+  const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
 
   if (isMaintenanceActive && !isAdmin) {
     return <Maintenance />;

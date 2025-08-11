@@ -25,6 +25,7 @@ export interface UseSolanaReturn {
   earnedRewards: number;
   connection: Connection;
   connectWallet: () => void;
+  disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
   sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
   stakeTokens: (amount: number) => Promise<any>;
@@ -43,7 +44,7 @@ const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction } = useWallet();
+  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
@@ -264,6 +265,7 @@ export const useSolana = (): UseSolanaReturn => {
     stakedBalance: 0,
     earnedRewards: 0,
     connectWallet,
+    disconnectWallet: disconnect,
     getWalletBalances,
     sendTransaction,
     stakeTokens: notImplemented,

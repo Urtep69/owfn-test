@@ -394,6 +394,7 @@ export const de = {
     activate_maintenance_mode: "Wartung aktivieren",
     deactivate_maintenance_mode: "Wartung deaktivieren",
     admin_login: "Admin-Anmeldung",
+    maintenance_login_denied: 'Verbindung verweigert. Die Plattform befindet sich im Wartungsmodus. Nur Administratoren können sich anmelden.',
 
     // Coming Soon
     coming_soon_title: 'In Kürze verfügbar',

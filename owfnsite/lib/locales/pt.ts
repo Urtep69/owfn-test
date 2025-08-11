@@ -50,7 +50,7 @@ export const pt = {
     home_title: 'A Rede Familiar Mundial Oficial',
     home_subtitle: `Uma rede global unida pela visão de construir um mundo melhor através da tecnologia e da humanidade. Estamos construindo um movimento que conecta famílias em todo o mundo através da blockchain para contribuir para um impacto social real.`,
     core_message_title: 'Um Movimento que Construímos Juntos',
-    home_message: `A grande visão deste projeto só pode ser realizada com o apoio da humanidade. Ao comprar nosso token e promovê-lo entre amigos, familiares e colegas, você se torna uma parte vital de um movimento global pela mudança. Isso não é apenas um projeto; é uma força viva e pulsante para o bem que construímos juntos.`,
+    home_message: `A grande visão deste projeto só pode ser realizada com o apoio da humanidade. Ao comprar nostro token e promovê-lo entre amigos, familiares e colegas, você se torna uma parte vital de um movimento global pela mudança. Isso não é apenas um projeto; é uma força viva e pulsante para o bem que construímos juntos.`,
     home_feature_impact_title: 'Impacto Real',
     home_feature_impact_desc: 'Aproveitando a blockchain para ajuda 100% transparente em saúde, educação e necessidades básicas.',
     home_feature_community_title: 'Impulsionado pela Comunidade',
@@ -64,7 +64,7 @@ export const pt = {
     about_mission_title: 'Nossa Missão',
     about_mission_desc: `A Official World Family Network (OWFN) tem a missão de construir uma rede global que forneça apoio real e 100% transparente à humanidade. Ajudamos pessoas em qualquer lugar, a qualquer hora, com necessidades essenciais, aproveitando o poder da tecnologia blockchain. Nosso objetivo é criar um sistema de ajuda descentralizado que seja eficiente, responsável e acessível a todos. Acreditamos que, ao conectar as pessoas diretamente às causas, podemos eliminar ineficiências e garantir que a ajuda chegue a quem mais precisa.`,
     about_vision_title: 'Nossa Visão',
-    about_vision_desc: `Imaginamos um mundo onde as fronteiras não limitam a compaixão e o apoio. Um mundo onde a tecnologia nos une para resolver questões globais críticas como a pobreza, a falta de acesso a cuidados de saúde e as disparidades educacionais. A OWFN pretende ser mais do que apenas um projeto; é um movimento. Uma força viva e que respira para o bem, construída e sustentada por uma comunidade global de indivíduos que acreditam em um futuro melhor e mais equitativo para todos. Essa visão só pode ser alcançada por meio da ação coletiva e do apoio inabalável de nossa comunidade.`,
+    about_vision_desc: `Imaginamos um mundo onde as fronteiras não limitam a compaixão e o apoio. Um mundo onde a tecnologia nos une para resolver questões globais críticas como a pobreza, a falta de acesso a cuidados de saúde e as disparidades educacionais. A OWFN pretende ser mais do que apenas um projeto; é um movimento. Uma força viva e que respira para o bem, construída e sustentada por uma comunidade global de indivíduos que acreditam em um futuro melhor e mais equitativo para todos. Essa visão só pode ser alcançada por meio da ação coletiva e do apoio inabalável de nostra comunidade.`,
     about_impact_areas_title: 'Áreas de Impacto',
     about_impact_health_title: 'Saúde',
     about_impact_health_desc: 'Cobrindo custos de cirurgia, modernizando hospitais e fornecendo acesso a cuidados médicos críticos.',
@@ -394,6 +394,7 @@ export const pt = {
     activate_maintenance_mode: 'Ativar Manutenção',
     deactivate_maintenance_mode: 'Desativar Manutenção',
     admin_login: 'Login de Administrador',
+    maintenance_login_denied: 'Conexão negada. A plataforma está em modo de manutenção. Apenas administradores podem fazer login.',
 
     // Coming Soon
     coming_soon_title: 'Em Breve',

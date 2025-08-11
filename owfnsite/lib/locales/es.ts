@@ -394,6 +394,7 @@ export const es = {
     activate_maintenance_mode: "Activar Mantenimiento",
     deactivate_maintenance_mode: "Desactivar Mantenimiento",
     admin_login: "Inicio de Sesión de Administrador",
+    maintenance_login_denied: 'Conexión denegada. La plataforma está en modo de mantenimiento. Solo los administradores pueden iniciar sesión.',
 
     // Coming Soon
     coming_soon_title: 'Próximamente',

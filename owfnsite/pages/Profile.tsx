@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Wrench, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { ImpactBadge, ImpactNFT } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
@@ -22,31 +22,6 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
         </div>
     </div>
 );
-
-const AdminControls = () => {
-    const { t, isMaintenanceActive, toggleMaintenanceMode } = useAppContext();
-
-    return (
-        <div className="bg-accent-950 border-l-4 border-accent-600 p-6 rounded-lg shadow-3d">
-            <h2 className="text-2xl font-bold mb-4 text-accent-300 flex items-center gap-2"><Wrench /> {t('admin_controls')}</h2>
-            <div className="flex items-center justify-between">
-                <div>
-                    <p className="font-semibold">{t('maintenance_mode')}</p>
-                    <p className={`text-sm font-bold ${isMaintenanceActive ? 'text-green-400' : 'text-red-400'}`}>
-                        {t('maintenance_status')}: {isMaintenanceActive ? t('maintenance_status_active') : t('maintenance_status_inactive')}
-                    </p>
-                </div>
-                <button 
-                    onClick={toggleMaintenanceMode} 
-                    className={`font-bold py-2 px-4 rounded-lg transition-colors ${isMaintenanceActive ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white'}`}
-                >
-                    {isMaintenanceActive ? t('deactivate_maintenance_mode') : t('activate_maintenance_mode')}
-                </button>
-            </div>
-        </div>
-    );
-};
-
 
 export default function Profile() {
     const { t, solana } = useAppContext();
@@ -192,8 +167,6 @@ export default function Profile() {
                     </div>
                 </ComingSoonWrapper>
             </div>
-
-            {isAdmin && <AdminControls />}
         </div>
     );
 }

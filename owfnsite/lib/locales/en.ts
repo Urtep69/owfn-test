@@ -394,6 +394,7 @@ export const en = {
     activate_maintenance_mode: "Activate Maintenance",
     deactivate_maintenance_mode: "Deactivate Maintenance",
     admin_login: "Admin Login",
+    maintenance_login_denied: 'Connection denied. The platform is in maintenance mode. Only administrators can log in.',
 
     // Coming Soon
     coming_soon_title: 'Coming Soon',

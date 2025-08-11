@@ -4,7 +4,7 @@ import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
 import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
-import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES } from '../constants.ts';
+import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 
 interface AppContextType {
@@ -23,7 +23,6 @@ interface AppContextType {
   addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
   isMaintenanceActive: boolean;
-  toggleMaintenanceMode: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -35,20 +34,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
-  const [isMaintenanceActive, setIsMaintenanceActive] = useState(false);
-
-  useEffect(() => {
-    const savedMode = localStorage.getItem('maintenanceMode');
-    setIsMaintenanceActive(savedMode === 'true');
-  }, []);
-
-  const toggleMaintenanceMode = useCallback(() => {
-    setIsMaintenanceActive(prev => {
-        const newState = !prev;
-        localStorage.setItem('maintenanceMode', String(newState));
-        return newState;
-    });
-  }, []);
+  const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
@@ -130,7 +116,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addProposal,
     voteOnProposal,
     isMaintenanceActive,
-    toggleMaintenanceMode,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

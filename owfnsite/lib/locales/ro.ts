@@ -394,6 +394,7 @@ export const ro = {
     activate_maintenance_mode: "Activează Mentenanța",
     deactivate_maintenance_mode: "Dezactivează Mentenanța",
     admin_login: "Autentificare Admin",
+    maintenance_login_denied: 'Conectare refuzată. Platforma este în modul de întreținere. Doar administratorii se pot autentifica.',
 
     // Coming Soon
     coming_soon_title: 'În Curând',
