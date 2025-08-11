@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, User } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
@@ -7,7 +6,7 @@ import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
 
 export const Chatbot = () => {
-    const { t } = useAppContext();
+    const { t, currentLanguage } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
@@ -29,7 +28,7 @@ export const Chatbot = () => {
         setIsLoading(true);
 
         try {
-            const botResponseText = await getChatbotResponse(messages, input);
+            const botResponseText = await getChatbotResponse(messages, input, currentLanguage.code);
             const botMessage: ChatMessage = { role: 'model', parts: [{ text: botResponseText }] };
             setMessages(prev => [...prev, botMessage]);
         } catch (error) {

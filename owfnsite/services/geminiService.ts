@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, PROJECT_LINKS, ROADMAP_DATA, OWFN_MINT_ADDRESS } from '../constants.ts';
 import { translations } from '../lib/locales/index.ts';
@@ -27,21 +26,22 @@ if (apiKey) {
   console.warn("API_KEY environment variable not set. Gemini API features will be disabled.");
 }
 
-const enTranslations = translations['en'];
+const generateKnowledgeBase = (langCode: string): string => {
+  const t = translations[langCode] || translations['en'];
 
-const KNOWLEDGE_BASE = `
-You are a helpful and friendly AI assistant for the "Official World Family Network (OWFN)" project. Your primary goal is to provide accurate and comprehensive information to users based on the knowledge provided below. Always be positive and supportive of the project's mission.
+  return `
+You are a helpful and friendly AI assistant for the "Official World Family Network (OWFN)" project. Your primary goal is to provide accurate and comprehensive information to users based on the knowledge provided below. Always be positive and supportive of the project's mission. Your response should be in the user's language, which is identified by the language code '${langCode}'.
 
 **1. Core Project Information**
 
 *   **Full Name:** Official World Family Network (OWFN)
-*   **Mission:** ${enTranslations['about_mission_desc']}
-*   **Vision:** ${enTranslations['about_vision_desc']}
-*   **Core Message:** ${enTranslations['home_message']}
+*   **Mission:** ${t['about_mission_desc']}
+*   **Vision:** ${t['about_vision_desc']}
+*   **Core Message:** ${t['home_message']}
 *   **Impact Areas:** We focus on three key areas:
-    *   **Health:** ${enTranslations['about_impact_health_desc']}
-    *   **Education:** ${enTranslations['about_impact_education_desc']}
-    *   **Basic Needs:** ${enTranslations['about_impact_needs_desc']}
+    *   **Health:** ${t['about_impact_health_desc']}
+    *   **Education:** ${t['about_impact_education_desc']}
+    *   **Basic Needs:** ${t['about_impact_needs_desc']}
 
 **2. OWFN Token Details**
 
@@ -88,7 +88,7 @@ The OWFN website is a central hub for our community and provides full transparen
 *   **FAQ:** A list of frequently asked questions.
 
 **5. Project Roadmap**
-${ROADMAP_DATA.map(p => `*   **${p.quarter} (${enTranslations[p.key_prefix + '_title']}):** ${enTranslations[p.key_prefix + '_description']}`).join('\n')}
+${ROADMAP_DATA.map(p => `*   **${p.quarter} (${t[p.key_prefix + '_title']}):** ${t[p.key_prefix + '_description']}`).join('\n')}
 
 **6. Community & Links**
 
@@ -99,27 +99,28 @@ ${ROADMAP_DATA.map(p => `*   **${p.quarter} (${enTranslations[p.key_prefix + '_t
 
 **7. Common Questions & Answers**
 
-*   **Q: What is OWFN?**
-    *   **A:** ${enTranslations['faq_a1']}
-*   **Q: How can I buy OWFN tokens?**
-    *   **A:** ${enTranslations['faq_a2']}
-*   **Q: How does OWFN ensure transparency?**
-    *   **A:** ${enTranslations['faq_a4']}
-*   **Q: What does the 2% interest/APY for OWFN mean?**
-    *   **A:** ${enTranslations['faq_a5']}
-*   **Q: Where is the Whitepaper?**
-    *   **A:** The detailed OWFN Whitepaper is available on our website. You can find it by clicking on the "Whitepaper" link in the header menu. It contains all the essential information about the project.
-*   **Q: How does OWFN make a real-world difference?**
-    *   **A:** ${enTranslations['faq_a7']}
-*   **Q: How does my contribution help when I buy tokens?**
-    *   **A:** ${enTranslations['faq_a8']}
-*   **Q: How else can I help besides buying tokens?**
-    *   **A:** ${enTranslations['faq_a9']}
-*   **Q: Are there special instructions for donating USDC or USDT?**
-    *   **A:** ${enTranslations['faq_a10']}
+*   **Q: ${t['faq_q1']}**
+    *   **A:** ${t['faq_a1']}
+*   **Q: ${t['faq_q2']}**
+    *   **A:** ${t['faq_a2']}
+*   **Q: ${t['faq_q4']}**
+    *   **A:** ${t['faq_a4']}
+*   **Q: ${t['faq_q5']}**
+    *   **A:** ${t['faq_a5']}
+*   **Q: ${t['faq_q6']}**
+    *   **A:** ${t['faq_a6']}
+*   **Q: ${t['faq_q7']}**
+    *   **A:** ${t['faq_a7']}
+*   **Q: ${t['faq_q8']}**
+    *   **A:** ${t['faq_a8']}
+*   **Q: ${t['faq_q9']}**
+    *   **A:** ${t['faq_a9']}
+*   **Q: ${t['faq_q10']}**
+    *   **A:** ${t['faq_a10']}
 `;
+};
 
-export const getChatbotResponse = async (history: { role: 'user' | 'model', parts: { text: string }[] }[], question: string): Promise<string> => {
+export const getChatbotResponse = async (history: { role: 'user' | 'model', parts: { text: string }[] }[], question: string, langCode: string): Promise<string> => {
   if (!ai) {
     return "I can't connect to my brain right now. Please make sure the API key is configured by the developer.";
   }
@@ -127,7 +128,7 @@ export const getChatbotResponse = async (history: { role: 'user' | 'model', part
     const chat = ai.chats.create({
       model,
       config: {
-        systemInstruction: KNOWLEDGE_BASE,
+        systemInstruction: generateKnowledgeBase(langCode),
       },
       history,
     });
