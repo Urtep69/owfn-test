@@ -1,4 +1,4 @@
-import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
 export default async function handler(request: Request) {
     if (request.method !== 'POST') {
@@ -16,6 +16,7 @@ export default async function handler(request: Request) {
     try {
         const { text, targetLanguage } = await request.json();
 
+        // If the text is empty or just whitespace, return it as is.
         if (!text || !text.trim()) {
             return new Response(JSON.stringify({ text: text || '' }), {
                 status: 200,
@@ -24,28 +25,29 @@ export default async function handler(request: Request) {
         }
         
         const ai = new GoogleGenAI({ apiKey });
-
-        // Using the Chat API for a more robust, instruction-following translation task.
-        const chat: Chat = ai.chats.create({
+        
+        // This is a single-turn, stateless request, so generateContent is more appropriate and efficient.
+        const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
+            // A very direct and structured prompt.
+            contents: `Translate the following text from English to ${targetLanguage}. Do not add any extra commentary, notes, or quotation marks. Return ONLY the translated text.\n\nText to translate:\n"""\n${text}\n"""`,
             config: {
-                systemInstruction: `You are a professional translator. Your only task is to translate the user's text into the specified language. You must output ONLY the translated text, without any additional text, formatting, or quotation marks.`,
-                temperature: 0,
+                // Keep temperature low for deterministic translation
+                temperature: 0, 
+                // Disable thinking to optimize for speed and reduce timeout risk on serverless functions.
                 thinkingConfig: { thinkingBudget: 0 },
             }
         });
-
-        const response: GenerateContentResponse = await chat.sendMessage({
-            message: `Translate the following text to ${targetLanguage}: "${text}"`
-        });
-
-        const translatedText = response.text.trim();
         
-        if (!translatedText) {
+        const translatedText = response.text;
+
+        // Check for an empty or null response from the model
+        if (!translatedText || !translatedText.trim()) {
+             console.error("Translation resulted in an empty string. Full API response:", JSON.stringify(response, null, 2));
              throw new Error("Translation resulted in an empty string.");
         }
 
-        return new Response(JSON.stringify({ text: translatedText }), {
+        return new Response(JSON.stringify({ text: translatedText.trim() }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
