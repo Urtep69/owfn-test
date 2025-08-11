@@ -135,18 +135,16 @@ export default function ImpactPortal() {
 
             <div className="grid md:grid-cols-3 gap-8">
                 {categories.map(category => (
-                    category.casesCount > 0 && (
-                        <Link 
-                            key={category.name}
-                            href={`/impact/category/${category.name.toLowerCase().replace(' ', '-')}`}
-                        >
-                           <a className="block text-center p-8 bg-primary-800 rounded-lg shadow-3d hover:shadow-3d-lg hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent-500">
-                                {category.icon}
-                                <h2 className="text-2xl font-bold">{t(category.titleKey)}</h2>
-                                <p className="text-primary-400 mt-2">{t(category.descKey)}</p>
-                           </a>
-                        </Link>
-                    )
+                    <Link 
+                        key={category.name}
+                        href={`/impact/category/${category.name.toLowerCase().replace(' ', '-')}`}
+                    >
+                       <a className="block text-center p-8 bg-primary-800 rounded-lg shadow-3d hover:shadow-3d-lg hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent-500">
+                            {category.icon}
+                            <h2 className="text-2xl font-bold">{t(category.titleKey)}</h2>
+                            <p className="text-primary-400 mt-2">{t(category.descKey)}</p>
+                       </a>
+                    </Link>
                 ))}
             </div>
 
