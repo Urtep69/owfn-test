@@ -16,7 +16,6 @@ export default async function handler(request: Request) {
     try {
         const { text, targetLanguage } = await request.json();
 
-        // If the input text is empty or just whitespace, return it as is to avoid unnecessary API calls.
         if (!text || !text.trim()) {
             return new Response(JSON.stringify({ text: text || '' }), {
                 status: 200,
@@ -26,21 +25,21 @@ export default async function handler(request: Request) {
         
         const ai = new GoogleGenAI({ apiKey });
 
+        const prompt = `You are a professional translation engine. Your sole task is to translate the following text into ${targetLanguage}. Provide ONLY the translated text as your response. Do not include any extra commentary, introductions, or explanations. Do not wrap the translation in quotation marks.
+
+Text to translate:
+"${text}"`;
+
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: text, // Pass the raw text as the main content for translation.
+            contents: prompt,
             config: {
-                // Provide a clear and direct system instruction for the translation task.
-                systemInstruction: `You are a professional translation engine. Your task is to translate the user's input text into ${targetLanguage}. You must respond with ONLY the translated text. Do not add any extra commentary, introductions, explanations, or any surrounding text like quotation marks. Your output must be the raw translated text and nothing else.`,
-                temperature: 0, // Use 0 for deterministic, direct translation.
+                temperature: 0,
+                thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for faster, direct translation.
             }
         });
         
-        // Even with instructions, models can sometimes add extra formatting. Clean the response as a safeguard.
-        let translatedText = response.text.trim();
-        if ((translatedText.startsWith('"') && translatedText.endsWith('"'))) {
-            translatedText = translatedText.substring(1, translatedText.length - 1);
-        }
+        const translatedText = response.text.trim();
 
         return new Response(JSON.stringify({ text: translatedText }), {
             status: 200,
@@ -49,7 +48,8 @@ export default async function handler(request: Request) {
 
     } catch (error) {
         console.error("Gemini translation API error in serverless function:", error);
-        return new Response(JSON.stringify({ error: "Failed to get translation from AI." }), {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+        return new Response(JSON.stringify({ error: `Failed to get translation from AI: ${errorMessage}` }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });
