@@ -50,10 +50,8 @@ export default async function handler(request: Request) {
         
         const ai = new GoogleGenAI({ apiKey });
 
-        // Get the language name for the AI instruction.
         const languageName = new Intl.DisplayNames(['en'], { type: 'language' }).of(langCode) || 'the user\'s language';
 
-        // Combine the static knowledge base with dynamic instructions.
         const systemInstruction = `
 You are a helpful and friendly AI assistant for the "Official World Family Network (OWFN)" project. Your primary goal is to provide accurate information to users based on the knowledge provided below. Always be positive and supportive of the project's mission.
 
@@ -65,18 +63,19 @@ ${KNOWLEDGE_BASE}
 
 Remember to be helpful, positive, and stick to the information provided. If a user asks a question you cannot answer with this data, politely state that you do not have that information at the moment but you can answer questions about the project's mission, tokenomics, and features.
 `;
-
-        const chat = ai.chats.create({
-            model: 'gemini-2.5-flash',
-            config: {
-                systemInstruction: systemInstruction,
-                thinkingConfig: { thinkingBudget: 0 }
-            },
-            history: history,
-        });
+        
+        const contents = [...history, { role: 'user', parts: [{ text: question }] }];
 
         if (stream) {
-            const streamResponse = await chat.sendMessageStream({ message: question });
+            const streamResponse = await ai.models.generateContentStream({
+                model: 'gemini-2.5-flash',
+                contents: contents,
+                config: {
+                    systemInstruction: systemInstruction,
+                    thinkingConfig: { thinkingBudget: 0 }
+                },
+            });
+
             const readableStream = new ReadableStream({
                 async start(controller) {
                     try {
@@ -105,7 +104,15 @@ Remember to be helpful, positive, and stick to the information provided. If a us
         }
 
         // Fallback for non-streaming requests
-        const response = await chat.sendMessage({ message: question });
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: contents,
+            config: {
+                systemInstruction: systemInstruction,
+                thinkingConfig: { thinkingBudget: 0 }
+            },
+        });
+        
         return new Response(JSON.stringify({ text: response.text }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
