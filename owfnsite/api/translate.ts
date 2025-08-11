@@ -25,9 +25,9 @@ export default async function handler(request: Request) {
         
         const ai = new GoogleGenAI({ apiKey });
 
-        const prompt = `You are a professional translation engine. Your sole task is to translate the following text into ${targetLanguage}. Provide ONLY the translated text as your response. Do not include any extra commentary, introductions, or explanations. Do not wrap the translation in quotation marks.
+        const prompt = `Translate the text below into ${targetLanguage}. Output ONLY the raw translated text. Do not add any extra commentary, introductions, explanations, or quotation marks.
 
-Text to translate:
+TEXT:
 "${text}"`;
 
         const response = await ai.models.generateContent({
@@ -40,6 +40,11 @@ Text to translate:
         });
         
         const translatedText = response.text.trim();
+        
+        // Add a check to ensure we didn't get an empty or failed response text
+        if (!translatedText) {
+             throw new Error("Translation resulted in an empty string.");
+        }
 
         return new Response(JSON.stringify({ text: translatedText }), {
             status: 200,
