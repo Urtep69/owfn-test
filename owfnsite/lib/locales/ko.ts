@@ -383,6 +383,7 @@ export const ko = {
     you_voted: '투표함',
     no_active_proposals: '현재 활성 제안이 없습니다.',
     no_past_proposals: '표시할 과거 제안이 없습니다.',
+    no_active_cases_in_category: '현재 이 카테고리에 활성 사례가 없습니다.',
     
     // Maintenance
     maintenance_heading: '더 나은 서비스를 위해 노력하고 있습니다!',
