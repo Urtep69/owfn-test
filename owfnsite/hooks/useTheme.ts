@@ -14,8 +14,8 @@ export const useTheme = (): [Theme, () => void] => {
     } catch (e) {
       console.warn("Could not read theme from localStorage", e);
     }
-    // Default to light theme as requested
-    return 'light';
+    // Default to dark theme as requested
+    return 'dark';
   });
 
   useEffect(() => {
