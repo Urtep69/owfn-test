@@ -55,9 +55,9 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
 
     const getStatusChip = () => {
         switch(proposal.status) {
-            case 'active': return <div className="bg-blue-500/20 text-blue-300 text-xs font-bold px-2 py-1 rounded-full">{t('status_active')}</div>;
-            case 'passed': return <div className="bg-green-500/20 text-green-300 text-xs font-bold px-2 py-1 rounded-full">{t('status_passed')}</div>;
-            case 'failed': return <div className="bg-red-500/20 text-red-300 text-xs font-bold px-2 py-1 rounded-full">{t('status_failed')}</div>;
+            case 'active': return <div className="bg-blue-500/20 text-blue-400 dark:text-blue-300 text-xs font-bold px-2 py-1 rounded-full">{t('status_active')}</div>;
+            case 'passed': return <div className="bg-green-500/20 text-green-500 dark:text-green-300 text-xs font-bold px-2 py-1 rounded-full">{t('status_passed')}</div>;
+            case 'failed': return <div className="bg-red-500/20 text-red-500 dark:text-red-300 text-xs font-bold px-2 py-1 rounded-full">{t('status_failed')}</div>;
         }
     }
 
@@ -65,31 +65,31 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
     const description = proposal.description[currentLanguage.code] || proposal.description['en'];
 
     return (
-        <div className="bg-primary-800 p-6 rounded-lg shadow-3d space-y-4">
+        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d space-y-4">
             <div className="flex justify-between items-start">
                 <h3 className="text-xl font-bold">{title}</h3>
                 {getStatusChip()}
             </div>
-            <p className="text-primary-400 text-sm">{description}</p>
-            <div className="text-xs text-primary-500">Proposed by: <AddressDisplay address={proposal.proposer} /></div>
+            <p className="text-primary-600 dark:text-darkPrimary-400 text-sm">{description}</p>
+            <div className="text-xs text-primary-500 dark:text-darkPrimary-500">Proposed by: <AddressDisplay address={proposal.proposer} /></div>
             
             <div className="space-y-2">
-                <div className="w-full bg-primary-700 rounded-full h-4 flex overflow-hidden">
+                <div className="w-full bg-primary-200 dark:bg-darkPrimary-700 rounded-full h-4 flex overflow-hidden">
                     <div className="bg-green-500 h-full" style={{ width: `${forPercentage}%` }}></div>
                     <div className="bg-red-500 h-full" style={{ width: `${againstPercentage}%` }}></div>
                 </div>
                 <div className="flex justify-between text-sm font-semibold">
-                    <span className="text-green-400">{t('votes_for')}: {forPercentage.toFixed(2)}%</span>
-                    <span className="text-red-400">{t('votes_against')}: {againstPercentage.toFixed(2)}%</span>
+                    <span className="text-green-600 dark:text-green-400">{t('votes_for')}: {forPercentage.toFixed(2)}%</span>
+                    <span className="text-red-600 dark:text-red-400">{t('votes_against')}: {againstPercentage.toFixed(2)}%</span>
                 </div>
             </div>
             
             {proposal.status === 'active' && (
-                <div className="flex justify-between items-center border-t border-primary-700 pt-4">
-                    <div className="text-sm text-primary-400">{t('ends_in')}: <Countdown endDate={proposal.endDate} /></div>
+                <div className="flex justify-between items-center border-t border-primary-200 dark:border-darkPrimary-700 pt-4">
+                    <div className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('ends_in')}: <Countdown endDate={proposal.endDate} /></div>
                     {address && (
                         hasVoted ? (
-                             <div className="flex items-center gap-2 text-accent-500 font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
+                             <div className="flex items-center gap-2 text-accent-600 dark:text-darkAccent-500 font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
                         ) : (
                             <div className="flex gap-2">
                                 <button onClick={() => handleVote('for')} disabled={loading} className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 disabled:opacity-50"><ThumbsUp size={16}/></button>
@@ -130,61 +130,5 @@ export default function Governance() {
         <div className="animate-fade-in-up space-y-8">
             <div className="flex justify-between items-center">
                 <div className="text-center md:text-left">
-                    <h1 className="text-4xl font-bold text-accent-400">{t('governance')}</h1>
-                    <p className="mt-2 text-lg text-primary-400">
-                        {t('governance_subtitle')}
-                    </p>
-                </div>
-                 {solana.connected && (
-                     <button onClick={() => setCreateModalOpen(true)} className="bg-accent-500 text-primary-950 font-bold py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-accent-600">
-                        <PlusCircle size={20} />
-                        <span className="hidden md:inline">{t('create_proposal')}</span>
-                    </button>
-                 )}
-            </div>
-
-            <section>
-                <h2 className="text-2xl font-bold mb-4">{t('active_proposals')}</h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                    {activeProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
-                </div>
-            </section>
-            
-            <section>
-                <h2 className="text-2xl font-bold mb-4">{t('past_proposals')}</h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                    {pastProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
-                </div>
-            </section>
-
-            {isCreateModalOpen && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setCreateModalOpen(false)}>
-                    <div className="bg-primary-800 rounded-lg shadow-3d-lg p-8 w-full max-w-lg" onClick={e => e.stopPropagation()}>
-                        <h2 className="text-2xl font-bold mb-6">{t('create_proposal')}</h2>
-                        <form onSubmit={handleCreateProposal} className="space-y-4">
-                             <input
-                                type="text"
-                                placeholder={t('proposal_title')}
-                                value={newTitle}
-                                onChange={(e) => setNewTitle(e.target.value)}
-                                required
-                                className="w-full p-3 bg-primary-700 rounded-md focus:ring-2 focus:ring-accent-500 focus:outline-none"
-                            />
-                            <textarea
-                                placeholder={t('proposal_description')}
-                                value={newDescription}
-                                onChange={(e) => setNewDescription(e.target.value)}
-                                required
-                                rows={5}
-                                className="w-full p-3 bg-primary-700 rounded-md focus:ring-2 focus:ring-accent-500 focus:outline-none"
-                            ></textarea>
-                            <button type="submit" disabled={isSubmitting} className="w-full bg-accent-500 text-primary-950 font-bold py-3 rounded-lg hover:bg-accent-600 disabled:opacity-50 disabled:cursor-wait">
-                                {isSubmitting ? t('processing') : t('submit_proposal')}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-}
+                    <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('governance')}</h1>
+                    <p className="mt-2 text-

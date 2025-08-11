@@ -7,7 +7,7 @@ import { TOKEN_ALLOCATIONS } from '../constants.ts';
 const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-primary-800/80 backdrop-blur-sm p-2 border border-primary-600 rounded-lg shadow-lg">
+        <div className="bg-primary-50/80 dark:bg-darkPrimary-800/80 backdrop-blur-sm p-2 border border-primary-200 dark:border-darkPrimary-600 rounded-lg shadow-lg text-primary-900 dark:text-darkPrimary-100">
           <p className="font-bold">{`${payload[0].name}`}</p>
           <p className="text-sm">{`Amount: ${payload[0].value.toLocaleString()} OWFN`}</p>
           <p className="text-sm">{`Percentage: ${payload[0].payload.percentage}%`}</p>
@@ -38,7 +38,7 @@ export const AllocationChart = () => {
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
-          <Legend />
+          <Legend wrapperStyle={{ color: 'var(--recharts-legend-text-color)' }} />
         </PieChart>
       </ResponsiveContainer>
     </div>

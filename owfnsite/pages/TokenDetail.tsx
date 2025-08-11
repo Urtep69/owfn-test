@@ -64,16 +64,16 @@ const formatNumber = (num?: number, style: 'currency' | 'decimal' = 'decimal', m
 };
 
 const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) => (
-    <div className="flex justify-between items-center py-3 border-b border-primary-700/50">
-        <span className="text-primary-300 text-sm">{label}</span>
+    <div className="flex justify-between items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50">
+        <span className="text-primary-600 dark:text-darkPrimary-300 text-sm">{label}</span>
         <div className="text-right">
-            <span className="font-semibold text-primary-100 text-sm font-mono">{value}</span>
+            <span className="font-semibold text-primary-800 dark:text-darkPrimary-100 text-sm font-mono">{value}</span>
         </div>
     </div>
 );
 
 const AuthorityStatus = ({ enabled, t, labelKey }: { enabled?: boolean, t: Function, labelKey: string }) => {
-    const color = enabled ? 'text-red-400' : 'text-green-400';
+    const color = enabled ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400';
     const Icon = enabled ? Unlock : Lock;
     const text = enabled ? 'Enabled' : 'Disabled';
 
@@ -91,8 +91,8 @@ const AuthorityStatus = ({ enabled, t, labelKey }: { enabled?: boolean, t: Funct
 };
 
 const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
-    <div className="bg-primary-800 p-6 rounded-lg shadow-lg h-full">
-        <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-accent-400">
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-lg h-full">
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-accent-600 dark:text-darkAccent-400">
             {icon} {title}
         </h3>
         <div className="space-y-1">
@@ -208,8 +208,8 @@ export default function TokenDetail() {
     if (loading) {
         return (
             <div className="flex flex-col justify-center items-center h-96 space-y-4">
-                <Loader2 className="w-12 h-12 animate-spin text-accent-500" />
-                <p className="text-primary-400">{t('profile_loading_tokens')}</p>
+                <Loader2 className="w-12 h-12 animate-spin text-accent-500 dark:text-darkAccent-500" />
+                <p className="text-primary-600 dark:text-darkPrimary-400">{t('profile_loading_tokens')}</p>
             </div>
         );
     }
@@ -219,7 +219,7 @@ export default function TokenDetail() {
             <div className="text-center py-10 animate-fade-in-up">
                 <h2 className="text-2xl font-bold">{t('token_not_found')}</h2>
                 {error && <p className="text-red-400 mt-2">{error}</p>}
-                 <Link to={from || '/dashboard'} className="text-accent-500 hover:underline mt-4 inline-block flex items-center justify-center gap-2">
+                 <Link to={from || '/dashboard'} className="text-accent-500 dark:text-darkAccent-500 hover:underline mt-4 inline-block flex items-center justify-center gap-2">
                     <ArrowLeft size={16} />
                     {from === '/profile' ? t('back_to_profile') : t('back_to_dashboard')}
                 </Link>
@@ -227,7 +227,7 @@ export default function TokenDetail() {
         );
     }
 
-    const priceChangeColor = (token.price24hChange ?? 0) >= 0 ? 'text-green-400' : 'text-red-400';
+    const priceChangeColor = (token.price24hChange ?? 0) >= 0 ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400';
     
     return (
         <div className="animate-fade-in-up space-y-6">
@@ -235,14 +235,14 @@ export default function TokenDetail() {
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 flex-shrink-0">{token.logo}</div>
                     <div>
-                        <h1 className="text-2xl font-bold text-primary-100 flex items-center gap-2">
-                            {token.name} <span className="text-primary-400 text-lg">({token.symbol})</span>
+                        <h1 className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100 flex items-center gap-2">
+                            {token.name} <span className="text-primary-500 dark:text-darkPrimary-400 text-lg">({token.symbol})</span>
                         </h1>
                     </div>
                 </div>
                  <div className="flex items-center gap-4 self-end sm:self-center">
                     <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-primary-100">
+                        <span className="text-3xl font-bold text-primary-900 dark:text-darkPrimary-100">
                             ${token.pricePerToken < 0.0001 ? token.pricePerToken.toPrecision(4) : token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                         </span>
                         <span className={`font-semibold ${priceChangeColor}`}>
@@ -289,12 +289,12 @@ export default function TokenDetail() {
                  {token.description.en !== 'No description provided.' && (
                     <div className="md:col-span-2">
                         <InfoCard title={t('token_description_title')} icon={<Info size={20} />}>
-                            <p className="text-sm text-primary-300 whitespace-pre-wrap">{token.description.en}</p>
+                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 whitespace-pre-wrap">{token.description.en}</p>
                         </InfoCard>
                     </div>
                  )}
             </div>
-             <Link to={from || '/dashboard'} className="inline-flex items-center gap-2 text-sm text-accent-400 hover:underline p-2 mt-2">
+             <Link to={from || '/dashboard'} className="inline-flex items-center gap-2 text-sm text-accent-600 dark:text-darkAccent-400 hover:underline p-2 mt-2">
                 <ArrowLeft size={16} /> {from === '/profile' ? t('back_to_profile') : t('back_to_dashboard')}
             </Link>
         </div>

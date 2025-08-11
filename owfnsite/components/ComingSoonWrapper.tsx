@@ -24,7 +24,7 @@ export const ComingSoonWrapper: React.FC<ComingSoonWrapperProps> = ({ children, 
             {showMessage ? (
                 <ComingSoon />
             ) : (
-                <div className="absolute inset-0 bg-primary-900/60 z-10"></div>
+                <div className="absolute inset-0 bg-primary-100/60 dark:bg-darkPrimary-900/60 z-10"></div>
             )}
         </div>
     );
