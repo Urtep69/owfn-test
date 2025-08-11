@@ -25,11 +25,14 @@ export default async function handler(request: Request) {
         
         const ai = new GoogleGenAI({ apiKey });
         
+        const prompt = `Please translate the following text into ${targetLanguage}:\n\n"${text}"`;
+
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: text,
+            contents: prompt,
             config: {
-                systemInstruction: `You are an expert translator. Translate the text to ${targetLanguage}. Respond with only the translated text, without any introductory phrases, explanations, or quotation marks.`,
+                systemInstruction: `You are an expert translator. Your sole purpose is to translate the text provided. Respond ONLY with the translated text, without any additional commentary, introductions, or quotation marks.`,
+                temperature: 0,
             }
         });
 
