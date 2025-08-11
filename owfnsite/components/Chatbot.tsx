@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, User } from 'lucide-react';
-import { streamChatbotResponse } from '../services/geminiService.ts';
+import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
@@ -25,30 +25,26 @@ export const Chatbot = () => {
         if (input.trim() === '' || isLoading) return;
 
         const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }] };
-        const currentInput = input;
-        // Truncate the history sent to the API to prevent server memory overload.
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
+        const currentInput = input;
 
         setMessages(prev => [...prev, userMessage, { role: 'model', parts: [{ text: '' }] }]);
         setInput('');
         setIsLoading(true);
 
         try {
-            // Pass the truncated history and the new question separately
-            const stream = streamChatbotResponse(historyForApi, currentInput, currentLanguage.code);
-
-            for await (const chunk of stream) {
-                setMessages(prev => {
-                    const newMessages = [...prev];
-                    const lastMessage = newMessages[newMessages.length - 1];
-                    if (lastMessage && lastMessage.role === 'model') {
-                        lastMessage.parts[0].text += chunk;
-                    }
-                    return newMessages;
-                });
-            }
+            const responseText = await getChatbotResponse(historyForApi, currentInput, currentLanguage.code);
+            
+            setMessages(prev => {
+                const newMessages = [...prev];
+                const lastMessage = newMessages[newMessages.length - 1];
+                if (lastMessage && lastMessage.role === 'model') {
+                    lastMessage.parts[0].text = responseText;
+                }
+                return newMessages;
+            });
         } catch (error) {
-            console.error("Error processing chatbot stream:", error);
+            console.error("Error processing chatbot response:", error);
             setMessages(prev => {
                 const newMessages = [...prev];
                 const lastMessage = newMessages[newMessages.length - 1];
