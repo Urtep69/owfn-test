@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
@@ -22,34 +21,47 @@ export default function Donations() {
 
     useEffect(() => {
         const fetchPrice = async () => {
+            // Prioritize using the price from the user's token data if available and valid.
+            if (currentUserToken && currentUserToken.pricePerToken > 0) {
+                setTokenPrice(currentUserToken.pricePerToken);
+                return;
+            }
+
+            // As a fallback, or if the user doesn't own the token, fetch the price from Jupiter.
             const mintAddress = KNOWN_TOKEN_MINT_ADDRESSES[selectedToken];
-            if (!mintAddress) {
+            if (!mintAddress || selectedToken === 'OWFN') { // OWFN has no market price yet
                 setTokenPrice(0);
                 return;
             }
+
             try {
                 const res = await fetch(`https://price.jup.ag/v4/price?ids=${mintAddress}`);
+                if (!res.ok) {
+                    throw new Error(`Jupiter API failed with status ${res.status}`);
+                }
                 const data = await res.json();
-                if(data.data[mintAddress]) {
+                if (data.data && data.data[mintAddress]) {
                     setTokenPrice(data.data[mintAddress].price);
                 } else {
                     setTokenPrice(0);
                 }
             } catch (e) {
-                console.error("Failed to fetch price", e);
+                console.error(`Failed to fetch price for ${selectedToken}:`, e);
                 setTokenPrice(0);
             }
         };
+
         fetchPrice();
-    }, [selectedToken]);
+    }, [selectedToken, currentUserToken]);
 
     const usdValue = useMemo(() => {
         const numAmount = parseFloat(amount);
-        if (isNaN(numAmount) || !tokenPrice) {
+        if (isNaN(numAmount) || !tokenPrice || tokenPrice <= 0) {
             return 0;
         }
         return numAmount * tokenPrice;
     }, [amount, tokenPrice]);
+
 
     const handlePercentageClick = (percentage: number) => {
         if (currentUserToken && currentUserToken.balance > 0) {
