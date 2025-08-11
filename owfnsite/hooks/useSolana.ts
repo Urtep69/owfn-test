@@ -156,12 +156,17 @@ export const useSolana = (): UseSolanaReturn => {
             }
         }
         
+        // This logic incorrectly assigned a value to the OWFN token based on the presale rate,
+        // even without liquidity. It has been removed to avoid confusion. The token value will
+        // now correctly be $0 until it has a market price.
+        /*
         const owfnToken = allTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS);
         if (owfnToken && owfnToken.pricePerToken === 0 && solPrice > 0) {
             const presaleRate = PRESALE_DETAILS.rate;
             owfnToken.pricePerToken = solPrice / presaleRate;
             owfnToken.usdValue = owfnToken.balance * owfnToken.pricePerToken;
         }
+        */
         
         return allTokens.sort((a,b) => b.usdValue - a.usdValue);
 
