@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useLocation } from 'wouter';
+import { useParams, Link } from 'wouter';
 import { Loader2, ArrowLeft, BarChart2, DollarSign, TrendingUp, Briefcase, KeyRound, Lock, Unlock, ShieldCheck, Database, Info } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { HELIUS_API_KEY } from '../constants.ts';
@@ -105,8 +104,8 @@ const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactN
 export default function TokenDetail() {
     const { t } = useAppContext();
     const params = useParams();
-    const [location] = useLocation();
-    const searchParams = new URLSearchParams(location.split('?')[1] || '');
+    // useLocation from wouter doesn't include search params, so we read them directly.
+    const searchParams = new URLSearchParams(window.location.search);
     const from = searchParams.get('from');
     
     const mintAddress = params?.['mint'];
