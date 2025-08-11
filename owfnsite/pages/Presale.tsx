@@ -149,39 +149,48 @@ export default function Presale() {
     const calculateState = () => {
         const now = new Date();
         const { startDate, endDate } = PRESALE_DETAILS;
-        let status: 'pending' | 'active' | 'ended' = 'pending';
-        let targetDate: Date;
 
-        if (now < startDate) {
-            status = 'pending';
-            targetDate = startDate;
-        } else if (now < endDate) {
-            status = 'active';
-            targetDate = endDate;
+        // 1. Determine the current status
+        let newStatus: 'pending' | 'active' | 'ended';
+        if (now.getTime() < startDate.getTime()) {
+            newStatus = 'pending';
+        } else if (now.getTime() < endDate.getTime()) {
+            newStatus = 'active';
         } else {
-            status = 'ended';
+            newStatus = 'ended';
+        }
+        setPresaleStatus(newStatus);
+
+        // 2. Determine the target date for the countdown based on the status
+        let targetDate: Date;
+        if (newStatus === 'pending') {
+            targetDate = startDate;
+        } else { // 'active' or 'ended' both count down to the end date
             targetDate = endDate;
         }
-        
-        setPresaleStatus(status);
 
-        const difference = +targetDate - +now;
-        let newTimeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
-        if (difference > 0) {
-            newTimeLeft = {
+        // 3. Calculate the time difference
+        const difference = targetDate.getTime() - now.getTime();
+
+        // 4. Update the time left state, only if there's time remaining and the sale isn't over
+        if (difference > 0 && newStatus !== 'ended') {
+            setTimeLeft({
                 days: Math.floor(difference / (1000 * 60 * 60 * 24)),
                 hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
                 minutes: Math.floor((difference / 1000 / 60) % 60),
                 seconds: Math.floor((difference / 1000) % 60),
-            };
+            });
+        } else {
+            setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         }
-        setTimeLeft(newTimeLeft);
     };
 
-    calculateState();
-    const timer = setInterval(calculateState, 1000);
-    return () => clearInterval(timer);
-  }, []);
+    calculateState(); // Run once immediately on mount
+    const timer = setInterval(calculateState, 1000); // And then every second
+
+    return () => clearInterval(timer); // Cleanup on unmount
+  }, []); // Empty dependency array ensures this runs only once
+
 
   useEffect(() => {
     const fetchPresaleProgress = async () => {
