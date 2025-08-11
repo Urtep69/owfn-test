@@ -1,5 +1,4 @@
 
-
 import { useState, useEffect, useCallback } from 'react';
 import type { Theme } from '../types.ts';
 
@@ -15,8 +14,8 @@ export const useTheme = (): [Theme, () => void] => {
     } catch (e) {
       console.warn("Could not read theme from localStorage", e);
     }
-    // Default to dark theme as per original design
-    return 'dark';
+    // Default to light theme as requested
+    return 'light';
   });
 
   useEffect(() => {
