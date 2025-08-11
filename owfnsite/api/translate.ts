@@ -14,8 +14,14 @@ export default async function handler(request: Request) {
         });
     }
     
+    let text: string = '';
+    let targetLanguage: string = '';
+
     try {
-        const { text, targetLanguage } = await request.json();
+        const body = await request.json();
+        text = body.text;
+        targetLanguage = body.targetLanguage;
+        
         console.log(`Translation request received. Target: ${targetLanguage}, Text: "${text.substring(0, 50)}..."`);
 
         if (!text || !text.trim()) {
@@ -26,21 +32,23 @@ export default async function handler(request: Request) {
         }
         
         const ai = new GoogleGenAI({ apiKey });
+
+        // A direct and explicit prompt structure without systemInstruction.
+        const prompt = `Translate the following text to ${targetLanguage}. Provide ONLY the translated text, without any additional comments, formatting, or quotation marks.\n\nText to translate:\n"""\n${text}\n"""`;
         
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: `Translate the following English text to ${targetLanguage}:\n\n---\n${text}\n---`,
+            contents: prompt,
             config: {
-                systemInstruction: "You are an expert translator. Your sole purpose is to translate the text provided by the user to the specified target language. You must not add any extra text, explanations, notes, or quotation marks. Your entire response must be ONLY the translated text.",
                 temperature: 0, 
-                thinkingConfig: { thinkingBudget: 0 },
+                thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for speed and directness
             }
         });
         
         const translatedText = response.text;
 
         if (!translatedText || !translatedText.trim()) {
-             console.error("Translation resulted in an empty string. Full API response:", JSON.stringify(response, null, 2));
+             console.error(`Translation resulted in an empty string. Target: ${targetLanguage}, Input: "${text.substring(0,100)}..." Full API response:`, JSON.stringify(response, null, 2));
              throw new Error("Translation resulted in an empty string.");
         }
         
@@ -52,7 +60,7 @@ export default async function handler(request: Request) {
         });
 
     } catch (error) {
-        console.error("Gemini translation API error in serverless function:", error);
+        console.error(`Gemini translation API error. Target: ${targetLanguage}, Input Text: "${text.substring(0, 100)}..."`, error);
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
         return new Response(JSON.stringify({ error: `Failed to get translation from AI: ${errorMessage}` }), {
             status: 500,
