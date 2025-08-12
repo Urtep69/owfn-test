@@ -4,7 +4,7 @@
   "private": true,
   "description": "A global network united by the vision to build a better world through technology and humanity.",
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && cp index.html dist/ && (test -d public && cp -R public/. dist/ || true) && esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.ts=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"'"
+    "build": "rm -rf dist && mkdir -p dist && cp index.html dist/ && copyfiles -u 1 \"public/**/*\" dist && esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.ts=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"'"
   },
   "author": "OWFN",
   "license": "UNLICENSED",
@@ -24,6 +24,7 @@
     "wouter": "^3.2.0"
   },
   "devDependencies": {
-    "esbuild": "^0.23.0"
+    "esbuild": "^0.23.0",
+    "copyfiles": "^2.4.1"
   }
 }
