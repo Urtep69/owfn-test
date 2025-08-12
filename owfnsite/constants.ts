@@ -63,7 +63,7 @@ export const PRESALE_DETAILS = {
   rate: 10000000,
   bonusThreshold: 2, // Minimum SOL to get the bonus
   bonusPercentage: 10, // 10% bonus
-  startDate: new Date('2025-08-12T00:00:00Z'),
+  startDate: new Date('2025-08-13T00:00:00Z'),
   endDate: new Date('2025-09-12T00:00:00Z')
 };
 
