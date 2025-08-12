@@ -43,7 +43,7 @@ export const TOKEN_ALLOCATIONS: TokenAllocation[] = [
   { name: 'Impact Treasury & Social Initiatives', value: 6300000000, percentage: 35, color: '#b89b74' },
   { name: 'Community & Ecosystem Growth', value: 5400000000, percentage: 30, color: '#9e825c' },
   { name: 'Presale & Liquidity', value: 2880000000, percentage: 16, color: '#eac06a' },
-  { name: 'Team & Founders', value: 270000000, percentage: 15, color: '#f0d090' },
+  { name: 'Team & Founders', value: 2700000000, percentage: 15, color: '#f0d090' },
   { name: 'Marketing & Business Development', value: 540000000, percentage: 3, color: '#d2b48c' },
   { name: 'Advisors & Partnerships', value: 180000000, percentage: 1, color: '#846944' },
 ];
