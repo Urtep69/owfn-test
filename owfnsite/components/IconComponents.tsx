@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { OWFN_LOGO_URL } from '../constants.ts';
 import { Image } from 'lucide-react';
+import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from '../lib/assets.ts';
 
 export const OwfnIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
-    src={OWFN_LOGO_URL} 
+    src={owfnLogo} 
     alt="OWFN Logo" 
     className={`${className} rounded-full border-2 border-accent-600 dark:border-darkAccent-700 object-cover`} 
   />
@@ -13,7 +13,7 @@ export const OwfnIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
 
 export const SolIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
-    src="/solana.png" 
+    src={solanaLogo} 
     alt="Solana Logo" 
     className={`${className} rounded-full object-cover`} 
   />
@@ -21,7 +21,7 @@ export const SolIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
 
 export const UsdcIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
-    src="/usdc.png" 
+    src={usdcLogo} 
     alt="USD Coin Logo" 
     className={`${className} rounded-full object-cover`} 
   />
@@ -29,7 +29,7 @@ export const UsdcIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
 
 export const UsdtIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
-    src="/usdt.png" 
+    src={usdtLogo} 
     alt="Tether Logo" 
     className={`${className} rounded-full object-cover`} 
   />

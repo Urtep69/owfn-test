@@ -1,11 +1,10 @@
-
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from './components/IconComponents.tsx';
+import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
 
 
 export const OWFN_MINT_ADDRESS = 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B';
-export const OWFN_LOGO_URL = '/owfn.png';
+export const OWFN_LOGO_URL: string = owfnLogo;
 export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenance mode globally
 
@@ -100,7 +99,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         name: 'Official World Family Network',
         symbol: 'OWFN',
         mintAddress: OWFN_MINT_ADDRESS,
-        logo: React.createElement(OwfnIcon),
+        logo: owfnLogo,
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
@@ -125,7 +124,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         name: 'Solana',
         symbol: 'SOL',
         mintAddress: 'So11111111111111111111111111111111111111112',
-        logo: React.createElement(SolIcon),
+        logo: solanaLogo,
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
@@ -144,7 +143,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         name: 'USD Coin',
         symbol: 'USDC',
         mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a',
-        logo: React.createElement(UsdcIcon),
+        logo: usdcLogo,
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
@@ -163,7 +162,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         name: 'Tether',
         symbol: 'USDT',
         mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-        logo: React.createElement(UsdtIcon),
+        logo: usdtLogo,
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,

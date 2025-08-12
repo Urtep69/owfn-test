@@ -1,0 +1,1 @@
+Please place your image assets (owfn.png, solana.png, usdc.png, usdt.png) in this directory. The 'assets' directory at the root is no longer used.
