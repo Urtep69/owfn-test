@@ -227,9 +227,19 @@ export const zh = {
     case_update_3: '项目资金正式启动。我们感谢 OWFN 社区的第一波支持。',
 
     // Partnerships Page
-    partnerships_title: '合作伙伴',
-    partnerships_subtitle: '我们正在积极寻求与非政府组织、企业和其他项目的合作。',
-    partnerships_contact_info: '请通过 partnerships@owfn.org 联系我们进行合作。',
+    partnerships_title: '合作伙伴与未来合作',
+    partnerships_focus_title: '我们当前的重点',
+    partnerships_focus_desc: '在此阶段，我们的绝对优先事项是确保预售成功，并建立一个强大、积极参与的社区基础。这是我们未来影响力的基石。',
+    partnerships_post_presale_intro: '预售成功结束后，我们的团队将开始积极寻求和评估战略合作伙伴关系。',
+    partnerships_vision_title: '全球影响力的共同愿景',
+    partnerships_vision_desc: '我们相信，真正有意义的变革来自于合作。我们不仅仅是在寻找合作伙伴；我们是在寻找与我们拥有共同核心价值观、并坚定致力于创造真实、透明和持久社会公益的盟友。',
+    partnerships_ideal_partner_title: '我们的理想合作伙伴：',
+    partnerships_ideal_item_1: '与我们有共同的使命，为有需要的人提供直接、透明的援助。',
+    partnerships_ideal_item_2: '在所有运营中都重视完全的透明度和问责制。',
+    partnerships_ideal_item_3: '致力于可持续影响的长期愿景，而非短期收益。',
+    partnerships_invitation_title: '考虑合作吗？',
+    partnerships_invitation_desc: '如果这一愿景与您的组织产生共鸣，我们邀请您关注我们的进展。请准备您的提案，概述合作如何能够扩大我们共同的使命。预售阶段结束后，我们将更突出地显示联系方式，并开放正式的讨论渠道。',
+    partnerships_thank_you: '感谢您有兴趣与我们共建一个更美好的世界。',
 
     // FAQ Page
     faq_title: '常见问题',

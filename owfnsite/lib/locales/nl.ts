@@ -227,9 +227,19 @@ export const nl = {
     case_update_3: 'De projectfinanciering is officieel gestart. We zijn dankbaar voor de eerste golf van steun van de OWFN-gemeenschap.',
 
     // Partnerships Page
-    partnerships_title: 'Partnerschappen',
-    partnerships_subtitle: 'We zijn actief op zoek naar partnerschappen met NGO\'s, bedrijven en andere projecten.',
-    partnerships_contact_info: 'Neem contact met ons op via partnerships@owfn.org om samen te werken.',
+    partnerships_title: 'Partnerschappen & Toekomstige Samenwerkingen',
+    partnerships_focus_title: 'Onze Huidige Focus',
+    partnerships_focus_desc: 'Onze absolute prioriteit in deze fase is het verzekeren van een succesvolle voorverkoop en het opbouwen van een sterke, betrokken gemeenschapsbasis. Dit is het fundament waarop onze toekomstige impact zal worden gebouwd.',
+    partnerships_post_presale_intro: 'Nadat de voorverkoop succesvol is afgesloten, zal ons team beginnen met het actief zoeken en evalueren van strategische partnerschappen.',
+    partnerships_vision_title: 'Een Gedeelde Visie voor Wereldwijde Impact',
+    partnerships_vision_desc: 'Wij geloven dat ware, betekenisvolle verandering voortkomt uit samenwerking. We zijn niet alleen op zoek naar partners; we zijn op zoek naar bondgenoten die onze kernwaarden delen en diep toegewijd zijn aan het creëren van echt, transparant en duurzaam sociaal goed.',
+    partnerships_ideal_partner_title: 'Onze Ideale Partner:',
+    partnerships_ideal_item_1: 'Deelt onze missie om directe, transparante hulp te bieden aan mensen in nood.',
+    partnerships_ideal_item_2: 'Waardeert volledige transparantie en verantwoordingsplicht in alle operaties.',
+    partnerships_ideal_item_3: 'Is toegewijd aan een langetermijnvisie van duurzame impact, niet aan kortetermijnwinst.',
+    partnerships_invitation_title: 'Denkt u aan een Samenwerking?',
+    partnerships_invitation_desc: 'Als deze visie resoneert met uw organisatie, nodigen wij u uit om onze vooruitgang te volgen. Bereid alstublieft uw voorstel voor waarin u schetst hoe een samenwerking onze gedeelde missie kan versterken. Contactgegevens zullen prominenter worden gemaakt, en we zullen formele kanalen voor discussie openen nadat de voorverkoop fase is voltooid.',
+    partnerships_thank_you: 'Bedankt voor uw interesse om samen met ons een betere wereld te bouwen.',
 
     // FAQ Page
     faq_title: 'Veelgestelde Vragen',

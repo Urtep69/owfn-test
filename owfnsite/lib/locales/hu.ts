@@ -227,9 +227,19 @@ export const hu = {
     case_update_3: 'A projekt finanszírozása hivatalosan megkezdődött. Hálásak vagyunk az OWFN közösség első támogatási hullámáért.',
     
     // Partnerships Page
-    partnerships_title: 'Partnerségek',
-    partnerships_subtitle: 'Aktívan keressük a partnerségeket civil szervezetekkel, vállalatokkal és más projektekkel.',
-    partnerships_contact_info: 'Lépjen kapcsolatba velünk a partnerships@owfn.org címen az együttműködés érdekében.',
+    partnerships_title: 'Partnerségek és Jövőbeli Együttműködések',
+    partnerships_focus_title: 'Jelenlegi Fókuszunk',
+    partnerships_focus_desc: 'Ebben a szakaszban abszolút prioritásunk a sikeres előértékesítés biztosítása és egy erős, elkötelezett közösségi alap kiépítése. Ez az alapja a jövőbeni hatásunknak.',
+    partnerships_post_presale_intro: 'Az előértékesítés sikeres lezárása után csapatunk megkezdi a stratégiai partnerségek aktív keresését és értékelését.',
+    partnerships_vision_title: 'Közös Vízió a Globális Hatásért',
+    partnerships_vision_desc: 'Hisszük, hogy az igazi, jelentőségteljes változás az együttműködésből fakad. Nem csupán partnereket keresünk; olyan szövetségeseket keresünk, akik osztják alapvető értékeinket és mélyen elkötelezettek a valós, átlátható és tartós társadalmi jó megteremtése iránt.',
+    partnerships_ideal_partner_title: 'Ideális Partnerünk:',
+    partnerships_ideal_item_1: 'Osztja küldetésünket, hogy közvetlen, átlátható segítséget nyújtsunk a rászorulóknak.',
+    partnerships_ideal_item_2: 'Minden műveletben értékeli a teljes átláthatóságot és elszámoltathatóságot.',
+    partnerships_ideal_item_3: 'Elkötelezett a fenntartható hatás hosszú távú víziója mellett, nem a rövid távú nyereség mellett.',
+    partnerships_invitation_title: 'Gondolkodik az Együttműködésen?',
+    partnerships_invitation_desc: 'Ha ez a vízió rezonál szervezetével, meghívjuk, hogy kövesse nyomon fejlődésünket. Kérjük, készítse el javaslatát, amely felvázolja, hogyan tudna egy együttműködés felerősíteni közös küldetésünket. A kapcsolattartási adatok hangsúlyosabbá válnak, és az előértékesítési szakasz lezárása után hivatalos csatornákat nyitunk a megbeszélésekre.',
+    partnerships_thank_you: 'Köszönjük érdeklődését, hogy velünk építsen egy jobb világot.',
 
     // FAQ Page
     faq_title: 'Gyakran Ismételt Kérdések',

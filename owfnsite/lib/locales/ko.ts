@@ -227,9 +227,19 @@ export const ko = {
     case_update_3: '프로젝트 자금 지원이 공식적으로 시작되었습니다. OWFN 커뮤니티의 첫 번째 지원 물결에 감사드립니다.',
     
     // Partnerships Page
-    partnerships_title: '파트너십',
-    partnerships_subtitle: '우리는 NGO, 기업 및 기타 프로젝트와 적극적으로 파트너십을 모색하고 있습니다.',
-    partnerships_contact_info: '협력을 원하시면 partnerships@owfn.org로 문의하십시오.',
+    partnerships_title: '파트너십 및 향후 협력',
+    partnerships_focus_title: '현재의 초점',
+    partnerships_focus_desc: '이 단계에서 우리의 절대적인 우선순위는 성공적인 프리세일을 보장하고 강력하고 참여적인 커뮤니티 기반을 구축하는 것입니다. 이것이 우리 미래 영향력의 기반이 될 것입니다.',
+    partnerships_post_presale_intro: '프리세일이 성공적으로 종료된 후, 우리 팀은 전략적 파트너십을 적극적으로 찾고 평가하는 과정을 시작할 것입니다.',
+    partnerships_vision_title: '글로벌 영향력을 위한 공유된 비전',
+    partnerships_vision_desc: '우리는 진정하고 의미 있는 변화가 협력에서 비롯된다고 믿습니다. 우리는 단순히 파트너를 찾는 것이 아니라, 우리의 핵심 가치를 공유하고 실제적이고 투명하며 지속적인 사회적 선을 창출하는 데 깊이 헌신하는 동맹을 찾고 있습니다.',
+    partnerships_ideal_partner_title: '우리의 이상적인 파트너:',
+    partnerships_ideal_item_1: '도움이 필요한 사람들에게 직접적이고 투명한 지원을 제공하는 우리의 사명을 공유합니다.',
+    partnerships_ideal_item_2: '모든 운영에서 완전한 투명성과 책임감을 중시합니다.',
+    partnerships_ideal_item_3: '단기적인 이익이 아닌 지속 가능한 영향력이라는 장기적인 비전에 헌신합니다.',
+    partnerships_invitation_title: '협력을 생각하고 계신가요?',
+    partnerships_invitation_desc: '이 비전이 귀하의 조직에 공감된다면, 우리의 진행 상황을 지켜봐 주시기 바랍니다. 협력이 우리의 공유된 사명을 어떻게 증폭시킬 수 있는지 개략적으로 설명하는 제안서를 준비해 주십시오. 프리세일 단계가 완료된 후 연락처 정보가 더 눈에 띄게 될 것이며, 논의를 위한 공식적인 채널을 열 것입니다.',
+    partnerships_thank_you: '우리와 함께 더 나은 세상을 만드는 데 관심을 가져주셔서 감사합니다.',
     
     // FAQ Page
     faq_title: '자주 묻는 질문',
