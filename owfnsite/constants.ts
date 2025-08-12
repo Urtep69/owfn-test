@@ -5,7 +5,7 @@ import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from './components/IconComponen
 
 
 export const OWFN_MINT_ADDRESS = 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B';
-export const OWFN_LOGO_URL = '/owfn.png';
+export const OWFN_LOGO_URL = './owfn.png';
 export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenance mode globally
 

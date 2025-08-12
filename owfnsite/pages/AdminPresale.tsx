@@ -251,7 +251,7 @@ export default function AdminPresale() {
             ) : (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<img src="/solana.png" className="w-6 h-6"/>} />
+                        <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<img src="./solana.png" className="w-6 h-6"/>} />
                         <StatCard title={t('total_transactions')} value={stats.count} icon={<FileText />} />
                         <StatCard title={t('unique_contributors')} value={stats.contributors} icon={<User />} />
                     </div>
