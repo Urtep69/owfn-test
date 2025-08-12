@@ -147,6 +147,7 @@ export const it = {
     make_donation: 'Fai una Donazione',
     donation_desc: 'Sostieni le nostre iniziative di impatto sociale donando criptovalute. Tutti i fondi vanno direttamente alla Tesoreria di Impatto.',
     donation_solana_warning: 'IMPORTANTE: Le donazioni per USDC e USDT sono attualmente accettate SOLO dalla rete Solana. Non inviare da nessun\'altra rete (ad es. Ethereum) poiché i fondi andranno persi e non raggiungeranno la loro destinazione.',
+    donation_fee_info: 'Le donazioni dirette sono attualmente esenti da commissioni. Al termine della prevendita, verrà attivata una commissione di trasferimento dello 0,5% su tutte le transazioni di $OWFN per finanziare perpetuamente la Tesoreria di Impatto.',
     select_token: 'Seleziona Token',
     amount: 'Importo',
     donations_form_title: 'Modulo di Donazione',

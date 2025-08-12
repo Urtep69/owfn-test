@@ -147,6 +147,7 @@ export const zh = {
     make_donation: '进行捐赠',
     donation_desc: '通过捐赠加密货币来支持我们的社会影响力倡议。所有资金将直接进入影响力金库。',
     donation_solana_warning: '重要提示：USDC 和 USDT 的捐赠目前仅接受来自 Solana 网络。请勿从任何其他网络（例如以太坊）发送，否则资金将丢失且无法到达目的地。',
+    donation_fee_info: '目前直接捐赠是免费的。预售结束后，所有 $OWFN 交易将激活 0.5% 的转账费，以永久资助影响力金库。',
     select_token: '选择代币',
     amount: '金额',
     donations_form_title: '捐赠表格',

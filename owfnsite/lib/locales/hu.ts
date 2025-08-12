@@ -147,6 +147,7 @@ export const hu = {
     make_donation: 'Adományozz',
     donation_desc: 'Támogassa társadalmi hatású kezdeményezéseinket kriptovaluta adományozásával. Minden pénz közvetlenül a Hatás Kincstárba kerül.',
     donation_solana_warning: 'FONTOS: Az USDC és USDT adományokat jelenleg CSAK a Solana hálózatról fogadjuk el. Ne küldjön más hálózatról (pl. Ethereum), mert a pénz elveszik, és nem éri el a célját.',
+    donation_fee_info: 'A közvetlen adományok jelenleg díjmentesek. Az előértékesítés lezárulta után minden $OWFN tranzakcióra 0,5%-os átutalási díjat aktiválunk a Hatás Kincstár folyamatos finanszírozása érdekében.',
     select_token: 'Válasszon Tokent',
     amount: 'Összeg',
     donations_form_title: 'Adományozási Űrlap',

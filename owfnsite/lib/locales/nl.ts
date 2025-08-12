@@ -147,6 +147,7 @@ export const nl = {
     make_donation: 'Doe een Donatie',
     donation_desc: 'Steun onze sociale impactinitiatieven door crypto te doneren. Alle fondsen gaan rechtstreeks naar de Impact Treasury.',
     donation_solana_warning: 'BELANGRIJK: Donaties voor USDC en USDT worden momenteel ALLEEN geaccepteerd van het Solana-netwerk. Stuur niet vanuit een ander netwerk (bijv. Ethereum), aangezien de fondsen verloren gaan en hun bestemming niet zullen bereiken.',
+    donation_fee_info: 'Directe donaties zijn momenteel kosteloos. Na afloop van de voorverkoop wordt een overdrachtskosten van 0,5% op alle $OWFN-transacties geactiveerd om de Impact Treasury permanent te financieren.',
     select_token: 'Selecteer Token',
     amount: 'Bedrag',
     donations_form_title: 'Donatieformulier',
