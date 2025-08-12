@@ -228,9 +228,19 @@ export const ro = {
     case_update_3: 'Finanțarea proiectului a început oficial. Suntem recunoscători pentru primul val de sprijin din partea comunității OWFN.',
     
     // Partnerships Page
-    partnerships_title: 'Parteneriate',
-    partnerships_subtitle: 'Căutăm activ parteneriate cu ONG-uri, corporații și alte proiecte.',
-    partnerships_contact_info: 'Contactați-ne la partnerships@owfn.org pentru a colabora.',
+    partnerships_title: 'Parteneriate și Colaborări Viitoare',
+    partnerships_focus_title: 'Prioritatea Noastră Actuală',
+    partnerships_focus_desc: 'În această etapă, prioritatea noastră absolută este asigurarea succesului prevânzării și construirea unei fundații comunitare puternice și angajate. Acesta este fundamentul pe care se va clădi impactul nostru viitor.',
+    partnerships_post_presale_intro: 'După încheierea cu succes a prevânzării, echipa noastră va începe procesul de căutare activă și evaluare a parteneriatelor strategice.',
+    partnerships_vision_title: 'O Viziune Comună pentru un Impact Global',
+    partnerships_vision_desc: 'Credem că schimbarea reală și semnificativă provine din colaborare. Nu căutăm doar parteneri; căutăm aliați care împărtășesc valorile noastre fundamentale și sunt profund dedicați creării unui bine social real, transparent și de durată.',
+    partnerships_ideal_partner_title: 'Partenerul nostru Ideal:',
+    partnerships_ideal_item_1: 'Împărtășește misiunea noastră de a oferi ajutor direct și transparent celor aflați în nevoie.',
+    partnerships_ideal_item_2: 'Valorează transparența completă și responsabilitatea în toate operațiunile.',
+    partnerships_ideal_item_3: 'Este dedicat unei viziuni pe termen lung a impactului sustenabil, nu câștigurilor pe termen scurt.',
+    partnerships_invitation_title: 'Vă gândiți la o Colaborare?',
+    partnerships_invitation_desc: 'Dacă această viziune rezonează cu organizația dumneavoastră, vă invităm să urmăriți progresul nostru. Vă rugăm să pregătiți propunerea dumneavoastră, subliniind modul în care o colaborare ar putea amplifica misiunea noastră comună. Detaliile de contact vor fi mai proeminente și vom deschide canale formale de discuție după finalizarea etapei de prevânzare.',
+    partnerships_thank_you: 'Vă mulțumim pentru interesul acordat în construirea unei lumi mai bune alături de noi.',
 
     // FAQ Page
     faq_title: 'Întrebări Frecvente',

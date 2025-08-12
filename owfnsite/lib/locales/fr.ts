@@ -227,9 +227,19 @@ export const fr = {
     case_update_3: 'Le financement du projet a officiellement commencé. Nous sommes reconnaissants pour la première vague de soutien de la communauté OWFN.',
     
     // Partnerships Page
-    partnerships_title: 'Partenariats',
-    partnerships_subtitle: 'Nous recherchons activement des partenariats avec des ONG, des entreprises et d\'autres projets.',
-    partnerships_contact_info: 'Contactez-nous à partnerships@owfn.org pour collaborer.',
+    partnerships_title: 'Partenariats et collaborations futures',
+    partnerships_focus_title: 'Notre priorité actuelle',
+    partnerships_focus_desc: 'Notre priorité absolue à ce stade est d\'assurer une prévente réussie et de construire une base communautaire solide et engagée. C\'est sur ce socle que notre impact futur sera bâti.',
+    partnerships_post_presale_intro: 'Une fois la prévente terminée avec succès, notre équipe entamera le processus de recherche et d\'évaluation active de partenariats stratégiques.',
+    partnerships_vision_title: 'Une vision commune pour un impact mondial',
+    partnerships_vision_desc: 'Nous croyons qu\'un changement véritable et significatif provient de la collaboration. Nous ne cherchons pas seulement des partenaires ; nous cherchons des alliés qui partagent nos valeurs fondamentales et qui sont profondément engagés à créer un bien social réel, transparent et durable.',
+    partnerships_ideal_partner_title: 'Notre partenaire idéal :',
+    partnerships_ideal_item_1: 'Partage notre mission de fournir une aide directe et transparente à ceux qui en ont besoin.',
+    partnerships_ideal_item_2: 'Valorise la transparence totale et la responsabilité dans toutes les opérations.',
+    partnerships_ideal_item_3: 'S\'engage dans une vision à long terme d\'impact durable, et non dans des gains à court terme.',
+    partnerships_invitation_title: 'Vous envisagez une collaboration ?',
+    partnerships_invitation_desc: 'Si cette vision résonne avec votre organisation, nous vous invitons à suivre notre progression. Veuillez préparer votre proposition en décrivant comment une collaboration pourrait amplifier notre mission commune. Les coordonnées seront rendues plus visibles et nous ouvrirons des canaux de discussion formels une fois la phase de prévente terminée.',
+    partnerships_thank_you: 'Merci de votre intérêt à construire un monde meilleur avec nous.',
     
     // FAQ Page
     faq_title: 'Foire Aux Questions',
@@ -387,7 +397,7 @@ export const fr = {
     status_passed: 'Adoptée',
     status_failed: 'Rejetée',
     you_voted: 'Vous avez voté',
-    no_active_proposals: 'Il n\'y a actuellement aucune proposition active.',
+    no_active_proposals: 'Il n\'y a currently aucune proposition active.',
     no_past_proposals: 'Il n\'y a aucune proposition passée à afficher.',
     no_active_cases_in_category: 'Aucun cas actif dans cette catégorie pour le moment.',
 

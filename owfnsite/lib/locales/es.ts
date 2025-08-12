@@ -227,10 +227,20 @@ export const es = {
     case_update_3: 'La financiación del proyecto comenzó oficialmente. Agradecemos la primera ola de apoyo de la comunidad OWFN.',
     
     // Partnerships Page
-    partnerships_title: 'Asociaciones',
-    partnerships_subtitle: 'Buscamos activamente asociaciones con ONG, corporaciones y otros proyectos.',
-    partnerships_contact_info: 'Contáctenos en partnerships@owfn.org para colaborar.',
-    
+    partnerships_title: 'Asociaciones y Colaboraciones Futuras',
+    partnerships_focus_title: 'Nuestro Enfoque Actual',
+    partnerships_focus_desc: 'Nuestra prioridad absoluta en esta etapa es asegurar una preventa exitosa y construir una base comunitaria sólida y comprometida. Este es el cimiento sobre el cual se construirá nuestro impacto futuro.',
+    partnerships_post_presale_intro: 'Una vez que la preventa concluya con éxito, nuestro equipo comenzará el proceso de buscar y evaluar activamente asociaciones estratégicas.',
+    partnerships_vision_title: 'Una Visión Compartida para un Impacto Global',
+    partnerships_vision_desc: 'Creemos que el cambio verdadero y significativo proviene de la colaboración. No solo buscamos socios; buscamos aliados que compartan nuestros valores fundamentales y estén profundamente comprometidos con la creación de un bien social real, transparente y duradero.',
+    partnerships_ideal_partner_title: 'Nuestro Socio Ideal:',
+    partnerships_ideal_item_1: 'Comparte nuestra misión de proporcionar ayuda directa y transparente a quienes la necesitan.',
+    partnerships_ideal_item_2: 'Valora la transparencia total y la rendición de cuentas en todas las operaciones.',
+    partnerships_ideal_item_3: 'Está comprometido con una visión a largo plazo de impacto sostenible, no con ganancias a corto plazo.',
+    partnerships_invitation_title: '¿Piensa en Colaborar?',
+    partnerships_invitation_desc: 'Si esta visión resuena con su organización, le invitamos a seguir nuestro progreso. Por favor, prepare su propuesta detallando cómo una colaboración podría amplificar nuestra misión compartida. Los detalles de contacto se harán más prominentes y abriremos canales formales de discusión una vez que se complete la fase de preventa.',
+    partnerships_thank_you: 'Gracias por su interés en construir un mundo mejor con nosotros.',
+
     // FAQ Page
     faq_title: 'Preguntas Frecuentes',
     faq_subtitle: 'Encuentra respuestas a las preguntas más comunes sobre OWFN.',

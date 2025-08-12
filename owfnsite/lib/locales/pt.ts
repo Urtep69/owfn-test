@@ -227,9 +227,19 @@ export const pt = {
     case_update_3: 'O financiamento do projeto começou oficialmente. Agradecemos a primeira onda de apoio da comunidade OWFN.',
     
     // Partnerships Page
-    partnerships_title: 'Parcerias',
-    partnerships_subtitle: 'Estamos ativamente buscando parcerias com ONGs, corporações e outros projetos.',
-    partnerships_contact_info: 'Contate-nos em partnerships@owfn.org para colaborar.',
+    partnerships_title: 'Parcerias e Colaborações Futuras',
+    partnerships_focus_title: 'Nosso Foco Atual',
+    partnerships_focus_desc: 'Nossa prioridade absoluta nesta fase é garantir uma pré-venda bem-sucedida e construir uma base comunitária forte e engajada. Esta é a base sobre a qual nosso impacto futuro será construído.',
+    partnerships_post_presale_intro: 'Após a conclusão bem-sucedida da pré-venda, nossa equipe iniciará o processo de busca e avaliação ativa de parcerias estratégicas.',
+    partnerships_vision_title: 'Uma Visão Compartilhada para um Impacto Global',
+    partnerships_vision_desc: 'Acreditamos que a mudança verdadeira e significativa vem da colaboração. Não estamos apenas procurando parceiros; estamos procurando aliados que compartilhem nossos valores fundamentais e estejam profundamente comprometidos em criar um bem social real, transparente e duradouro.',
+    partnerships_ideal_partner_title: 'Nosso Parceiro Ideal:',
+    partnerships_ideal_item_1: 'Compartilha nossa missão de fornecer ajuda direta e transparente aos necessitados.',
+    partnerships_ideal_item_2: 'Valoriza a transparência total e a responsabilidade em todas as operações.',
+    partnerships_ideal_item_3: 'Está comprometido com uma visão de longo prazo de impacto sustentável, não com ganhos de curto prazo.',
+    partnerships_invitation_title: 'Pensando em Colaborar?',
+    partnerships_invitation_desc: 'Se esta visão ressoa com sua organização, convidamos você a acompanhar nosso progresso. Por favor, prepare sua proposta descrevendo como uma colaboração poderia ampliar nossa missão compartilhada. Os detalhes de contato se tornarão mais proeminentes e abriremos canais formais de discussão após a conclusão da fase de pré-venda.',
+    partnerships_thank_you: 'Obrigado pelo seu interesse em construir um mundo melhor conosco.',
     
     // FAQ Page
     faq_title: 'Perguntas Frequentes',

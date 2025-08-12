@@ -147,6 +147,7 @@ export const tr = {
     make_donation: 'Bağış Yap',
     donation_desc: 'Kripto bağışlayarak sosyal etki girişimlerimizi destekleyin. Tüm fonlar doğrudan Etki Hazinesine gider.',
     donation_solana_warning: 'ÖNEMLİ: USDC ve USDT bağışları şu anda SADECE Solana ağından kabul edilmektedir. Başka bir ağdan (örneğin Ethereum) göndermeyin, aksi takdirde fonlar kaybolur ve hedeflerine ulaşmaz.',
+    donation_fee_info: 'Doğrudan bağışlar şu anda ücretsizdir. Ön satış sona erdikten sonra, Etki Hazinesini sürekli olarak finanse etmek için tüm $OWFN işlemlerinde %0,5\'lik bir transfer ücreti etkinleştirilecektir.',
     select_token: 'Token Seç',
     amount: 'Miktar',
     donations_form_title: 'Bağış Formu',

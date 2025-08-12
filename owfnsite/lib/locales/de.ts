@@ -227,9 +227,19 @@ export const de = {
     case_update_3: 'Die Projektfinanzierung hat offiziell begonnen. Wir sind dankbar für die erste Unterstützungswelle aus der OWFN-Community.',
     
     // Partnerships Page
-    partnerships_title: 'Partnerschaften',
-    partnerships_subtitle: 'Wir suchen aktiv Partnerschaften mit NGOs, Unternehmen und anderen Projekten.',
-    partnerships_contact_info: 'Kontaktieren Sie uns unter partnerships@owfn.org, um zusammenzuarbeiten.',
+    partnerships_title: 'Partnerschaften & zukünftige Kooperationen',
+    partnerships_focus_title: 'Unser aktueller Fokus',
+    partnerships_focus_desc: 'Unsere absolute Priorität in dieser Phase ist es, einen erfolgreichen Vorverkauf zu gewährleisten und eine starke, engagierte Community-Grundlage zu schaffen. Dies ist das Fundament, auf dem unsere zukünftige Wirkung aufgebaut wird.',
+    partnerships_post_presale_intro: 'Nach erfolgreichem Abschluss des Vorverkaufs wird unser Team den Prozess der aktiven Suche und Bewertung strategischer Partnerschaften beginnen.',
+    partnerships_vision_title: 'Eine gemeinsame Vision für globale Wirkung',
+    partnerships_vision_desc: 'Wir glauben, dass wahrer, bedeutungsvoller Wandel aus Zusammenarbeit entsteht. Wir suchen nicht nur Partner; wir suchen Verbündete, die unsere Grundwerte teilen und sich zutiefst dafür einsetzen, echtes, transparentes und dauerhaftes soziales Wohl zu schaffen.',
+    partnerships_ideal_partner_title: 'Unser idealer Partner:',
+    partnerships_ideal_item_1: 'Teilt unsere Mission, direkte, transparente Hilfe für Bedürftige zu leisten.',
+    partnerships_ideal_item_2: 'Schätzt vollständige Transparenz und Rechenschaftspflicht in allen Operationen.',
+    partnerships_ideal_item_3: 'Verpflichtet sich zu einer langfristigen Vision nachhaltiger Wirkung, nicht zu kurzfristigen Gewinnen.',
+    partnerships_invitation_title: 'Denken Sie an eine Zusammenarbeit?',
+    partnerships_invitation_desc: 'Wenn diese Vision bei Ihrer Organisation Anklang findet, laden wir Sie ein, unseren Fortschritt zu verfolgen. Bitte bereiten Sie Ihren Vorschlag vor, in dem Sie darlegen, wie eine Zusammenarbeit unsere gemeinsame Mission verstärken könnte. Kontaktdaten werden nach Abschluss der Vorverkaufsphase prominenter gemacht, und wir werden formelle Kanäle für Diskussionen eröffnen.',
+    partnerships_thank_you: 'Vielen Dank für Ihr Interesse, mit uns eine bessere Welt zu bauen.',
     
     // FAQ Page
     faq_title: 'Häufig gestellte Fragen',

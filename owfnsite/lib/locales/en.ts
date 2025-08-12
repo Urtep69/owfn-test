@@ -228,9 +228,19 @@ export const en = {
     case_update_3: 'Project funding officially began. We are grateful for the first wave of support from the OWFN community.',
 
     // Partnerships Page
-    partnerships_title: 'Partnerships',
-    partnerships_subtitle: 'We are actively seeking partnerships with NGOs, corporations, and other projects.',
-    partnerships_contact_info: 'Contact us at partnerships@owfn.org to collaborate.',
+    partnerships_title: 'Partnerships & Future Collaborations',
+    partnerships_focus_title: 'Our Current Focus',
+    partnerships_focus_desc: 'Our absolute priority at this stage is to ensure a successful presale and build a strong, engaged community foundation. This is the bedrock upon which our future impact will be built.',
+    partnerships_post_presale_intro: 'After the presale concludes successfully, our team will begin the process of actively seeking and evaluating strategic partnerships.',
+    partnerships_vision_title: 'A Shared Vision for Global Impact',
+    partnerships_vision_desc: 'We believe that true, meaningful change comes from collaboration. We are not just looking for partners; we are looking for allies who share our core values and are deeply committed to creating real, transparent, and lasting social good.',
+    partnerships_ideal_partner_title: 'Our Ideal Partner:',
+    partnerships_ideal_item_1: 'Shares our mission to provide direct, transparent aid to those in need.',
+    partnerships_ideal_item_2: 'Values complete transparency and accountability in all operations.',
+    partnerships_ideal_item_3: 'Is committed to a long-term vision of sustainable impact, not short-term gains.',
+    partnerships_invitation_title: 'Thinking of Collaborating?',
+    partnerships_invitation_desc: 'If this vision resonates with your organization, we invite you to follow our progress. Please prepare your proposal outlining how a collaboration could amplify our shared mission. Contact details will be made more prominent, and we will open formal channels for discussion after the presale phase is complete.',
+    partnerships_thank_you: 'Thank you for your interest in building a better world with us.',
 
     // FAQ Page
     faq_title: 'Frequently Asked Questions',
