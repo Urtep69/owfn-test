@@ -148,6 +148,7 @@ export const en = {
     make_donation: 'Make a Donation',
     donation_desc: 'Support our social impact initiatives by donating crypto. All funds go directly to the Impact Treasury.',
     donation_solana_warning: `IMPORTANT: Donations for USDC and USDT are currently accepted ONLY from the Solana network. Do not send from any other network (e.g., Ethereum) as the funds will be lost and will not reach their destination.`,
+    donation_fee_info: 'Direct donations are currently fee-free. After the presale concludes, a 0.5% transfer fee on all $OWFN transactions will be activated to perpetually fund the Impact Treasury.',
     select_token: 'Select Token',
     amount: 'Amount',
     donations_form_title: 'Donation Form',

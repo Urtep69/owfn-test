@@ -147,6 +147,7 @@ export const fr = {
     make_donation: 'Faire un don',
     donation_desc: 'Soutenez nos initiatives à impact social en faisant un don en crypto. Tous les fonds vont directly à la Trésorerie d\'Impact.',
     donation_solana_warning: `IMPORTANT : Les dons en USDC et USDT ne sont actuellement acceptés QUE depuis le réseau Solana. N'envoyez pas depuis un autre réseau (par exemple, Ethereum) car les fonds seront perdus et n'atteindront pas leur destination.`,
+    donation_fee_info: 'Les dons directs sont actuellement sans frais. Après la fin de la prévente, des frais de transfert de 0,5 % sur toutes les transactions $OWFN seront activés pour financer perpétuellement la Trésorerie d\'Impact.',
     select_token: 'Sélectionner le jeton',
     amount: 'Montant',
     donations_form_title: 'Formulaire de don',

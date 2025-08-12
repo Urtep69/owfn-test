@@ -31,7 +31,7 @@ interface PresaleTx {
 interface AggregatedContributor {
     address: string;
     totalSol: number;
-    totalOwfn: number;
+    totalOwfn: bigint; // Use BigInt for precision
 }
 
 const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
@@ -125,20 +125,33 @@ export default function AdminPresale() {
             contributorMap.set(tx.from, existing);
         });
         
+        const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
+        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * BigInt(LAMPORTS_PER_SOL);
+        const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
+
         return Array.from(contributorMap.entries()).map(([address, data]) => {
             const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
-            let owfnAmount = totalSol * PRESALE_DETAILS.rate;
-            if (totalSol >= PRESALE_DETAILS.bonusThreshold) {
-                owfnAmount *= (1 + PRESALE_DETAILS.bonusPercentage / 100);
+            
+            // Perform all calculations with BigInt for precision
+            let totalOwfnInSmallestUnit = (data.totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
+
+            if (data.totalLamports >= bonusThresholdLamports) {
+                const bonusAmount = (totalOwfnInSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
+                totalOwfnInSmallestUnit += bonusAmount;
             }
-            return { address, totalSol: totalSol, totalOwfn: owfnAmount };
+
+            return { address, totalSol, totalOwfn: totalOwfnInSmallestUnit };
         });
     }, [transactions]);
 
 
     const exportToCsv = useCallback(() => {
         const headers = ['contributor_address', 'total_sol_spent', 'total_owfn_to_receive'];
-        const rows = aggregatedContributors.map(c => [c.address, c.totalSol.toFixed(9), c.totalOwfn.toFixed(9)]);
+        const rows = aggregatedContributors.map(c => {
+             const owfnAmount = Number(c.totalOwfn) / (10 ** TOKEN_DETAILS.decimals);
+             return [c.address, c.totalSol.toFixed(9), owfnAmount.toFixed(TOKEN_DETAILS.decimals)];
+        });
+
         const csvContent = "data:text/csv;charset=utf-8," 
             + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
         
@@ -189,17 +202,12 @@ export default function AdminPresale() {
                                 instructions.push(createAssociatedTokenAccountInstruction(sourceOwner, destinationAta, recipient, tokenMint));
                             }
                             
-                            // CRITICAL FIX: Convert float token amount to smallest unit (BigInt) without precision loss.
-                            const amountStr = contributor.totalOwfn.toFixed(TOKEN_DETAILS.decimals);
-                            const [integerPart, fractionalPart] = amountStr.split('.');
-                            const amountInSmallestUnit = BigInt(integerPart + (fractionalPart || ''));
-
                             instructions.push(
                                 createTransferInstruction(
                                     sourceAta,
                                     destinationAta,
                                     sourceOwner,
-                                    amountInSmallestUnit
+                                    contributor.totalOwfn // This is already a BigInt of the smallest unit
                                 )
                             );
                             return instructions;
@@ -240,7 +248,11 @@ export default function AdminPresale() {
 
     }, [wallet, connection, aggregatedContributors, t]);
     
-    const totalOwfnToDistribute = useMemo(() => aggregatedContributors.reduce((sum, c) => sum + c.totalOwfn, 0), [aggregatedContributors]);
+    const totalOwfnToDistribute = useMemo(() => {
+        const total = aggregatedContributors.reduce((sum, c) => sum + c.totalOwfn, 0n);
+        return Number(total) / (10 ** TOKEN_DETAILS.decimals);
+    }, [aggregatedContributors]);
+
     const estimatedFees = useMemo(() => aggregatedContributors.length * 0.000005, [aggregatedContributors]); // 5000 lamports per signature
 
     return (

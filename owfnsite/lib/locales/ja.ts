@@ -147,6 +147,7 @@ export const ja = {
     make_donation: '寄付をする',
     donation_desc: '仮想通貨を寄付して、私たちの社会的インパクトイニシアチブを支援してください。すべての資金は直接インパクト基金に送られます。',
     donation_solana_warning: `重要：USDCおよびUSDTの寄付は現在、Solanaネットワークからのみ受け付けています。他のネットワーク（例：Ethereum）から送金しないでください。資金は失われ、目的地に届きません。`,
+    donation_fee_info: '直接寄付は現在手数料無料です。プレセール終了後、すべての$OWFN取引に0.5%の送金手数料が適用され、インパクト基金を永続的に資金提供します。',
     select_token: 'トークンを選択',
     amount: '金額',
     donations_form_title: '寄付フォーム',
@@ -307,7 +308,7 @@ export const ja = {
     pool_age: 'プール開設期間',
     on_chain_security: 'オンチェーンセキュリティ',
     update_authority: '更新権限',
-
+    
     // Staking & Vesting
     staking_title: 'OWFNをステークして報酬を獲得',
     staking_subtitle: 'OWFNトークンをロックして報酬を獲得し、ネットワークをサポートしましょう。',

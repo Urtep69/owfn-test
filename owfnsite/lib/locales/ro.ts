@@ -148,6 +148,7 @@ export const ro = {
     make_donation: 'Fă o Donație',
     donation_desc: 'Susține inițiativele noastre de impact social donând crypto. Toate fondurile merg direct către Trezoreria de Impact.',
     donation_solana_warning: `IMPORTANT: Donațiile în USDC și USDT sunt acceptate momentan DOAR din rețeaua Solana. Nu trimiteți din altă rețea (de ex. Ethereum), deoarece tokenii se vor pierde și nu vor ajunge ca donație.`,
+    donation_fee_info: 'Donațiile directe sunt în prezent fără taxe. După încheierea prevânzării, o taxă de transfer de 0,5% pentru toate tranzacțiile cu $OWFN va fi activată pentru a finanța perpetuu Trezoreria de Impact.',
     select_token: 'Selectează Token',
     amount: 'Sumă',
     donations_form_title: 'Formular de Donație',
