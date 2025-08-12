@@ -13,7 +13,7 @@ export const OwfnIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
 
 export const SolIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
-    src="./solana.png" 
+    src="/solana.png" 
     alt="Solana Logo" 
     className={`${className} rounded-full object-cover`} 
   />
@@ -21,7 +21,7 @@ export const SolIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
 
 export const UsdcIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
-    src="./usdc.png" 
+    src="/usdc.png" 
     alt="USD Coin Logo" 
     className={`${className} rounded-full object-cover`} 
   />
@@ -29,7 +29,7 @@ export const UsdcIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
 
 export const UsdtIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
-    src="./usdt.png" 
+    src="/usdt.png" 
     alt="Tether Logo" 
     className={`${className} rounded-full object-cover`} 
   />

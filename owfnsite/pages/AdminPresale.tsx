@@ -11,9 +11,11 @@ import {
     HELIUS_API_KEY, 
     HELIUS_API_BASE_URL, 
     PRESALE_DETAILS,
-    OWFN_MINT_ADDRESS
+    OWFN_MINT_ADDRESS,
+    TOKEN_DETAILS,
 } from '../constants.ts';
 import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User } from 'lucide-react';
+import { SolIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { Token } from '../types.ts';
 
@@ -23,6 +25,7 @@ interface PresaleTx {
     solAmount: number;
     owfnAmount: number;
     timestamp: number;
+    lamports: number;
 }
 
 interface AggregatedContributor {
@@ -83,6 +86,7 @@ export default function AdminPresale() {
                         solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
                         owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
                         timestamp: tx.timestamp,
+                        lamports: tx.nativeTransfers[0].amount,
                     }));
                 
                 allTxs.push(...parsedTxs);
@@ -114,19 +118,20 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        const contributorMap = new Map<string, { totalSol: number }>();
+        const contributorMap = new Map<string, { totalLamports: bigint }>();
         transactions.forEach(tx => {
-            const existing = contributorMap.get(tx.from) ?? { totalSol: 0 };
-            existing.totalSol += tx.solAmount;
+            const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n };
+            existing.totalLamports += BigInt(tx.lamports);
             contributorMap.set(tx.from, existing);
         });
         
         return Array.from(contributorMap.entries()).map(([address, data]) => {
-            let owfnAmount = data.totalSol * PRESALE_DETAILS.rate;
-            if (data.totalSol >= PRESALE_DETAILS.bonusThreshold) {
+            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
+            let owfnAmount = totalSol * PRESALE_DETAILS.rate;
+            if (totalSol >= PRESALE_DETAILS.bonusThreshold) {
                 owfnAmount *= (1 + PRESALE_DETAILS.bonusPercentage / 100);
             }
-            return { address, totalSol: data.totalSol, totalOwfn: owfnAmount };
+            return { address, totalSol: totalSol, totalOwfn: owfnAmount };
         });
     }, [transactions]);
 
@@ -184,12 +189,17 @@ export default function AdminPresale() {
                                 instructions.push(createAssociatedTokenAccountInstruction(sourceOwner, destinationAta, recipient, tokenMint));
                             }
                             
+                            // CRITICAL FIX: Convert float token amount to smallest unit (BigInt) without precision loss.
+                            const amountStr = contributor.totalOwfn.toFixed(TOKEN_DETAILS.decimals);
+                            const [integerPart, fractionalPart] = amountStr.split('.');
+                            const amountInSmallestUnit = BigInt(integerPart + (fractionalPart || ''));
+
                             instructions.push(
                                 createTransferInstruction(
                                     sourceAta,
                                     destinationAta,
                                     sourceOwner,
-                                    BigInt(Math.floor(contributor.totalOwfn)) // Use whole numbers for tokens
+                                    amountInSmallestUnit
                                 )
                             );
                             return instructions;
@@ -251,7 +261,7 @@ export default function AdminPresale() {
             ) : (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<img src="./solana.png" className="w-6 h-6"/>} />
+                        <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<SolIcon className="w-6 h-6"/>} />
                         <StatCard title={t('total_transactions')} value={stats.count} icon={<FileText />} />
                         <StatCard title={t('unique_contributors')} value={stats.contributors} icon={<User />} />
                     </div>
