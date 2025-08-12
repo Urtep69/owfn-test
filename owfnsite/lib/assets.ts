@@ -1,6 +1,8 @@
-const owfnLogo = '/assets/owfn.png';
-const solanaLogo = '/assets/solana.png';
-const usdcLogo = '/assets/usdc.png';
-const usdtLogo = '/assets/usdt.png';
+import { owfnLogoData, solanaLogoData, usdcLogoData, usdtLogoData } from './logoData.ts';
+
+const owfnLogo = owfnLogoData;
+const solanaLogo = solanaLogoData;
+const usdcLogo = usdcLogoData;
+const usdtLogo = usdtLogoData;
 
 export { owfnLogo, solanaLogo, usdcLogo, usdtLogo };
