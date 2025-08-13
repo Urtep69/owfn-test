@@ -46,7 +46,17 @@ export default async function handler(request: Request) {
         const solPrice = jupiterData?.data?.SOL?.price ?? 0;
         const priceUsd = bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0;
         
-        const totalSupply = asset.token_info?.supply ? parseInt(asset.token_info.supply) / (10 ** (asset.token_info.decimals ?? 0)) : 0;
+        const tokenInfo = asset.token_info;
+        let totalSupply = 0;
+        if (tokenInfo?.supply && typeof tokenInfo.decimals !== 'undefined') {
+            try {
+                const supplyBigInt = BigInt(tokenInfo.supply);
+                const decimalsBigInt = 10n ** BigInt(tokenInfo.decimals);
+                totalSupply = Number(supplyBigInt / decimalsBigInt);
+            } catch (e) {
+                console.error(`Failed to parse supply for mint ${mintAddress}:`, e);
+            }
+        }
         
         const marketCap = bestPair?.fdv ?? 0;
 
@@ -55,7 +65,7 @@ export default async function handler(request: Request) {
             name: asset.content?.metadata?.name || 'Unknown Token',
             symbol: asset.content?.metadata?.symbol || 'N/A',
             logo: asset.content?.links?.image,
-            decimals: asset.token_info?.decimals ?? 0,
+            decimals: tokenInfo?.decimals ?? 0,
             pricePerToken: priceUsd,
             priceSol: priceUsd > 0 && solPrice > 0 ? priceUsd / solPrice : 0,
             price24hChange: bestPair?.priceChange?.h24 ?? 0,
@@ -73,8 +83,8 @@ export default async function handler(request: Request) {
             deployerAddress: asset.authorities?.find((a: any) => a.type === 'creator')?.address,
             txns: bestPair?.txns,
             audit: {
-                isMintable: !!asset.token_info?.mint_authority,
-                isFreezable: !!asset.token_info?.freeze_authority,
+                isMintable: !!tokenInfo?.mint_authority,
+                isFreezable: !!tokenInfo?.freeze_authority,
             },
         };
 
