@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
-import { Loader2, ArrowLeft, BarChart2, DollarSign, TrendingUp, Briefcase, KeyRound, Lock, Unlock, ShieldCheck, Database, Info } from 'lucide-react';
+import { Loader2, ArrowLeft, BarChart2, Briefcase, ShieldCheck, Info, Users, CheckCircle, XCircle } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
@@ -45,6 +46,15 @@ interface DexScreenerPair {
     };
 }
 
+interface BirdeyeTokenOverview {
+    data?: {
+        holders?: number;
+        supply?: number;
+        circulatingSupply?: number;
+    };
+}
+
+
 const formatNumber = (num?: number, style: 'currency' | 'decimal' = 'decimal', maximumFractionDigits = 2) => {
     if (num === null || num === undefined) return 'N/A';
     const isCurrency = style === 'currency';
@@ -75,15 +85,15 @@ const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) =
 
 const AuthorityStatus = ({ enabled, t, labelKey }: { enabled?: boolean, t: Function, labelKey: string }) => {
     const color = enabled ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400';
-    const Icon = enabled ? Unlock : Lock;
-    const text = enabled ? 'Enabled' : 'Disabled';
+    const Icon = enabled ? <XCircle size={14} /> : <CheckCircle size={14} />;
+    const text = enabled ? t('yes') : t('no');
 
     return (
         <InfoItem 
             label={t(labelKey)} 
             value={
                 <div className={`flex items-center justify-end gap-2 font-semibold ${color}`}>
-                    <Icon size={14} />
+                    {Icon}
                     <span>{text}</span>
                 </div>
             } 
@@ -105,7 +115,6 @@ const InfoCard = ({ title, icon, children }: { title: string | React.ReactNode, 
 export default function TokenDetail() {
     const { t, currentLanguage } = useAppContext();
     const params = useParams();
-    // useLocation from wouter doesn't include search params, so we read them directly.
     const searchParams = new URLSearchParams(window.location.search);
     const from = searchParams.get('from');
     
@@ -135,37 +144,45 @@ export default function TokenDetail() {
                     body: JSON.stringify({ jsonrpc: '2.0', id: 'my-id', method: 'getAsset', params: { id: mintAddress } }),
                 });
                 const dexscreenerPromise = fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`);
-                
-                const [heliusRes, dexscreenerRes] = await Promise.all([heliusPromise, dexscreenerPromise]);
+                const birdeyePromise = fetch(`https://public-api.birdeye.so/defi/token_overview?address=${mintAddress}`, {
+                    headers: { 'X-API-KEY': '52536b330424422c88f21556a5751221' } // It's a public key from their docs
+                });
 
-                if (!heliusRes.ok) throw new Error(`Helius API failed with status ${heliusRes.status}`);
-                const heliusData = await heliusRes.json();
+                const [heliusResult, dexscreenerResult, birdeyeResult] = await Promise.allSettled([heliusPromise, dexscreenerPromise, birdeyePromise]);
+
+                if (heliusResult.status === 'rejected' || (heliusResult.status === 'fulfilled' && !heliusResult.value.ok)) {
+                     throw new Error(`Helius API failed`);
+                }
+                const heliusData = await heliusResult.value.json();
                 const asset: HeliusAsset = heliusData.result;
                 if (!asset) throw new Error("Could not fetch asset metadata from Helius.");
 
                 let bestPair: DexScreenerPair | null = null;
-                if (dexscreenerRes.ok) {
-                    const dexscreenerData = await dexscreenerRes.json();
+                if (dexscreenerResult.status === 'fulfilled' && dexscreenerResult.value.ok) {
+                    const dexscreenerData = await dexscreenerResult.value.json();
                     if (dexscreenerData.pairs && dexscreenerData.pairs.length > 0) {
                         bestPair = dexscreenerData.pairs
                             .filter((p: any) => p.liquidity && p.liquidity.usd > 1000)
                             .sort((a: any, b: any) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
                     }
                 }
+                
+                let birdeyeData: BirdeyeTokenOverview = {};
+                if (birdeyeResult.status === 'fulfilled' && birdeyeResult.value.ok) {
+                    birdeyeData = await birdeyeResult.value.json();
+                }
 
                 const updateAuthority = asset.authorities?.find(a => a.type === 'metadata_update_authority');
-
+                const circulatingSupply = birdeyeData.data?.circulatingSupply ?? 0;
+                const price = bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0;
+                
                 const formatAge = (timestamp?: number) => {
                     if (!timestamp) return 'N/A';
-                    const seconds = Math.floor((Date.now() - timestamp) / 1000);
-                    const intervals = { year: 31536000, month: 2592000, day: 86400, hour: 3600, minute: 60 };
-                    if (seconds < 60) return `${seconds} seconds ago`;
-                    if (seconds < intervals.hour) return `${Math.floor(seconds / intervals.minute)} minutes ago`;
-                    if (seconds < intervals.day) return `${Math.floor(seconds / intervals.hour)} hours ago`;
-                    if (seconds < intervals.month) return `${Math.floor(seconds / intervals.day)} days ago`;
-                    if (seconds < intervals.year) return `${Math.floor(seconds / intervals.month)} months ago`;
-                    return `${Math.floor(seconds / intervals.year)} years ago`;
+                    const age = new Date(timestamp * 1000); // DexScreener uses Unix timestamp
+                    return new Intl.DateTimeFormat('en-CA').format(age);
                 };
+                
+                const creator = asset.authorities?.find(a => a.type === 'creator');
 
                 const tokenData: TokenDetails = {
                     mintAddress: asset.id,
@@ -175,12 +192,14 @@ export default function TokenDetail() {
                     description: { en: asset.content?.metadata?.description || 'No description provided.' },
                     decimals: asset.token_info?.decimals ?? 0,
                     totalSupply: asset.token_info ? parseFloat(asset.token_info.supply) / Math.pow(10, asset.token_info.decimals || 0) : 0,
-                    pricePerToken: bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0,
+                    pricePerToken: price,
                     price24hChange: bestPair?.priceChange?.h24 ?? 0,
                     volume24h: bestPair?.volume?.h24 ?? 0,
                     liquidity: bestPair?.liquidity?.usd ?? 0,
-                    marketCap: bestPair?.fdv ?? 0,
+                    marketCap: price * circulatingSupply,
                     fdv: bestPair?.fdv,
+                    holders: birdeyeData.data?.holders ?? 0,
+                    circulatingSupply: circulatingSupply,
                     pairAddress: bestPair?.pairAddress,
                     txns: bestPair?.txns,
                     totalTx24h: (bestPair?.txns?.h24.buys ?? 0) + (bestPair?.txns?.h24.sells ?? 0),
@@ -191,9 +210,16 @@ export default function TokenDetail() {
                         mintAuthorityRevoked: !asset.token_info?.mint_authority,
                         freezeAuthorityRevoked: !asset.token_info?.freeze_authority,
                     },
-                    deployerAddress: updateAuthority?.address,
-                    // Interface requirements
-                    balance: 0, usdValue: 0, holders: 0, circulatingSupply: 0,
+                    audit: {
+                        contractVerified: null, // N/A, requires specialized API
+                        isHoneypot: null, // N/A, requires specialized API
+                        isFreezable: !!asset.token_info?.freeze_authority,
+                        isMintable: !!asset.token_info?.mint_authority,
+                        alerts: 0,
+                    },
+                    deployerAddress: creator?.address,
+                    balance: 0, 
+                    usdValue: 0,
                 };
                 setToken(tokenData);
 
@@ -212,7 +238,6 @@ export default function TokenDetail() {
         if (!token) return;
 
         const englishDescription = token.description.en;
-        // Show English immediately while waiting for translation
         setDisplayedDescription(englishDescription); 
         
         const noDescriptionText = 'No description provided.';
@@ -228,7 +253,6 @@ export default function TokenDetail() {
                 setDisplayedDescription(translatedText);
             } catch (error) {
                 console.error("Translation failed:", error);
-                // Fallback to English if translation fails
                 setDisplayedDescription(englishDescription);
             } finally {
                 setIsTranslating(false);
@@ -286,7 +310,7 @@ export default function TokenDetail() {
                 </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <InfoCard title={t('market_stats')} icon={<BarChart2 size={20} />}>
                     <InfoItem label={t('market_cap')} value={formatNumber(token.marketCap, 'currency')} />
                     <InfoItem label={t('fully_diluted_valuation')} value={formatNumber(token.fdv, 'currency')} />
@@ -294,34 +318,37 @@ export default function TokenDetail() {
                     <InfoItem label={t('volume_24h')} value={formatNumber(token.volume24h, 'currency')} />
                 </InfoCard>
 
-                <InfoCard title={t('trading_activity')} icon={<TrendingUp size={20} />}>
-                    <InfoItem label={t('buys_24h')} value={token.txns?.h24.buys.toLocaleString() ?? 'N/A'} />
-                    <InfoItem label={t('sells_24h')} value={token.txns?.h24.sells.toLocaleString() ?? 'N/A'} />
-                    <InfoItem label={t('total_transactions_24h')} value={token.totalTx24h?.toLocaleString() ?? 'N/A'} />
-                </InfoCard>
-
-                <InfoCard title={t('token_supply')} icon={<Database size={20} />}>
-                    <InfoItem label={t('total_supply')} value={formatNumber(token.totalSupply)} />
-                    <InfoItem label={t('decimals')} value={token.decimals} />
+                <InfoCard title={t('token_distribution')} icon={<Users size={20} />}>
+                     <InfoItem label={t('holders')} value={formatNumber(token.holders)} />
+                     <InfoItem label={t('circulating_supply')} value={formatNumber(token.circulatingSupply)} />
+                     <InfoItem label={t('total_supply')} value={formatNumber(token.totalSupply)} />
+                     <InfoItem label={t('total_transactions_24h')} value={token.totalTx24h?.toLocaleString() ?? 'N/A'} />
                 </InfoCard>
 
                 <InfoCard title={t('pool_info')} icon={<Briefcase size={20} />}>
                     <InfoItem label={t('exchange')} value={<span className="capitalize">{token.dexId ?? 'N/A'}</span>} />
                     {token.pairAddress && <InfoItem label={t('pair_address')} value={<AddressDisplay address={token.pairAddress} type="address" />} />}
                     <InfoItem label={t('pool_age')} value={token.poolCreated ?? 'N/A'} />
+                    {token.deployerAddress && <InfoItem label={t('deployer_address')} value={<AddressDisplay address={token.deployerAddress} />} />}
                 </InfoCard>
 
-                <div className="md:col-span-2">
+                <div className="lg:col-span-3">
                     <InfoCard title={t('on_chain_security')} icon={<ShieldCheck size={20} />}>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-                            <AuthorityStatus enabled={!token.security.mintAuthorityRevoked} t={t} labelKey="mint_authority" />
-                            <AuthorityStatus enabled={!token.security.freezeAuthorityRevoked} t={t} labelKey="freeze_authority" />
-                            {token.deployerAddress && <InfoItem label={t('update_authority')} value={<AddressDisplay address={token.deployerAddress} />} />}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6">
+                            <AuthorityStatus enabled={token.audit?.isMintable} t={t} labelKey="is_mintable" />
+                            <AuthorityStatus enabled={token.audit?.isFreezable} t={t} labelKey="is_freezable" />
+                            <InfoItem label={t('contract_verified')} value={
+                                <span className="font-semibold text-primary-500 dark:text-darkPrimary-400">{t('check_not_available')}</span>
+                            } />
+                            <InfoItem label={t('is_honeypot')} value={
+                                <span className="font-semibold text-primary-500 dark:text-darkPrimary-400">{t('check_not_available')}</span>
+                            } />
                         </div>
                     </InfoCard>
                 </div>
+
                  {token.description.en !== 'No description provided.' && (
-                    <div className="md:col-span-2">
+                    <div className="lg:col-span-3">
                         <InfoCard 
                             title={
                                 <div className="flex items-center gap-2">
@@ -336,6 +363,7 @@ export default function TokenDetail() {
                     </div>
                  )}
             </div>
+
              <Link to={from || '/dashboard'} className="inline-flex items-center gap-2 text-sm text-accent-600 dark:text-darkAccent-400 hover:underline p-2 mt-2">
                 <ArrowLeft size={16} /> {from === '/profile' ? t('back_to_profile') : t('back_to_dashboard')}
             </Link>

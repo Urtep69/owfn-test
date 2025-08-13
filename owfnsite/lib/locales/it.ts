@@ -318,6 +318,15 @@ export const it = {
     pool_age: 'Età Pool',
     on_chain_security: 'Sicurezza On-Chain',
     update_authority: 'Autorità di Aggiornamento',
+    holders: 'Detentori',
+    circulating_supply: 'Offerta Circolante',
+    token_distribution: 'Distribuzione Token',
+    contract_verified: 'Contratto Verificato',
+    is_honeypot: 'È Honeypot?',
+    check_not_available: 'Non Disponibile',
+    is_mintable: 'È Coniabile?',
+    is_freezable: 'È Congelabile?',
+    deployer_address: 'Indirizzo del Creatore',
     
     // Staking & Vesting
     staking_title: 'Metti in Stake OWFN, Guadagna Ricompense',

@@ -318,6 +318,15 @@ export const nl = {
     pool_age: 'Pool Leeftijd',
     on_chain_security: 'On-Chain Beveiliging',
     update_authority: 'Update Autoriteit',
+    holders: 'Houders',
+    circulating_supply: 'Circulerend Aanbod',
+    token_distribution: 'Tokendistributie',
+    contract_verified: 'Contract Geverifieerd',
+    is_honeypot: 'Is Honeypot?',
+    check_not_available: 'Niet Beschikbaar',
+    is_mintable: 'Is Mintbaar?',
+    is_freezable: 'Is Bevriesbaar?',
+    deployer_address: 'Deployer Adres',
     
     // Staking & Vesting
     staking_title: 'Stake OWFN, Verdien Beloningen',

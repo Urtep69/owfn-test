@@ -1,3 +1,4 @@
+
 export const de = {
     // Navigation
     home: 'Startseite',
@@ -318,6 +319,15 @@ export const de = {
     pool_age: 'Pool-Alter',
     on_chain_security: 'On-Chain-Sicherheit',
     update_authority: 'Update-Autorität',
+    holders: 'Inhaber',
+    circulating_supply: 'Umlaufversorgung',
+    token_distribution: 'Token-Verteilung',
+    contract_verified: 'Vertrag verifiziert',
+    is_honeypot: 'Ist Honeypot?',
+    check_not_available: 'Nicht verfügbar',
+    is_mintable: 'Ist prägbar?',
+    is_freezable: 'Ist einfrierbar?',
+    deployer_address: 'Deployer Address',
 
     // Staking & Vesting
     staking_title: 'OWFN staken, Belohnungen verdienen',

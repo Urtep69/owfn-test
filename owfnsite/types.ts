@@ -60,8 +60,8 @@ export interface TokenSecurity {
 }
 
 export interface TokenAudit {
-    contractVerified: boolean;
-    isHoneypot: boolean;
+    contractVerified: boolean | null;
+    isHoneypot: boolean | null;
     isFreezable: boolean;
     isMintable: boolean;
     alerts: number;

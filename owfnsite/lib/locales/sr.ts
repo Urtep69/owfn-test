@@ -318,6 +318,15 @@ export const sr = {
     pool_age: 'Старост базена',
     on_chain_security: 'Безбедност на ланцу',
     update_authority: 'Овлашћење за ажурирање',
+    holders: 'Власници',
+    circulating_supply: 'Циркулишућа понуда',
+    token_distribution: 'Дистрибуција токена',
+    contract_verified: 'Уговор верификован',
+    is_honeypot: 'Да ли је Honeypot?',
+    check_not_available: 'Није доступно',
+    is_mintable: 'Може ли се ковати?',
+    is_freezable: 'Може ли се замрзнути?',
+    deployer_address: 'Адреса креатора',
     
     // Staking & Vesting
     staking_title: 'Стејкујте OWFN, зарадите награде',

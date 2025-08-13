@@ -318,6 +318,15 @@ export const tr = {
     pool_age: 'Havuz Yaşı',
     on_chain_security: 'Zincir Üzeri Güvenlik',
     update_authority: 'Güncelleme Yetkisi',
+    holders: 'Sahipler',
+    circulating_supply: 'Dolaşımdaki Arz',
+    token_distribution: 'Token Dağıtımı',
+    contract_verified: 'Sözleşme Doğrulandı',
+    is_honeypot: 'Honeypot mu?',
+    check_not_available: 'Mevcut Değil',
+    is_mintable: 'Mintlenebilir mi?',
+    is_freezable: 'Dondurulabilir mi?',
+    deployer_address: 'Dağıtıcı Adresi',
 
     // Staking & Vesting
     staking_title: 'OWFN Stake Edin, Ödüller Kazanın',

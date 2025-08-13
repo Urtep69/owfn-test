@@ -318,6 +318,15 @@ export const hu = {
     pool_age: 'Pool Életkora',
     on_chain_security: 'Láncon belüli Biztonság',
     update_authority: 'Frissítési Jogosultság',
+    holders: 'Birtokosok',
+    circulating_supply: 'Forgalomban lévő Kínálat',
+    token_distribution: 'Token Elosztás',
+    contract_verified: 'Szerződés Ellenőrizve',
+    is_honeypot: 'Honeypot?',
+    check_not_available: 'Nem Elérhető',
+    is_mintable: 'Kibocsátható?',
+    is_freezable: 'Befagyasztható?',
+    deployer_address: 'Telepítő Címe',
 
     // Staking & Vesting
     staking_title: 'Stakelj OWFN-t, Szerezz Jutalmakat',

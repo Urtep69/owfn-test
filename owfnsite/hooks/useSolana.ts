@@ -42,6 +42,9 @@ const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
     'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
 };
 
+const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
+
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
@@ -58,6 +61,11 @@ export const useSolana = (): UseSolanaReturn => {
   }, [connected, setVisible]);
 
   const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
+    const cached = balanceCache.get(walletAddress);
+    if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
+        return cached.data;
+    }
+      
     setLoading(true);
     try {
         const url = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
@@ -157,19 +165,9 @@ export const useSolana = (): UseSolanaReturn => {
             }
         }
         
-        // This logic incorrectly assigned a value to the OWFN token based on the presale rate,
-        // even without liquidity. It has been removed to avoid confusion. The token value will
-        // now correctly be $0 until it has a market price.
-        /*
-        const owfnToken = allTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS);
-        if (owfnToken && owfnToken.pricePerToken === 0 && solPrice > 0) {
-            const presaleRate = PRESALE_DETAILS.rate;
-            owfnToken.pricePerToken = solPrice / presaleRate;
-            owfnToken.usdValue = owfnToken.balance * owfnToken.pricePerToken;
-        }
-        */
-        
-        return allTokens.sort((a,b) => b.usdValue - a.usdValue);
+        const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
+        balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
+        return sortedTokens;
 
     } catch (error) {
         console.error("Error fetching wallet balances:", error);
@@ -184,6 +182,7 @@ export const useSolana = (): UseSolanaReturn => {
       getWalletBalances(address).then(setUserTokens);
     } else {
       setUserTokens([]);
+      balanceCache.clear(); // Clear cache on disconnect
     }
   }, [connected, address, getWalletBalances]);
 
@@ -233,6 +232,7 @@ export const useSolana = (): UseSolanaReturn => {
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
+        balanceCache.delete(address!); // Invalidate cache after a transaction
         getWalletBalances(address!).then(setUserTokens);
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 

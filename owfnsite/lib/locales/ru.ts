@@ -318,6 +318,15 @@ export const ru = {
     pool_age: 'Возраст пула',
     on_chain_security: 'Безопасность на блокчейне',
     update_authority: 'Право на обновление',
+    holders: 'Держатели',
+    circulating_supply: 'Циркулирующее предложение',
+    token_distribution: 'Распределение токенов',
+    contract_verified: 'Контракт проверен',
+    is_honeypot: 'Это Honeypot?',
+    check_not_available: 'Недоступно',
+    is_mintable: 'Возможен выпуск?',
+    is_freezable: 'Возможна заморозка?',
+    deployer_address: 'Адрес создателя',
     
     // Staking & Vesting
     staking_title: 'Стейкайте OWFN, получайте вознаграждения',

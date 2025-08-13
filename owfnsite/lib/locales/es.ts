@@ -1,3 +1,4 @@
+
 export const es = {
     // Navigation
     home: 'Inicio',
@@ -318,6 +319,15 @@ export const es = {
     pool_age: 'Antigüedad del Pool',
     on_chain_security: 'Seguridad On-Chain',
     update_authority: 'Autoridad de Actualización',
+    holders: 'Tenedores',
+    circulating_supply: 'Suministro Circulante',
+    token_distribution: 'Distribución de Tokens',
+    contract_verified: 'Contrato Verificado',
+    is_honeypot: '¿Es Honeypot?',
+    check_not_available: 'No Disponible',
+    is_mintable: '¿Se puede acuñar?',
+    is_freezable: '¿Se puede congelar?',
+    deployer_address: 'Dirección del Creador',
 
     // Staking & Vesting
     staking_title: 'Haz Staking de OWFN, Gana Recompensas',

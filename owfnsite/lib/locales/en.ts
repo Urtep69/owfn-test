@@ -319,6 +319,16 @@ export const en = {
     pool_age: 'Pool Age',
     on_chain_security: 'On-Chain Security',
     update_authority: 'Update Authority',
+    holders: 'Holders',
+    circulating_supply: 'Circulating Supply',
+    token_distribution: 'Token Distribution',
+    contract_verified: 'Contract Verified',
+    is_honeypot: 'Is Honeypot?',
+    check_not_available: 'Not Available',
+    is_mintable: 'Is Mintable?',
+    is_freezable: 'Is Freezable?',
+    deployer_address: 'Deployer Address',
+
 
     // Staking & Vesting
     staking_title: 'Stake OWFN, Earn Rewards',
