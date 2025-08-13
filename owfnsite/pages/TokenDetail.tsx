@@ -74,8 +74,18 @@ export default function TokenDetail() {
             try {
                 const response = await fetch(`/api/token-info?mint=${mintAddress}`);
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `Request failed with status ${response.status}`);
+                    let errorText = `Request failed with status ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorText = errorData.error || errorText;
+                    } catch (e) {
+                        // Fallback for non-JSON responses
+                        const text = await response.text();
+                        if (text) {
+                             errorText = text;
+                        }
+                    }
+                    throw new Error(errorText);
                 }
                 const data = await response.json();
 
