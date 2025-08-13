@@ -69,10 +69,10 @@ export const pt = {
     about_impact_health_title: 'Saúde',
     about_impact_health_desc: 'Cobrir custos de cirurgia, modernizar hospitais e fornecer acesso a cuidados médicos essenciais.',
     about_impact_education_title: 'Educação',
-    about_impact_education_desc: 'Construir e modernizar escolas e jardins de infância para fornecer educação de qualidade às futuras gerações.',
+    about_impact_education_desc: 'Construir e modernizar escolas e jardins de infância para fornecer educação de qualidade para as gerações futuras.',
     about_impact_needs_title: 'Necessidades Básicas',
-    about_impact_needs_desc: 'Fornecer alimentos, abrigo e roupas para desabrigados e construir lares dignos para idosos.',
-    
+    about_impact_needs_desc: 'Fornecer comida, abrigo e roupas para os sem-teto e construir casas dignas para os idosos.',
+
     // Roadmap Page
     roadmap_title: 'Roteiro para o Impacto Global',
     roadmap_subtitle: 'Nossa jornada para criar um impacto global duradouro.',
@@ -82,9 +82,9 @@ export const pt = {
     roadmap_q4_2025_description: 'Lançamento oficial do token em DEXs, criação do pool de liquidez inicial e início dos primeiros projetos de impacto social concretos.',
     roadmap_q1_2026_title: 'Expansão Global',
     roadmap_q1_2026_description: 'Expansão dos programas de ajuda para novas regiões, garantia de parcerias estratégicas com ONGs e desenvolvimento de uma plataforma de votação transparente para os membros da comunidade.',
-    roadmap_q2_2026_title: 'Impacto Sustentado',
-    roadmap_q2_2026_description: 'Implementação de uma DAO totalmente funcional para decisões da comunidade, estabelecimento de um fundo de impacto de longo prazo e escalonamento contínuo de nossos esforços para modernizar escolas, hospitais e fornecer ajuda essencial globalmente.',
-    
+    roadmap_q2_2026_title: 'Impacto Sustentável',
+    roadmap_q2_2026_description: 'Implementação de um DAO totalmente funcional para decisões da comunidade, estabelecimento de um fundo de impacto de longo prazo e escalonamento contínuo de nossos esforços para modernizar escolas, hospitais e fornecer ajuda essencial globalmente.',
+
     // Tokenomics Page
     tokenomics_title: 'Tokenomics',
     tokenomics_subtitle: 'Uma economia transparente e equilibrada para um crescimento sustentável.',
@@ -94,7 +94,7 @@ export const pt = {
     token_decimals: 'Decimais do Token',
     token_standard: 'Padrão do Token',
     token_extensions: 'Extensões Ativas',
-
+    
     // Presale Page
     presale_join_title: 'Participe da Pré-venda',
     presale_ends_in: 'A pré-venda termina em',
@@ -102,10 +102,10 @@ export const pt = {
     sol_collected: 'SOL Arrecadado',
     you_pay: 'Você paga',
     you_receive: 'Você recebe',
-    min_buy: 'Compra mín.',
-    max_buy: 'Compra máx.',
-    invalid_amount: 'O valor deve ser entre {min} e {max} SOL.',
-    presale_purchase_success_alert: 'Compra bem-sucedida! Você contribuiu com {amount} SOL. Seus {owfnAmount} tokens OWFN estão reservados e serão automaticamente distribuídos para sua carteira no final da pré-venda.',
+    min_buy: 'Compra mínima',
+    max_buy: 'Compra máxima',
+    invalid_amount: 'O valor deve estar entre {min} e {max} SOL.',
+    presale_purchase_success_alert: 'Compra bem-sucedida! Você contribuiu com {amount} SOL. Seus {owfnAmount} tokens OWFN estão reservados e serão enviados automaticamente para sua carteira no final da pré-venda.',
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: 'Vendido {progress}%',
     presale_buy_info: 'Comprar (Mín: {min} SOL, Máx: {max} SOL)',
@@ -116,11 +116,11 @@ export const pt = {
     presale_whitelist_finished: 'Venda Whitelist Concluída:',
     presale_public_ending_in: 'Venda Pública Termina em:',
     presale_sale_starts_in: 'Venda Pública Começa em:',
-    presale_sale_ended: 'Venda Pública Concluída',
+    presale_sale_ended: 'Venda Pública Encerrada',
     presale_project_info_title: 'Informações do Projeto',
     token_name_label: 'Nome do Token',
     token_symbol_label: 'Símbolo do Token',
-    token_supply_label: 'Fornecimento do Token',
+    token_supply_label: 'Fornecimento de Tokens',
     presale_sale_rate_label: 'Taxa de Venda',
     presale_listing_rate_label: 'Taxa de Listagem',
     presale_softcap_label: 'Softcap',
@@ -130,7 +130,7 @@ export const pt = {
     presale_end_time_label: 'Fim da Venda',
     view_full_details: 'Ver detalhes completos →',
     presale_dyor_nfa_title: 'DYOR, NFA',
-    presale_dyor_nfa_desc: 'Faça sua própria pesquisa. Não é um conselho financeiro.',
+    presale_dyor_nfa_desc: 'Faça Sua Própria Pesquisa. Não é Aconselhamento Financeiro.',
     presale_footer_copyright: '© {year} Official World Family Network | Todos os direitos reservados.',
     presale_amount_error: 'O valor deve estar entre {min} e {max} SOL.',
     presale_max_amount_error: 'O valor não deve exceder {max} SOL.',
@@ -143,14 +143,14 @@ export const pt = {
     presale_you_contributed: 'Você já contribuiu com: {amount} SOL.',
     presale_you_can_buy: 'Você pode contribuir com mais {amount} SOL.',
     presale_bonus_offer: '{percentage}% DE BÔNUS em compras de {threshold} SOL ou mais!',
-
+    
     // Donations Page
-    make_donation: 'Faça uma Doação',
-    donation_desc: 'Apoie nossas iniciativas de impacto social doando cripto. Todos os fundos vão diretamente para a Tesouraria de Impacto.',
+    make_donation: 'Fazer uma Doação',
+    donation_desc: 'Apoie nossas iniciativas de impacto social doando criptomoedas. Todos os fundos vão diretamente para a Tesouraria de Impacto.',
     donation_solana_warning: 'IMPORTANTE: Doações de USDC e USDT são atualmente aceitas APENAS da rede Solana. Não envie de nenhuma outra rede (ex: Ethereum), pois os fundos serão perdidos e não chegarão ao destino.',
     donation_fee_info: 'Doações diretas estão atualmente isentas de taxas. Após a conclusão da pré-venda, uma taxa de transferência de 0,5% em todas as transações de $OWFN será ativada para financiar perpetuamente a Tesouraria de Impacto.',
     select_token: 'Selecionar Token',
-    amount: 'Quantidade',
+    amount: 'Valor',
     donations_form_title: 'Formulário de Doação',
     donations_stats_title: 'Estatísticas de Doação ao Vivo (Simulado)',
     donated: 'Doado',
@@ -161,12 +161,12 @@ export const pt = {
     wallet_monitor: 'Painel de Monitoramento de Carteiras',
     wallet_monitor_desc: 'Monitoramento em tempo real das carteiras oficiais do projeto para total transparência.',
     total_value: 'Valor Total',
-    wallet_name_presale: 'Pré-venda & Liquidez',
+    wallet_name_presale: 'Pré-venda e Liquidez',
     wallet_name_impact_treasury: 'Tesouraria de Impacto',
-    wallet_name_community: 'Comunidade & Ecossistema',
-    wallet_name_team: 'Equipe & Fundadores',
-    wallet_name_marketing: 'Marketing & Desenvolvimento de Negócios',
-    wallet_name_advisors: 'Consultores & Parcerias',
+    wallet_name_community: 'Comunidade e Ecossistema',
+    wallet_name_team: 'Equipe e Fundadores',
+    wallet_name_marketing: 'Marketing e Desenvolvimento de Negócios',
+    wallet_name_advisors: 'Consultores e Parcerias',
     
     // Profile
     my_profile: 'Meu Perfil',
@@ -181,7 +181,7 @@ export const pt = {
     projects_supported: 'Projetos Apoiados',
     votes_cast: 'Votos Lançados',
     impact_trophies_nfts: 'Troféus de Impacto (NFTs)',
-    impact_badges: 'Insígnias de Impacto',
+    impact_badges: 'Distintivos de Impacto',
     badge_first_donation: 'Primeiro Doador',
     badge_first_donation_desc: 'Concedido por fazer sua primeira doação.',
     badge_community_voter: 'Votante da Comunidade',
@@ -208,29 +208,29 @@ export const pt = {
     case_details: 'Detalhes do Caso (ex: detalhamento de custos, cronograma)',
     case_details_title: 'Detalhes do caso',
     back_to_all_cases: 'Voltar para todos os casos',
-    back_to_category_cases: 'Voltar para casos de {category}',
+    back_to_category_cases: 'Voltar para os casos de {category}',
     support_this_cause: 'Apoie esta Causa',
     case_not_found: 'Caso não encontrado',
     case_donation_success_alert: 'Obrigado por sua doação para "{title}"!',
-    admin_saving_case: 'Traduzindo e Salvando...',
+    admin_saving_case: 'Traduzindo e salvando...',
     admin_fill_fields_alert: 'Por favor, preencha todos os campos obrigatórios.',
     category_health: 'Saúde',
     category_education: 'Educação',
     category_basic_needs: 'Necessidades Básicas',
     live_updates: 'Atualizações ao Vivo',
     funding_milestones: 'Marcos de Financiamento',
-    milestone_25: 'Financiamento inicial garantido para materiais.',
-    milestone_50: 'Construção/Implementação começa.',
+    milestone_25: 'Financiamento inicial para materiais garantido.',
+    milestone_50: 'Construção/implementação começa.',
     milestone_75: 'Relatório de meio de projeto e verificação.',
     milestone_100: 'Projeto concluído e relatório final emitido.',
-    case_update_1: 'Materiais chegaram ao local. A construção começará na próxima semana!',
-    case_update_2: 'Planos arquitetônicos foram finalizados e aprovados pelas autoridades locais.',
+    case_update_1: 'Os materiais chegaram ao local. A construção está prevista para começar na próxima semana!',
+    case_update_2: 'Os planos arquitetônicos foram finalizados e aprovados pelas autoridades locais.',
     case_update_3: 'O financiamento do projeto começou oficialmente. Somos gratos pela primeira onda de apoio da comunidade OWFN.',
     
     // Partnerships Page
     partnerships_title: 'Parcerias e Colaborações Futuras',
     partnerships_focus_title: 'Nosso Foco Atual',
-    partnerships_focus_desc: 'Nossa prioridade absoluta nesta fase é garantir uma pré-venda bem-sucedida e construir uma base comunitária forte e engajada. Esta é a base sobre a qual nosso impacto futuro será construído.',
+    partnerships_focus_desc: 'Nossa prioridade absoluta nesta fase é garantir uma pré-venda bem-sucedida e construir uma base comunitária forte e engajada. Este é o alicerce sobre o qual nosso impacto futuro será construído.',
     partnerships_post_presale_intro: 'Após a conclusão bem-sucedida da pré-venda, nossa equipe iniciará o processo de busca e avaliação ativa de parcerias estratégicas.',
     partnerships_vision_title: 'Uma Visão Compartilhada para um Impacto Global',
     partnerships_vision_desc: 'Acreditamos que a mudança verdadeira e significativa vem da colaboração. Não estamos apenas procurando parceiros; estamos procurando aliados que compartilham nossos valores fundamentais e estão profundamente comprometidos em criar um bem social real, transparente e duradouro.',
@@ -239,32 +239,32 @@ export const pt = {
     partnerships_ideal_item_2: 'Valoriza a transparência total e a responsabilidade em todas as operações.',
     partnerships_ideal_item_3: 'Está comprometido com uma visão de longo prazo de impacto sustentável, não com ganhos de curto prazo.',
     partnerships_invitation_title: 'Pensando em Colaborar?',
-    partnerships_invitation_desc: 'Se esta visão ressoa com sua organização, convidamos você a acompanhar nosso progresso. Por favor, prepare sua proposta descrevendo como uma colaboração poderia ampliar nossa missão compartilhada. Os detalhes de contato se tornarão mais proeminentes e abriremos canais formais de discussão após a conclusão da fase de pré-venda.',
+    partnerships_invitation_desc: 'Se esta visão ressoa com sua organização, convidamos você a acompanhar nosso progresso. Prepare sua proposta delineando como uma colaboração poderia ampliar nossa missão compartilhada. Os detalhes de contato serão mais proeminentes e abriremos canais formais de discussão após a conclusão da fase de pré-venda.',
     partnerships_thank_you: 'Obrigado por seu interesse em construir um mundo melhor conosco.',
-
+    
     // FAQ Page
     faq_title: 'Perguntas Frequentes',
     faq_subtitle: 'Encontre respostas para as perguntas mais comuns sobre a OWFN.',
     faq_q1: 'O que é a OWFN?',
-    faq_a1: 'A OWFN (Official World Family Network) é um token baseado em Solana projetado para unir famílias globalmente através da tecnologia blockchain, focando em impacto social, educação, saúde e ajuda humanitária com total transparência.',
+    faq_a1: 'A OWFN (Official World Family Network) é um token baseado na Solana, projetado para unir famílias globalmente através da tecnologia blockchain, com foco em impacto social, educação, saúde e ajuda humanitária com total transparência.',
     faq_q2: 'Como posso comprar tokens OWFN?',
     faq_a2: 'Você pode participar da pré-venda de tokens OWFN diretamente através do link fornecido na seção "Pré-venda" do nosso site. Certifique-se de ter SOL (Solana) em sua carteira para fazer a compra.',
     faq_q3: 'Qual é o fornecimento total de tokens OWFN?',
     faq_a3: 'O fornecimento total de tokens OWFN é de 18.000.000.000 (18 bilhões) de OWFN.',
     faq_q4: 'Como a OWFN garante a transparência em suas iniciativas de impacto social?',
-    faq_a4: 'A OWFN utiliza a blockchain Solana para registrar todas as transações relacionadas à sua Tesouraria de Impacto. Isso garante que cada doação e alocação seja publicamente verificável e imutável, proporcionando total transparência.',
+    faq_a4: 'A OWFN utiliza a blockchain da Solana para registrar todas as transações relacionadas à sua Tesouraria de Impacto. Isso garante que cada doação e alocação seja publicamente verificável e imutável, proporcionando total transparência.',
     faq_q5: 'O que significa 2% de APY para os detentores de OWFN?',
-    faq_a5: 'A OWFN é um Token que Gera Juros (IBT) que recompensa automaticamente seus detentores com um Rendimento Percentual Anual (APY) de 2%. Isso significa que suas participações em OWFN crescerão ao longo do tempo simplesmente mantendo-as em sua carteira.',
+    faq_a5: 'A OWFN é um Token Portador de Juros (IBT) que recompensa automaticamente seus detentores com um Rendimento Percentual Anual (APY) de 2%. Isso significa que suas participações em OWFN crescerão ao longo do tempo simplesmente por mantê-las em sua carteira.',
     faq_q6: 'Onde posso encontrar o Whitepaper da OWFN?',
     faq_a6: 'Você pode encontrar o Whitepaper detalhado da OWFN clicando no botão "Whitepaper" no cabeçalho ou na seção principal do nosso site.',
     faq_q7: 'Como a OWFN faz a diferença no mundo real?',
-    faq_a7: 'A OWFN financia diretamente iniciativas em áreas críticas como saúde (ex: cobrindo custos de cirurgia, modernizando hospitais), educação (ex: construindo e renovando escolas, jardins de infância) e necessidades básicas (ex: fornecendo comida, abrigo, roupas para desabrigados, estabelecendo lares de idosos). Também respondemos a desastres e investimos em projetos de desenvolvimento comunitário sustentável. Cada token contribui para essas ações concretas, garantindo 100% de apoio real à humanidade.',
+    faq_a7: 'A OWFN financia diretamente iniciativas em áreas críticas como saúde (ex: cobrindo custos de cirurgia, modernizando hospitais), educação (ex: construindo e renovando escolas, jardins de infância) e necessidades básicas (ex: fornecendo comida, abrigo, roupas para os sem-teto, estabelecendo lares de idosos). Também respondemos a desastres e investimos em projetos de desenvolvimento comunitário sustentável. Cada token contribui para essas ações concretas, garantindo 100% de apoio real à humanidade.',
     faq_q8: 'Como minha contribuição, através da compra de tokens, realmente ajuda?',
-    faq_a8: 'Sua contribuição ajuda de duas maneiras fundamentais. Primeiro, quando você compra tokens durante a pré-venda, uma parte significativa dos fundos vai diretamente para a Tesouraria de Impacto para lançar nossos projetos sociais. Segundo, para criar uma fonte de financiamento sustentável e de longo prazo, uma pequena taxa de transferência de 0,5% será ativada em todas as transações *após* o término do período de pré-venda. Esta taxa é projetada como uma micro-doação automática para a Tesouraria de Impacto. Isso significa que toda vez que o token for usado no futuro, ele gerará apoio contínuo para nossas causas humanitárias, transformando todo o ecossistema em uma força perpétua para o bem. Todos esses fluxos financeiros são totalmente transparentes na blockchain.',
-    faq_q9: 'Além de comprar tokens, de que outra forma posso me envolver e ajudar a OWFN?',
+    faq_a8: 'Sua contribuição ajuda de duas maneiras fundamentais. Primeiro, quando você compra tokens durante a pré-venda, uma parte significativa dos fundos vai diretamente para a Tesouraria de Impacto para lançar nossos projetos sociais. Segundo, para criar uma fonte de financiamento sustentável e de longo prazo, uma pequena taxa de transferência de 0,5% será ativada em todas as transações *após* o término do período de pré-venda. Esta taxa é projetada como uma microdoação automática para a Tesouraria de Impacto. Isso significa que toda vez que o token for usado no futuro, ele gerará apoio contínuo para nossas causas humanitárias, transformando todo o ecossistema em uma força perpétua para o bem. Todos esses fluxos financeiros são totalmente transparentes na blockchain.',
+    faq_q9: 'Além de comprar tokens, como mais posso me envolver e ajudar a OWFN?',
     faq_a9: 'Seu envolvimento é crucial! Divulgar a OWFN é incrivelmente poderoso. Fale com seus amigos, familiares e colegas sobre nossa missão. Compartilhe nossa visão nas redes sociais, durante suas viagens ou no trabalho. Cada conversa, cada compartilhamento, ajuda a aumentar a conscientização e traz mais pessoas para nossa família global, ampliando nosso impacto coletivo. Junte-se aos nossos canais da comunidade para se manter atualizado e participar das discussões.',
     faq_q10: 'Existem instruções especiais para doar USDC ou USDT?',
-    faq_a10: 'Sim, isso é extremamente importante. Todas as doações de USDC e USDT devem ser enviadas *exclusivamente* da blockchain Solana. Não envie de nenhuma outra rede (ex: Ethereum), pois os fundos serão perdidos e não chegarão ao seu destino. Esta informação também é claramente exibida na página de doações.',
+    faq_a10: 'Sim, isso é de importância crítica. Todas as doações de USDC e USDT devem ser enviadas *exclusivamente* da blockchain da Solana. Não envie de nenhuma outra rede (ex: Ethereum), pois os fundos serão perdidos e não chegarão ao seu destino. Esta informação também é claramente exibida na página de doações.',
     
     // Chatbot
     chatbot_title: 'Assistente OWFN',
@@ -273,16 +273,16 @@ export const pt = {
     
     // Whitepaper
     whitepaper_title: 'Whitepaper da OWFN',
-    whitepaper_subtitle: 'Uma Visão Geral Detalhada do Projeto Official World Family Network',
+    whitepaper_subtitle: 'Uma Visão Detalhada do Projeto Official World Family Network',
     whitepaper_features_title: 'Ecossistema e Funcionalidades do Projeto',
     whitepaper_features_desc: 'A plataforma OWFN oferece várias funcionalidades chave para apoiar sua missão:',
     whitepaper_feature_presale: 'Permite que os primeiros apoiadores comprem tokens OWFN antes do lançamento público.',
-    whitepaper_feature_donations: 'Um portal dedicado para fazer doações diretas de cripto para a Tesouraria de Impacto.',
+    whitepaper_feature_donations: 'Um portal dedicado para fazer doações diretas de criptomoedas para a Tesouraria de Impacto.',
     whitepaper_feature_dashboard: 'Oferece monitoramento em tempo real de todas as carteiras oficiais do projeto para total transparência.',
     whitepaper_feature_impact_portal: 'Mostra casos sociais específicos financiados pelo projeto, permitindo que a comunidade veja seu impacto.',
     whitepaper_community_title: 'Comunidade e Links Oficiais',
-    whitepaper_community_desc: 'Junte-se à nossa crescente comunidade e mantenha-se atualizado com as últimas notícias:',
-    
+    whitepaper_community_desc: 'Junte-se à nossa comunidade crescente e mantenha-se atualizado com as últimas notícias:',
+
     // Alerts & Messages
     transaction_success_alert: 'Transação bem-sucedida! Você enviou {amount} {tokenSymbol}.',
     transaction_failed_alert: 'A transação falhou. Por favor, tente novamente.',
@@ -292,9 +292,9 @@ export const pt = {
     
     // Footer
     footer_copyright: '© {year} Official World Family Network. Todos os direitos reservados.',
-
+    
     // Token Detail Page
-    token_detail_title: 'Análise de Token',
+    token_detail_title: 'Análise do Token',
     back_to_dashboard: 'Voltar ao Painel',
     back_to_profile: 'Voltar ao Perfil',
     token_not_found: 'Dados do token não encontrados.',
@@ -312,7 +312,7 @@ export const pt = {
     buys_24h: 'Compras (24h)',
     sells_24h: 'Vendas (24h)',
     total_transactions_24h: 'Total de Transações (24h)',
-    token_supply: 'Fornecimento de Token',
+    token_supply: 'Fornecimento de Tokens',
     decimals: 'Decimais',
     pool_info: 'Informações do Pool',
     exchange: 'Bolsa',
@@ -346,16 +346,16 @@ export const pt = {
     staking_connect_prompt: 'Conecte sua carteira para começar a fazer staking de seus tokens OWFN e ganhar recompensas.',
     stake_success_alert: '{amount} OWFN em staking com sucesso!',
     unstake_success_alert: '{amount} OWFN retirado do staking com sucesso!',
-    claim_success_alert: '{amount} recompensas de OWFN reivindicadas com sucesso!',
-    impact_staking_title: 'Impact Staking',
+    claim_success_alert: '{amount} recompensas OWFN reivindicadas com sucesso!',
+    impact_staking_title: 'Staking de Impacto',
     impact_staking_desc: 'Contribua com uma parte de suas recompensas de staking para causas sociais.',
     donate_rewards_percentage: 'Você doará {percentage}% de suas recompensas reivindicadas para a Tesouraria de Impacto.',
     vesting_title: 'Vesting de Tokens',
-    vesting_subtitle: 'Acompanhe seus cronogramas de vesting e reivindique tokens desbloqueados.',
+    vesting_subtitle: 'Acompanhe seus cronogramas de vesting e reivindique os tokens desbloqueados.',
     vesting_connect_title: 'Conecte-se para Ver o Vesting',
     vesting_connect_prompt: 'Conecte sua carteira para ver seus cronogramas de vesting pessoais.',
     no_vesting_schedule: 'Nenhum Cronograma de Vesting Encontrado',
-    no_vesting_schedule_desc: 'Não há nenhum cronograma de vesting associado ao endereço da carteira conectada.',
+    no_vesting_schedule_desc: 'Não há cronograma de vesting associado ao endereço da carteira conectada.',
     my_vesting_schedule: 'Meu Cronograma de Vesting',
     total_allocation: 'Alocação Total',
     claimed: 'Reivindicado',
@@ -375,7 +375,7 @@ export const pt = {
     create_schedule: 'Criar Cronograma',
     vesting_schedule_created: 'Cronograma de vesting criado com sucesso!',
     all_vesting_schedules: 'Todos os Cronogramas de Vesting',
-    
+
     // Airdrop
     airdrop_title: 'Airdrop de Tokens OWFN',
     airdrop_subtitle: 'Verifique sua elegibilidade para nossos airdrops e recompensas da comunidade.',
@@ -388,7 +388,7 @@ export const pt = {
     airdrop_not_eligible_message: 'Desculpe, este endereço de carteira não é elegível para o airdrop atual. Mantenha-se ativo em nossa comunidade para futuras oportunidades!',
     airdrop_info_box_title: 'Sobre este Airdrop',
     airdrop_info_box_desc: 'Este airdrop foi projetado para recompensar os primeiros apoiadores e membros ativos da comunidade. A elegibilidade é baseada em fatores como participação na pré-venda e engajamento em eventos da comunidade.',
-    
+
     // Governance
     governance_title: 'Governança',
     governance_subtitle: 'Participe do futuro da OWFN votando em propostas.',
@@ -409,7 +409,7 @@ export const pt = {
     you_voted: 'Você Votou',
     no_active_proposals: 'Atualmente não há propostas ativas.',
     no_past_proposals: 'Não há propostas anteriores para exibir.',
-    no_active_cases_in_category: 'Não há casos ativos nesta categoria no momento.',
+    no_active_cases_in_category: 'Nenhum caso ativo nesta categoria no momento.',
     
     // Maintenance
     maintenance_heading: 'Estamos melhorando as coisas!',
@@ -423,14 +423,14 @@ export const pt = {
     deactivate_maintenance_mode: 'Desativar Manutenção',
     admin_login: 'Login de Administrador',
     maintenance_login_denied: 'Conexão negada. A plataforma está em modo de manutenção. Apenas administradores podem fazer login.',
-    
+
     // Coming Soon
     coming_soon_title: 'Em Breve',
-    coming_soon_desc: 'Este recurso está atualmente em desenvolvimento. Estamos trabalhando duro para trazê-lo para você em breve. Obrigado por sua paciência e apoio.',
+    coming_soon_desc: 'Esta funcionalidade está atualmente em desenvolvimento. Estamos trabalhando duro para trazê-la para você em breve. Obrigado por sua paciência e apoio.',
     
     // Admin Presale
     presale_admin_title: 'Administrador da Pré-venda',
-    presale_admin_subtitle: 'Monitore transações e gerencie o airdrop de tokens pós-pré-venda.',
+    presale_admin_subtitle: 'Monitore as transações e gerencie o airdrop de tokens pós-pré-venda.',
     total_sol_raised: 'Total de SOL Arrecadado',
     total_transactions: 'Total de Transações',
     unique_contributors: 'Contribuidores Únicos',
@@ -438,7 +438,7 @@ export const pt = {
     export_csv: 'Exportar como CSV',
     presale_purchases: 'Compras da Pré-venda',
     contributor: 'Contribuidor',
-    sol_amount: 'Quantidade de SOL',
+    sol_amount: 'Valor em SOL',
     owfn_to_receive: 'OWFN a Receber',
     date: 'Data',
     transaction: 'Transação',
@@ -451,10 +451,10 @@ export const pt = {
     insufficient_sol_balance: 'Saldo de SOL insuficiente para taxas de transação.',
     estimated_tx_fees: 'Taxas de transação estimadas',
     start_airdrop: 'Iniciar Airdrop',
-    airdrop_confirmation_prompt: 'Tem certeza de que deseja iniciar o airdrop? Isso enviará tokens OWFN para {count} carteiras únicas e não poderá ser desfeito.',
+    airdrop_confirmation_prompt: 'Tem certeza de que deseja iniciar o airdrop? Isso enviará tokens OWFN para {count} carteiras únicas e não pode ser desfeito.',
     airdrop_in_progress: 'Airdrop em Andamento... Não feche esta janela.',
     processing_batch: 'Processando lote {current} de {total}...',
     airdrop_complete: 'Airdrop Concluído',
-    airdrop_summary: '{success} bem-sucedidos, {failed} falharam.',
+    airdrop_summary: '{success} com sucesso, {failed} falharam.',
     airdrop_log: 'Log do Airdrop',
 };

@@ -316,7 +316,7 @@ export const ja = {
     decimals: '小数',
     pool_info: 'プール情報',
     exchange: '取引所',
-    pool_age: 'プール開設期間',
+    pool_age: 'プール作成日',
     on_chain_security: 'オンチェーンセキュリティ',
     update_authority: '更新権限',
     holders: '保有者',

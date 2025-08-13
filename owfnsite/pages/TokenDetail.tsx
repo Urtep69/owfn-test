@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { Loader2, ArrowLeft, BarChart2, Briefcase, ShieldCheck, Info, Users, CheckCircle, XCircle } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { HELIUS_API_KEY } from '../constants.ts';
+import { HELIUS_RPC_URL, HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
 import { translateText } from '../services/geminiService.ts';
+import { Connection, PublicKey } from '@solana/web3.js';
 
 // --- API Interfaces ---
 interface HeliusAsset {
@@ -172,17 +173,46 @@ export default function TokenDetail() {
                     birdeyeData = await birdeyeResult.value.json();
                 }
 
-                const updateAuthority = asset.authorities?.find(a => a.type === 'metadata_update_authority');
-                const circulatingSupply = birdeyeData.data?.circulatingSupply ?? 0;
+                const decimals = asset.token_info?.decimals ?? 0;
+                let totalSupplyFromChain: bigint = 0n;
+
+                if (asset.token_info?.supply) {
+                    totalSupplyFromChain = BigInt(asset.token_info.supply);
+                }
+                
+                if (totalSupplyFromChain === 0n) {
+                    try {
+                        const connection = new Connection(HELIUS_RPC_URL);
+                        const supplyResponse = await connection.getTokenSupply(new PublicKey(mintAddress));
+                        if (supplyResponse.value.amount) {
+                            totalSupplyFromChain = BigInt(supplyResponse.value.amount);
+                        }
+                    } catch (e) {
+                        console.error("Failed to get token supply from RPC", e);
+                    }
+                }
+                const totalSupply = Number(totalSupplyFromChain) / Math.pow(10, decimals);
+                
+                let circulatingSupply = birdeyeData.data?.circulatingSupply ?? 0;
+                if (circulatingSupply === 0 && totalSupply > 0) {
+                    circulatingSupply = totalSupply;
+                }
+
                 const price = bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0;
                 
                 const formatAge = (timestamp?: number) => {
-                    if (!timestamp) return 'N/A';
-                    const age = new Date(timestamp * 1000); // DexScreener uses Unix timestamp
-                    return new Intl.DateTimeFormat('en-CA').format(age);
+                    if (timestamp === null || timestamp === undefined) return 'N/A';
+                    // Timestamps from dexscreener are in seconds. Let's do a sanity check.
+                    // If it's a huge number, it might be in ms. A recent timestamp in ms is > 1.5e12
+                    const date = new Date(timestamp > 1000000000000 ? timestamp : timestamp * 1000);
+                    if (isNaN(date.getTime())) {
+                        return 'N/A';
+                    }
+                    return new Intl.DateTimeFormat('en-CA').format(date);
                 };
                 
                 const creator = asset.authorities?.find(a => a.type === 'creator');
+                const updateAuthority = asset.authorities?.find(a => a.type === 'metadata_update_authority');
 
                 const tokenData: TokenDetails = {
                     mintAddress: asset.id,
@@ -190,8 +220,8 @@ export default function TokenDetail() {
                     symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}...`,
                     logo: <GenericTokenIcon uri={asset.content?.links?.image} className="w-12 h-12" />,
                     description: { en: asset.content?.metadata?.description || 'No description provided.' },
-                    decimals: asset.token_info?.decimals ?? 0,
-                    totalSupply: asset.token_info ? parseFloat(asset.token_info.supply) / Math.pow(10, asset.token_info.decimals || 0) : 0,
+                    decimals: decimals,
+                    totalSupply: totalSupply,
                     pricePerToken: price,
                     price24hChange: bestPair?.priceChange?.h24 ?? 0,
                     volume24h: bestPair?.volume?.h24 ?? 0,
@@ -319,7 +349,7 @@ export default function TokenDetail() {
                 </InfoCard>
 
                 <InfoCard title={t('token_distribution')} icon={<Users size={20} />}>
-                     <InfoItem label={t('holders')} value={formatNumber(token.holders)} />
+                     <InfoItem label={t('holders')} value={token.holders > 0 ? formatNumber(token.holders) : 'N/A'} />
                      <InfoItem label={t('circulating_supply')} value={formatNumber(token.circulatingSupply)} />
                      <InfoItem label={t('total_supply')} value={formatNumber(token.totalSupply)} />
                      <InfoItem label={t('total_transactions_24h')} value={token.totalTx24h?.toLocaleString() ?? 'N/A'} />

@@ -316,7 +316,7 @@ export const ro = {
     decimals: 'Zecimale',
     pool_info: 'Informații Pool',
     exchange: 'Bursă',
-    pool_age: 'Vechime Pool',
+    pool_age: 'Pool Creat',
     on_chain_security: 'Securitate On-Chain',
     update_authority: 'Autoritate de Actualizare',
     holders: 'Deținători',

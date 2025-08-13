@@ -316,7 +316,7 @@ export const es = {
     decimals: 'Decimales',
     pool_info: 'Información del Pool',
     exchange: 'Exchange',
-    pool_age: 'Antigüedad del Pool',
+    pool_age: 'Pool Creado',
     on_chain_security: 'Seguridad On-Chain',
     update_authority: 'Autoridad de Actualización',
     holders: 'Tenedores',

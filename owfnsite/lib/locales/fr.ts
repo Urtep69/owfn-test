@@ -316,7 +316,7 @@ export const fr = {
     decimals: 'Décimales',
     pool_info: 'Informations sur le Pool',
     exchange: 'Échange',
-    pool_age: 'Âge du Pool',
+    pool_age: 'Pool Créé',
     on_chain_security: 'Sécurité On-Chain',
     update_authority: 'Autorité de Mise à Jour',
     holders: 'Détenteurs',
@@ -385,7 +385,7 @@ export const fr = {
     airdrop_congratulations: 'Félicitations !',
     airdrop_eligible_message: 'Votre portefeuille est éligible ! Vous recevrez {amount} jetons OWFN lors de la prochaine distribution.',
     airdrop_not_eligible: 'Non Éligible',
-    airdrop_not_eligible_message: 'Désolé, cette adresse de portefeuille n\'est pas éligible pour l\'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !',
+    airdrop_not_eligible_message: 'Désolé, cette adresse de portefeuille n\'est pas éligible for l\'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !',
     airdrop_info_box_title: 'À propos de cet Airdrop',
     airdrop_info_box_desc: 'Cet airdrop est conçu pour récompenser les premiers supporters et les membres actifs de la communauté. L\'éligibilité est basée sur des facteurs tels que la participation à la prévente et l\'engagement dans les événements communautaires.',
 
