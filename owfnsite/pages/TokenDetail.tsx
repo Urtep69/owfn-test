@@ -174,29 +174,42 @@ export default function TokenDetail() {
                 }
 
                 const decimals = asset.token_info?.decimals ?? 0;
-                let totalSupplyFromChain: bigint = 0n;
 
-                if (asset.token_info?.supply) {
-                    totalSupplyFromChain = BigInt(asset.token_info.supply);
+                // --- NEW ROBUST SUPPLY LOGIC ---
+                let totalSupply = 0;
+                let circulatingSupply = 0;
+
+                // Priority 1: Birdeye data for both supplies
+                if (birdeyeData.data) {
+                    circulatingSupply = birdeyeData.data.circulatingSupply ?? 0;
+                    totalSupply = birdeyeData.data.supply ?? 0;
                 }
                 
-                if (totalSupplyFromChain === 0n) {
-                    try {
+                // Priority 2: Fallback to on-chain for total supply if Birdeye fails
+                if (totalSupply === 0) {
+                     try {
                         const connection = new Connection(HELIUS_RPC_URL);
                         const supplyResponse = await connection.getTokenSupply(new PublicKey(mintAddress));
                         if (supplyResponse.value.amount) {
-                            totalSupplyFromChain = BigInt(supplyResponse.value.amount);
+                            const totalSupplyFromChain = BigInt(supplyResponse.value.amount);
+                            totalSupply = Number(totalSupplyFromChain) / Math.pow(10, decimals);
                         }
                     } catch (e) {
                         console.error("Failed to get token supply from RPC", e);
                     }
                 }
-                const totalSupply = Number(totalSupplyFromChain) / Math.pow(10, decimals);
                 
-                let circulatingSupply = birdeyeData.data?.circulatingSupply ?? 0;
+                // Priority 3: Helius asset info as last resort for total supply
+                if (totalSupply === 0 && asset.token_info?.supply) {
+                    const totalSupplyFromHelius = BigInt(asset.token_info.supply);
+                     totalSupply = Number(totalSupplyFromHelius) / Math.pow(10, decimals);
+                }
+
+                // Fallback for circulating supply: if it's 0, use total supply.
                 if (circulatingSupply === 0 && totalSupply > 0) {
                     circulatingSupply = totalSupply;
                 }
+                // --- END OF NEW SUPPLY LOGIC ---
 
                 const price = bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0;
                 
