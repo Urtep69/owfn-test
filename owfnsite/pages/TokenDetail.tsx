@@ -1,40 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'wouter';
-import { Loader2, ArrowLeft, BarChart3, Droplets, Flame, Users, LockKeyhole, ShieldCheck, CheckCircle, AlertTriangle, Link as LinkIcon, Landmark } from 'lucide-react';
+import { Loader2, ArrowLeft, BarChart3, Droplets, Flame, Users, LockKeyhole, ShieldCheck, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { HELIUS_RPC_URL, HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
 import { SolIcon } from '../components/IconComponents.tsx';
 import { DualProgressBar } from '../components/DualProgressBar.tsx';
-import { Connection } from '@solana/web3.js';
-
-interface HeliusAsset {
-    id: string;
-    content?: {
-        metadata?: { name?: string; symbol?: string; };
-        links?: { image?: string; };
-    };
-    token_info?: {
-        decimals: number;
-        mint_authority?: string;
-        freeze_authority?: string;
-    };
-    authorities?: { address: string, type: string }[];
-}
-
-interface DexScreenerPair {
-    pairAddress: string;
-    dexId: string;
-    priceUsd?: string;
-    priceChange?: { h1?: number; h6?: number; h24?: number; };
-    volume?: { h24?: number };
-    liquidity?: { usd?: number };
-    fdv?: number;
-    txns?: { h24: { buys: number, sells: number }; };
-}
 
 const formatNumber = (num?: number, options: Intl.NumberFormatOptions = {}) => {
     if (num === null || num === undefined) return 'N/A';
@@ -99,65 +72,36 @@ export default function TokenDetail() {
             setLoading(true);
             setError(null);
             try {
-                const connection = new Connection(HELIUS_RPC_URL);
-                const heliusPromise = fetch(`https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ jsonrpc: '2.0', id: 'my-id', method: 'getAsset', params: { id: mintAddress } }),
-                }).then(res => res.json());
-
-                const dexscreenerPromise = fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`).then(res => res.ok ? res.json() : null);
-                const jupiterPromise = fetch(`https://price.jup.ag/v4/price?ids=SOL`).then(res => res.json());
-
-                const [heliusData, dexscreenerData, jupiterData] = await Promise.all([heliusPromise, dexscreenerPromise, jupiterPromise]);
-
-                const asset: HeliusAsset = heliusData.result;
-                if (!asset) throw new Error("Could not fetch asset metadata from Helius.");
-
-                const bestPair: DexScreenerPair | null = dexscreenerData?.pairs
-                    ?.filter((p: any) => p.liquidity && p.liquidity.usd > 1000)
-                    .sort((a: any, b: any) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0] ?? null;
-
-                const solPrice = jupiterData.data.SOL.price;
-                const priceUsd = bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0;
+                const response = await fetch(`/api/token-info?mint=${mintAddress}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Request failed with status ${response.status}`);
+                }
+                const data = await response.json();
 
                 const tokenData: TokenDetails = {
-                    mintAddress: asset.id,
-                    name: asset.content?.metadata?.name || 'Unknown Token',
-                    symbol: asset.content?.metadata?.symbol || 'N/A',
-                    logo: <GenericTokenIcon uri={asset.content?.links?.image} className="w-12 h-12" />,
-                    decimals: asset.token_info?.decimals ?? 0,
-                    pricePerToken: priceUsd,
-                    priceSol: priceUsd > 0 && solPrice > 0 ? priceUsd / solPrice : 0,
-                    price24hChange: bestPair?.priceChange?.h24 ?? 0,
-                    priceChange: {
-                        h1: bestPair?.priceChange?.h1,
-                        h6: bestPair?.priceChange?.h6,
+                    ...data,
+                    balance: 0,
+                    usdValue: 0,
+                    description: {},
+                    security: { 
+                        isMutable: false, 
+                        mintAuthorityRevoked: !data.audit?.isMintable, 
+                        freezeAuthorityRevoked: !data.audit?.isFreezable 
                     },
-                    volume24h: bestPair?.volume?.h24 ?? 0,
-                    liquidity: bestPair?.liquidity?.usd ?? 0,
-                    marketCap: bestPair?.fdv ? bestPair.fdv * (priceUsd / parseFloat(bestPair.priceUsd)) : 0, // Simplified MC calc
-                    fdv: bestPair?.fdv ?? 0,
-                    holders: 0,
-                    circulatingSupply: 0, 
-                    totalSupply: 0, 
-                    pairAddress: bestPair?.pairAddress,
-                    dexId: bestPair?.dexId,
-                    deployerAddress: asset.authorities?.find(a => a.type === 'creator')?.address,
-                    txns: bestPair?.txns,
+                    logo: <GenericTokenIcon uri={data.logo} className="w-12 h-12" />,
                     audit: {
-                        isMintable: !!asset.token_info?.mint_authority,
-                        isFreezable: !!asset.token_info?.freeze_authority,
+                        isMintable: data.audit?.isMintable ?? false,
+                        isFreezable: data.audit?.isFreezable ?? false,
                         contractVerified: null,
                         isHoneypot: null,
                         alerts: 0,
                     },
-                    lpBurnedPercent: 0, // Placeholder
-                    balance: 0,
-                    usdValue: 0,
-                    description: {},
-                    security: { isMutable: false, mintAuthorityRevoked: false, freezeAuthorityRevoked: false },
+                    holders: 0, // Placeholder data
+                    circulatingSupply: 0, // Placeholder data
+                    lpBurnedPercent: 0, // Placeholder data
                 };
+                
                 setToken(tokenData);
             } catch (err) {
                 console.error("Failed to fetch token details:", err);
