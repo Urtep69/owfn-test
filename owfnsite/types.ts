@@ -86,19 +86,16 @@ export interface TokenDetails extends Token {
     marketCap: number;
     volume24h: number;
     price24hChange: number;
+    priceChange?: {
+        h1?: number;
+        h6?: number;
+    };
+    priceSol?: number;
     holders: number;
     circulatingSupply: number;
     totalSupply?: number;
     liquidity?: number;
-    totalMarketCap?: number;
-    volatility?: number;
-    totalTx24h?: number;
-    pooledSol?: number;
-    pooledToken?: number;
-    poolCreated?: string;
-    dextScore?: DextScore;
     audit?: TokenAudit;
-    communityTrust?: CommunityTrust;
     pairAddress?: string;
     fdv?: number;
     pairCreatedAt?: number;

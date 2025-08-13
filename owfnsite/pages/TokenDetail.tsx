@@ -1,32 +1,24 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'wouter';
-import { Loader2, ArrowLeft, BarChart2, Briefcase, ShieldCheck, Info, Users, CheckCircle, XCircle } from 'lucide-react';
+import { useParams } from 'wouter';
+import { Loader2, ArrowLeft, BarChart3, Droplets, Flame, Users, LockKeyhole, ShieldCheck, CheckCircle, AlertTriangle, Link as LinkIcon, Landmark } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { HELIUS_RPC_URL, HELIUS_API_KEY } from '../constants.ts';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
-import { translateText } from '../services/geminiService.ts';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { SolIcon } from '../components/IconComponents.tsx';
+import { DualProgressBar } from '../components/DualProgressBar.tsx';
+import { Connection } from '@solana/web3.js';
 
-// --- API Interfaces ---
 interface HeliusAsset {
     id: string;
     content?: {
-        metadata?: {
-            name?: string;
-            symbol?: string;
-            description?: string;
-        };
-        links?: {
-            image?: string;
-        };
+        metadata?: { name?: string; symbol?: string; };
+        links?: { image?: string; };
     };
     token_info?: {
         decimals: number;
-        supply: string;
-        token_program: string;
         mint_authority?: string;
         freeze_authority?: string;
     };
@@ -37,95 +29,64 @@ interface DexScreenerPair {
     pairAddress: string;
     dexId: string;
     priceUsd?: string;
-    priceChange?: { h24?: number };
+    priceChange?: { h1?: number; h6?: number; h24?: number; };
     volume?: { h24?: number };
     liquidity?: { usd?: number };
     fdv?: number;
-    pairCreatedAt?: number;
-    txns?: {
-        h24: { buys: number, sells: number };
-    };
+    txns?: { h24: { buys: number, sells: number }; };
 }
 
-interface BirdeyeTokenOverview {
-    data?: {
-        holders?: number;
-        supply?: number;
-        circulatingSupply?: number;
-    };
-}
-
-
-const formatNumber = (num?: number, style: 'currency' | 'decimal' = 'decimal', maximumFractionDigits = 2) => {
+const formatNumber = (num?: number, options: Intl.NumberFormatOptions = {}) => {
     if (num === null || num === undefined) return 'N/A';
-    const isCurrency = style === 'currency';
-    const prefix = isCurrency ? '$' : '';
+    const defaultOptions: Intl.NumberFormatOptions = {
+        maximumFractionDigits: 2,
+        ...options,
+    };
 
     if (Math.abs(num) >= 1_000_000_000) {
-        return `${prefix}${(num / 1_000_000_000).toFixed(2)}B`;
+        return `$${(num / 1_000_000_000).toFixed(2)}B`;
     }
     if (Math.abs(num) >= 1_000_000) {
-        return `${prefix}${(num / 1_000_000).toFixed(2)}M`;
+        return `$${(num / 1_000_000).toFixed(2)}M`;
     }
     if (Math.abs(num) >= 1_000) {
-        return `${prefix}${(num / 1_000).toFixed(2)}K`;
+        return `$${(num / 1_000).toFixed(2)}K`;
     }
-    return isCurrency 
-        ? num.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits }) 
-        : num.toLocaleString('en-US', { maximumFractionDigits });
+    return new Intl.NumberFormat('en-US', defaultOptions).format(num);
 };
 
-const InfoItem = ({ label, value }: { label: string, value: React.ReactNode }) => (
-    <div className="flex justify-between items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50">
-        <span className="text-primary-600 dark:text-darkPrimary-300 text-sm">{label}</span>
-        <div className="text-right">
-            <span className="font-semibold text-primary-800 dark:text-darkPrimary-100 text-sm font-mono">{value}</span>
+const PriceChangeTicker = ({ label, value }: { label: string, value?: number }) => {
+  if (value === undefined || value === null) return null;
+  const color = value >= 0 ? 'text-green-500' : 'text-red-500';
+  return (
+    <div className="text-center bg-primary-100 dark:bg-darkPrimary-800 p-2 rounded-md flex-1">
+      <div className="text-xs text-primary-500 dark:text-darkPrimary-400">{label}</div>
+      <div className={`text-sm font-bold ${color}`}>{value.toFixed(2)}%</div>
+    </div>
+  );
+};
+
+const MetricCard = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: React.ReactNode }) => (
+    <div className="bg-primary-100 dark:bg-darkPrimary-800 p-4 rounded-lg">
+        <div className="flex items-center text-primary-500 dark:text-darkPrimary-400 mb-2">
+            {icon}
+            <span className="text-sm font-semibold ml-2">{label}</span>
+        </div>
+        <div className="text-xl font-bold text-primary-900 dark:text-darkPrimary-100 truncate">
+            {value}
         </div>
     </div>
 );
 
-const AuthorityStatus = ({ enabled, t, labelKey }: { enabled?: boolean, t: Function, labelKey: string }) => {
-    const color = enabled ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400';
-    const Icon = enabled ? <XCircle size={14} /> : <CheckCircle size={14} />;
-    const text = enabled ? t('yes') : t('no');
-
-    return (
-        <InfoItem 
-            label={t(labelKey)} 
-            value={
-                <div className={`flex items-center justify-end gap-2 font-semibold ${color}`}>
-                    {Icon}
-                    <span>{text}</span>
-                </div>
-            } 
-        />
-    );
-};
-
-const InfoCard = ({ title, icon, children }: { title: string | React.ReactNode, icon: React.ReactNode, children: React.ReactNode }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-lg h-full">
-        <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-accent-600 dark:text-darkAccent-400">
-            {icon} {title}
-        </h3>
-        <div className="space-y-1">
-            {children}
-        </div>
-    </div>
-);
 
 export default function TokenDetail() {
-    const { t, currentLanguage } = useAppContext();
+    const { t } = useAppContext();
     const params = useParams();
-    const searchParams = new URLSearchParams(window.location.search);
-    const from = searchParams.get('from');
-    
     const mintAddress = params?.['mint'];
 
     const [token, setToken] = useState<TokenDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [displayedDescription, setDisplayedDescription] = useState('');
-    const [isTranslating, setIsTranslating] = useState(false);
 
     useEffect(() => {
         if (!mintAddress) {
@@ -137,135 +98,67 @@ export default function TokenDetail() {
         const fetchTokenData = async () => {
             setLoading(true);
             setError(null);
-
             try {
+                const connection = new Connection(HELIUS_RPC_URL);
                 const heliusPromise = fetch(`https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ jsonrpc: '2.0', id: 'my-id', method: 'getAsset', params: { id: mintAddress } }),
-                });
-                const dexscreenerPromise = fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`);
-                const birdeyePromise = fetch(`https://public-api.birdeye.so/defi/token_overview?address=${mintAddress}`, {
-                    headers: { 'X-API-KEY': '52536b330424422c88f21556a5751221' } // It's a public key from their docs
-                });
+                }).then(res => res.json());
 
-                const [heliusResult, dexscreenerResult, birdeyeResult] = await Promise.allSettled([heliusPromise, dexscreenerPromise, birdeyePromise]);
+                const dexscreenerPromise = fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`).then(res => res.ok ? res.json() : null);
+                const jupiterPromise = fetch(`https://price.jup.ag/v4/price?ids=SOL`).then(res => res.json());
 
-                if (heliusResult.status === 'rejected' || (heliusResult.status === 'fulfilled' && !heliusResult.value.ok)) {
-                     throw new Error(`Helius API failed`);
-                }
-                const heliusData = await heliusResult.value.json();
+                const [heliusData, dexscreenerData, jupiterData] = await Promise.all([heliusPromise, dexscreenerPromise, jupiterPromise]);
+
                 const asset: HeliusAsset = heliusData.result;
                 if (!asset) throw new Error("Could not fetch asset metadata from Helius.");
 
-                let bestPair: DexScreenerPair | null = null;
-                if (dexscreenerResult.status === 'fulfilled' && dexscreenerResult.value.ok) {
-                    const dexscreenerData = await dexscreenerResult.value.json();
-                    if (dexscreenerData.pairs && dexscreenerData.pairs.length > 0) {
-                        bestPair = dexscreenerData.pairs
-                            .filter((p: any) => p.liquidity && p.liquidity.usd > 1000)
-                            .sort((a: any, b: any) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
-                    }
-                }
-                
-                let birdeyeData: BirdeyeTokenOverview = {};
-                if (birdeyeResult.status === 'fulfilled' && birdeyeResult.value.ok) {
-                    birdeyeData = await birdeyeResult.value.json();
-                }
+                const bestPair: DexScreenerPair | null = dexscreenerData?.pairs
+                    ?.filter((p: any) => p.liquidity && p.liquidity.usd > 1000)
+                    .sort((a: any, b: any) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0] ?? null;
 
-                const decimals = asset.token_info?.decimals ?? 0;
-
-                // --- NEW ROBUST SUPPLY LOGIC ---
-                let totalSupply = 0;
-                let circulatingSupply = 0;
-
-                // Priority 1: Birdeye data for both supplies
-                if (birdeyeData.data) {
-                    circulatingSupply = birdeyeData.data.circulatingSupply ?? 0;
-                    totalSupply = birdeyeData.data.supply ?? 0;
-                }
-                
-                // Priority 2: Fallback to on-chain for total supply if Birdeye fails
-                if (totalSupply === 0) {
-                     try {
-                        const connection = new Connection(HELIUS_RPC_URL);
-                        const supplyResponse = await connection.getTokenSupply(new PublicKey(mintAddress));
-                        if (supplyResponse.value.amount) {
-                            const totalSupplyFromChain = BigInt(supplyResponse.value.amount);
-                            totalSupply = Number(totalSupplyFromChain) / Math.pow(10, decimals);
-                        }
-                    } catch (e) {
-                        console.error("Failed to get token supply from RPC", e);
-                    }
-                }
-                
-                // Priority 3: Helius asset info as last resort for total supply
-                if (totalSupply === 0 && asset.token_info?.supply) {
-                    const totalSupplyFromHelius = BigInt(asset.token_info.supply);
-                     totalSupply = Number(totalSupplyFromHelius) / Math.pow(10, decimals);
-                }
-
-                // Fallback for circulating supply: if it's 0, use total supply.
-                if (circulatingSupply === 0 && totalSupply > 0) {
-                    circulatingSupply = totalSupply;
-                }
-                // --- END OF NEW SUPPLY LOGIC ---
-
-                const price = bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0;
-                
-                const formatAge = (timestamp?: number) => {
-                    if (timestamp === null || timestamp === undefined) return 'N/A';
-                    // Timestamps from dexscreener are in seconds. Let's do a sanity check.
-                    // If it's a huge number, it might be in ms. A recent timestamp in ms is > 1.5e12
-                    const date = new Date(timestamp > 1000000000000 ? timestamp : timestamp * 1000);
-                    if (isNaN(date.getTime())) {
-                        return 'N/A';
-                    }
-                    return new Intl.DateTimeFormat('en-CA').format(date);
-                };
-                
-                const creator = asset.authorities?.find(a => a.type === 'creator');
-                const updateAuthority = asset.authorities?.find(a => a.type === 'metadata_update_authority');
+                const solPrice = jupiterData.data.SOL.price;
+                const priceUsd = bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0;
 
                 const tokenData: TokenDetails = {
                     mintAddress: asset.id,
                     name: asset.content?.metadata?.name || 'Unknown Token',
-                    symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}...`,
+                    symbol: asset.content?.metadata?.symbol || 'N/A',
                     logo: <GenericTokenIcon uri={asset.content?.links?.image} className="w-12 h-12" />,
-                    description: { en: asset.content?.metadata?.description || 'No description provided.' },
-                    decimals: decimals,
-                    totalSupply: totalSupply,
-                    pricePerToken: price,
+                    decimals: asset.token_info?.decimals ?? 0,
+                    pricePerToken: priceUsd,
+                    priceSol: priceUsd > 0 && solPrice > 0 ? priceUsd / solPrice : 0,
                     price24hChange: bestPair?.priceChange?.h24 ?? 0,
+                    priceChange: {
+                        h1: bestPair?.priceChange?.h1,
+                        h6: bestPair?.priceChange?.h6,
+                    },
                     volume24h: bestPair?.volume?.h24 ?? 0,
                     liquidity: bestPair?.liquidity?.usd ?? 0,
-                    marketCap: price * circulatingSupply,
-                    fdv: bestPair?.fdv,
-                    holders: birdeyeData.data?.holders ?? 0,
-                    circulatingSupply: circulatingSupply,
+                    marketCap: bestPair?.fdv ? bestPair.fdv * (priceUsd / parseFloat(bestPair.priceUsd)) : 0, // Simplified MC calc
+                    fdv: bestPair?.fdv ?? 0,
+                    holders: 0,
+                    circulatingSupply: 0, 
+                    totalSupply: 0, 
                     pairAddress: bestPair?.pairAddress,
-                    txns: bestPair?.txns,
-                    totalTx24h: (bestPair?.txns?.h24.buys ?? 0) + (bestPair?.txns?.h24.sells ?? 0),
-                    poolCreated: formatAge(bestPair?.pairCreatedAt),
                     dexId: bestPair?.dexId,
-                    security: { 
-                        isMutable: !!updateAuthority,
-                        mintAuthorityRevoked: !asset.token_info?.mint_authority,
-                        freezeAuthorityRevoked: !asset.token_info?.freeze_authority,
-                    },
+                    deployerAddress: asset.authorities?.find(a => a.type === 'creator')?.address,
+                    txns: bestPair?.txns,
                     audit: {
-                        contractVerified: null, // N/A, requires specialized API
-                        isHoneypot: null, // N/A, requires specialized API
-                        isFreezable: !!asset.token_info?.freeze_authority,
                         isMintable: !!asset.token_info?.mint_authority,
+                        isFreezable: !!asset.token_info?.freeze_authority,
+                        contractVerified: null,
+                        isHoneypot: null,
                         alerts: 0,
                     },
-                    deployerAddress: creator?.address,
-                    balance: 0, 
+                    lpBurnedPercent: 0, // Placeholder
+                    balance: 0,
                     usdValue: 0,
+                    description: {},
+                    security: { isMutable: false, mintAuthorityRevoked: false, freezeAuthorityRevoked: false },
                 };
                 setToken(tokenData);
-
             } catch (err) {
                 console.error("Failed to fetch token details:", err);
                 setError(err instanceof Error ? err.message : "An unknown error occurred.");
@@ -277,139 +170,106 @@ export default function TokenDetail() {
         fetchTokenData();
     }, [mintAddress]);
 
-    useEffect(() => {
-        if (!token) return;
-
-        const englishDescription = token.description.en;
-        setDisplayedDescription(englishDescription); 
-        
-        const noDescriptionText = 'No description provided.';
-        if (currentLanguage.code === 'en' || englishDescription === noDescriptionText) {
-            setIsTranslating(false);
-            return;
-        }
-
-        const doTranslate = async () => {
-            setIsTranslating(true);
-            try {
-                const translatedText = await translateText(englishDescription, currentLanguage.name);
-                setDisplayedDescription(translatedText);
-            } catch (error) {
-                console.error("Translation failed:", error);
-                setDisplayedDescription(englishDescription);
-            } finally {
-                setIsTranslating(false);
-            }
-        };
-
-        doTranslate();
-
-    }, [token, currentLanguage]);
-
     if (loading) {
         return (
-            <div className="flex flex-col justify-center items-center h-96 space-y-4">
+            <div className="flex justify-center items-center h-96">
                 <Loader2 className="w-12 h-12 animate-spin text-accent-500 dark:text-darkAccent-500" />
-                <p className="text-primary-600 dark:text-darkPrimary-400">{t('profile_loading_tokens')}</p>
             </div>
         );
     }
-    
+
     if (error || !token) {
         return (
-            <div className="text-center py-10 animate-fade-in-up">
+            <div className="text-center py-10">
                 <h2 className="text-2xl font-bold">{t('token_not_found')}</h2>
                 {error && <p className="text-red-400 mt-2">{error}</p>}
-                 <Link to={from || '/dashboard'} className="text-accent-500 dark:text-darkAccent-500 hover:underline mt-4 inline-block flex items-center justify-center gap-2">
-                    <ArrowLeft size={16} />
-                    {from === '/profile' ? t('back_to_profile') : t('back_to_dashboard')}
-                </Link>
+                <a href="/" className="text-accent-500 hover:underline mt-4 inline-flex items-center gap-2">
+                    <ArrowLeft size={16} /> {t('back_to_dashboard')}
+                </a>
             </div>
         );
     }
-
-    const priceChangeColor = (token.price24hChange ?? 0) >= 0 ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400';
     
+    const hasWarnings = token.audit?.isMintable || token.audit?.isFreezable;
+
     return (
-        <div className="animate-fade-in-up space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 flex-shrink-0">{token.logo}</div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100 flex items-center gap-2">
-                            {token.name} <span className="text-primary-500 dark:text-darkPrimary-400 text-lg">({token.symbol})</span>
-                        </h1>
-                    </div>
-                </div>
-                 <div className="flex items-center gap-4 self-end sm:self-center">
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-primary-900 dark:text-darkPrimary-100">
-                            ${token.pricePerToken < 0.0001 ? token.pricePerToken.toPrecision(4) : token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
-                        </span>
-                        <span className={`font-semibold ${priceChangeColor}`}>
-                            {token.price24hChange?.toFixed(2)}%
-                        </span>
-                    </div>
-                </div>
-            </div>
-            
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <InfoCard title={t('market_stats')} icon={<BarChart2 size={20} />}>
-                    <InfoItem label={t('market_cap')} value={formatNumber(token.marketCap, 'currency')} />
-                    <InfoItem label={t('fully_diluted_valuation')} value={formatNumber(token.fdv, 'currency')} />
-                    <InfoItem label={t('liquidity')} value={formatNumber(token.liquidity, 'currency')} />
-                    <InfoItem label={t('volume_24h')} value={formatNumber(token.volume24h, 'currency')} />
-                </InfoCard>
-
-                <InfoCard title={t('token_distribution')} icon={<Users size={20} />}>
-                     <InfoItem label={t('holders')} value={token.holders > 0 ? formatNumber(token.holders) : 'N/A'} />
-                     <InfoItem label={t('circulating_supply')} value={formatNumber(token.circulatingSupply)} />
-                     <InfoItem label={t('total_supply')} value={formatNumber(token.totalSupply)} />
-                     <InfoItem label={t('total_transactions_24h')} value={token.totalTx24h?.toLocaleString() ?? 'N/A'} />
-                </InfoCard>
-
-                <InfoCard title={t('pool_info')} icon={<Briefcase size={20} />}>
-                    <InfoItem label={t('exchange')} value={<span className="capitalize">{token.dexId ?? 'N/A'}</span>} />
-                    {token.pairAddress && <InfoItem label={t('pair_address')} value={<AddressDisplay address={token.pairAddress} type="address" />} />}
-                    <InfoItem label={t('pool_age')} value={token.poolCreated ?? 'N/A'} />
-                    {token.deployerAddress && <InfoItem label={t('deployer_address')} value={<AddressDisplay address={token.deployerAddress} />} />}
-                </InfoCard>
-
-                <div className="lg:col-span-3">
-                    <InfoCard title={t('on_chain_security')} icon={<ShieldCheck size={20} />}>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6">
-                            <AuthorityStatus enabled={token.audit?.isMintable} t={t} labelKey="is_mintable" />
-                            <AuthorityStatus enabled={token.audit?.isFreezable} t={t} labelKey="is_freezable" />
-                            <InfoItem label={t('contract_verified')} value={
-                                <span className="font-semibold text-primary-500 dark:text-darkPrimary-400">{t('check_not_available')}</span>
-                            } />
-                            <InfoItem label={t('is_honeypot')} value={
-                                <span className="font-semibold text-primary-500 dark:text-darkPrimary-400">{t('check_not_available')}</span>
-                            } />
+        <div className="space-y-6 text-primary-900 dark:text-darkPrimary-100 animate-fade-in-up bg-primary-50 dark:bg-darkPrimary-950 -m-8 p-8 min-h-screen">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Column */}
+                <div className="lg:col-span-1 space-y-6">
+                    <div className="bg-white dark:bg-darkPrimary-900 p-6 rounded-xl shadow-lg">
+                        <div className="flex items-center gap-4 mb-4">
+                            {token.logo}
+                            <div>
+                                <h1 className="text-2xl font-bold">{token.name}</h1>
+                                <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold">{token.symbol}</p>
+                            </div>
                         </div>
-                    </InfoCard>
+                        <div className="space-y-2">
+                            <p className="text-4xl font-bold tracking-tight">
+                                {formatNumber(token.pricePerToken, { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 8 })}
+                            </p>
+                            <div className="flex items-center gap-2 text-lg font-semibold text-primary-600 dark:text-darkPrimary-300">
+                                <SolIcon className="w-5 h-5"/>
+                                <span>{token.priceSol?.toFixed(6)} SOL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-darkPrimary-900 p-4 rounded-xl shadow-lg flex gap-2">
+                        <PriceChangeTicker label="1H" value={token.priceChange?.h1} />
+                        <PriceChangeTicker label="6H" value={token.priceChange?.h6} />
+                        <PriceChangeTicker label="24H" value={token.price24hChange} />
+                    </div>
+                    
+                    <div className={`p-6 rounded-xl shadow-lg ${hasWarnings ? 'bg-amber-500/10' : 'bg-green-500/10'}`}>
+                        <div className="flex items-center gap-3 mb-2">
+                            {hasWarnings 
+                                ? <AlertTriangle className="w-8 h-8 text-amber-500" />
+                                : <CheckCircle className="w-8 h-8 text-green-500" />
+                            }
+                            <div>
+                                <h3 className="text-lg font-bold">{hasWarnings ? t('risk_warnings') : t('risk_passed')}</h3>
+                                <p className="text-xs text-primary-600 dark:text-darkPrimary-400">{t('verified_by_owfn')}</p>
+                            </div>
+                        </div>
+                        <p className="text-sm text-primary-700 dark:text-darkPrimary-300">
+                            {hasWarnings ? t('risk_factors_found') : t('no_risk_factors_found')}
+                        </p>
+                    </div>
+
+                    <a
+                        href={`https://jup.ag/swap/SOL-${token.mintAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full block text-center bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-4 rounded-lg text-lg hover:opacity-90 transition-opacity"
+                    >
+                        {t('swap')}
+                    </a>
                 </div>
 
-                 {token.description.en !== 'No description provided.' && (
-                    <div className="lg:col-span-3">
-                        <InfoCard 
-                            title={
-                                <div className="flex items-center gap-2">
-                                    <span>{t('token_description_title')}</span>
-                                    {isTranslating && <Loader2 className="w-4 h-4 animate-spin"/>}
-                                </div>
-                            } 
-                            icon={<Info size={20} />}
-                        >
-                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 whitespace-pre-wrap">{displayedDescription}</p>
-                        </InfoCard>
+                {/* Right Column */}
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="bg-white dark:bg-darkPrimary-900 p-6 rounded-xl shadow-lg">
+                        <h3 className="text-xl font-bold mb-2">{t('trading_stats')}</h3>
+                        <DualProgressBar
+                            label1={t('buys')}
+                            value1={token.txns?.h24.buys ?? 0}
+                            label2={t('sells')}
+                            value2={token.txns?.h24.sells ?? 0}
+                        />
                     </div>
-                 )}
-            </div>
 
-             <Link to={from || '/dashboard'} className="inline-flex items-center gap-2 text-sm text-accent-600 dark:text-darkAccent-400 hover:underline p-2 mt-2">
-                <ArrowLeft size={16} /> {from === '/profile' ? t('back_to_profile') : t('back_to_dashboard')}
-            </Link>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <MetricCard icon={<BarChart3 size={20}/>} label={t('market_cap')} value={formatNumber(token.marketCap, {style:'currency', currency: 'USD'})} />
+                        <MetricCard icon={<Droplets size={20}/>} label={t('liquidity')} value={formatNumber(token.liquidity, {style:'currency', currency: 'USD'})} />
+                        <MetricCard icon={<Flame size={20}/>} label={t('lp_burned')} value={`${token.lpBurnedPercent ?? 0}%`} />
+                        {token.deployerAddress && <MetricCard icon={<Users size={20}/>} label={t('deployer')} value={<AddressDisplay address={token.deployerAddress} className="text-base"/>} />}
+                        <MetricCard icon={<ShieldCheck size={20}/>} label={t('mint_authority')} value={<span className={token.audit?.isMintable ? 'text-red-500' : 'text-green-500'}>{token.audit?.isMintable ? t('enabled') : t('disabled')}</span>} />
+                        <MetricCard icon={<LockKeyhole size={20}/>} label={t('freeze_authority')} value={<span className={token.audit?.isFreezable ? 'text-red-500' : 'text-green-500'}>{token.audit?.isFreezable ? t('enabled') : t('disabled')}</span>} />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

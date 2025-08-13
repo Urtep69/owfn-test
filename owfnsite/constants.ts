@@ -1,3 +1,4 @@
+
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
@@ -114,7 +115,6 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         price24hChange: 0,
         holders: 0,
         circulatingSupply: 0,
-        poolCreated: '2024-07-20',
         dextScore: { score: 99, maxScore: 99, points: [20, 25, 20, 20, 14] },
         audit: { contractVerified: true, isHoneypot: false, isFreezable: false, isMintable: false, alerts: 0 },
         communityTrust: { positiveVotes: 1200, negativeVotes: 50, tradeCount: 1, totalTrades: 1250 },
@@ -136,7 +136,6 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         price24hChange: 0,
         holders: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A',
         pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDC': {
@@ -155,7 +154,6 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         price24hChange: 0,
         holders: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A',
         pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDT': {
@@ -174,7 +172,6 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         price24hChange: 0,
         holders: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A',
         pairAddress: '7xKXtg2CW87d97TXJSD40M5M5gajNdkgdsDEsMmL2trn', // SOL/USDT
     }
 };
