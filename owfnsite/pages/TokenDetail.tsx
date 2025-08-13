@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'wouter';
 import { Loader2, ArrowLeft, BarChart3, Droplets, Flame, Users, LockKeyhole, ShieldCheck, CheckCircle, AlertTriangle } from 'lucide-react';
@@ -73,20 +72,23 @@ export default function TokenDetail() {
             setError(null);
             try {
                 const response = await fetch(`/api/token-info?mint=${mintAddress}`);
+                
                 if (!response.ok) {
+                    const errorBody = await response.text();
                     let errorText = `Request failed with status ${response.status}`;
                     try {
-                        const errorData = await response.json();
-                        errorText = errorData.error || errorText;
+                        const errorJson = JSON.parse(errorBody);
+                        errorText = errorJson.error || errorText;
                     } catch (e) {
-                        // Fallback for non-JSON responses
-                        const text = await response.text();
-                        if (text) {
-                             errorText = text;
+                        // If the body is not JSON, use the raw text.
+                        // This handles HTML error pages from the server gracefully.
+                        if (errorBody) {
+                           errorText = errorBody;
                         }
                     }
                     throw new Error(errorText);
                 }
+
                 const data = await response.json();
 
                 const tokenData: TokenDetails = {
