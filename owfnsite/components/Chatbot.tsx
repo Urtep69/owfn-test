@@ -28,28 +28,45 @@ export const Chatbot = () => {
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
         const currentInput = input;
 
+        // Add user message and an empty placeholder for the model's response.
         setMessages(prev => [...prev, userMessage, { role: 'model', parts: [{ text: '' }] }]);
         setInput('');
         setIsLoading(true);
 
         try {
-            const responseText = await getChatbotResponse(historyForApi, currentInput, currentLanguage.code);
-            
-            setMessages(prev => {
-                const newMessages = [...prev];
-                const lastMessage = newMessages[newMessages.length - 1];
-                if (lastMessage && lastMessage.role === 'model') {
-                    lastMessage.parts[0].text = responseText;
+            await getChatbotResponse(
+                historyForApi,
+                currentInput,
+                currentLanguage.code,
+                (chunk) => { // onChunk: Append text to the last message
+                    setMessages(prev => {
+                        const newMessages = [...prev];
+                        const lastMessage = newMessages[newMessages.length - 1];
+                        if (lastMessage && lastMessage.role === 'model') {
+                            lastMessage.parts[0].text += chunk;
+                        }
+                        return newMessages;
+                    });
+                },
+                (errorMsg) => { // onError: Display error in the last message bubble
+                    setMessages(prev => {
+                        const newMessages = [...prev];
+                        const lastMessage = newMessages[newMessages.length - 1];
+                        if (lastMessage && lastMessage.role === 'model') {
+                            lastMessage.parts[0].text = errorMsg;
+                        }
+                        return newMessages;
+                    });
                 }
-                return newMessages;
-            });
+            );
         } catch (error) {
-            console.error("Error processing chatbot response:", error);
-            setMessages(prev => {
+            console.error("Chatbot stream failed:", error);
+            // Fallback error message
+             setMessages(prev => {
                 const newMessages = [...prev];
                 const lastMessage = newMessages[newMessages.length - 1];
-                if (lastMessage && lastMessage.role === 'model') {
-                    lastMessage.parts[0].text = t('chatbot_error');
+                if (lastMessage && lastMessage.role === 'model' && lastMessage.parts[0].text === '') {
+                     lastMessage.parts[0].text = t('chatbot_error');
                 }
                 return newMessages;
             });
@@ -93,23 +110,19 @@ export const Chatbot = () => {
                         <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
                             <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
-                                <p className="text-sm whitespace-pre-wrap">{msg.parts[0].text}</p>
+                                {msg.parts[0].text ? (
+                                    <p className="text-sm whitespace-pre-wrap">{msg.parts[0].text}</p>
+                                ) : (
+                                    <div className="flex items-center space-x-1 py-2">
+                                        <span className="w-2 h-2 bg-accent-500 dark:bg-darkAccent-500 rounded-full animate-bounce delay-75"></span>
+                                        <span className="w-2 h-2 bg-accent-500 dark:bg-darkAccent-500 rounded-full animate-bounce delay-150"></span>
+                                        <span className="w-2 h-2 bg-accent-500 dark:bg-darkAccent-500 rounded-full animate-bounce delay-300"></span>
+                                    </div>
+                                )}
                             </div>
                             {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                         </div>
                     ))}
-                    {isLoading && messages[messages.length - 1]?.parts[0].text === '' && (
-                        <div className="flex items-start gap-3 justify-start">
-                            <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />
-                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-primary-100 dark:bg-darkPrimary-700 text-primary-800 dark:text-darkPrimary-200 rounded-bl-none">
-                                <div className="flex items-center space-x-1">
-                                    <span className="w-2 h-2 bg-accent-500 dark:bg-darkAccent-500 rounded-full animate-bounce delay-75"></span>
-                                    <span className="w-2 h-2 bg-accent-500 dark:bg-darkAccent-500 rounded-full animate-bounce delay-150"></span>
-                                    <span className="w-2 h-2 bg-accent-500 dark:bg-darkAccent-500 rounded-full animate-bounce delay-300"></span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                     <div ref={messagesEndRef} />
                 </div>
             </div>

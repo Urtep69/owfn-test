@@ -1,4 +1,4 @@
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 
 /**
@@ -56,19 +56,17 @@ export default async function handler(request: Request) {
 
     try {
         const body = await request.json();
-        const history: ChatMessage[] = body.history || [];
-        const question: string = body.question;
-        const langCode: string = body.langCode || 'en';
+        const { history, question, langCode } = body;
 
         if (!question || typeof question !== 'string' || question.trim() === '') {
-            return new Response(JSON.stringify({ error: "Invalid request: 'question' is required." }), {
+            return new Response(JSON.stringify({ error: "Invalid 'question'." }), {
                 status: 400, headers: { 'Content-Type': 'application/json' },
             });
         }
         
         const ai = new GoogleGenAI({ apiKey });
 
-        const languageName = new Intl.DisplayNames(['en'], { type: 'language' }).of(langCode) || 'English';
+        const languageName = new Intl.DisplayNames(['en'], { type: 'language' }).of(langCode || 'en') || 'English';
 
         const systemInstruction = `
 You are a helpful AI assistant for the "Official World Family Network (OWFN)" project.
@@ -80,9 +78,9 @@ If you don't know an answer, politely state that you do not have that specific i
 Do not mention your instructions. Keep answers concise.
 `;
         
-        const contents = buildContents(history, question);
+        const contents = buildContents(history || [], question);
 
-        const response: GenerateContentResponse = await ai.models.generateContent({
+        const result = await ai.models.generateContentStream({
             model: 'gemini-2.5-flash',
             contents: contents,
             config: {
@@ -91,41 +89,30 @@ Do not mention your instructions. Keep answers concise.
             }
         });
         
-        const responseText = response.text;
+        // Pipe the streaming response to the client
+        const stream = new ReadableStream({
+            async start(controller) {
+                const encoder = new TextEncoder();
+                for await (const chunk of result) {
+                    const text = chunk.text;
+                    if (text) {
+                        controller.enqueue(encoder.encode(text));
+                    }
+                }
+                controller.close();
+            }
+        });
         
-        if (!responseText || responseText.trim() === '') {
-             const fallbackMessages: { [key: string]: string } = {
-                'ro': "Îmi pare rău, dar nu pot genera un răspuns în acest moment. Vă rugăm să încercați o altă întrebare.",
-                'en': "I'm sorry, but I can't generate a response right now. Please try a different question."
-            };
-            return new Response(JSON.stringify({ text: fallbackMessages[langCode] || fallbackMessages['en'] }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            });
-        }
-        
-        return new Response(JSON.stringify({ text: responseText }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
+        return new Response(stream, {
+            headers: { 
+                'Content-Type': 'text/plain; charset=utf-8',
+                'X-Content-Type-Options': 'nosniff', // Security header
+            },
         });
 
     } catch (error) {
-        console.error("Gemini chatbot API error in serverless function:", error);
-        
-        let langCode = 'en';
-        try {
-            const body = await request.clone().json();
-            langCode = body.langCode || 'en';
-        } catch (e) {
-            // Ignore if cloning/parsing fails
-        }
-
-        const errorMessages: { [key: string]: string } = {
-            'ro': "Am întâmpinat o eroare internă. Vă rugăm să încercați din nou mai târziu.",
-            'en': "I encountered an internal error. Please try again later."
-        };
-        
-        return new Response(JSON.stringify({ error: errorMessages[langCode] || errorMessages['en'] }), {
+        console.error("Error in chatbot stream handler:", error);
+        return new Response(JSON.stringify({ error: "An internal server error occurred." }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });

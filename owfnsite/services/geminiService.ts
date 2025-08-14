@@ -1,6 +1,12 @@
 import type { ChatMessage } from '../types.ts';
 
-export async function getChatbotResponse(history: ChatMessage[], question: string, langCode: string): Promise<string> {
+export async function getChatbotResponse(
+  history: ChatMessage[],
+  question: string,
+  langCode: string,
+  onChunk: (chunk: string) => void,
+  onError: (errorMsg: string) => void
+): Promise<void> {
   try {
     const response = await fetch('/api/chatbot', {
       method: 'POST',
@@ -8,29 +14,39 @@ export async function getChatbotResponse(history: ChatMessage[], question: strin
       body: JSON.stringify({ history, question, langCode }),
     });
 
-    if (!response.ok) {
+    if (!response.ok || !response.body) {
       let errorMsg = `A server error occurred: ${response.status}`;
       try {
+        // Attempt to read a JSON error message from the server
         const errorData = await response.json();
         errorMsg = errorData.error || errorMsg;
-      } catch (e) { /* ignore JSON parsing errors */ }
-      
-      if (errorMsg.includes("I can't connect")) {
-         return "I can't connect to my brain right now. Please check your internet connection.";
-      } else {
-         return errorMsg;
+      } catch (e) { 
+        // If it's not JSON, try to read as text as a fallback
+        try {
+            const errorText = await response.text();
+            if (errorText) errorMsg = errorText;
+        } catch (textErr) { /* ignore fallback error */ }
       }
+      onError(errorMsg);
+      return;
     }
 
-    const data = await response.json();
-    return data.text || "Sorry, I received an empty response.";
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
 
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      onChunk(decoder.decode(value, { stream: true }));
+    }
   } catch (error) {
-    console.error("Chatbot service error:", error);
+    console.error("Chatbot service stream error:", error);
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      return "I can't connect to my brain right now. Please check your internet connection.";
+      onError("I can't connect to my brain right now. Please check your internet connection.");
     } else {
-      return "Sorry, I encountered a communication error. Please try again.";
+      onError("Sorry, I encountered a communication error. Please try again.");
     }
   }
 }
