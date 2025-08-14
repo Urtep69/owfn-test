@@ -44,63 +44,54 @@ export default async function handler(request: Request) {
             throw new Error(`Token mint not found or invalid response from Helius.`);
         }
         
-        const tokenInfo = asset.token_info || {};
-        const authorities = Array.isArray(asset.authorities) ? asset.authorities : [];
-        const ownership = asset.ownership || {};
-        const content = asset.content || {};
-        const metadata = content.metadata || {};
-        const links = content.links || {};
-        const splTokenInfo = asset.spl_token_info || {};
+        const tokenInfo = asset.token_info;
+        const authorities = asset.authorities;
+        const ownership = asset.ownership;
+        
+        const name = asset.content?.metadata?.name || 'Unknown Token';
+        const symbol = asset.content?.metadata?.symbol || 'N/A';
+        const logo = asset.content?.links?.image || null;
+        const decimals = tokenInfo?.decimals ?? 0;
 
-        const name = metadata.name || 'Unknown Token';
-        const symbol = metadata.symbol || 'N/A';
-        const logo = links.image || null;
-        const decimals = tokenInfo.decimals ?? 0;
-
-        const creatorAddress = authorities.find((a: any) => a?.scopes?.includes('owner'))?.address 
-            || authorities[0]?.address
-            || ownership.owner 
+        const creatorAddress = authorities?.find((a: any) => a?.scopes?.includes('owner'))?.address 
+            || authorities?.[0]?.address
+            || ownership?.owner 
             || 'Unknown';
 
         const updateAuthority = asset.compression?.compressed === false
-            ? authorities.find((a: any) => a?.scopes?.includes('metaplex_metadata_update'))?.address || null
+            ? authorities?.find((a: any) => a?.scopes?.includes('metaplex_metadata_update'))?.address || null
             : null;
             
         const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
-        const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
+        const tokenStandard = ownership?.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
         
         let totalSupply: number = 0;
-        const supplyRaw = tokenInfo.supply;
-        const decimalsValue = typeof decimals === 'number' && decimals >= 0 ? decimals : 0;
+        const supplyRaw = tokenInfo?.supply;
         
-        // **DEFINITIVE FIX**: Validate supply format before processing to prevent crashes.
         if (supplyRaw != null) {
             const supplyString = String(supplyRaw);
-            // Must be a string of digits to be valid for BigInt conversion.
             if (/^\d+$/.test(supplyString) && supplyString.length > 0) {
                 try {
                     const supplyBigInt = BigInt(supplyString);
-                    const divisor = 10n ** BigInt(decimalsValue);
-
+                    const divisor = 10n ** BigInt(decimals);
                     if (divisor > 0n) {
                          const wholePart = supplyBigInt / divisor;
                          const fractionalPart = supplyBigInt % divisor;
-                         const fractionalString = fractionalPart.toString().padStart(decimalsValue, '0');
+                         const fractionalString = fractionalPart.toString().padStart(decimals, '0');
                          totalSupply = parseFloat(`${wholePart}.${fractionalString}`);
-                    } else { // This case handles decimals = 0
+                    } else {
                          totalSupply = Number(supplyBigInt);
                     }
                 } catch (e) {
-                    console.error(`CRASH prevented during totalSupply calculation for mint ${mintAddress}. Supply: "${supplyString}", Decimals: ${decimalsValue}. Error: ${e instanceof Error ? e.message : String(e)}`);
-                    totalSupply = 0; // Fallback to 0 on any parsing error.
+                    console.error(`CRASH prevented during totalSupply calculation for mint ${mintAddress}. Supply: "${supplyString}", Decimals: ${decimals}. Error: ${e instanceof Error ? e.message : String(e)}`);
+                    totalSupply = 0;
                 }
             } else {
-                 console.warn(`Invalid supply format encountered for mint ${mintAddress}. Supply: "${supplyString}". Defaulting to 0.`);
                  totalSupply = 0;
             }
         }
 
-        const tokenExtensionsRaw = splTokenInfo.token_extensions;
+        const tokenExtensionsRaw = asset.spl_token_info?.token_extensions;
         const tokenExtensions = (Array.isArray(tokenExtensionsRaw) ? tokenExtensionsRaw : []).map((ext: any) => {
             if (!ext || typeof ext !== 'object') return null;
             return {
@@ -120,8 +111,8 @@ export default async function handler(request: Request) {
             decimals,
             totalSupply,
             creatorAddress,
-            mintAuthority: tokenInfo.mint_authority || null,
-            freezeAuthority: tokenInfo.freeze_authority || null,
+            mintAuthority: tokenInfo?.mint_authority || null,
+            freezeAuthority: tokenInfo?.freeze_authority || null,
             updateAuthority,
             tokenStandard,
             tokenExtensions,
