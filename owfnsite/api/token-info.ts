@@ -69,25 +69,34 @@ export default async function handler(request: Request) {
         const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
         const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
         
-        let totalSupply = 0;
-        // **CRITICAL FIX**: Ensure `tokenInfo.supply` is a valid string before using BigInt to prevent crashes.
-        if (tokenInfo.supply != null && typeof tokenInfo.supply === 'string') {
-            try {
-                const supplyBigInt = BigInt(tokenInfo.supply);
-                const decimalsValue = typeof decimals === 'number' && decimals >= 0 ? decimals : 0;
-                const divisor = 10n ** BigInt(decimalsValue);
+        let totalSupply: number = 0;
+        const supplyRaw = tokenInfo.supply;
+        const decimalsValue = typeof decimals === 'number' && decimals >= 0 ? decimals : 0;
+        
+        // **DEFINITIVE FIX**: Validate supply format before processing to prevent crashes.
+        if (supplyRaw != null) {
+            const supplyString = String(supplyRaw);
+            // Must be a string of digits to be valid for BigInt conversion.
+            if (/^\d+$/.test(supplyString) && supplyString.length > 0) {
+                try {
+                    const supplyBigInt = BigInt(supplyString);
+                    const divisor = 10n ** BigInt(decimalsValue);
 
-                if (divisor > 0n) {
-                     const wholePart = supplyBigInt / divisor;
-                     const fractionalPart = supplyBigInt % divisor;
-                     const fractionalString = fractionalPart.toString().padStart(decimalsValue, '0');
-                     totalSupply = parseFloat(`${wholePart}.${fractionalString}`);
-                } else {
-                     totalSupply = Number(supplyBigInt); // Should only happen if decimals is 0
+                    if (divisor > 0n) {
+                         const wholePart = supplyBigInt / divisor;
+                         const fractionalPart = supplyBigInt % divisor;
+                         const fractionalString = fractionalPart.toString().padStart(decimalsValue, '0');
+                         totalSupply = parseFloat(`${wholePart}.${fractionalString}`);
+                    } else { // This case handles decimals = 0
+                         totalSupply = Number(supplyBigInt);
+                    }
+                } catch (e) {
+                    console.error(`CRASH prevented during totalSupply calculation for mint ${mintAddress}. Supply: "${supplyString}", Decimals: ${decimalsValue}. Error: ${e instanceof Error ? e.message : String(e)}`);
+                    totalSupply = 0; // Fallback to 0 on any parsing error.
                 }
-            } catch (e) {
-                console.error(`CRASH during totalSupply calculation for mint ${mintAddress}. Supply: "${tokenInfo.supply}", Decimals: ${decimals}. Error: ${e instanceof Error ? e.message : String(e)}`);
-                totalSupply = 0; // Fallback to 0 on any parsing error
+            } else {
+                 console.warn(`Invalid supply format encountered for mint ${mintAddress}. Supply: "${supplyString}". Defaulting to 0.`);
+                 totalSupply = 0;
             }
         }
 
