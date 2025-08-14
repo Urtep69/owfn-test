@@ -1,4 +1,3 @@
-
 export const fr = {
     // Navigation
     home: 'Accueil',
@@ -150,7 +149,9 @@ export const fr = {
     donation_desc: 'Soutenez nos initiatives à impact social en faisant un don en crypto. Tous les fonds vont directement à la Trésorerie d\'Impact.',
     donation_message_title: 'Un Pont d\'Espoir, Construit par Vous',
     donation_message_p1: 'Au-delà du code et de la blockchain se trouve notre véritable mission : l\'humanité. Chaque transaction sur cette page est plus qu\'un simple transfert de valeur ; c\'est une main tendue à travers les continents, un signal que personne ne doit craindre d\'être oublié.',
-    donation_message_p2: 'Votre contribution, quelle que soit la crypto-monnaie choisie, se transforme. Elle devient la fondation d\'une nouvelle école, un havre de paix où le potentiel d\'un enfant peut s\'épanouir. Elle se transforme en soins médicaux vitaux pour une famille qui avait perdu tout espoir. Elle devient un repas chaud pour une personne marginalisée par la société, un logement digne pour une personne âgée, ou les matériaux nécessaires pour reconstruire une communauté dévastée par une catastrophe. Grâce à la transparence offerte par la blockchain Solana, l\'Official World Family Network garantit que votre générosité parvient à destination avec intégrité et détermination.',
+    donation_message_p2_part1: 'Votre contribution, quelle que soit la crypto-monnaie choisie, se transforme. Elle devient la fondation d\'une nouvelle école, un havre de paix où le potentiel d\'un enfant peut s\'épanouir. Elle se transforme en soins médicaux vitaux pour une famille qui avait perdu tout espoir. Elle devient un repas chaud pour une personne marginalisée par la société, un logement digne pour une personne âgée, ou les matériaux nécessaires pour reconstruire une communauté dévastée par une catastrophe. Grâce à la transparence offerte par la blockchain Solana, l\'',
+    donation_message_p2_project_name: 'Official World Family Network',
+    donation_message_p2_part2: ' garantit que votre générosité parvient à destination avec intégrité et détermination.',
     donation_message_p3: 'Votre contribution, quelle que soit sa taille, est une puissante déclaration de solidarité. C\'est la preuve qu\'une famille mondiale, unie par la compassion, peut changer le monde. Vous ne faites pas seulement un don ; vous rejoignez un mouvement dédié à la construction d\'un avenir meilleur.',
     donation_message_thanks: 'Pour cela, nous vous sommes profondément reconnaissants.',
     donation_solana_warning: `IMPORTANT : Les dons en USDC et USDT ne sont actuellement acceptés QUE depuis le réseau Solana. N'envoyez pas depuis un autre réseau (par exemple, Ethereum) car les fonds seront perdus et n'atteindront pas leur destination.`,

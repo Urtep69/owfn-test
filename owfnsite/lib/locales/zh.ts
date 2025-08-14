@@ -50,7 +50,13 @@ export const zh = {
     home_subtitle: '一个通过技术和人性建设更美好世界的愿景联合起来的全球网络。我们正在建立一个通过区块链连接全球家庭的运动，为真正的社会影响做出贡献。',
     core_message_title: '我们共同建立的运动',
     home_message: '这个项目的宏伟愿景只有在人类的支持下才能实现。通过购买我们的代币并在朋友、家人和同事中推广，您将成为全球变革运动的重要组成部分。这不仅仅是一个项目；它是我们共同建立的一个活生生的、为善的力量。',
-    
+    home_feature_impact_title: '真正的影响',
+    home_feature_impact_desc: '利用区块链为健康、教育和基本需求提供100%透明的援助。',
+    home_feature_community_title: '社区驱动',
+    home_feature_community_desc: '我们的力量在于我们的社区。您的支持直接推动了全球的社会倡议。',
+    home_feature_solana_title: '由Solana驱动',
+    home_feature_solana_desc: '利用Solana区块链的速度和低成本实现高效和可扩展的操作。',
+
     // About Page
     about_title: '关于 OWFN',
     about_subtitle: '为了社会公益而建立一个团结的全球家庭。',
@@ -143,7 +149,9 @@ export const zh = {
     donation_desc: '通过捐赠加密货币来支持我们的社会影响力倡议。所有资金将直接进入影响力金库。',
     donation_message_title: '由您建造的希望之桥',
     donation_message_p1: '在代码和区块链之外，是我们真正的使命：人性。此页面上的每一笔交易都不仅仅是价值的转移；它是跨越大陆的援助之手，是一个信号，表明没有人需要害怕被遗忘。',
-    donation_message_p2: '您的贡献，无论选择何种加密货币，都会发生转变。它成为一所新学校的基础，一个孩子潜力得以绽放的安全港湾。它变成了一个失去所有希望的家庭的救命医疗。它成为社会边缘化人士的一顿热饭，一位长者的有尊严的家，或者重建受灾社区所需的材料。通过 Solana 区块链提供的透明度，官方世界家庭网络确保您的慷慨以诚信和目标到达目的地。',
+    donation_message_p2_part1: '您的贡献，无论选择何种加密货币，都会发生转变。它成为一所新学校的基础，一个孩子潜力得以绽放的安全港湾。它变成了一个失去所有希望的家庭的救命医疗。它成为社会边缘化人士的一顿热饭，一位长者的有尊严的家，或者重建受灾社区所需的材料。通过 Solana 区块链提供的透明度，',
+    donation_message_p2_project_name: '官方世界家庭网络',
+    donation_message_p2_part2: '确保您的慷慨以诚信和目标到达目的地。',
     donation_message_p3: '您的贡献，无论大小，都是团结的有力宣言。它证明了由同情心联合起来的全球大家庭可以改变世界。您不仅仅是在捐赠；您正在加入一个致力于建设更美好未来的运动。',
     donation_message_thanks: '为此，我们深表感谢。',
     donation_solana_warning: '重要提示：USDC 和 USDT 的捐赠目前仅接受来自 Solana 网络。请勿从任何其他网络（例如以太坊）发送，否则资金将丢失且无法到达目的地。',
