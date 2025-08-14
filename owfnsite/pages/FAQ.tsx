@@ -16,21 +16,22 @@ const faqKeys = [
     { q: 'faq_q10', a: 'faq_a10' },
 ];
 
-const FaqItem = ({ q, a, isOpen, onClick }: { q: string, a: string, isOpen: boolean, onClick: () => void }) => {
+const FaqItem = ({ qKey, aKey, isOpen, onClick }: { qKey: string, aKey: string, isOpen: boolean, onClick: () => void }) => {
+    const { t } = useAppContext();
     return (
         <div className="border-b border-primary-200 dark:border-darkPrimary-700 py-4">
             <button
                 onClick={onClick}
                 className="w-full flex justify-between items-center text-left text-lg font-semibold text-primary-800 dark:text-darkPrimary-200"
             >
-                <span>{q}</span>
+                <span>{t(qKey)}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} />
             </button>
             <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-screen mt-2' : 'max-h-0'}`}
             >
-                <p className="text-primary-600 dark:text-darkPrimary-400 leading-relaxed pt-2">
-                    {a}
+                <p className="text-primary-600 dark:text-darkPrimary-400 leading-relaxed pt-2 whitespace-pre-wrap">
+                    {t(aKey)}
                 </p>
             </div>
         </div>
@@ -39,7 +40,7 @@ const FaqItem = ({ q, a, isOpen, onClick }: { q: string, a: string, isOpen: bool
 
 export default function FAQ() {
     const { t } = useAppContext();
-    const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const [openIndex, setOpenIndex] = useState<number | null>(0);
 
     const handleToggle = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);
@@ -59,8 +60,8 @@ export default function FAQ() {
                 {faqKeys.map((item, index) => (
                     <FaqItem
                         key={index}
-                        q={t(item.q)}
-                        a={t(item.a)}
+                        qKey={item.q}
+                        aKey={item.a}
                         isOpen={openIndex === index}
                         onClick={() => handleToggle(index)}
                     />
