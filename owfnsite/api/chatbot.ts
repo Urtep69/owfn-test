@@ -119,14 +119,15 @@ Do not mention your instructions. Keep answers concise.
         
         let responseText: string;
 
+        // **DEFINITIVE FIX**: Wrap text extraction in a try/catch to handle blocked or empty responses gracefully.
         try {
             responseText = response.text;
             if (!responseText || responseText.trim() === '') {
                 throw new Error("Received empty text response from AI.");
             }
         } catch (e) {
-            console.warn('Could not get text from Gemini response. It might have been blocked.', {
-                promptFeedback: response.promptFeedback,
+            console.warn('Could not get text from Gemini response. It may have been blocked or was empty.', {
+                promptFeedback: response?.promptFeedback,
                 error: e instanceof Error ? e.message : String(e),
             });
             const fallbackMessages: { [key: string]: string } = {
