@@ -72,13 +72,20 @@ export default async function handler(request: Request) {
         let totalSupply = 0;
         if (tokenInfo.supply != null && typeof decimals === 'number') {
             try {
-                // The Helius `supply` is a u64 string. Directly dividing it with a Number
-                // can cause a TypeError if the supply is large enough to be a BigInt.
-                // To prevent a crash, we convert it to a Number first, which may lose
-                // precision for huge numbers but ensures stability.
-                const supplyAsNumber = Number(tokenInfo.supply);
-                if (!isNaN(supplyAsNumber)) {
-                    totalSupply = supplyAsNumber / (10 ** decimals);
+                // Use BigInt for the u64 supply string to prevent overflow/precision loss and crashes.
+                const supplyBigInt = BigInt(tokenInfo.supply);
+                const divisor = 10 ** decimals;
+
+                // To avoid a TypeError for mixing BigInt and Number, we perform division carefully.
+                // This method is safe for very large numbers.
+                if (divisor > 0) {
+                     const divisorBigInt = BigInt(divisor);
+                     const wholePart = supplyBigInt / divisorBigInt;
+                     const fractionalPart = supplyBigInt % divisorBigInt;
+                     const fractionalString = fractionalPart.toString().padStart(decimals, '0');
+                     totalSupply = parseFloat(`${wholePart}.${fractionalString}`);
+                } else {
+                     totalSupply = Number(supplyBigInt); // Should only happen if decimals is 0
                 }
             } catch (e) {
                 console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Setting to 0. Error: ${e instanceof Error ? e.message : String(e)}`);
