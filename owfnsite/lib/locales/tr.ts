@@ -116,6 +116,7 @@ export const tr = {
     presale_public_ending_in: 'Halka Açık Satış Bitiyor:',
     presale_sale_starts_in: 'Halka Açık Satış Başlıyor:',
     presale_sale_ended: 'Halka Açık Satış Bitti',
+    presale_ended_hardcap: 'Ön satış sona erdi: Hard Cap\'e ulaşıldı!',
     presale_project_info_title: 'Proje Bilgileri',
     token_name_label: 'Token Adı',
     token_symbol_label: 'Token Sembolü',
@@ -258,11 +259,11 @@ export const tr = {
     faq_a6: `Ayrıntılı OWFN Whitepaper'ını web sitemizin başlığındaki veya ana bölümündeki "Whitepaper" düğmesine tıklayarak bulabilirsiniz.`,
     faq_q7: `OWFN gerçek dünyada nasıl bir fark yaratıyor?`,
     faq_a7: `OWFN, sağlık (ör. ameliyat masraflarını karşılama, hastaneleri modernize etme), eğitim (ör. okullar, anaokulları inşa etme ve yenileme) ve temel ihtiyaçlar (ör. evsizlere yiyecek, barınak, giysi sağlama, huzurevleri kurma) gibi kritik alanlardaki girişimleri doğrudan finanse eder. Ayrıca afet yardımına yanıt veriyor ve sürdürülebilir topluluk geliştirme projelerine yatırım yapıyoruz. Her token bu somut eylemlere katkıda bulunarak insanlığa %100 gerçek destek sağlar.`,
-    faq_q8: `Token satın alarak yaptığım katkı gerçekten nasıl yardımcı oluyor?`,
+    faq_q8: 'Token satın alarak yaptığım katkı gerçekten nasıl yardımcı oluyor?',
     faq_a8: `Katkınız iki temel şekilde yardımcı olur. Birincisi, ön satış sırasında token satın aldığınızda, fonların önemli bir kısmı doğrudan Etki Hazinesine giderek sosyal projelerimizi başlatır. İkincisi, sürdürülebilir, uzun vadeli bir finansman kaynağı oluşturmak için, ön satış dönemi sona erdikten sonra tüm işlemlerde küçük bir %0,5 transfer ücreti etkinleştirilecektir. Bu ücret, Etki Hazinesine otomatik bir mikro bağış olarak tasarlanmıştır. Bu, gelecekte token her kullanıldığında, insani amaçlarımız için sürekli destek ürettiği ve tüm ekosistemi sürekli bir iyilik gücüne dönüştürdüğü anlamına gelir. Tüm bu finansal akışlar blok zincirinde tamamen şeffaftır.`,
-    faq_q9: `Token satın almanın ötesinde, OWFN'e nasıl dahil olabilir ve yardımcı olabilirim?`,
+    faq_q9: 'Token satın almanın ötesinde, OWFN\'e nasıl dahil olabilir ve yardımcı olabilirim?',
     faq_a9: `Katılımınız çok önemlidir! OWFN hakkında bilgi yaymak inanılmaz derecede güçlüdür. Misyonumuzu arkadaşlarınıza, ailenize ve meslektaşlarınıza anlatın. Vizyonumuzu sosyal medyada, seyahatlerinizde veya iş yerinizde paylaşın. Her konuşma, her paylaşım, farkındalığı artırmaya yardımcı olur ve küresel ailemize daha fazla insanı dahil ederek kolektif etkimizi artırır. Güncel kalmak ve tartışmalara katılmak için topluluk kanallarımıza katılın.`,
-    faq_q10: `USDC veya USDT bağışlamak için özel talimatlar var mı?`,
+    faq_q10: 'USDC veya USDT bağışlamak için özel talimatlar var mı?',
     faq_a10: `Evet, bu son derece önemlidir. Tüm USDC ve USDT bağışları *yalnızca* Solana blok zincirinden gönderilmelidir. Başka bir ağdan (örneğin Ethereum) göndermeyin, aksi takdirde fonlar kaybolur ve hedeflerine ulaşmaz. Bu bilgi bağış sayfasında da açıkça belirtilmiştir.`,
 
     // Chatbot
