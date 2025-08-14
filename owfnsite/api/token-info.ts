@@ -7,44 +7,35 @@ export default async function handler(request: Request) {
 
     if (!mintAddress) {
         return new Response(JSON.stringify({ error: "Mint address is required" }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
+            status: 400, headers: { 'Content-Type': 'application/json' },
         });
     }
 
     const HELIUS_API_KEY = process.env.API_KEY || process.env.HELIUS_API_KEY;
     if (!HELIUS_API_KEY) {
         return new Response(JSON.stringify({ error: "Server configuration error: Missing API Key." }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
+            status: 500, headers: { 'Content-Type': 'application/json' },
         });
     }
 
     try {
         const heliusUrl = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
-
-        // Fetch all data sources concurrently for performance
-        const [heliusResult, dexscreenerResult, solscanResult] = await Promise.allSettled([
-            fetch(heliusUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    jsonrpc: '2.0',
-                    id: 'my-id',
-                    method: 'getAsset',
-                    params: { id: mintAddress, displayOptions: { showFungible: true } },
-                }),
+        const response = await fetch(heliusUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 'my-id',
+                method: 'getAsset',
+                params: { id: mintAddress, displayOptions: { showFungible: true } },
             }),
-            fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`),
-            fetch(`https://api.solscan.io/v2/token/holders?token=${mintAddress}&offset=0&size=0`)
-        ]);
+        });
 
-        // --- Process Helius Data (Primary source for on-chain truth) ---
-        if (heliusResult.status === 'rejected' || !heliusResult.value.ok) {
+        if (!response.ok) {
             throw new Error(`Failed to fetch on-chain data from Helius.`);
         }
         
-        const heliusResponse = await heliusResult.value.json().catch(() => {
+        const heliusResponse = await response.json().catch(() => {
             throw new Error('Failed to parse Helius API response.');
         });
         
@@ -53,13 +44,14 @@ export default async function handler(request: Request) {
             throw new Error(`Token mint not found on-chain via Helius.`);
         }
         
-        // Safely access potentially missing nested objects by providing default empty objects
+        // Safely access potentially missing nested objects
         const tokenInfo = asset.token_info || {};
         const authorities = Array.isArray(asset.authorities) ? asset.authorities : [];
         const ownership = asset.ownership || {};
         const content = asset.content || {};
+        const metadata = content.metadata || {};
+        const links = content.links || {};
 
-        // Safely determine creator address with multiple fallbacks
         const creatorAddress = authorities.find((a: any) => a.scopes?.includes('owner'))?.address 
             || (authorities.length > 0 ? authorities[0].address : null) 
             || ownership.owner 
@@ -68,44 +60,23 @@ export default async function handler(request: Request) {
         const updateAuthority = !asset.compression?.compressed 
             ? authorities.find((a: any) => a.scopes?.includes('metaplex_metadata_update'))?.address || null
             : null;
-
+            
         const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
-        const tokenStandard = ownership.owner === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
+        const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
         
-        let totalSupply = 0;
         const decimals = tokenInfo.decimals ?? 0;
-        if (tokenInfo && tokenInfo.supply != null) {
+        let totalSupply = 0;
+        if (tokenInfo.supply != null) {
             try {
+                // Ensure supply is treated as a string to handle scientific notation or large numbers
                 const supplyString = String(tokenInfo.supply);
-                const integerString = supplyString.split('.')[0];
-                totalSupply = Number(BigInt(integerString)) / (10 ** decimals);
+                // Use BigInt for precision with large supply numbers
+                totalSupply = Number(BigInt(supplyString)) / (10 ** decimals);
             } catch (e) {
-                console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Falling back to 0.`);
+                console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}.`);
                 totalSupply = 0;
             }
         }
-
-        // --- Process Dexscreener Data ---
-        let bestPair = null;
-        if (dexscreenerResult.status === 'fulfilled' && dexscreenerResult.value.ok) {
-            const dexscreenerData = await dexscreenerResult.value.json().catch(() => null);
-            if (dexscreenerData && Array.isArray(dexscreenerData.pairs)) {
-                 bestPair = dexscreenerData.pairs
-                    .filter((p: any) => p?.liquidity?.usd > 1000)
-                    .sort((a: any, b: any) => (b?.liquidity?.usd ?? 0) - (a?.liquidity?.usd ?? 0))[0] ?? null;
-            }
-        }
-
-        // --- Process Solscan Data ---
-        let holders = 0;
-        if (solscanResult.status === 'fulfilled' && solscanResult.value.ok) {
-            const solscanData = await solscanResult.value.json().catch(() => null);
-            holders = solscanData?.data?.total ?? 0;
-        }
-        
-        const priceUsd = bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0;
-        const marketCap = bestPair?.fdv ?? (totalSupply > 0 && priceUsd > 0 ? totalSupply * priceUsd : 0);
-        const circulatingSupply = marketCap > 0 && priceUsd > 0 ? marketCap / priceUsd : totalSupply;
 
         const tokenExtensionsRaw = asset.spl_token_info?.token_extensions;
         const tokenExtensions = (Array.isArray(tokenExtensionsRaw) ? tokenExtensionsRaw : []).map((ext: any) => ({
@@ -116,31 +87,16 @@ export default async function handler(request: Request) {
             },
         }));
 
-        const responseData: TokenDetails = {
-            // Base Info
+        const responseData: Partial<TokenDetails> = {
+            // Base Info from Token interface
             mintAddress: asset.id,
-            name: content.metadata?.name || 'Unknown Token',
-            symbol: content.metadata?.symbol || 'N/A',
-            logo: content.links?.image,
+            name: metadata.name || 'Unknown Token',
+            symbol: metadata.symbol || 'N/A',
+            logo: links.image,
             decimals: decimals,
-            pricePerToken: priceUsd, balance: 0, usdValue: 0, description: {}, // Placeholder fields
-
-            // Market Data
-            price24hChange: bestPair?.priceChange?.h24 ?? 0,
-            priceChange: bestPair?.priceChange,
-            volume24h: bestPair?.volume?.h24 ?? 0,
-            liquidity: bestPair?.liquidity?.usd ?? 0,
-            marketCap,
-            fdv: bestPair?.fdv ?? 0,
-            pairAddress: bestPair?.pairAddress,
-            dexId: bestPair?.dexId,
-            txns: bestPair?.txns,
             
-            // On-chain Data
+            // On-chain technical details
             totalSupply,
-            circulatingSupply,
-            holders,
-            poolCreatedAt: bestPair?.pairCreatedAt,
             creatorAddress,
             mintAuthority: tokenInfo.mint_authority || null,
             freezeAuthority: tokenInfo.freeze_authority || null,
@@ -150,16 +106,14 @@ export default async function handler(request: Request) {
         };
 
         return new Response(JSON.stringify(responseData), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
+            status: 200, headers: { 'Content-Type': 'application/json' },
         });
 
     } catch (error) {
         console.error(`Token Info API error for mint ${mintAddress}:`, error);
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
         return new Response(JSON.stringify({ error: `Failed to fetch token data. Reason: ${errorMessage}` }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
+            status: 500, headers: { 'Content-Type': 'application/json' },
         });
     }
 }

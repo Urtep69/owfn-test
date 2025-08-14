@@ -64,13 +64,13 @@ export interface TokenExtension {
 }
 
 export interface TokenDetails extends Token {
-    description: Record<string, string>;
-    marketCap: number;
-    volume24h: number;
-    price24hChange: number;
-    holders: number;
+    description?: Record<string, string>;
+    marketCap?: number;
+    volume24h?: number;
+    price24hChange?: number;
+    holders?: number;
     totalSupply: number;
-    circulatingSupply: number;
+    circulatingSupply?: number;
     
     priceSol?: number;
     priceChange?: {
