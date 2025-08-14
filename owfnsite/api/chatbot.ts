@@ -2,64 +2,57 @@ import { GoogleGenAI } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 
 /**
- * The definitive, "last-generation" history builder.
- * This function is rewritten to be ultra-defensive. Instead of trying to repair a
- * potentially invalid history from the client, it meticulously reconstructs a new,
- * guaranteed-valid history from scratch. It enforces the Gemini API's strictest rules,
- * eliminating the root cause of unrecoverable server crashes (500 errors).
+ * The definitive, "anti-crash" history builder. This function is rewritten to be
+ * ultra-defensive against malformed client-side history, which was causing fatal
+ * server errors (500). It guarantees the history sent to the Gemini API is always
+ * valid by rebuilding it from scratch according to the API's strictest rules.
  *
- * Key guarantees:
- * 1. Pre-filters all incoming messages to discard anything malformed (nulls, wrong types, empty parts), preventing TypeErrors.
- * 2. Guarantees the conversation starts with the first valid 'user' message, as required by the API.
- * 3. Guarantees perfect role alternation (user, model, user, ...) by rebuilding the sequence.
- * 4. Guarantees the final message is the new user question, ensuring the conversation context is correct.
+ * Guarantees:
+ * 1. Starts by filtering for structurally sound messages to prevent type errors.
+ * 2. Scans for the *first valid user message* and discards anything before it,
+ *    enforcing the API's "must start with user" rule at all costs.
+ * 3. Rebuilds the history from that starting point, enforcing perfect role alternation.
+ * 4. Ensures the final history sent to the API ends with a 'model' turn before the new question is added.
  */
-function buildValidHistory(rawHistory: unknown, question: string): ChatMessage[] {
-    // Defensively ensure rawHistory is an array before proceeding.
-    if (!Array.isArray(rawHistory)) {
-        return [{ role: 'user', parts: [{ text: question }] }];
-    }
+function buildValidHistory(history: unknown, question: string): ChatMessage[] {
+    // 1. Defensively ensure history is an array and filter out malformed entries.
+    const cleanHistory = Array.isArray(history)
+        ? history.filter((msg): msg is ChatMessage =>
+            msg && typeof msg === 'object' &&
+            (msg.role === 'user' || msg.role === 'model') &&
+            Array.isArray(msg.parts) && msg.parts.length > 0 &&
+            typeof msg.parts[0]?.text === 'string' && msg.parts[0].text.trim() !== ''
+          )
+        : [];
 
-    // 1. Pre-filter the array to remove any malformed or empty messages.
-    // This is the most critical step to prevent TypeErrors on unexpected data structures.
-    const cleanHistory = rawHistory.filter((msg): msg is ChatMessage =>
-        msg &&
-        typeof msg === 'object' &&
-        (msg.role === 'user' || msg.role === 'model') &&
-        Array.isArray(msg.parts) &&
-        msg.parts.length > 0 &&
-        typeof msg.parts[0]?.text === 'string' &&
-        msg.parts[0].text.trim() !== ''
-    );
-
-    // 2. Find the starting point: the first valid user message.
+    // 2. Find the index of the first valid user message. This is the mandatory starting point.
     const firstUserIndex = cleanHistory.findIndex(msg => msg.role === 'user');
+
+    // If no user message exists, the conversation MUST start with the new question.
     if (firstUserIndex === -1) {
-        // If no user messages exist in the cleaned history, start a new conversation.
         return [{ role: 'user', parts: [{ text: question }] }];
     }
-    
-    const historySlice = cleanHistory.slice(firstUserIndex);
-    
-    // 3. Reconstruct the final history, enforcing strict role alternation.
-    const validHistory: ChatMessage[] = [];
-    if (historySlice.length > 0) {
-        validHistory.push(historySlice[0]); // Add the first user message
-    }
 
-    for (let i = 1; i < historySlice.length; i++) {
-        // The current message's role must be different from the previous one.
-        if (historySlice[i].role !== validHistory[validHistory.length - 1].role) {
-            validHistory.push(historySlice[i]);
+    // 3. Reconstruct the history from the first user message, ensuring strict alternation.
+    const validHistory: ChatMessage[] = [];
+    let lastRole: 'user' | 'model' | null = null;
+    
+    for (let i = firstUserIndex; i < cleanHistory.length; i++) {
+        const message = cleanHistory[i];
+        // The first message (guaranteed to be 'user') is always added.
+        // Subsequent messages are only added if their role is different from the previous one.
+        if (message.role !== lastRole) {
+            validHistory.push(message);
+            lastRole = message.role;
         }
     }
     
-    // 4. Ensure the history ends with a 'model' role before adding the new user question.
+    // 4. Ensure the history we send to the API ends with a 'model' turn.
     if (validHistory.length > 0 && validHistory[validHistory.length - 1].role === 'user') {
         validHistory.pop();
     }
     
-    // 5. Add the new user question. The sequence is now guaranteed to be valid.
+    // 5. Append the new user question to create the final turn.
     validHistory.push({ role: 'user', parts: [{ text: question }] });
 
     return validHistory;
