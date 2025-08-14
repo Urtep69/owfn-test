@@ -70,25 +70,23 @@ export default async function handler(request: Request) {
         const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
         
         let totalSupply = 0;
-        if (tokenInfo.supply != null && typeof decimals === 'number') {
+        // **CRITICAL FIX**: Ensure `tokenInfo.supply` is a valid string before using BigInt to prevent crashes.
+        if (tokenInfo.supply != null && typeof tokenInfo.supply === 'string') {
             try {
-                // Use BigInt for the u64 supply string to prevent overflow/precision loss and crashes.
                 const supplyBigInt = BigInt(tokenInfo.supply);
-                const divisor = 10 ** decimals;
+                const decimalsValue = typeof decimals === 'number' && decimals >= 0 ? decimals : 0;
+                const divisor = 10n ** BigInt(decimalsValue);
 
-                // To avoid a TypeError for mixing BigInt and Number, we perform division carefully.
-                // This method is safe for very large numbers.
-                if (divisor > 0) {
-                     const divisorBigInt = BigInt(divisor);
-                     const wholePart = supplyBigInt / divisorBigInt;
-                     const fractionalPart = supplyBigInt % divisorBigInt;
-                     const fractionalString = fractionalPart.toString().padStart(decimals, '0');
+                if (divisor > 0n) {
+                     const wholePart = supplyBigInt / divisor;
+                     const fractionalPart = supplyBigInt % divisor;
+                     const fractionalString = fractionalPart.toString().padStart(decimalsValue, '0');
                      totalSupply = parseFloat(`${wholePart}.${fractionalString}`);
                 } else {
                      totalSupply = Number(supplyBigInt); // Should only happen if decimals is 0
                 }
             } catch (e) {
-                console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Setting to 0. Error: ${e instanceof Error ? e.message : String(e)}`);
+                console.error(`CRASH during totalSupply calculation for mint ${mintAddress}. Supply: "${tokenInfo.supply}", Decimals: ${decimals}. Error: ${e instanceof Error ? e.message : String(e)}`);
                 totalSupply = 0; // Fallback to 0 on any parsing error
             }
         }

@@ -4,53 +4,49 @@ import type { ChatMessage } from '../types.ts';
 /**
  * Sanitizes and structures the chat history to ensure it's a valid, alternating sequence
  * of 'user' and 'model' roles, suitable for the Gemini API history argument.
- * This is a critical step to prevent API errors and server crashes.
+ * This function is defensively written to prevent any malformed input from crashing the server.
  * @param history The raw chat history from the client.
- * @returns A structured and valid chat history array that always ends with a model message.
+ * @returns A structured and valid chat history array that always ends with a model message or is empty.
  */
 function sanitizeAndStructureHistory(history: ChatMessage[]): ChatMessage[] {
     if (!Array.isArray(history) || history.length === 0) {
         return [];
     }
 
-    // 1. Filter out any malformed, empty, or invalid messages.
-    const validMessages = history.filter(msg =>
-        msg &&
-        (msg.role === 'user' || msg.role === 'model') &&
-        Array.isArray(msg.parts) &&
-        msg.parts.length > 0 &&
-        msg.parts[0] &&
-        typeof msg.parts[0].text === 'string' &&
-        msg.parts[0].text.trim().length > 0
+    const structuredHistory: ChatMessage[] = [];
+    let lastRole: 'user' | 'model' | null = null;
+
+    // Find the first valid user message to start the conversation
+    const firstUserIndex = history.findIndex(msg => 
+        msg && msg.role === 'user' && msg.parts?.[0]?.text?.trim()
     );
 
-    if (validMessages.length === 0) {
-        return [];
-    }
-    
-    // 2. Ensure history starts with a user message. Discard any leading model messages.
-    let firstUserIndex = validMessages.findIndex(msg => msg.role === 'user');
     if (firstUserIndex === -1) {
-        // No user messages found at all.
-        return [];
+        return []; // No valid user messages, so history is empty
     }
-    
-    const processedMessages = validMessages.slice(firstUserIndex);
 
-    // 3. Enforce strict alternation of roles.
-    const structuredHistory: ChatMessage[] = [processedMessages[0]];
-    for (let i = 1; i < processedMessages.length; i++) {
-        if (processedMessages[i].role !== structuredHistory[structuredHistory.length - 1].role) {
-            structuredHistory.push(processedMessages[i]);
+    for (let i = firstUserIndex; i < history.length; i++) {
+        const msg = history[i];
+
+        // Deeply validate message structure
+        if (!msg || !msg.role || !Array.isArray(msg.parts) || !msg.parts[0]?.text?.trim()) {
+            continue;
+        }
+
+        // Enforce strict role alternation
+        if (msg.role !== lastRole) {
+            structuredHistory.push(msg);
+            lastRole = msg.role;
         }
     }
-
-    // 4. The history provided to the API must end with a 'model' message.
-    // If the last message is from the user, pop it. It will be re-added later with the new question.
+    
+    // The history provided to the Gemini API must end with a 'model' role.
+    // If our sanitized history ends with a 'user' message, we must remove it.
+    // The new user question will be appended after this history.
     if (structuredHistory.length > 0 && structuredHistory[structuredHistory.length - 1].role === 'user') {
         structuredHistory.pop();
     }
-
+    
     return structuredHistory;
 }
 
