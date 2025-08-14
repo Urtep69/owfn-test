@@ -45,8 +45,6 @@ export default async function handler(request: Request) {
             throw new Error(`Token mint not found or invalid response from Helius.`);
         }
         
-        // --- Bulletproof Data Extraction ---
-        // Provide safe defaults for every potentially missing object.
         const tokenInfo = asset.token_info || {};
         const authorities = Array.isArray(asset.authorities) ? asset.authorities : [];
         const ownership = asset.ownership || {};
@@ -55,7 +53,6 @@ export default async function handler(request: Request) {
         const links = content.links || {};
         const splTokenInfo = asset.spl_token_info || {};
 
-        // Extract data with optional chaining and nullish coalescing at every step.
         const name = metadata.name || 'Unknown Token';
         const symbol = metadata.symbol || 'N/A';
         const logo = links.image || null;
@@ -76,9 +73,19 @@ export default async function handler(request: Request) {
         let totalSupply = 0;
         if (tokenInfo.supply != null) {
             try {
-                totalSupply = Number(BigInt(String(tokenInfo.supply))) / (10 ** decimals);
+                // This logic is made robust to handle various formats from the Helius API.
+                // It specifically handles cases where `supply` is a string with a decimal (e.g., "1000.0"),
+                // which would otherwise cause BigInt() to crash.
+                const supplyAsNumber = parseFloat(String(tokenInfo.supply));
+                if (!isNaN(supplyAsNumber)) {
+                    const supplyStringForBigInt = supplyAsNumber.toFixed(0);
+                    const supplyBigInt = BigInt(supplyStringForBigInt);
+                    totalSupply = Number(supplyBigInt) / (10 ** decimals);
+                } else {
+                    throw new Error("Supply is not a valid number.");
+                }
             } catch (e) {
-                console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Setting to 0.`);
+                console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Setting to 0. Error: ${e instanceof Error ? e.message : String(e)}`);
                 totalSupply = 0;
             }
         }
