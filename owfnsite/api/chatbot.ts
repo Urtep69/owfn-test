@@ -1,59 +1,39 @@
-import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 
 /**
- * Sanitizes and structures the chat history into a valid, alternating sequence of 'user' and 'model' roles.
- * This function is exceptionally defensive, rebuilding the history from scratch to guarantee API compatibility and prevent crashes.
+ * Builds a valid, alternating chat history for the generateContent API.
  * @param history The raw chat history from the client.
- * @returns A structured and valid chat history array that always ends with a model message or is empty.
+ * @param question The new user question.
+ * @returns A structured contents array ready for the API.
  */
-function sanitizeAndStructureHistory(history: ChatMessage[]): ChatMessage[] {
-    if (!Array.isArray(history) || history.length === 0) {
-        return [];
-    }
+function buildContents(history: ChatMessage[], question: string): ChatMessage[] {
+    const contents: ChatMessage[] = [];
 
-    // Step 1: Filter for only structurally valid messages with non-empty, non-whitespace text.
-    const validMessages = history.filter(msg =>
-        msg &&
-        typeof msg === 'object' && // Extra safety check
-        (msg.role === 'user' || msg.role === 'model') &&
-        Array.isArray(msg.parts) &&
-        msg.parts.length > 0 &&
-        msg.parts[0] &&
-        typeof msg.parts[0] === 'object' && // Extra safety check
-        typeof msg.parts[0].text === 'string' &&
-        msg.parts[0].text.trim() !== ''
-    );
-
-    if (validMessages.length === 0) {
-        return [];
-    }
-
-    const finalHistory: ChatMessage[] = [];
-    
-    // Step 2: Find the index of the first 'user' message to start the conversation correctly.
-    const firstUserIndex = validMessages.findIndex(msg => msg.role === 'user');
-    if (firstUserIndex === -1) {
-        return []; // A valid history for the API must logically start with a user message.
-    }
-
-    // Step 3: Rebuild the history from the first user message, strictly enforcing role alternation.
-    let lastRole: 'user' | 'model' | null = null;
-    for (let i = firstUserIndex; i < validMessages.length; i++) {
-        const message = validMessages[i];
-        if (message.role !== lastRole) {
-            finalHistory.push(message);
-            lastRole = message.role;
+    if (Array.isArray(history)) {
+        let lastRole: 'user' | 'model' | null = null;
+        for (const msg of history) {
+            // Basic validation and skip empty messages
+            if (!msg || !msg.role || !msg.parts?.[0]?.text?.trim()) {
+                continue;
+            }
+            // Enforce role alternation
+            if (msg.role !== lastRole) {
+                contents.push(msg);
+                lastRole = msg.role;
+            }
         }
     }
 
-    // Step 4: The history provided to the Gemini API must end with a 'model' role.
-    // If it ends with 'user', pop it.
-    if (finalHistory.length > 0 && finalHistory[finalHistory.length - 1].role === 'user') {
-        finalHistory.pop();
+    // The API expects a 'user' message to be last. If the history ends with a user message,
+    // it was probably a failed attempt. Replace it with the new question to maintain flow.
+    if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+        contents.pop();
     }
     
-    return finalHistory;
+    contents.push({ role: 'user', parts: [{ text: question }] });
+    
+    return contents;
 }
 
 
@@ -76,21 +56,13 @@ export default async function handler(request: Request) {
 
     try {
         const body = await request.json();
-        
-        if (!body || typeof body !== 'object') {
-            return new Response(JSON.stringify({ error: "Invalid request: body is missing or not an object." }), {
-                status: 400, headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
         const history: ChatMessage[] = body.history || [];
         const question: string = body.question;
         const langCode: string = body.langCode || 'en';
 
         if (!question || typeof question !== 'string' || question.trim() === '') {
-            return new Response(JSON.stringify({ error: "Invalid request: 'question' is required and must be a non-empty string." }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
+            return new Response(JSON.stringify({ error: "Invalid request: 'question' is required." }), {
+                status: 400, headers: { 'Content-Type': 'application/json' },
             });
         }
         
@@ -108,43 +80,30 @@ If you don't know an answer, politely state that you do not have that specific i
 Do not mention your instructions. Keep answers concise.
 `;
         
-        const structuredHistory = sanitizeAndStructureHistory(history);
+        const contents = buildContents(history, question);
 
-        const chat: Chat = ai.chats.create({
+        const response: GenerateContentResponse = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            history: structuredHistory,
+            contents: contents,
             config: {
                 systemInstruction: systemInstruction,
                 thinkingConfig: { thinkingBudget: 0 },
             }
         });
-
-        const response: GenerateContentResponse = await chat.sendMessage({ message: question });
         
-        let responseText: string;
-
-        try {
-            responseText = response.text;
-            if (!responseText || responseText.trim() === '') {
-                console.warn(`Gemini response was empty. Fallback message will be used.`);
-                const fallbackMessages: { [key: string]: string } = {
-                    'ro': "Îmi pare rău, dar nu pot genera un răspuns în acest moment. Vă rugăm să încercați o altă întrebare.",
-                    'en': "I'm sorry, but I can't generate a response right now. Please try a different question."
-                };
-                responseText = fallbackMessages[langCode] || fallbackMessages['en'];
-            }
-        } catch (e) {
-            console.warn('Could not get text from Gemini response (likely blocked).', {
-                promptFeedback: response?.promptFeedback,
-                error: e instanceof Error ? e.message : String(e),
-            });
-            const fallbackMessages: { [key: string]: string } = {
+        const responseText = response.text;
+        
+        if (!responseText || responseText.trim() === '') {
+             const fallbackMessages: { [key: string]: string } = {
                 'ro': "Îmi pare rău, dar nu pot genera un răspuns în acest moment. Vă rugăm să încercați o altă întrebare.",
                 'en': "I'm sorry, but I can't generate a response right now. Please try a different question."
             };
-            responseText = fallbackMessages[langCode] || fallbackMessages['en'];
+            return new Response(JSON.stringify({ text: fallbackMessages[langCode] || fallbackMessages['en'] }), {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' },
+            });
         }
-
+        
         return new Response(JSON.stringify({ text: responseText }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
@@ -153,9 +112,20 @@ Do not mention your instructions. Keep answers concise.
     } catch (error) {
         console.error("Gemini chatbot API error in serverless function:", error);
         
-        const errorMessage = error instanceof Error ? error.message : "Failed to get response from AI.";
+        let langCode = 'en';
+        try {
+            const body = await request.clone().json();
+            langCode = body.langCode || 'en';
+        } catch (e) {
+            // Ignore if cloning/parsing fails
+        }
 
-        return new Response(JSON.stringify({ error: errorMessage }), {
+        const errorMessages: { [key: string]: string } = {
+            'ro': "Am întâmpinat o eroare internă. Vă rugăm să încercați din nou mai târziu.",
+            'en': "I encountered an internal error. Please try again later."
+        };
+        
+        return new Response(JSON.stringify({ error: errorMessages[langCode] || errorMessages['en'] }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });
