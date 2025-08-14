@@ -36,9 +36,36 @@ export async function getChatbotResponse(
     const decoder = new TextDecoder();
     let buffer = '';
 
+    const processLine = (line: string) => {
+        if (line.trim() === '') return; // Skip empty lines
+        try {
+          const parsed = JSON.parse(line);
+
+          switch(parsed.type) {
+            case 'chunk':
+              onChunk(parsed.data);
+              break;
+            case 'error':
+              console.error('Chatbot stream error from server:', parsed.data);
+              onError(parsed.data);
+              return false; // Stop processing
+            case 'end':
+              return false; // Graceful end of stream
+            default:
+              console.warn('Received unknown message type from chatbot stream:', parsed.type);
+          }
+        } catch (e) {
+          console.error("Failed to parse chatbot stream JSON object:", line, e);
+        }
+        return true; // Continue processing
+    };
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) {
+        // Process any remaining data in the buffer before exiting.
+        // This handles cases where the stream ends without a final newline.
+        processLine(buffer);
         break;
       }
 
@@ -52,26 +79,9 @@ export async function getChatbotResponse(
       buffer = lines.pop() || ''; 
       
       for (const line of lines) {
-        if (line.trim() === '') continue; // Skip empty lines
-        try {
-          const parsed = JSON.parse(line);
-
-          switch(parsed.type) {
-            case 'chunk':
-              onChunk(parsed.data);
-              break;
-            case 'error':
-              console.error('Chatbot stream error from server:', parsed.data);
-              onError(parsed.data);
-              return; // Stop processing on error
-            case 'end':
-              return; // Graceful end of stream
-            default:
-              console.warn('Received unknown message type from chatbot stream:', parsed.type);
-          }
-        } catch (e) {
-          console.error("Failed to parse chatbot stream JSON object:", line, e);
-          // Don't call onError for a single malformed line, just log it.
+        if (!processLine(line)) {
+            // Error or end signal received, stop processing.
+            return;
         }
       }
     }
