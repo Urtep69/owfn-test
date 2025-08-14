@@ -116,6 +116,7 @@ export const hu = {
     presale_public_ending_in: 'Nyilvános Értékesítés Vége:',
     presale_sale_starts_in: 'Nyilvános Értékesítés Kezdete:',
     presale_sale_ended: 'Nyilvános Értékesítés Befejeződött',
+    presale_ended_hardcap: 'Elővásárlás befejeződött: Hard Cap elérve!',
     presale_project_info_title: 'Projekt Információk',
     token_name_label: 'Token Neve',
     token_symbol_label: 'Token Szimbóluma',
@@ -258,12 +259,9 @@ export const hu = {
     faq_a6: 'A részletes OWFN Whitepaper-t a weboldalunk fejlécében vagy fő szakaszában található "Whitepaper" gombra kattintva találja meg.',
     faq_q7: 'Hogyan tesz különbséget az OWFN a való világban?',
     faq_a7: 'Az OWFN közvetlenül finanszíroz kezdeményezéseket olyan kritikus területeken, mint az egészségügy (pl. műtéti költségek fedezése, kórházak modernizálása), az oktatás (pl. iskolák, óvodák építése és felújítása), és az alapvető szükségletek (pl. élelmiszer, menedék, ruházat biztosítása hajléktalanok számára, idősotthonok létrehozása). Katasztrófaelhárításra is reagálunk és fenntartható közösségfejlesztési projektekbe fektetünk. Minden token hozzájárul ezekhez a konkrét intézkedésekhez, 100%-ban valós támogatást biztosítva az emberiség számára.',
-    faq_q8: 'Hogyan segít valójában a hozzájárulásom a tokenek vásárlásával?',
-    faq_a8: 'A hozzájárulása két alapvető módon segít. Először is, amikor az elővásárlás során tokeneket vásárol, a pénzeszközök jelentős része közvetlenül a Hatás Kincstárba kerül a társadalmi projektjeink elindításához. Másodszor, a fenntartható, hosszú távú finanszírozási forrás megteremtése érdekében egy kis, 0,5%-os átutalási díjat aktiválunk minden tranzakción *az elővásárlási időszak lezárulta után*. Ez a díj automatikus mikro-adományként szolgál a Hatás Kincstár számára. Ez azt jelenti, hogy minden alkalommal, amikor a tokent a jövőben használják, folyamatos támogatást generál humanitárius ügyeink számára, az egész ökoszisztémát egy örökös jó erővé alakítva. Mindezek a pénzügyi folyamatok teljesen átláthatóak a blokkláncon.',
-    faq_q9: 'A tokenek vásárlásán túl hogyan vehetek még részt és segíthetek az OWFN-nek?',
-    faq_a9: 'Az Ön részvétele kulcsfontosságú! Az OWFN hírének terjesztése hihetetlenül hatékony. Beszéljen barátaival, családjával és kollégáival a küldetésünkről. Ossza meg víziónkat a közösségi médiában, utazásai során vagy a munkahelyén. Minden beszélgetés, minden megosztás segít növelni a tudatosságot és több embert vonz be globális családunkba, felerősítve kollektív hatásunkat. Csatlakozzon közösségi csatornáinkhoz, hogy naprakész maradjon és részt vegyen a vitákban.',
-    faq_q10: 'Vannak különleges utasítások az USDC vagy USDT adományozására?',
-    faq_a10: 'Igen, ez kritikusan fontos. Minden USDC és USDT adományt *kizárólag* a Solana blokkláncról kell küldeni. Ne küldjön más hálózatról (pl. Ethereum), mert a pénz elveszik és nem éri el a célját. Ez az információ az adományozási oldalon is egyértelműen fel van tüntetve.',
+    faq_a8: `A hozzájárulása két alapvető módon segít. Először is, amikor az elővásárlás során tokeneket vásárol, a pénzeszközök jelentős része közvetlenül a Hatás Kincstárba kerül a társadalmi projektjeink elindításához. Másodszor, a fenntartható, hosszú távú finanszírozási forrás megteremtése érdekében egy kis, 0,5%-os átutalási díjat aktiválunk minden tranzakción *az elővásárlási időszak lezárulta után*. Ez a díj automatikus mikro-adományként szolgál a Hatás Kincstár számára. Ez azt jelenti, hogy minden alkalommal, amikor a tokent a jövőben használják, folyamatos támogatást generál humanitárius ügyeink számára, az egész ökoszisztémát egy örökös jó erővé alakítva. Mindezek a pénzügyi folyamatok teljesen átláthatóak a blokkláncon.`,
+    faq_a9: `Az Ön részvétele kulcsfontosságú! Az OWFN hírének terjesztése hihetetlenül hatékony. Beszéljen barátaival, családjával és kollégáival a küldetésünkről. Ossza meg víziónkat a közösségi médiában, utazásai során vagy a munkahelyén. Minden beszélgetés, minden megosztás segít növelni a tudatosságot és több embert vonz be globális családunkba, felerősítve kollektív hatásunkat. Csatlakozzon közösségi csatornáinkhoz, hogy naprakész maradjon és részt vegyen a vitákban.`,
+    faq_a10: `Igen, ez kritikusan fontos. Minden USDC és USDT adományt *kizárólag* a Solana blokkláncról kell küldeni. Ne küldjön más hálózatról (pl. Ethereum), mert a pénz elveszik és nem éri el a célját. Ez az információ az adományozási oldalon is egyértelműen fel van tüntetve.`,
 
     // Chatbot
     chatbot_title: 'OWFN Asszisztens',

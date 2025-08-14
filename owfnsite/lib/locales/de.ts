@@ -1,4 +1,3 @@
-
 export const de = {
     // Navigation
     home: 'Startseite',
@@ -117,6 +116,7 @@ export const de = {
     presale_public_ending_in: 'Öffentlicher Verkauf endet in:',
     presale_sale_starts_in: 'Öffentlicher Verkauf beginnt in:',
     presale_sale_ended: 'Öffentlicher Verkauf beendet',
+    presale_ended_hardcap: 'Vorverkauf beendet: Hard Cap erreicht!',
     presale_project_info_title: 'Projektinformationen',
     token_name_label: 'Token-Name',
     token_symbol_label: 'Token-Symbol',
@@ -259,12 +259,9 @@ export const de = {
     faq_a6: `Das detaillierte OWFN-Whitepaper finden Sie, indem Sie auf die Schaltfläche "Whitepaper" in der Kopfzeile oder im Hauptbereich unserer Website klicken.`,
     faq_q7: `Wie bewirkt OWFN einen realen Unterschied?`,
     faq_a7: `OWFN finanziert direkt Initiativen in kritischen Bereichen wie Gesundheitswesen (z.B. Deckung von Operationskosten, Modernisierung von Krankenhäusern), Bildung (z.B. Bau und Renovierung von Schulen, Kindergärten) und Grundbedürfnisse (z.B. Bereitstellung von Nahrung, Unterkunft, Kleidung für Obdachlose, Einrichtung von Pflegeheimen). Wir reagieren auch auf Katastrophenhilfe und investieren in nachhaltige Gemeindeentwicklungsprojekte. Jeder Token trägt zu diesen konkreten Maßnahmen bei und gewährleistet 100% echte Unterstützung für die Menschheit.`,
-    faq_q8: `Wie hilft mein Beitrag durch den Kauf von Token wirklich?`,
-    faq_a8: `Ihr Beitrag hilft auf zwei grundlegende Weisen. Erstens, wenn Sie während des Vorverkaufs Token kaufen, fließt ein erheblicher Teil der Mittel direkt in die Impact Treasury, um unsere sozialen Projekte zu starten. Zweitens, um eine nachhaltige, langfristige Finanzierungsquelle zu schaffen, wird eine geringe Überweisungsgebühr von 0,5 % auf alle Transaktionen *nach* Abschluss des Vorverkaufszeitraums aktiviert. Diese Gebühr ist als automatische Mikrospende an die Impact Treasury konzipiert. Das bedeutet, dass jedes Mal, wenn der Token in Zukunft verwendet wird, er kontinuierliche Unterstützung für unsere humanitären Zwecke generiert und das gesamte Ökosystem in eine dauerhafte Kraft für das Gute verwandelt. Alle diese Finanzströme sind auf der Blockchain vollständig transparent.`,
-    faq_q9: `Wie kann ich mich über den Kauf von Token hinaus engagieren und OWFN helfen?`,
-    faq_a9: `Ihr Engagement ist entscheidend! Die Verbreitung von Informationen über OWFN ist unglaublich wirkungsvoll. Sprechen Sie mit Ihren Freunden, Ihrer Familie und Ihren Kollegen über unsere Mission. Teilen Sie unsere Vision in den sozialen Medien, auf Reisen oder bei der Arbeit. Jedes Gespräch, jede Teilung trägt zur Sensibilisierung bei und bringt mehr Menschen in unsere globale Familie, was unsere kollektive Wirkung verstärkt. Treten Sie unseren Community-Kanälen bei, um auf dem Laufenden zu bleiben und an Diskussionen teilzunehmen.`,
-    faq_q10: `Gibt es spezielle Anweisungen für Spenden von USDC oder USDT?`,
-    faq_a10: `Ja, das ist äußerst wichtig. Alle Spenden von USDC und USDT müssen *ausschließlich* aus dem Solana-Netzwerk gesendet werden. Senden Sie sie nicht von einem anderen Netzwerk (z. B. Ethereum), da die Gelder sonst verloren gehen und ihr Ziel nicht erreichen. Diese Information wird auch deutlich auf der Spendenseite angezeigt.`,
+    faq_q8: `Ihr Beitrag hilft auf zwei grundlegende Weisen. Erstens, wenn Sie während des Vorverkaufs Token kaufen, fließt ein erheblicher Teil der Mittel direkt in die Impact Treasury, um unsere sozialen Projekte zu starten. Zweitens, um eine nachhaltige, langfristige Finanzierungsquelle zu schaffen, wird eine geringe Überweisungsgebühr von 0,5 % auf alle Transaktionen *nach* Abschluss des Vorverkaufszeitraums aktiviert. Diese Gebühr ist als automatische Mikrospende an die Impact Treasury konzipiert. Das bedeutet, dass jedes Mal, wenn der Token in Zukunft verwendet wird, er kontinuierliche Unterstützung für unsere humanitären Zwecke generiert und das gesamte Ökosystem in eine dauerhafte Kraft für das Gute verwandelt. Alle diese Finanzströme sind auf der Blockchain vollständig transparent.`,
+    faq_q9: `Ihr Engagement ist entscheidend! Die Verbreitung von Informationen über OWFN ist unglaublich wirkungsvoll. Sprechen Sie mit Ihren Freunden, Ihrer Familie und Ihren Kollegen über unsere Mission. Teilen Sie unsere Vision in den sozialen Medien, auf Reisen oder bei der Arbeit. Jedes Gespräch, jede Teilung trägt zur Sensibilisierung bei und bringt mehr Menschen in unsere globale Familie, was unsere kollektive Wirkung verstärkt. Treten Sie unseren Community-Kanälen bei, um auf dem Laufenden zu bleiben und an Diskussionen teilzunehmen.`,
+    faq_q10: `Ja, das ist äußerst wichtig. Alle Spenden von USDC und USDT müssen *ausschließlich* aus dem Solana-Netzwerk gesendet werden. Senden Sie sie nicht von einem anderen Netzwerk (z. B. Ethereum), da die Gelder sonst verloren gehen und ihr Ziel nicht erreichen. Diese Information wird auch deutlich auf der Spendenseite angezeigt.`,
     
     // Chatbot
     chatbot_title: 'OWFN-Assistent',

@@ -47,7 +47,7 @@ export const it = {
     
     // Home Page
     home_title: 'La Rete Familiare Mondiale Ufficiale',
-    home_subtitle: 'Una rete globale unita dalla visione di costruire un mondo migliore attraverso la tecnologia e l\'umanità. Stiamo costruendo un movimento che connette le famiglie di tutto il mondo attraverso la blockchain per contribuire a un impatto sociale reale.',
+    home_subtitle: 'Una rete globale unita dalla visione di construire un mondo migliore attraverso la tecnologia e l\'umanità. Stiamo costruendo un movimento che connette le famiglie di tutto il mondo attraverso la blockchain per contribuire a un impatto sociale reale.',
     core_message_title: 'Un Movimento che Costruiamo Insieme',
     home_message: 'La grande visione di questo progetto può essere realizzata solo con il supporto dell\'umanità. Acquistando il nostro token e promuovendolo tra amici, familiari e colleghi, diventi una parte vitale di un movimento globale per il cambiamento. Questo non è solo un progetto; è una forza viva e pulsante per il bene che costruiamo insieme.',
     home_feature_impact_title: 'Impatto Reale',
@@ -61,7 +61,7 @@ export const it = {
     about_title: 'Riguardo a OWFN',
     about_subtitle: 'Costruire una famiglia globale unita per il bene sociale.',
     about_mission_title: 'La Nostra Missione',
-    about_mission_desc: 'L\'Official World Family Network (OWFN) ha la missione di costruire una rete globale che fornisca un supporto reale e trasparente al 100% all\'umanità. Assistiamo le persone ovunque, in qualsiasi momento, con bisogni essenziali sfruttando la potenza della tecnologia blockchain. Il nostro obiettivo è creare un sistema di aiuti decentralizzato che sia efficiente, responsabile e accessibile a tutti. Crediamo che collegando direttamente le persone alle cause, possiamo eliminare le inefficienze e garantire che l\'aiuto raggiunga coloro che ne hanno più bisogno.',
+    about_mission_desc: 'L\'Official World Family Network (OWFN) ha la missione di construire una rete globale che fornisca un supporto reale e trasparente al 100% all\'umanità. Assistiamo le persone ovunque, in qualsiasi momento, con bisogni essenziali sfruttando la potenza della tecnologia blockchain. Il nostro obiettivo è creare un sistema di aiuti decentralizzato che sia efficiente, responsabile e accessibile a tutti. Crediamo che collegando direttamente le persone alle cause, possiamo eliminare le inefficienze e garantire che l\'aiuto raggiunga coloro che ne hanno più bisogno.',
     about_vision_title: 'La Nostra Visione',
     about_vision_desc: 'Immaginiamo un mondo in cui i confini non limitano la compassione e il sostegno. Un mondo in cui la tecnologia ci unisce per risolvere problemi globali critici come la povertà, la mancanza di accesso all\'assistenza sanitaria e le disparità educative. OWFN mira ad essere più di un semplice progetto; è un movimento. Una forza viva e che respira per il bene, costruita e sostenuta da una comunità globale di individui che credono in un futuro migliore e più equo per tutti. Questa visione può essere raggiunta solo attraverso l\'azione collettiva e il sostegno incrollabile della nostra comunità.',
     about_impact_areas_title: 'Aree di Impatto',
@@ -116,6 +116,7 @@ export const it = {
     presale_public_ending_in: 'La Vendita Pubblica termina tra:',
     presale_sale_starts_in: 'La Vendita Pubblica inizia tra:',
     presale_sale_ended: 'Vendita Pubblica Terminata',
+    presale_ended_hardcap: 'Prevendita terminata: Hard Cap raggiunto!',
     presale_project_info_title: 'Informazioni sul Progetto',
     token_name_label: 'Nome Token',
     token_symbol_label: 'Simbolo Token',
@@ -229,7 +230,7 @@ export const it = {
     // Partnerships Page
     partnerships_title: 'Partnership e Collaborazioni Future',
     partnerships_focus_title: 'Il Nostro Focus Attuale',
-    partnerships_focus_desc: 'La nostra priorità assoluta in questa fase è garantire una prevendita di successo e costruire una solida e coinvolta base comunitaria. Questa è la roccia su cui verrà costruito il nostro impatto futuro.',
+    partnerships_focus_desc: 'La nostra priorità assoluta in questa fase è garantire una prevendita di successo e construire una solida e coinvolta base comunitaria. Questa è la roccia su cui verrà costruito il nostro impatto futuro.',
     partnerships_post_presale_intro: 'Dopo la conclusione positiva della prevendita, il nostro team inizierà il processo di ricerca e valutazione attiva di partnership strategiche.',
     partnerships_vision_title: 'Una Visione Condivisa per un Impatto Globale',
     partnerships_vision_desc: 'Crediamo che il cambiamento vero e significativo nasca dalla collaborazione. Non stiamo solo cercando partner; stiamo cercando alleati che condividano i nostri valori fondamentali e siano profondamente impegnati a creare un bene sociale reale, trasparente e duraturo.',
@@ -239,7 +240,7 @@ export const it = {
     partnerships_ideal_item_3: 'È impegnato in una visione a lungo termine di impatto sostenibile, non in guadagni a breve termine.',
     partnerships_invitation_title: 'Stai Pensando di Collaborare?',
     partnerships_invitation_desc: 'Se questa visione risuona con la tua organizzazione, ti invitiamo a seguire i nostri progressi. Prepara la tua proposta delineando come una collaborazione potrebbe amplificare la nostra missione condivisa. I dettagli di contatto verranno resi più evidenti e apriremo canali formali di discussione dopo la conclusione della fase di prevendita.',
-    partnerships_thank_you: 'Grazie per il tuo interesse nel costruire un mondo migliore con noi.',
+    partnerships_thank_you: 'Grazie per il tuo interesse nel construire un mondo migliore con noi.',
 
     // FAQ Page
     faq_title: 'Domande Frequenti',
@@ -258,12 +259,10 @@ export const it = {
     faq_a6: 'Puoi trovare il Whitepaper dettagliato di OWFN cliccando sul pulsante "Whitepaper" nell\'intestazione o nella sezione principale del nostro sito web.',
     faq_q7: 'In che modo OWFN fa la differenza nel mondo reale?',
     faq_a7: 'OWFN finanzia direttamente iniziative in aree critiche come la sanità (ad es. coprendo i costi chirurgici, modernizzando gli ospedali), l\'istruzione (ad es. costruendo e ristrutturando scuole, asili) e i bisogni di base (ad es. fornendo cibo, alloggio, vestiti per i senzatetto, creando case di riposo). Rispondiamo anche ai soccorsi in caso di calamità e investiamo in progetti di sviluppo comunitario sostenibile. Ogni token contribuisce a queste azioni concrete, garantendo un supporto reale al 100% all\'umanità.',
-    faq_q8: 'In che modo il mio contributo, attraverso l\'acquisto di token, aiuta veramente?',
     faq_a8: `Il tuo contributo aiuta in due modi fondamentali. In primo luogo, quando acquisti token durante la prevendita, una parte significativa dei fondi va direttamente nella Tesoreria di Impatto per lanciare i nostri progetti sociali. In secondo luogo, per creare una fonte di finanziamento sostenibile a lungo termine, una piccola commissione di trasferimento dello 0,5% sarà attivata su tutte le transazioni *dopo* la conclusione del periodo di prevendita. Questa commissione è progettata come una micro-donazione automatica alla Tesoreria di Impatto. Ciò significa che ogni volta che il token verrà utilizzato in futuro, genererà un sostegno continuo per le nostre cause umanitarie, trasformando l'intero ecosistema in una forza perpetua per il bene. Tutti questi flussi finanziari sono completamente trasparenti sulla blockchain.`,
-    faq_q9: 'Oltre all\'acquisto di token, in che altro modo posso essere coinvolto e aiutare OWFN?',
-    faq_a9: 'Il tuo coinvolgimento è cruciale! Spargere la voce su OWFN è incredibilmente potente. Parla della nostra missione ai tuoi amici, familiari e colleghi. Condividi la nostra visione sui social media, durante i tuoi viaggi o al lavoro. Ogni conversazione, ogni condivisione, aiuta ad aumentare la consapevolezza e porta più persone nella nostra famiglia globale, amplificando il nostro impatto collettivo. Unisciti ai nostri canali comunitari per rimanere aggiornato e partecipare alle discussioni.',
+    faq_q9: `Il tuo coinvolgimento è cruciale! Spargere la voce su OWFN è incredibilmente potente. Parla della nostra missione ai tuoi amici, familiari e colleghi. Condividi la nostra visione sui social media, durante i tuoi viaggi o al lavoro. Ogni conversazione, ogni condivisione, aiuta ad aumentare la consapevolezza e porta più persone nella nostra famiglia globale, amplificando il nostro impatto collettivo. Unisciti ai nostri canali comunitari per rimanere aggiornato e partecipare alle discussioni.`,
     faq_q10: 'Ci sono istruzioni speciali per donare USDC o USDT?',
-    faq_a10: 'Sì, questo è di importanza critica. Tutte le donazioni di USDC e USDT devono essere inviate *esclusivamente* dalla rete Solana. Non inviare da nessun\'altra rete (ad es. Ethereum), poiché i fondi andranno persi e non raggiungeranno la loro destinazione. Questa informazione è anche chiaramente visualizzata sulla pagina delle donazioni.',
+    faq_a10: `Sì, questo è di importanza critica. Tutte le donazioni di USDC e USDT devono essere inviate *esclusivamente* dalla rete Solana. Non inviare da nessun'altra rete (ad es. Ethereum), poiché i fondi andranno persi e non raggiungeranno la loro destinazione. Questa informazione è anche chiaramente visualizzata sulla pagina delle donazioni.`,
     
     // Chatbot
     chatbot_title: 'Assistente OWFN',

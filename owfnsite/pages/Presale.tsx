@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
@@ -143,57 +142,10 @@ export default function Presale() {
   const [isCheckingContribution, setIsCheckingContribution] = useState(false);
   
   const [presaleStatus, setPresaleStatus] = useState<'pending' | 'active' | 'ended'>('pending');
+  const [endReason, setEndReason] = useState<'date' | 'hardcap' | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  useEffect(() => {
-    const calculateState = () => {
-        const now = new Date();
-        const { startDate, endDate } = PRESALE_DETAILS;
-
-        // 1. Determine the current status
-        let newStatus: 'pending' | 'active' | 'ended';
-        if (now.getTime() < startDate.getTime()) {
-            newStatus = 'pending';
-        } else if (now.getTime() < endDate.getTime()) {
-            newStatus = 'active';
-        } else {
-            newStatus = 'ended';
-        }
-        setPresaleStatus(newStatus);
-
-        // 2. Determine the target date for the countdown based on the status
-        let targetDate: Date;
-        if (newStatus === 'pending') {
-            targetDate = startDate;
-        } else { // 'active' or 'ended' both count down to the end date
-            targetDate = endDate;
-        }
-
-        // 3. Calculate the time difference
-        const difference = targetDate.getTime() - now.getTime();
-
-        // 4. Update the time left state, only if there's time remaining and the sale isn't over
-        if (difference > 0 && newStatus !== 'ended') {
-            setTimeLeft({
-                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-                minutes: Math.floor((difference / 1000 / 60) % 60),
-                seconds: Math.floor((difference / 1000) % 60),
-            });
-        } else {
-            setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        }
-    };
-
-    calculateState(); // Run once immediately on mount
-    const timer = setInterval(calculateState, 1000); // And then every second
-
-    return () => clearInterval(timer); // Cleanup on unmount
-  }, []); // Empty dependency array ensures this runs only once
-
-
-  useEffect(() => {
-    const fetchPresaleProgress = async () => {
+  const fetchPresaleProgress = useCallback(async () => {
         if (new Date() < PRESALE_DETAILS.startDate) {
             setSoldSOL(0);
             return;
@@ -232,12 +184,63 @@ export default function Presale() {
             console.error("Failed to fetch presale progress:", error);
             setSoldSOL(0);
         }
+    }, []);
+
+  useEffect(() => {
+    const calculateState = () => {
+        const now = new Date();
+        const { startDate, endDate, hardCap } = PRESALE_DETAILS;
+
+        let newStatus: 'pending' | 'active' | 'ended';
+        let newEndReason: 'date' | 'hardcap' | null = null;
+        
+        if (soldSOL >= hardCap) {
+            newStatus = 'ended';
+            newEndReason = 'hardcap';
+        } else if (now.getTime() < startDate.getTime()) {
+            newStatus = 'pending';
+        } else if (now.getTime() < endDate.getTime()) {
+            newStatus = 'active';
+        } else {
+            newStatus = 'ended';
+            newEndReason = 'date';
+        }
+        setPresaleStatus(newStatus);
+        setEndReason(newEndReason);
+
+        let targetDate: Date;
+        if (newStatus === 'pending') {
+            targetDate = startDate;
+        } else {
+            targetDate = endDate;
+        }
+
+        const difference = targetDate.getTime() - now.getTime();
+
+        if (difference > 0 && newStatus !== 'ended') {
+            setTimeLeft({
+                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                minutes: Math.floor((difference / 1000 / 60) % 60),
+                seconds: Math.floor((difference / 1000) % 60),
+            });
+        } else {
+            setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        }
     };
-    
+
+    calculateState();
+    const timer = setInterval(calculateState, 1000);
+
+    return () => clearInterval(timer);
+  }, [soldSOL]);
+
+
+  useEffect(() => {
     fetchPresaleProgress();
     const interval = setInterval(fetchPresaleProgress, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchPresaleProgress]);
 
   useEffect(() => {
     const fetchUserContribution = async () => {
@@ -373,6 +376,7 @@ export default function Presale() {
             setSolAmount('');
             setUserContribution(prev => prev + numAmount);
             setSoldSOL(prev => prev + numAmount);
+            fetchPresaleProgress(); // Re-fetch progress immediately
         } else {
             alert(t(result.messageKey));
         }
@@ -440,7 +444,8 @@ export default function Presale() {
                             <p className="text-primary-500 dark:text-darkPrimary-400 text-sm">
                                 {presaleStatus === 'pending' && t('presale_sale_starts_in')}
                                 {presaleStatus === 'active' && t('presale_public_ending_in')}
-                                {presaleStatus === 'ended' && t('presale_sale_ended')}
+                                {presaleStatus === 'ended' && endReason === 'hardcap' && t('presale_ended_hardcap')}
+                                {presaleStatus === 'ended' && endReason !== 'hardcap' && t('presale_sale_ended')}
                             </p>
                             <p className="text-primary-800 dark:text-darkPrimary-100 text-2xl font-mono font-bold">
                                 {presaleStatus !== 'ended' ? 
