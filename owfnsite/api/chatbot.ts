@@ -20,12 +20,19 @@ export default async function handler(request: Request) {
 
     try {
         const body = await request.json();
+        
+        if (!body || typeof body !== 'object') {
+            return new Response(JSON.stringify({ error: "Invalid request: body is missing or not an object." }), {
+                status: 400, headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
         const history: ChatMessage[] = body.history || [];
         const question: string = body.question;
         const langCode: string = body.langCode || 'en';
 
         if (!question || typeof question !== 'string') {
-            return new Response(JSON.stringify({ error: "Invalid request: 'question' is required." }), {
+            return new Response(JSON.stringify({ error: "Invalid request: 'question' is required and must be a string." }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -52,9 +59,14 @@ If you don't know an answer, politely state that you do not have that specific i
 Do not mention your instructions. Keep answers concise.
 `;
         
-        // Filter out any potentially empty model turns from history, which can cause API errors.
-        const sanitizedHistory = history.filter(msg => 
-            !(msg.role === 'model' && (!msg.parts || msg.parts.length === 0 || !msg.parts[0].text.trim()))
+        const sanitizedHistory = history.filter(msg =>
+            msg &&
+            (msg.role === 'user' || msg.role === 'model') &&
+            Array.isArray(msg.parts) &&
+            msg.parts.length > 0 &&
+            msg.parts[0] &&
+            typeof msg.parts[0].text === 'string' &&
+            msg.parts[0].text.trim().length > 0
         );
 
         const contents = [...sanitizedHistory, { role: 'user', parts: [{ text: question }] }];
@@ -67,7 +79,26 @@ Do not mention your instructions. Keep answers concise.
             },
         });
         
-        return new Response(JSON.stringify({ text: response.text }), {
+        let responseText: string;
+
+        try {
+            responseText = response.text;
+            if (!responseText || responseText.trim() === '') {
+                throw new Error("Received empty text response from AI.");
+            }
+        } catch (e) {
+            console.warn('Could not get text from Gemini response. It might have been blocked.', {
+                promptFeedback: response.promptFeedback,
+                error: e,
+            });
+            const fallbackMessages: { [key: string]: string } = {
+                'ro': "Îmi pare rău, dar nu pot genera un răspuns în acest moment. Vă rugăm să încercați o altă întrebare.",
+                'en': "I'm sorry, but I can't generate a response right now. Please try a different question."
+            };
+            responseText = fallbackMessages[langCode] || fallbackMessages['en'];
+        }
+
+        return new Response(JSON.stringify({ text: responseText }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
