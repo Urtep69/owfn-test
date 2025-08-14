@@ -264,12 +264,15 @@ export const ro = {
     faq_q9: `Pe lângă cumpărarea de tokenuri, cum altfel mă pot implica și pot ajuta OWFN?`,
     faq_a9: `Implicarea dvs. este crucială! Răspândirea cuvântului despre OWFN este incredibil de puternică. Vorbiți cu prietenii, familia și colegii despre misiunea noastră. Împărtășiți viziunea noastră pe rețelele sociale, în timpul călătoriilor sau la locul de muncă. Fiecare conversație, fiecare distribuire, ajută la creșterea gradului de conștientizare și aduce mai mulți oameni în familia noastră globală, amplificând impactul nostru colectiv. Alăturați-vă canalelor noastre comunitare pentru a rămâne la curent și a participa la discuții.`,
     faq_q10: `Există instrucțiuni speciale pentru donarea de USDC sau USDT?`,
-    faq_a10: `Da, acest lucru este extrem de important. Toate donațiile de USDC și USDT trebuie trimise *exclusiv* de pe rețeaua Solana. Nu trimiteți din nicio altă rețea (de ex. Ethereum), deoarece fondurile se vor pierde și nu vor ajunge la destinație. Această informație este afișată clar și pe pagina de donații.`,
+    faq_a10: `Da, acest lucru este extrem de important. Toate donațiile de USDC și USDT trebuie trimise *exclusiv* de pe rețeauua Solana. Nu trimiteți din nicio altă rețea (de ex. Ethereum), deoarece fondurile se vor pierde și nu vor ajunge la destinație. Această informație este afișată clar și pe pagina de donații.`,
 
     // Chatbot
     chatbot_title: 'Asistent OWFN',
     chatbot_placeholder: 'Pune o întrebare...',
     chatbot_error: 'Ne pare rău, întâmpin probleme de conectare. Vă rugăm să încercați din nou mai târziu.',
+    chatbot_loading_1: 'Mă conectez la circuitele mele...',
+    chatbot_loading_2: 'Analizez întrebarea...',
+    chatbot_loading_3: 'Formulez un răspuns...',
     
     // Whitepaper
     whitepaper_title: 'Whitepaper OWFN',

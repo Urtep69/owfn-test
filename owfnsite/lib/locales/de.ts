@@ -270,6 +270,9 @@ export const de = {
     chatbot_title: 'OWFN-Assistent',
     chatbot_placeholder: 'Stellen Sie eine Frage...',
     chatbot_error: 'Entschuldigung, ich habe Verbindungsprobleme. Bitte versuchen Sie es später erneut.',
+    chatbot_loading_1: 'Verbinde...',
+    chatbot_loading_2: 'Analysiere...',
+    chatbot_loading_3: 'Formuliere...',
     
     // Whitepaper
     whitepaper_title: 'OWFN Whitepaper',

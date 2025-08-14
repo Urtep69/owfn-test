@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, User } from 'lucide-react';
+import { MessageCircle, X, Send, User, Loader2 } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -13,13 +13,24 @@ export const Chatbot = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [loadingText, setLoadingText] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const loadingIntervalRef = useRef<number | null>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(scrollToBottom, [messages, isLoading]);
+    useEffect(scrollToBottom, [messages, isLoading, loadingText]);
+    
+    // Cleanup interval on component unmount
+    useEffect(() => {
+        return () => {
+            if (loadingIntervalRef.current) {
+                window.clearInterval(loadingIntervalRef.current);
+            }
+        };
+    }, []);
 
     const handleSend = async () => {
         if (input.trim() === '' || isLoading) return;
@@ -28,49 +39,73 @@ export const Chatbot = () => {
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
         const currentInput = input;
 
-        // Add user message and an empty placeholder for the model's response.
-        setMessages(prev => [...prev, userMessage, { role: 'model', parts: [{ text: '' }] }]);
+        setMessages(prev => [...prev, userMessage]);
         setInput('');
         setIsLoading(true);
 
+        const loadingMessages = [
+            t('chatbot_loading_1'),
+            t('chatbot_loading_2'),
+            t('chatbot_loading_3'),
+        ];
+        let index = 0;
+        
+        const updateLoadingText = () => {
+            setLoadingText(loadingMessages[index]);
+            index = (index + 1) % loadingMessages.length;
+        };
+        
+        updateLoadingText(); // Set initial text immediately
+        loadingIntervalRef.current = window.setInterval(updateLoadingText, 2500);
+
         try {
+            let fullResponse = '';
+            let firstChunkReceived = false;
+
             await getChatbotResponse(
                 historyForApi,
                 currentInput,
                 currentLanguage.code,
                 (chunk) => { // onChunk: Append text to the last message
-                    setMessages(prev => {
-                        const newMessages = [...prev];
-                        const lastMessage = newMessages[newMessages.length - 1];
-                        if (lastMessage && lastMessage.role === 'model') {
-                            lastMessage.parts[0].text += chunk;
-                        }
-                        return newMessages;
-                    });
+                    if (loadingIntervalRef.current) {
+                        window.clearInterval(loadingIntervalRef.current);
+                        loadingIntervalRef.current = null;
+                        setIsLoading(false); // Stop loading animation
+                    }
+                    if (!firstChunkReceived) {
+                        setMessages(prev => [...prev, { role: 'model', parts: [{ text: chunk }] }]);
+                        firstChunkReceived = true;
+                    } else {
+                         setMessages(prev => {
+                            const newMessages = [...prev];
+                            const lastMessage = newMessages[newMessages.length - 1];
+                            if (lastMessage && lastMessage.role === 'model') {
+                                lastMessage.parts[0].text += chunk;
+                            }
+                            return newMessages;
+                        });
+                    }
                 },
-                (errorMsg) => { // onError: Display error in the last message bubble
-                    setMessages(prev => {
-                        const newMessages = [...prev];
-                        const lastMessage = newMessages[newMessages.length - 1];
-                        if (lastMessage && lastMessage.role === 'model') {
-                            lastMessage.parts[0].text = errorMsg;
-                        }
-                        return newMessages;
-                    });
+                (errorMsg) => { // onError: Display error in a new message bubble
+                    if (loadingIntervalRef.current) {
+                        window.clearInterval(loadingIntervalRef.current);
+                        loadingIntervalRef.current = null;
+                    }
+                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
                 }
             );
         } catch (error) {
             console.error("Chatbot stream failed:", error);
-            // Fallback error message
-             setMessages(prev => {
-                const newMessages = [...prev];
-                const lastMessage = newMessages[newMessages.length - 1];
-                if (lastMessage && lastMessage.role === 'model' && lastMessage.parts[0].text === '') {
-                     lastMessage.parts[0].text = t('chatbot_error');
-                }
-                return newMessages;
-            });
+            if (loadingIntervalRef.current) {
+                window.clearInterval(loadingIntervalRef.current);
+                loadingIntervalRef.current = null;
+            }
+             setMessages(prev => [...prev, { role: 'model', parts: [{ text: t('chatbot_error') }] }]);
         } finally {
+            if (loadingIntervalRef.current) {
+                window.clearInterval(loadingIntervalRef.current);
+                loadingIntervalRef.current = null;
+            }
             setIsLoading(false);
         }
     };
@@ -110,19 +145,22 @@ export const Chatbot = () => {
                         <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
                             <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
-                                {msg.parts[0].text ? (
-                                    <p className="text-sm whitespace-pre-wrap">{msg.parts[0].text}</p>
-                                ) : (
-                                    <div className="flex items-center space-x-1 py-2">
-                                        <span className="w-2 h-2 bg-accent-500 dark:bg-darkAccent-500 rounded-full animate-bounce delay-75"></span>
-                                        <span className="w-2 h-2 bg-accent-500 dark:bg-darkAccent-500 rounded-full animate-bounce delay-150"></span>
-                                        <span className="w-2 h-2 bg-accent-500 dark:bg-darkAccent-500 rounded-full animate-bounce delay-300"></span>
-                                    </div>
-                                )}
+                               <p className="text-sm whitespace-pre-wrap">{msg.parts[0].text}</p>
                             </div>
                             {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                         </div>
                     ))}
+                    {isLoading && (
+                         <div className="flex items-start gap-3 justify-start">
+                            <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />
+                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none">
+                                <div className="flex items-center space-x-2 text-sm text-primary-600 dark:text-darkPrimary-300">
+                                    <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
+                                    <span>{loadingText}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div ref={messagesEndRef} />
                 </div>
             </div>
