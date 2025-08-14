@@ -1,3 +1,4 @@
+
 export const nl = {
     // Navigation
     home: 'Home',
@@ -147,6 +148,11 @@ export const nl = {
     // Donations Page
     make_donation: 'Doe een Donatie',
     donation_desc: 'Steun onze sociale impactinitiatieven door crypto te doneren. Alle fondsen gaan rechtstreeks naar de Impact Treasury.',
+    donation_message_title: 'Een Brug van Hoop, door Jou Gebouwd',
+    donation_message_p1: 'Achter de code en de blockchain ligt onze ware missie: de mensheid. Elke transactie op deze pagina is meer dan alleen een overdracht van waarde; het is een uitgestoken helpende hand over continenten, een signaal dat niemand hoeft te vrezen vergeten te worden.',
+    donation_message_p2: 'Uw bijdrage, ongeacht de gekozen cryptovaluta, transformeert. Het wordt de fundering van een nieuwe school, een veilige haven waar het potentieel van een kind kan bloeien. Het wordt levensreddende medische zorg voor een familie die alle hoop had verloren. Het wordt een warme maaltijd voor iemand die door de maatschappij is gemarginaliseerd, een waardig thuis voor een oudere, of de materialen die nodig zijn om een door een ramp verwoeste gemeenschap weer op te bouwen. Door de transparantie die de Solana-blockchain biedt, zorgt het Official World Family Network ervoor dat uw vrijgevigheid met integriteit en doelgerichtheid zijn bestemming bereikt.',
+    donation_message_p3: 'Uw bijdrage, ongeacht de omvang, is een krachtige verklaring van solidariteit. Het is het bewijs dat een wereldwijde familie, verenigd door medeleven, de wereld kan veranderen. U doet niet zomaar een donatie; u sluit zich aan bij een beweging die zich inzet voor het bouwen van een betere toekomst.',
+    donation_message_thanks: 'Hiervoor zijn wij u diep dankbaar.',
     donation_solana_warning: 'BELANGRIJK: Donaties voor USDC en USDT worden momenteel ALLEEN geaccepteerd van het Solana-netwerk. Stuur niet vanuit een ander netwerk (bijv. Ethereum), aangezien de fondsen verloren gaan en hun bestemming niet zullen bereiken.',
     donation_fee_info: 'Directe donaties zijn momenteel kosteloos. Na afloop van de voorverkoop wordt een overdrachtskosten van 0,5% op alle $OWFN-transacties geactiveerd om de Impact Treasury permanent te financieren.',
     select_token: 'Selecteer Token',

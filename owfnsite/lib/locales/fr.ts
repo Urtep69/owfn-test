@@ -1,3 +1,4 @@
+
 export const fr = {
     // Navigation
     home: 'Accueil',
@@ -47,7 +48,7 @@ export const fr = {
     
     // Home Page
     home_title: 'Le Réseau Familial Mondial Officiel',
-    home_subtitle: `Un réseau mondial uni par la vision de construire un monde meilleur grâce à la technologie et à l'humanité. Nous construisons un mouvement qui connecte les familles du monde entier via la blockchain pour contribuer à un impact social réel.`,
+    home_subtitle: `Un réseau mondial uni par la vision de construire un monde meilleur grâce à la technologie et à l'humanité. Nous construisons un mouvement qui connecte les familles du monde entier via la blockchain pour contribuir à un impact social réel.`,
     core_message_title: 'Un mouvement que nous construisons ensemble',
     home_message: `La grande vision de ce projet ne peut être réalisée qu'avec le soutien de l'humanité. En achetant notre jeton et en le promouvant auprès de vos amis, de votre famille et de vos collègues, vous devenez un élément essentiel d'un mouvement mondial pour le changement. Ce n'est pas seulement un projet ; c'est une force vivante et agissante pour le bien que nous construisons ensemble.`,
     home_feature_impact_title: 'Impact Réel',
