@@ -43,7 +43,10 @@ export default async function handler(request: Request) {
         if (heliusResult.status === 'rejected' || !heliusResult.value.ok) {
             throw new Error(`Failed to fetch on-chain data from Helius.`);
         }
-        const heliusResponse = await heliusResult.value.json();
+        // Safely parse JSON
+        const heliusResponse = await heliusResult.value.json().catch(() => {
+            throw new Error('Failed to parse Helius API response.');
+        });
         const asset = heliusResponse?.result;
 
         if (!asset) {
@@ -127,7 +130,14 @@ export default async function handler(request: Request) {
             freezeAuthority: tokenInfo?.freeze_authority || null,
             updateAuthority,
             tokenStandard,
-            tokenExtensions: (asset.spl_token_info?.token_extensions || []).map((ext: any) => ({...ext, state: {...ext.state, mintDecimals: decimals}})),
+            // FIX: Safely spread the state object which might be null
+            tokenExtensions: (asset.spl_token_info?.token_extensions || []).map((ext: any) => ({
+                ...ext,
+                state: {
+                    ...(ext.state || {}),
+                    mintDecimals: decimals,
+                },
+            })),
         };
 
         return new Response(JSON.stringify(responseData), {
@@ -139,7 +149,7 @@ export default async function handler(request: Request) {
         console.error(`Token Info API error for mint ${mintAddress}:`, error);
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
         return new Response(JSON.stringify({ error: `Failed to fetch token data. Reason: ${errorMessage}` }), {
-            status: 502,
+            status: 500,
             headers: { 'Content-Type': 'application/json' },
         });
     }
