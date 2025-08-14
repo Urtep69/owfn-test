@@ -1,4 +1,3 @@
-
 export const ru = {
     // Navigation
     home: 'Главная',
