@@ -15,10 +15,12 @@ function sanitizeAndStructureHistory(history: ChatMessage[]): ChatMessage[] {
     // Step 1: Filter for only structurally valid messages with non-empty, non-whitespace text.
     const validMessages = history.filter(msg =>
         msg &&
+        typeof msg === 'object' && // Extra safety check
         (msg.role === 'user' || msg.role === 'model') &&
         Array.isArray(msg.parts) &&
         msg.parts.length > 0 &&
         msg.parts[0] &&
+        typeof msg.parts[0] === 'object' && // Extra safety check
         typeof msg.parts[0].text === 'string' &&
         msg.parts[0].text.trim() !== ''
     );

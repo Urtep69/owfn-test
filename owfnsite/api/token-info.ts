@@ -72,25 +72,14 @@ export default async function handler(request: Request) {
         const supplyRaw = tokenInfo?.supply;
         
         if (supplyRaw != null) {
-            const supplyString = String(supplyRaw);
-            if (/^\d+$/.test(supplyString) && supplyString.length > 0) {
-                try {
-                    const supplyBigInt = BigInt(supplyString);
-                    const divisor = 10n ** BigInt(decimals);
-                    if (divisor > 0n) {
-                         const wholePart = supplyBigInt / divisor;
-                         const fractionalPart = supplyBigInt % divisor;
-                         const fractionalString = fractionalPart.toString().padStart(decimals, '0');
-                         totalSupply = parseFloat(`${wholePart}.${fractionalString}`);
-                    } else {
-                         totalSupply = Number(supplyBigInt);
-                    }
-                } catch (e) {
-                    console.error(`CRASH prevented during totalSupply calculation for mint ${mintAddress}. Supply: "${supplyString}", Decimals: ${decimals}. Error: ${e instanceof Error ? e.message : String(e)}`);
-                    totalSupply = 0;
-                }
-            } else {
-                 totalSupply = 0;
+            try {
+                // Use standard Number and Math.pow for maximum stability, accepting
+                // potential precision loss for extremely large numbers over a server crash.
+                totalSupply = Number(supplyRaw) / Math.pow(10, decimals);
+            } catch (e) {
+                console.error(`Error calculating total supply for mint ${mintAddress}. Supply: "${supplyRaw}", Decimals: ${decimals}. Error: ${e instanceof Error ? e.message : String(e)}`);
+                // Fallback to 0 if any error occurs during calculation
+                totalSupply = 0;
             }
         }
 
