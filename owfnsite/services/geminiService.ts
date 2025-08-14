@@ -1,5 +1,6 @@
 import type { ChatMessage } from '../types.ts';
 
+// This is the new "ultramodern" service function that understands the JSON stream protocol.
 export async function getChatbotResponse(
   history: ChatMessage[],
   question: string,
@@ -14,18 +15,18 @@ export async function getChatbotResponse(
       body: JSON.stringify({ history, question, langCode }),
     });
 
+    // The server should always respond with 200 OK now, even for errors.
+    // But we keep this check for catastrophic server failures (e.g., function timeout).
     if (!response.ok || !response.body) {
       let errorMsg = `A server error occurred: ${response.status}`;
       try {
-        // Attempt to read a JSON error message from the server
         const errorData = await response.json();
         errorMsg = errorData.error || errorMsg;
-      } catch (e) { 
-        // If it's not JSON, try to read as text as a fallback
-        try {
+      } catch (e) {
+         try {
             const errorText = await response.text();
             if (errorText) errorMsg = errorText;
-        } catch (textErr) { /* ignore fallback error */ }
+        } catch (textErr) { /* ignore */ }
       }
       onError(errorMsg);
       return;
@@ -33,16 +34,49 @@ export async function getChatbotResponse(
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
+    let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) {
         break;
       }
-      onChunk(decoder.decode(value, { stream: true }));
+
+      // Append new data to buffer
+      buffer += decoder.decode(value, { stream: true });
+      
+      // Process complete JSON objects separated by newlines
+      const lines = buffer.split('\n');
+      
+      // Keep the last, possibly incomplete, line in the buffer
+      buffer = lines.pop() || ''; 
+      
+      for (const line of lines) {
+        if (line.trim() === '') continue; // Skip empty lines
+        try {
+          const parsed = JSON.parse(line);
+
+          switch(parsed.type) {
+            case 'chunk':
+              onChunk(parsed.data);
+              break;
+            case 'error':
+              console.error('Chatbot stream error from server:', parsed.data);
+              onError(parsed.data);
+              return; // Stop processing on error
+            case 'end':
+              return; // Graceful end of stream
+            default:
+              console.warn('Received unknown message type from chatbot stream:', parsed.type);
+          }
+        } catch (e) {
+          console.error("Failed to parse chatbot stream JSON object:", line, e);
+          // Don't call onError for a single malformed line, just log it.
+        }
+      }
     }
   } catch (error) {
-    console.error("Chatbot service stream error:", error);
+    console.error("Chatbot service fetch error:", error);
     if (error instanceof TypeError && error.message.includes('fetch')) {
       onError("I can't connect to my brain right now. Please check your internet connection.");
     } else {
@@ -50,6 +84,7 @@ export async function getChatbotResponse(
     }
   }
 }
+
 
 export const translateText = async (text: string, targetLanguage: string): Promise<string> => {
   // If there's no text to translate, return immediately to avoid API calls.
