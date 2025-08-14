@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: 'Acasă',
@@ -148,6 +147,11 @@ export const ro = {
     // Donations Page
     make_donation: 'Fă o Donație',
     donation_desc: 'Susține inițiativele noastre de impact social donând crypto. Toate fondurile merg direct către Trezoreria de Impact.',
+    donation_message_title: 'Un Pod al Speranței, Construit de Tine',
+    donation_message_p1: 'Dincolo de cod și de blockchain, se află adevărata noastră misiune: umanitatea. Fiecare tranzacție de pe această pagină este mai mult decât un simplu transfer de valoare; este o mână de ajutor întinsă peste continente, un semnal că nimănui nu trebuie să-i fie teamă că a fost uitat.',
+    donation_message_p2: 'Contribuția ta, indiferent de criptomoneda aleasă, se transformă. Devine fundația unei noi școli, un adăpost sigur unde potențialul unui copil poate înflori. Se transformă în îngrijire medicală vitală pentru o familie care își pierduse orice speranță. Devine o masă caldă pentru cineva marginalizat de societate, o casă demnă pentru un bătrân sau materialele necesare pentru a reconstrui o comunitate devastată de un dezastru. Prin transparența oferită de blockchain-ul Solana, Official World Family Network se asigură că generozitatea ta ajunge la destinație cu integritate și scop.',
+    donation_message_p3: 'Contribuția ta, indiferent de mărime, este o declarație puternică de solidaritate. Este dovada că o familie globală, unită de compasiune, poate schimba lumea. Nu faci doar o donație; te alături unei mișcări dedicate construirii unui viitor mai bun.',
+    donation_message_thanks: 'Pentru acest lucru, îți suntem profund recunoscători.',
     donation_solana_warning: `IMPORTANT: Donațiile în USDC și USDT sunt acceptate momentan DOAR din rețeaua Solana. Nu trimiteți din altă rețea (de ex. Ethereum), deoarece tokenii se vor pierde și nu vor ajunge ca donație.`,
     donation_fee_info: 'Donațiile directe sunt în prezent fără taxe. După încheierea prevânzării, o taxă de transfer de 0,5% pentru toate tranzacțiile cu $OWFN va fi activată pentru a finanța perpetuu Trezoreria de Impact.',
     select_token: 'Selectează Token',

@@ -1,4 +1,3 @@
-
 export const pt = {
     // Navigation
     home: 'Início',
@@ -148,6 +147,11 @@ export const pt = {
     // Donations Page
     make_donation: 'Fazer uma Doação',
     donation_desc: 'Apoie nossas iniciativas de impacto social doando cripto. Todos os fundos vão diretamente para a Tesouraria de Impacto.',
+    donation_message_title: 'Uma Ponte de Esperança, Construída por Você',
+    donation_message_p1: 'Além do código e da blockchain, está a nossa verdadeira missão: a humanidade. Cada transação nesta página é mais do que uma simples transferência de valor; é uma mão amiga estendida através dos continentes, um sinal de que ninguém precisa ter medo de ser esquecido.',
+    donation_message_p2: 'Sua contribuição, independentemente da criptomoeda escolhida, transforma-se. Torna-se a fundação de uma nova escola, um refúgio seguro onde o potencial de uma criança pode florescer. Transforma-se em cuidados médicos vitais para uma família que havia perdido toda a esperança. Torna-se uma refeição quente para alguém marginalizado pela sociedade, um lar digno para um idoso, ou os materiais necessários para reconstruir uma comunidade devastada por um desastre. Através da transparência oferecida pela blockchain Solana, a Official World Family Network garante que sua generosidade chegue ao seu destino com integridade e propósito.',
+    donation_message_p3: 'Sua contribuição, não importa o tamanho, é uma poderosa declaração de solidariedade. É a prova de que uma família global, unida pela compaixão, pode mudar o mundo. Você não está apenas fazendo uma doação; você está se juntando a um movimento dedicado a construir um futuro melhor.',
+    donation_message_thanks: 'Por isso, somos profundamente gratos.',
     donation_solana_warning: `IMPORTANTE: Doações de USDC e USDT são atualmente aceitas APENAS da rede Solana. Não envie de nenhuma outra rede (ex: Ethereum), pois os fundos serão perdidos e não chegarão ao seu destino.`,
     donation_fee_info: 'Doações diretas estão atualmente isentas de taxas. Após a conclusão da pré-venda, uma taxa de transferência de 0,5% em todas as transações de $OWFN será ativada para financiar perpetuamente a Tesouraria de Impacto.',
     select_token: 'Selecionar Token',

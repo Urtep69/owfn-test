@@ -1,4 +1,3 @@
-
 export const de = {
     // Navigation
     home: 'Startseite',
@@ -148,6 +147,11 @@ export const de = {
     // Donations Page
     make_donation: 'Spenden',
     donation_desc: 'Unterstützen Sie unsere sozialen Initiativen durch eine Krypto-Spende. Alle Gelder gehen direkt an die Impact Treasury.',
+    donation_message_title: 'Eine Brücke der Hoffnung, von Ihnen gebaut',
+    donation_message_p1: 'Jenseits von Code und Blockchain liegt unsere wahre Mission: die Menschlichkeit. Jede Transaktion auf dieser Seite ist mehr als nur eine Wertübertragung; es ist eine helfende Hand, die über Kontinente hinweg ausgestreckt wird, ein Signal, dass niemand fürchten muss, vergessen zu werden.',
+    donation_message_p2: 'Ihr Beitrag, unabhängig von der gewählten Kryptowährung, verwandelt sich. Er wird zum Fundament einer neuen Schule, einem sicheren Hafen, in dem das Potenzial eines Kindes aufblühen kann. Er verwandelt sich in lebenswichtige medizinische Versorgung für eine Familie, die alle Hoffnung verloren hatte. Er wird zu einer warmen Mahlzeit für jemanden, der von der Gesellschaft ausgegrenzt wird, zu einem würdigen Zuhause für einen Älteren oder zu den Materialien, die benötigt werden, um eine von einer Katastrophe zerstörte Gemeinschaft wieder aufzubauen. Durch die Transparenz, die die Solana-Blockchain bietet, stellt das Official World Family Network sicher, dass Ihre Großzügigkeit ihr Ziel mit Integrität und Zweck erreicht.',
+    donation_message_p3: 'Ihr Beitrag, egal wie groß, ist ein starkes Zeichen der Solidarität. Er ist der Beweis, dass eine globale Familie, vereint durch Mitgefühl, die Welt verändern kann. Sie tätigen nicht nur eine Spende; Sie schließen sich einer Bewegung an, die sich dem Aufbau einer besseren Zukunft widmet.',
+    donation_message_thanks: 'Dafür sind wir Ihnen zutiefst dankbar.',
     donation_solana_warning: `WICHTIG: Spenden für USDC und USDT werden derzeit NUR aus dem Solana-Netzwerk akzeptiert. Senden Sie nicht von einem anderen Netzwerk (z.B. Ethereum), da die Gelder sonst verloren gehen und ihr Ziel nicht erreichen.`,
     donation_fee_info: 'Direkte Spenden sind derzeit gebührenfrei. Nach Abschluss des Vorverkaufs wird eine Überweisungsgebühr von 0,5 % auf alle $OWFN-Transaktionen aktiviert, um die Impact Treasury dauerhaft zu finanzieren.',
     select_token: 'Token auswählen',

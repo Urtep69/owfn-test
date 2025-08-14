@@ -1,4 +1,3 @@
-
 export const es = {
     // Navigation
     home: 'Inicio',
@@ -148,6 +147,11 @@ export const es = {
     // Donations Page
     make_donation: 'Hacer una Donación',
     donation_desc: 'Apoye nuestras iniciativas de impacto social donando criptomonedas. Todos los fondos van directamente a la Tesorería de Impacto.',
+    donation_message_title: 'Un Puente de Esperanza, Construido por Ti',
+    donation_message_p1: 'Más allá del código y la blockchain se encuentra nuestra verdadera misión: la humanidad. Cada transacción en esta página es más que una simple transferencia de valor; es una mano amiga extendida a través de los continentes, una señal de que nadie necesita temer ser olvidado.',
+    donation_message_p2: 'Tu contribución, independientemente de la criptomoneda elegida, se transforma. Se convierte en los cimientos de una nueva escuela, un refugio seguro donde el potencial de un niño puede florecer. Se convierte en atención médica vital para una familia que había perdido toda esperanza. Se convierte en una comida caliente para alguien marginado por la sociedad, un hogar digno para un anciano, o los materiales necesarios para reconstruir una comunidad devastada por un desastre. A través de la transparencia que ofrece la blockchain de Solana, la Red Familiar Mundial Oficial asegura que tu generosidad llegue a su destino con integridad y propósito.',
+    donation_message_p3: 'Tu contribución, sin importar el tamaño, es una poderosa declaración de solidaridad. Es la prueba de que una familia global, unida por la compasión, puede cambiar el mundo. No solo estás haciendo una donación; te estás uniendo a un movimiento dedicado a construir un futuro mejor.',
+    donation_message_thanks: 'Por esto, estamos profundamente agradecidos.',
     donation_solana_warning: `IMPORTANTE: Las donaciones de USDC y USDT actualmente SÓLO se aceptan desde la red de Solana. No envíe desde ninguna otra red (por ejemplo, Ethereum) ya que los fondos se perderán y no llegarán a su destino.`,
     donation_fee_info: 'Las donaciones directas están actualmente libres de comisiones. Una vez finalizada la preventa, se activará una tarifa de transferencia del 0.5% en todas las transacciones de $OWFN para financiar perpetuamente la Tesorería de Impacto.',
     select_token: 'Seleccionar Token',
