@@ -16,7 +16,7 @@ const FaqItem = ({ question, answer, isOpen, onClick }: { question: string, answ
             <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-screen mt-2' : 'max-h-0'}`}
             >
-                <p className="text-primary-600 dark:text-darkPrimary-400 leading-relaxed pt-2">
+                <p className="text-primary-600 dark:text-darkPrimary-400 leading-relaxed pt-2 whitespace-pre-wrap">
                     {answer}
                 </p>
             </div>
@@ -26,7 +26,7 @@ const FaqItem = ({ question, answer, isOpen, onClick }: { question: string, answ
 
 export default function FAQ() {
     const { t } = useAppContext();
-    const [openIndex, setOpenIndex] = useState<number | null>(0);
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
 
     const handleToggle = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);
