@@ -70,7 +70,12 @@ export default async function handler(request: Request) {
         const decimals = tokenInfo?.decimals ?? 0;
         if (tokenInfo && tokenInfo.supply != null) {
             try {
-                totalSupply = Number(BigInt(tokenInfo.supply)) / (10 ** decimals);
+                // Helius supply is a u64, can be a large string.
+                // It can also sometimes be returned as a float string (e.g. "1000.0").
+                // BigInt requires a pure integer string, so we must sanitize it first.
+                const supplyString = String(tokenInfo.supply);
+                const integerString = supplyString.split('.')[0];
+                totalSupply = Number(BigInt(integerString)) / (10 ** decimals);
             } catch (e) {
                 console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Falling back to 0.`);
                 totalSupply = 0;
@@ -130,7 +135,6 @@ export default async function handler(request: Request) {
             freezeAuthority: tokenInfo?.freeze_authority || null,
             updateAuthority,
             tokenStandard,
-            // FIX: Safely spread the state object which might be null
             tokenExtensions: (asset.spl_token_info?.token_extensions || []).map((ext: any) => ({
                 ...ext,
                 state: {
