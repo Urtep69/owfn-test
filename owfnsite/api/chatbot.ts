@@ -3,10 +3,10 @@ import type { ChatMessage } from '../types.ts';
 
 /**
  * Sanitizes and structures the chat history to ensure it's a valid, alternating sequence
- * of 'user' and 'model' roles, starting with 'user' and ending with 'model'.
- * This is a requirement for the Gemini API history argument.
+ * of 'user' and 'model' roles, suitable for the Gemini API history argument.
+ * This is a requirement for the Gemini API.
  * @param history The raw chat history from the client.
- * @returns A structured and valid chat history array suitable for the Gemini API.
+ * @returns A structured and valid chat history array.
  */
 function sanitizeAndStructureHistory(history: ChatMessage[]): ChatMessage[] {
     if (!Array.isArray(history) || history.length === 0) {
@@ -28,24 +28,26 @@ function sanitizeAndStructureHistory(history: ChatMessage[]): ChatMessage[] {
         return [];
     }
     
-    // 2. Ensure history starts with a user message
-    if (validMessages[0].role === 'model') {
-        validMessages.shift();
+    // 2. Ensure history starts with a user message. If not, remove leading model messages.
+    let startIndex = 0;
+    while (startIndex < validMessages.length && validMessages[startIndex].role === 'model') {
+        startIndex++;
     }
-
+    validMessages = validMessages.slice(startIndex);
+    
     if (validMessages.length === 0) {
         return [];
     }
 
-    const structuredHistory: ChatMessage[] = [validMessages[0]];
     // 3. Ensure roles alternate by only adding messages with a different role than the previous one
+    const structuredHistory: ChatMessage[] = [validMessages[0]];
     for (let i = 1; i < validMessages.length; i++) {
         if (validMessages[i].role !== structuredHistory[structuredHistory.length - 1].role) {
             structuredHistory.push(validMessages[i]);
         }
     }
 
-    // 4. Ensure the history to be used as a prefix ends with a model message
+    // 4. The history prefix for the API call must end with a model message.
     if (structuredHistory.length > 0 && structuredHistory[structuredHistory.length - 1].role === 'user') {
         structuredHistory.pop();
     }
@@ -84,8 +86,8 @@ export default async function handler(request: Request) {
         const question: string = body.question;
         const langCode: string = body.langCode || 'en';
 
-        if (!question || typeof question !== 'string') {
-            return new Response(JSON.stringify({ error: "Invalid request: 'question' is required and must be a string." }), {
+        if (!question || typeof question !== 'string' || question.trim() === '') {
+            return new Response(JSON.stringify({ error: "Invalid request: 'question' is required and must be a non-empty string." }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
             });

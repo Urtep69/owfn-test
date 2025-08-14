@@ -70,13 +70,16 @@ export default async function handler(request: Request) {
         const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
         
         let totalSupply = 0;
-        if (tokenInfo.supply != null) {
+        if (tokenInfo.supply != null && typeof decimals === 'number') {
             try {
-                // Helius supply is a string representation of a u64. It shouldn't have decimals, 
-                // but we handle it defensively by removing any fractional part before converting to BigInt.
-                const supplyString = String(tokenInfo.supply).split('.')[0];
-                const supplyBigInt = BigInt(supplyString);
-                totalSupply = Number(supplyBigInt) / (10 ** decimals);
+                // The Helius `supply` is a u64 string. Directly dividing it with a Number
+                // can cause a TypeError if the supply is large enough to be a BigInt.
+                // To prevent a crash, we convert it to a Number first, which may lose
+                // precision for huge numbers but ensures stability.
+                const supplyAsNumber = Number(tokenInfo.supply);
+                if (!isNaN(supplyAsNumber)) {
+                    totalSupply = supplyAsNumber / (10 ** decimals);
+                }
             } catch (e) {
                 console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Setting to 0. Error: ${e instanceof Error ? e.message : String(e)}`);
                 totalSupply = 0; // Fallback to 0 on any parsing error
