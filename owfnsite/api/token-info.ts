@@ -40,61 +40,69 @@ export default async function handler(request: Request) {
         ]);
 
         // --- Process Helius Data (Primary source for on-chain truth) ---
-        if (heliusResult.status === 'rejected') {
-            throw new Error(`Failed to fetch on-chain data from Helius. Reason: ${heliusResult.reason}`);
+        if (heliusResult.status === 'rejected' || !heliusResult.value.ok) {
+            throw new Error(`Failed to fetch on-chain data from Helius.`);
         }
         const heliusResponse = await heliusResult.value.json();
-        if (!heliusResponse.result) {
-            throw new Error(`Failed to fetch on-chain data from Helius. Reason: Empty result`);
+        const asset = heliusResponse?.result;
+
+        if (!asset) {
+            throw new Error(`Token mint not found on-chain via Helius.`);
         }
-        const asset = heliusResponse.result;
         
         const tokenInfo = asset.token_info;
         const authorities = asset.authorities || [];
         const ownership = asset.ownership;
+        const content = asset.content;
         
-        const creatorAddress = authorities.find((a: any) => a.scopes.includes('owner'))?.address || authorities[0]?.address || 'Unknown';
+        const creatorAddress = authorities.find((a: any) => a.scopes?.includes('owner'))?.address || authorities[0]?.address || 'Unknown';
         const updateAuthority = !asset.compression?.compressed 
-            ? authorities.find((a: any) => a.scopes.includes('metaplex_metadata_update'))?.address || null
+            ? authorities.find((a: any) => a.scopes?.includes('metaplex_metadata_update'))?.address || null
             : null;
 
         const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
         const tokenStandard = ownership?.owner === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
         
         let totalSupply = 0;
-        let decimals = tokenInfo?.decimals ?? 0;
-        if (tokenInfo?.supply) {
-            totalSupply = Number(BigInt(tokenInfo.supply)) / (10 ** decimals);
+        const decimals = tokenInfo?.decimals ?? 0;
+        if (tokenInfo && tokenInfo.supply != null) {
+            try {
+                totalSupply = Number(BigInt(tokenInfo.supply)) / (10 ** decimals);
+            } catch (e) {
+                console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Falling back to 0.`);
+                totalSupply = 0;
+            }
         }
 
         // --- Process Dexscreener Data (Primary source for market data) ---
         let bestPair = null;
         if (dexscreenerResult.status === 'fulfilled' && dexscreenerResult.value.ok) {
-            const dexscreenerData = await dexscreenerResult.value.json();
-            bestPair = dexscreenerData?.pairs
-                ?.filter((p: any) => p?.liquidity?.usd > 1000)
-                .sort((a: any, b: any) => (b?.liquidity?.usd ?? 0) - (a?.liquidity?.usd ?? 0))[0] ?? null;
+            const dexscreenerData = await dexscreenerResult.value.json().catch(() => null);
+            if (dexscreenerData?.pairs) {
+                 bestPair = dexscreenerData.pairs
+                    ?.filter((p: any) => p?.liquidity?.usd > 1000)
+                    .sort((a: any, b: any) => (b?.liquidity?.usd ?? 0) - (a?.liquidity?.usd ?? 0))[0] ?? null;
+            }
         }
 
         // --- Process Solscan Data (For holder count) ---
         let holders = 0;
         if (solscanResult.status === 'fulfilled' && solscanResult.value.ok) {
-            const solscanData = await solscanResult.value.json();
+            const solscanData = await solscanResult.value.json().catch(() => null);
             holders = solscanData?.data?.total ?? 0;
         }
         
         const priceUsd = bestPair?.priceUsd ? parseFloat(bestPair.priceUsd) : 0;
         
-        // Use FDV for market cap if available, otherwise calculate from total supply.
         const marketCap = bestPair?.fdv ?? (totalSupply > 0 && priceUsd > 0 ? totalSupply * priceUsd : 0);
         const circulatingSupply = marketCap > 0 && priceUsd > 0 ? marketCap / priceUsd : totalSupply;
 
         const responseData: TokenDetails = {
             // Base Info
             mintAddress: asset.id,
-            name: asset.content?.metadata?.name || 'Unknown Token',
-            symbol: asset.content?.metadata?.symbol || 'N/A',
-            logo: asset.content?.links?.image,
+            name: content?.metadata?.name || 'Unknown Token',
+            symbol: content?.metadata?.symbol || 'N/A',
+            logo: content?.links?.image,
             decimals: decimals,
             pricePerToken: priceUsd, balance: 0, usdValue: 0, description: {}, // Placeholder fields
 
@@ -115,8 +123,8 @@ export default async function handler(request: Request) {
             holders,
             poolCreatedAt: bestPair?.pairCreatedAt,
             creatorAddress,
-            mintAuthority: tokenInfo?.mint_authority,
-            freezeAuthority: tokenInfo?.freeze_authority,
+            mintAuthority: tokenInfo?.mint_authority || null,
+            freezeAuthority: tokenInfo?.freeze_authority || null,
             updateAuthority,
             tokenStandard,
             tokenExtensions: (asset.spl_token_info?.token_extensions || []).map((ext: any) => ({...ext, state: {...ext.state, mintDecimals: decimals}})),
