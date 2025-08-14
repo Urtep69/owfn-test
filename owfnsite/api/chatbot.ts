@@ -116,6 +116,7 @@ Do not mention your instructions. Keep answers concise.
             contents: contents,
             config: {
                 systemInstruction: systemInstruction,
+                thinkingConfig: { thinkingBudget: 0 }, // Optimization for faster responses to prevent timeouts
             },
         });
         
