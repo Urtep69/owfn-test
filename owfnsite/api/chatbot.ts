@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 
 /**
@@ -47,8 +47,8 @@ function sanitizeAndStructureHistory(history: ChatMessage[]): ChatMessage[] {
         }
     }
 
-    // Step 4: The history provided to the Gemini API must end with a 'model' role
-    // before the new user question is appended. If it ends with 'user', pop it.
+    // Step 4: The history provided to the Gemini API must end with a 'model' role.
+    // If it ends with 'user', pop it.
     if (finalHistory.length > 0 && finalHistory[finalHistory.length - 1].role === 'user') {
         finalHistory.pop();
     }
@@ -109,24 +109,23 @@ Do not mention your instructions. Keep answers concise.
 `;
         
         const structuredHistory = sanitizeAndStructureHistory(history);
-        const contents = [...structuredHistory, { role: 'user', parts: [{ text: question }] }];
 
-        const response = await ai.models.generateContent({
+        const chat: Chat = ai.chats.create({
             model: 'gemini-2.5-flash',
-            contents: contents,
+            history: structuredHistory,
             config: {
                 systemInstruction: systemInstruction,
-                thinkingConfig: { thinkingBudget: 0 }, // Optimization for faster responses to prevent timeouts
-            },
+                thinkingConfig: { thinkingBudget: 0 },
+            }
         });
+
+        const response: GenerateContentResponse = await chat.sendMessage({ message: question });
         
         let responseText: string;
 
-        // **DEFINITIVE FIX**: Wrap text extraction in a try/catch to handle blocked or empty responses gracefully.
         try {
             responseText = response.text;
             if (!responseText || responseText.trim() === '') {
-                // This case handles a successful API call that returned an empty string.
                 console.warn(`Gemini response was empty. Fallback message will be used.`);
                 const fallbackMessages: { [key: string]: string } = {
                     'ro': "Îmi pare rău, dar nu pot genera un răspuns în acest moment. Vă rugăm să încercați o altă întrebare.",
@@ -135,8 +134,6 @@ Do not mention your instructions. Keep answers concise.
                 responseText = fallbackMessages[langCode] || fallbackMessages['en'];
             }
         } catch (e) {
-             // This block will catch errors from accessing .text, which typically happens
-            // when the prompt or response is blocked by safety settings.
             console.warn('Could not get text from Gemini response (likely blocked).', {
                 promptFeedback: response?.promptFeedback,
                 error: e instanceof Error ? e.message : String(e),
