@@ -3,13 +3,14 @@ import type { ChatMessage } from '../types.ts';
 
 /**
  * The definitive, ultra-robust history builder.
- * Instead of trying to fix a potentially malformed history, this function
- * REBUILDS the history from scratch, guaranteeing a valid, alternating sequence.
- * This defensive approach eliminates the primary cause of unrecoverable server crashes.
+ * This function rebuilds the history from scratch, guaranteeing a valid, alternating sequence
+ * that ALWAYS starts with a 'user' message, which is a strict requirement of the Gemini API.
+ * This defensive approach eliminates the root cause of unrecoverable server crashes.
  */
 function buildValidHistory(rawHistory: unknown, question: string): ChatMessage[] {
-    const validHistory: ChatMessage[] = [];
+    const alternatingHistory: ChatMessage[] = [];
     
+    // 1. Create a clean, alternating history from the raw input.
     if (Array.isArray(rawHistory)) {
         let lastRole: 'user' | 'model' | null = null;
         for (const msg of rawHistory) {
@@ -21,10 +22,9 @@ function buildValidHistory(rawHistory: unknown, question: string): ChatMessage[]
                 typeof msg.parts[0]?.text === 'string' &&
                 msg.parts[0].text.trim() !== '';
 
-            // If valid and the role is different from the last one, add it. This enforces alternation.
+            // If valid and the role is different from the last one, add it to enforce alternation.
             if (isValid && msg.role !== lastRole) {
-                // Rebuild the message object to ensure it only contains what we need.
-                validHistory.push({
+                alternatingHistory.push({
                     role: msg.role,
                     parts: [{ text: msg.parts[0].text }],
                 });
@@ -32,15 +32,20 @@ function buildValidHistory(rawHistory: unknown, question: string): ChatMessage[]
             }
         }
     }
+    
+    // 2. **CRITICAL FIX**: The Gemini API requires the conversation to start with a 'user' role.
+    // Find the first user message and discard anything before it to guarantee the sequence is valid.
+    const firstUserIndex = alternatingHistory.findIndex(msg => msg.role === 'user');
+    const validHistory = firstUserIndex !== -1 ? alternatingHistory.slice(firstUserIndex) : [];
 
-    // The conversation sent to the API must end with a user message.
+    // 3. The conversation sent to the API must end with a user message.
     // If our newly built valid history ends with a 'user' message, the API would see two
     // consecutive user messages when we add the new question. We must remove the last one.
     if (validHistory.length > 0 && validHistory[validHistory.length - 1].role === 'user') {
         validHistory.pop();
     }
     
-    // Add the new user question to the end, ensuring the sequence is correct.
+    // 4. Add the new user question to the end, ensuring the final sequence is correct.
     validHistory.push({ role: 'user', parts: [{ text: question }] });
     
     return validHistory;
