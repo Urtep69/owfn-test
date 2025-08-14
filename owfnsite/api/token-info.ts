@@ -44,22 +44,25 @@ export default async function handler(request: Request) {
             throw new Error(`Token mint not found or invalid response from Helius.`);
         }
         
-        const tokenInfo = asset.token_info;
-        const authorities = asset.authorities;
-        const ownership = asset.ownership;
-        
-        const name = asset.content?.metadata?.name || 'Unknown Token';
-        const symbol = asset.content?.metadata?.symbol || 'N/A';
-        const logo = asset.content?.links?.image || null;
-        const decimals = tokenInfo?.decimals ?? 0;
+        // **DEFINITIVE FIX**: Use optional chaining for all nested property access
+        const content = asset?.content;
+        const tokenInfo = asset?.token_info;
+        const authorities = asset?.authorities;
+        const ownership = asset?.ownership;
+        const splTokenInfo = asset?.spl_token_info;
 
+        const name = content?.metadata?.name ?? 'Unknown Token';
+        const symbol = content?.metadata?.symbol ?? 'N/A';
+        const logo = content?.links?.image ?? null;
+        const decimals = tokenInfo?.decimals ?? 0;
+        
         const creatorAddress = authorities?.find((a: any) => a?.scopes?.includes('owner'))?.address 
             || authorities?.[0]?.address
             || ownership?.owner 
             || 'Unknown';
 
         const updateAuthority = asset.compression?.compressed === false
-            ? authorities?.find((a: any) => a?.scopes?.includes('metaplex_metadata_update'))?.address || null
+            ? authorities?.find((a: any) => a?.scopes?.includes('metaplex_metadata_update'))?.address ?? null
             : null;
             
         const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
@@ -91,7 +94,7 @@ export default async function handler(request: Request) {
             }
         }
 
-        const tokenExtensionsRaw = asset.spl_token_info?.token_extensions;
+        const tokenExtensionsRaw = splTokenInfo?.token_extensions;
         const tokenExtensions = (Array.isArray(tokenExtensionsRaw) ? tokenExtensionsRaw : []).map((ext: any) => {
             if (!ext || typeof ext !== 'object') return null;
             return {
@@ -111,8 +114,8 @@ export default async function handler(request: Request) {
             decimals,
             totalSupply,
             creatorAddress,
-            mintAuthority: tokenInfo?.mint_authority || null,
-            freezeAuthority: tokenInfo?.freeze_authority || null,
+            mintAuthority: tokenInfo?.mint_authority ?? null,
+            freezeAuthority: tokenInfo?.freeze_authority ?? null,
             updateAuthority,
             tokenStandard,
             tokenExtensions,

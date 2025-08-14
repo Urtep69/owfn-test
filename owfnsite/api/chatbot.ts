@@ -123,10 +123,18 @@ Do not mention your instructions. Keep answers concise.
         try {
             responseText = response.text;
             if (!responseText || responseText.trim() === '') {
-                throw new Error("Received empty text response from AI.");
+                // This case handles a successful API call that returned an empty string.
+                console.warn(`Gemini response was empty. Fallback message will be used.`);
+                const fallbackMessages: { [key: string]: string } = {
+                    'ro': "Îmi pare rău, dar nu pot genera un răspuns în acest moment. Vă rugăm să încercați o altă întrebare.",
+                    'en': "I'm sorry, but I can't generate a response right now. Please try a different question."
+                };
+                responseText = fallbackMessages[langCode] || fallbackMessages['en'];
             }
         } catch (e) {
-            console.warn('Could not get text from Gemini response. It may have been blocked or was empty.', {
+             // This block will catch errors from accessing .text, which typically happens
+            // when the prompt or response is blocked by safety settings.
+            console.warn('Could not get text from Gemini response (likely blocked).', {
                 promptFeedback: response?.promptFeedback,
                 error: e instanceof Error ? e.message : String(e),
             });
