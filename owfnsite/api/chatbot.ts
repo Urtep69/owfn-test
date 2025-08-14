@@ -1,9 +1,66 @@
 import { GoogleGenAI } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 
+/**
+ * Takes the raw history from the client and the new question, and returns a
+ * perfectly structured `contents` array that is guaranteed to be valid for the Gemini API.
+ * This function is defensive and handles various malformed inputs gracefully.
+ * 
+ * The Gemini API requires `contents` to:
+ * 1. Be an array of objects, each with a `role` and `parts`.
+ * 2. Roles must strictly alternate between 'user' and 'model'.
+ * 3. The conversation must start with a 'user' role.
+ */
+function buildValidHistory(rawHistory: any, newQuestion: string): ChatMessage[] {
+    const history: ChatMessage[] = Array.isArray(rawHistory) ? rawHistory : [];
+    const validContents: ChatMessage[] = [];
+
+    // Process the existing history
+    for (const msg of history) {
+        // Strict validation of each message object from the client
+        const isValidStructure = 
+            msg &&
+            (msg.role === 'user' || msg.role === 'model') &&
+            Array.isArray(msg.parts) &&
+            msg.parts.length > 0 &&
+            typeof msg.parts[0]?.text === 'string' &&
+            msg.parts[0].text.trim() !== '';
+
+        if (isValidStructure) {
+            // Enforce role alternation. If the current message has the same role
+            // as the last valid message we've added, we skip it to prevent errors.
+            if (validContents.length === 0 || validContents[validContents.length - 1].role !== msg.role) {
+                // Re-create the object to ensure it's clean and discard any extra properties.
+                validContents.push({
+                    role: msg.role,
+                    parts: [{ text: msg.parts[0].text }],
+                });
+            }
+        }
+    }
+    
+    // The history sent to the API must end with a 'model' role before we add the new 'user' question.
+    // If the sanitized history ends with a 'user' message, it's an invalid sequence for a continued chat.
+    // We remove it to make way for the new, final user question.
+    if (validContents.length > 0 && validContents[validContents.length - 1].role === 'user') {
+        validContents.pop();
+    }
+    
+    // Add the new user question, which is the actual prompt for the AI.
+    validContents.push({ role: 'user', parts: [{ text: newQuestion }] });
+    
+    // Final check: if the very first message is from the 'model', the entire history is invalid.
+    // In this case, we can't recover context, so we start a fresh conversation with just the user's question.
+    if (validContents.length > 0 && validContents[0].role === 'model') {
+        return [{ role: 'user', parts: [{ text: newQuestion }] }];
+    }
+    
+    return validContents;
+}
+
+
 // Main handler for the chatbot API
 export default async function handler(request: Request) {
-    // 1. Basic validation and API key check
     if (request.method !== 'POST') {
         return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { 
             status: 405, headers: { 'Content-Type': 'application/json' } 
@@ -28,34 +85,13 @@ export default async function handler(request: Request) {
             });
         }
         
-        // 2. Build and sanitize chat history directly inside the handler
-        const contents: ChatMessage[] = [];
-        if (Array.isArray(history)) {
-            for (const msg of history) {
-                if (msg && (msg.role === 'user' || msg.role === 'model') && Array.isArray(msg.parts) && msg.parts.length > 0 && typeof msg.parts[0].text === 'string' && msg.parts[0].text.trim() !== '') {
-                    if (contents.length === 0 || contents[contents.length - 1].role !== msg.role) {
-                        contents.push(msg as ChatMessage);
-                    }
-                }
-            }
-        }
+        // Use the new, robust history builder to prevent API errors.
+        const contents = buildValidHistory(history, question);
         
-        // Ensure conversation always ends with a user message before sending to API
-        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
-            contents.pop();
-        }
-        contents.push({ role: 'user', parts: [{ text: question }] });
-        
-        // Ensure conversation starts with a user message
-        if (contents.length > 0 && contents[0].role !== 'user') {
-            console.warn("Invalid chat history: conversation did not start with a 'user' role. Starting fresh.");
-            contents.splice(0, contents.length, { role: 'user', parts: [{ text: question }] });
-        }
-        
-        // 3. Set up Gemini API call
         const ai = new GoogleGenAI({ apiKey });
         let languageName = 'English';
         try {
+            // Use Intl.DisplayNames to get the English name of the language (e.g., "Romanian" from "ro")
             languageName = new Intl.DisplayNames(['en'], { type: 'language' }).of(langCode || 'en') || 'English';
         } catch (e) {
             console.warn(`Could not determine language name for code: ${langCode}. Defaulting to English.`);
@@ -72,11 +108,11 @@ export default async function handler(request: Request) {
             }
         });
         
-        // 4. Create a robust, "anti-crash" stream to the client
+        // This ReadableStream is designed to be robust and prevent server crashes.
         const stream = new ReadableStream({
             async start(controller) {
                 const encoder = new TextEncoder();
-                // **CRITICAL FIX**: This try/catch block prevents the serverless function
+                // This try/catch block is critical. It prevents the serverless function
                 // from crashing if an error occurs *during* the stream from Gemini.
                 try {
                     for await (const chunk of result) {
@@ -89,7 +125,7 @@ export default async function handler(request: Request) {
                 } catch (streamError) {
                     console.error("Error during chatbot stream processing:", streamError);
                     // This terminates the stream with an error, allowing the client
-                    // to handle it gracefully instead of receiving a 500.
+                    // to handle it gracefully instead of receiving a 500 error.
                     controller.error(streamError); 
                 }
             }
@@ -103,6 +139,8 @@ export default async function handler(request: Request) {
         });
 
     } catch (error) {
+        // This outer catch block handles errors that occur before streaming begins,
+        // such as issues with the initial API call or JSON parsing.
         console.error("Error in chatbot handler:", error);
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
         return new Response(JSON.stringify({ error: `An internal server error occurred. Details: ${errorMessage}` }), {
