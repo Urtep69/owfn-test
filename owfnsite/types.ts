@@ -1,4 +1,5 @@
 
+
 export interface Token {
   name: string;
   symbol: string;
@@ -53,61 +54,47 @@ export interface ChatMessage {
     parts: { text: string }[];
 }
 
-export interface TokenSecurity {
-    isMutable: boolean;
-    mintAuthorityRevoked: boolean;
-    freezeAuthorityRevoked: boolean;
+export interface TokenExtensionState {
+  [key: string]: any;
 }
 
-export interface TokenAudit {
-    contractVerified: boolean;
-    isHoneypot: boolean;
-    isFreezable: boolean;
-    isMintable: boolean;
-    alerts: number;
-}
-
-export interface CommunityTrust {
-    positiveVotes: number;
-    negativeVotes: number;
-    tradeCount: number;
-    totalTrades: number;
-}
-
-export interface DextScore {
-    score: number;
-    maxScore: number;
-    points: number[];
+export interface TokenExtension {
+    extension: string;
+    state: TokenExtensionState;
 }
 
 export interface TokenDetails extends Token {
-    description: Record<string, string>;
-    security: TokenSecurity;
-    marketCap: number;
-    volume24h: number;
-    price24hChange: number;
-    holders: number;
-    circulatingSupply: number;
-    totalSupply?: number;
+    description?: Record<string, string>;
+    marketCap?: number;
+    volume24h?: number;
+    price24hChange?: number;
+    holders?: number;
+    totalSupply: number;
+    circulatingSupply?: number;
+    
+    priceSol?: number;
+    priceChange?: {
+        m5: number;
+        h1: number;
+        h6: number;
+        h24: number;
+    };
     liquidity?: number;
-    totalMarketCap?: number;
-    volatility?: number;
-    totalTx24h?: number;
-    pooledSol?: number;
-    pooledToken?: number;
-    poolCreated?: string;
-    dextScore?: DextScore;
-    audit?: TokenAudit;
-    communityTrust?: CommunityTrust;
     pairAddress?: string;
     fdv?: number;
-    pairCreatedAt?: number;
+    poolCreatedAt?: number; // Timestamp
     txns?: {
         h24: { buys: number, sells: number };
     };
-    lpBurnedPercent?: number;
-    deployerAddress?: string;
     dexId?: string;
+
+    // On-chain technical details
+    creatorAddress?: string;
+    mintAuthority?: string | null;
+    freezeAuthority?: string | null;
+    updateAuthority?: string | null;
+    tokenStandard?: 'SPL Token' | 'Token-2022';
+    tokenExtensions?: TokenExtension[];
 }
 
 export interface LiveTransaction {
