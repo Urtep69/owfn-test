@@ -1,4 +1,3 @@
-
 import type { TokenDetails } from '../types.ts';
 
 export default async function handler(request: Request) {
@@ -11,7 +10,7 @@ export default async function handler(request: Request) {
         });
     }
 
-    const HELIUS_API_KEY = process.env.API_KEY || process.env.HELIUS_API_KEY;
+    const HELIUS_API_KEY = process.env.API_KEY;
     if (!HELIUS_API_KEY) {
         return new Response(JSON.stringify({ error: "Server configuration error: Missing API Key." }), {
             status: 500, headers: { 'Content-Type': 'application/json' },
@@ -73,20 +72,14 @@ export default async function handler(request: Request) {
         let totalSupply = 0;
         if (tokenInfo.supply != null) {
             try {
-                // This logic is made robust to handle various formats from the Helius API.
-                // It specifically handles cases where `supply` is a string with a decimal (e.g., "1000.0"),
-                // which would otherwise cause BigInt() to crash.
-                const supplyAsNumber = parseFloat(String(tokenInfo.supply));
-                if (!isNaN(supplyAsNumber)) {
-                    const supplyStringForBigInt = supplyAsNumber.toFixed(0);
-                    const supplyBigInt = BigInt(supplyStringForBigInt);
-                    totalSupply = Number(supplyBigInt) / (10 ** decimals);
-                } else {
-                    throw new Error("Supply is not a valid number.");
-                }
+                // Helius supply is a string representation of a u64. It shouldn't have decimals, 
+                // but we handle it defensively by removing any fractional part before converting to BigInt.
+                const supplyString = String(tokenInfo.supply).split('.')[0];
+                const supplyBigInt = BigInt(supplyString);
+                totalSupply = Number(supplyBigInt) / (10 ** decimals);
             } catch (e) {
                 console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Setting to 0. Error: ${e instanceof Error ? e.message : String(e)}`);
-                totalSupply = 0;
+                totalSupply = 0; // Fallback to 0 on any parsing error
             }
         }
 

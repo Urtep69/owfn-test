@@ -2,10 +2,11 @@ import { GoogleGenAI } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 
 /**
- * Sanitizes and structures the chat history to ensure it alternates between 'user' and 'model' roles,
- * which is a requirement for the Gemini API. This prevents "Invalid argument" errors.
+ * Sanitizes and structures the chat history to ensure it's a valid, alternating sequence
+ * of 'user' and 'model' roles, starting with 'user' and ending with 'model'.
+ * This is a requirement for the Gemini API history argument.
  * @param history The raw chat history from the client.
- * @returns A structured and valid chat history array.
+ * @returns A structured and valid chat history array suitable for the Gemini API.
  */
 function sanitizeAndStructureHistory(history: ChatMessage[]): ChatMessage[] {
     if (!Array.isArray(history) || history.length === 0) {
@@ -13,7 +14,7 @@ function sanitizeAndStructureHistory(history: ChatMessage[]): ChatMessage[] {
     }
 
     // 1. Filter out any malformed or empty messages
-    const validMessages = history.filter(msg =>
+    let validMessages = history.filter(msg =>
         msg &&
         (msg.role === 'user' || msg.role === 'model') &&
         Array.isArray(msg.parts) &&
@@ -27,21 +28,26 @@ function sanitizeAndStructureHistory(history: ChatMessage[]): ChatMessage[] {
         return [];
     }
     
-    const structuredHistory: ChatMessage[] = [];
-    let lastRole: 'user' | 'model' | '' = '';
+    // 2. Ensure history starts with a user message
+    if (validMessages[0].role === 'model') {
+        validMessages.shift();
+    }
 
-    // 2. Iterate backwards to ensure the last messages form a valid, alternating sequence
-    for (let i = validMessages.length - 1; i >= 0; i--) {
-        const message = validMessages[i];
-        if (message.role !== lastRole) {
-            structuredHistory.unshift(message);
-            lastRole = message.role;
+    if (validMessages.length === 0) {
+        return [];
+    }
+
+    const structuredHistory: ChatMessage[] = [validMessages[0]];
+    // 3. Ensure roles alternate by only adding messages with a different role than the previous one
+    for (let i = 1; i < validMessages.length; i++) {
+        if (validMessages[i].role !== structuredHistory[structuredHistory.length - 1].role) {
+            structuredHistory.push(validMessages[i]);
         }
     }
-    
-    // 3. The API requires the history to start with a 'user' message.
-    if (structuredHistory.length > 0 && structuredHistory[0].role === 'model') {
-        structuredHistory.shift();
+
+    // 4. Ensure the history to be used as a prefix ends with a model message
+    if (structuredHistory.length > 0 && structuredHistory[structuredHistory.length - 1].role === 'user') {
+        structuredHistory.pop();
     }
 
     return structuredHistory;
