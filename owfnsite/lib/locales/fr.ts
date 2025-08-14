@@ -1,3 +1,4 @@
+
 export const fr = {
     // Navigation
     home: 'Accueil',
@@ -104,7 +105,7 @@ export const fr = {
     min_buy: 'Achat min',
     max_buy: 'Achat max',
     invalid_amount: 'Le montant doit être compris entre {min} et {max} SOL.',
-    presale_purchase_success_alert: `Achat réussi ! Vous avez contribué à hauteur de {amount} SOL. Vos {owfnAmount} jetons OWFN sont réservés et seront automatiquement distribués par airdrop à votre portefeuille à la fin de la prévente.`,
+    presale_purchase_success_alert: `Achat réussi ! Vous avez contribué à hauteur de {amount} SOL. Vos {owfnAmount} jetons OWFN sont réservés et seront automatically distribués par airdrop à votre portefeuille à la fin de la prévente.`,
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: 'Vendu {progress}%',
     presale_buy_info: 'Acheter (Min: {min} SOL, Max: {max} SOL)',
@@ -254,14 +255,17 @@ export const fr = {
     faq_q4: 'Comment l\'OWFN assure-t-il la transparence de ses initiatives à impact social ?',
     faq_a4: `L'OWFN utilise la blockchain Solana pour enregistrer toutes les transactions liées à sa Trésorerie d'Impact. Cela garantit que chaque don et allocation est publiquement vérifiable et immuable, offrant une transparence totale.`,
     faq_q5: 'Que signifie un APY de 2% pour les détenteurs d\'OWFN ?',
-    faq_a5: `L'OWFN est un jeton porteur d'intérêts (IBT) qui récompense automatiquement ses détenteurs avec un rendement annuel en pourcentage (APY) de 2%. Cela signifie que vos avoirs en OWFN augmenteront avec le temps simplement en les conservant dans votre portefeuille.`,
+    faq_a5: `L'OWFN est un jeton porteur d'intérêts (IBT) qui récompense automatically ses détenteurs avec un rendement annuel en pourcentage (APY) de 2%. Cela signifie que vos avoirs en OWFN augmenteront avec le temps simplement en les conservant dans votre portefeuille.`,
     faq_q6: 'Où puis-je trouver le Livre Blanc de l\'OWFN ?',
     faq_a6: `Vous pouvez trouver le Livre Blanc détaillé de l'OWFN en cliquant sur le bouton "Livre Blanc" dans l'en-tête ou la section principale de notre site web.`,
     faq_q7: `Comment l'OWFN fait-il une différence dans le monde réel ?`,
-    faq_a7: `L'OWFN finance directement des initiatives dans des domaines critiques tels que la santé (par exemple, couvrir les frais de chirurgie, moderniser les hôpitaux), l'éducation (par exemple, construire et rénover des écoles, des jardins d'enfants) et les besoins de base (par exemple, fournir de la nourriture, un abri, des vêtements aux sans-abri, créer des maisons de retraite). Nous répondons également aux secours en cas de catastrophe et investissons dans des projets de développement communautaire durable. Chaque jeton contribue à ces actions concrètes, garantissant un soutien 100% réel à l'humanité.`,
-    faq_q8: `Votre contribution aide de deux manières fondamentales. Premièrement, lorsque vous achetez des jetons pendant la prévente, une part importante des fonds va directement dans la Trésorerie d'Impact pour lancer nos projets sociaux. Deuxièmement, pour créer une source de financement durable à long terme, des frais de transfert de 0,5% seront activés sur toutes les transactions *après* la fin de la période de prévente. Ces frais sont conçus comme un micro-don automatique à la Trésorerie d'Impact. Cela signifie que chaque fois que le jeton sera utilisé à l'avenir, il générera un soutien continu pour nos causes humanitaires, transformant l'ensemble de l'écosystème en une force perpétuelle pour le bien. Tous ces flux financiers sont entièrement transparents sur la blockchain.`,
-    faq_q9: `Votre implication est cruciale ! Faire connaître l'OWFN est incroyablement puissant. Parlez de notre mission à vos amis, votre famille et vos collègues. Partagez notre vision sur les réseaux sociaux, lors de vos voyages ou au travail. Chaque conversation, chaque partage, contribue à sensibiliser et à attirer plus de personnes dans notre famille mondiale, amplifiant notre impact collectif. Rejoignez nos canaux communautaires pour rester informé et participer aux discussions.`,
-    faq_q10: `Oui, c'est d'une importance capitale. Tous les dons d'USDC et d'USDT doivent être envoyés *exclusivement* depuis la blockchain Solana. N'envoyez pas depuis un autre réseau (par exemple, Ethereum), car les fonds seront perdus et n'atteindront pas leur destination. Cette information est également clairement affichée sur la page des dons.`,
+    faq_a7: `L'OWFN finance directly des initiatives dans des domaines critiques tels que la santé (par exemple, couvrir les frais de chirurgie, moderniser les hôpitaux), l'éducation (par exemple, construire et rénover des écoles, des jardins d'enfants) et les besoins de base (par exemple, fournir de la nourriture, un abri, des vêtements aux sans-abri, créer des maisons de retraite). Nous répondons également aux secours en cas de catastrophe et investissons dans des projets de développement communautaire durable. Chaque jeton contribue à ces actions concrètes, garantissant un soutien 100% réel à l'humanité.`,
+    faq_q8: 'Comment ma contribution par l\'achat de jetons aide-t-elle réellement ?',
+    faq_a8: `Votre contribution aide de deux manières fondamentales. Premièrement, lorsque vous achetez des jetons pendant la prévente, une part importante des fonds va directement dans la Trésorerie d'Impact pour lancer nos projets sociaux. Deuxièmement, pour créer une source de financement durable à long terme, des frais de transfert de 0,5% seront activés sur toutes les transactions *après* la fin de la période de prévente. Ces frais sont conçus comme un micro-don automatique à la Trésorerie d'Impact. Cela signifie que chaque fois que le jeton sera utilisé à l'avenir, il générera un soutien continu pour nos causes humanitaires, transformant l'ensemble de l'écosystème en une force perpétuelle pour le bien. Tous ces flux financiers sont entièrement transparents sur la blockchain.`,
+    faq_q9: 'Outre l\'achat de jetons, comment puis-je m\'impliquer et aider l\'OWFN ?',
+    faq_a9: `Votre implication est cruciale ! Faire connaître l'OWFN est incroyablement puissant. Parlez de notre mission à vos amis, votre famille et vos collègues. Partagez notre vision sur les réseaux sociaux, lors de vos voyages ou au travail. Chaque conversation, chaque partage, contribue à sensibiliser et à attirer plus de personnes dans notre famille mondiale, amplifiant notre impact collectif. Rejoignez nos canaux communautaires pour rester informé et participer aux discussions.`,
+    faq_q10: 'Y a-t-il des instructions spéciales pour faire un don en USDC ou USDT ?',
+    faq_a10: `Oui, c'est d'une importance capitale. Tous les dons d'USDC et d'USDT doivent être envoyés *exclusivement* depuis la blockchain Solana. N'envoyez pas depuis un autre réseau (par exemple, Ethereum), car les fonds seront perdus et n'atteindront pas leur destination. Cette information est également clairement affichée sur la page des dons.`,
 
     // Chatbot
     chatbot_title: 'Assistant OWFN',
@@ -430,8 +434,8 @@ export const fr = {
 
     // Coming Soon
     coming_soon_title: 'Bientôt Disponible',
-    coming_soon_desc: 'Cette fonctionnalité est actuellement en cours de développement. Nous travaillons dur pour vous la proposer bientôt. Merci de votre patience et de votre soutien.',
-
+    coming_soon_desc: 'Cette fonctionnalité est currently en cours de développement. Nous travaillons dur pour vous la proposer bientôt. Merci de votre patience et de votre soutien.',
+    
     // Admin Presale
     presale_admin_title: 'Admin Prévente',
     presale_admin_subtitle: 'Surveillez les transactions et gérez l\'airdrop de jetons post-prévente.',
