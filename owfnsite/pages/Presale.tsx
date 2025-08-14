@@ -305,18 +305,40 @@ export default function Presale() {
   const { owfnAmount, bonusApplied } = useMemo(() => {
     const numAmount = parseFloat(solAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
-      return { owfnAmount: 0, bonusApplied: false };
-    }
-    
-    let finalOwfnAmount = numAmount * PRESALE_DETAILS.rate;
-    let isBonus = false;
-
-    if (numAmount >= PRESALE_DETAILS.bonusThreshold) {
-      finalOwfnAmount *= (1 + PRESALE_DETAILS.bonusPercentage / 100);
-      isBonus = true;
+        return { owfnAmount: 0, bonusApplied: false };
     }
 
-    return { owfnAmount: finalOwfnAmount, bonusApplied: isBonus };
+    try {
+        const LAMPORTS_PER_SOL_BIGINT = 1000000000n;
+        const owfnDecimals = BigInt(TOKEN_DETAILS.decimals);
+        const owfnDecimalsMultiplier = 10n ** owfnDecimals;
+
+        // Convert SOL string to lamports BigInt to avoid floating point issues
+        const parts = solAmount.split('.');
+        const integerPart = BigInt(parts[0] || '0');
+        const fractionalPart = (parts[1] || '').slice(0, 9).padEnd(9, '0');
+        const lamports = integerPart * LAMPORTS_PER_SOL_BIGINT + BigInt(fractionalPart);
+
+        const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
+        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * LAMPORTS_PER_SOL_BIGINT;
+        
+        let totalOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
+
+        let isBonus = false;
+        if (lamports >= bonusThresholdLamports) {
+            const bonusAmount = (totalOwfnSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
+            totalOwfnSmallestUnit += bonusAmount;
+            isBonus = true;
+        }
+
+        const finalOwfnAmount = Number(totalOwfnSmallestUnit) / Number(owfnDecimalsMultiplier);
+        
+        return { owfnAmount: finalOwfnAmount, bonusApplied: isBonus };
+
+    } catch (e) {
+        console.error("Error calculating OWFN amount:", e);
+        return { owfnAmount: 0, bonusApplied: false };
+    }
   }, [solAmount]);
 
 

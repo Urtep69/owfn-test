@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -14,7 +13,7 @@ import {
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
 } from '../constants.ts';
-import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User } from 'lucide-react';
+import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User, PieChart } from 'lucide-react';
 import { SolIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { Token } from '../types.ts';
@@ -272,10 +271,11 @@ export default function AdminPresale() {
                 <div className="flex justify-center items-center py-20"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>
             ) : (
                 <>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<SolIcon className="w-6 h-6"/>} />
                         <StatCard title={t('total_transactions')} value={stats.count} icon={<FileText />} />
                         <StatCard title={t('unique_contributors')} value={stats.contributors} icon={<User />} />
+                        <StatCard title={t('total_owfn_to_distribute')} value={totalOwfnToDistribute.toLocaleString(undefined, { maximumFractionDigits: 0 })} icon={<PieChart />} />
                     </div>
 
                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md">

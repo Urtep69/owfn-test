@@ -270,9 +270,9 @@ export const ja = {
     chatbot_title: 'OWFNアシスタント',
     chatbot_placeholder: '質問を入力してください...',
     chatbot_error: '申し訳ありません、接続に問題があります。後でもう一度お試しください。',
-    chatbot_loading_1: '接続中...',
-    chatbot_loading_2: '分析中...',
-    chatbot_loading_3: '作成中...',
+    chatbot_loading_1: '回路に接続しています...',
+    chatbot_loading_2: '質問を分析しています...',
+    chatbot_loading_3: '回答を作成しています...',
     
     // Whitepaper
     whitepaper_title: 'OWFNホワイトペーパー',

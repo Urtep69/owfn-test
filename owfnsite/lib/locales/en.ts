@@ -270,9 +270,9 @@ export const en = {
     chatbot_title: 'OWFN Assistant',
     chatbot_placeholder: 'Ask a question...',
     chatbot_error: 'Sorry, I am having trouble connecting. Please try again later.',
-    chatbot_loading_1: 'Connecting...',
-    chatbot_loading_2: 'Analyzing...',
-    chatbot_loading_3: 'Formulating...',
+    chatbot_loading_1: 'Connecting to my circuits...',
+    chatbot_loading_2: 'Analyzing your question...',
+    chatbot_loading_3: 'Formulating a response...',
     
     // Whitepaper
     whitepaper_title: 'OWFN Whitepaper',
