@@ -32,7 +32,7 @@ export default async function handler(request: Request) {
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch on-chain data from Helius.`);
+            throw new Error(`Helius API returned status ${response.status}`);
         }
         
         const heliusResponse = await response.json().catch(() => {
@@ -40,62 +40,67 @@ export default async function handler(request: Request) {
         });
         
         const asset = heliusResponse?.result;
-        if (!asset) {
-            throw new Error(`Token mint not found on-chain via Helius.`);
+        
+        if (!asset || !asset.id) {
+            throw new Error(`Token mint not found or invalid response from Helius.`);
         }
         
-        // Safely access potentially missing nested objects
+        // --- Bulletproof Data Extraction ---
+        // Provide safe defaults for every potentially missing object.
         const tokenInfo = asset.token_info || {};
         const authorities = Array.isArray(asset.authorities) ? asset.authorities : [];
         const ownership = asset.ownership || {};
         const content = asset.content || {};
         const metadata = content.metadata || {};
         const links = content.links || {};
+        const splTokenInfo = asset.spl_token_info || {};
 
-        const creatorAddress = authorities.find((a: any) => a.scopes?.includes('owner'))?.address 
-            || (authorities.length > 0 ? authorities[0].address : null) 
+        // Extract data with optional chaining and nullish coalescing at every step.
+        const name = metadata.name || 'Unknown Token';
+        const symbol = metadata.symbol || 'N/A';
+        const logo = links.image || null;
+        const decimals = tokenInfo.decimals ?? 0;
+
+        const creatorAddress = authorities.find((a: any) => a?.scopes?.includes('owner'))?.address 
+            || authorities[0]?.address
             || ownership.owner 
             || 'Unknown';
 
-        const updateAuthority = !asset.compression?.compressed 
-            ? authorities.find((a: any) => a.scopes?.includes('metaplex_metadata_update'))?.address || null
+        const updateAuthority = asset.compression?.compressed === false
+            ? authorities.find((a: any) => a?.scopes?.includes('metaplex_metadata_update'))?.address || null
             : null;
             
         const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
         const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
         
-        const decimals = tokenInfo.decimals ?? 0;
         let totalSupply = 0;
         if (tokenInfo.supply != null) {
             try {
-                // Ensure supply is treated as a string to handle scientific notation or large numbers
-                const supplyString = String(tokenInfo.supply);
-                // Use BigInt for precision with large supply numbers
-                totalSupply = Number(BigInt(supplyString)) / (10 ** decimals);
+                totalSupply = Number(BigInt(String(tokenInfo.supply))) / (10 ** decimals);
             } catch (e) {
-                console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}.`);
+                console.warn(`Could not parse supply "${tokenInfo.supply}" for mint ${mintAddress}. Setting to 0.`);
                 totalSupply = 0;
             }
         }
 
-        const tokenExtensionsRaw = asset.spl_token_info?.token_extensions;
-        const tokenExtensions = (Array.isArray(tokenExtensionsRaw) ? tokenExtensionsRaw : []).map((ext: any) => ({
-            ...ext,
-            state: {
-                ...(ext.state || {}),
-                mintDecimals: decimals,
-            },
-        }));
+        const tokenExtensionsRaw = splTokenInfo.token_extensions;
+        const tokenExtensions = (Array.isArray(tokenExtensionsRaw) ? tokenExtensionsRaw : []).map((ext: any) => {
+            if (!ext || typeof ext !== 'object') return null;
+            return {
+                extension: ext.extension || 'unknownExtension',
+                state: {
+                    ...(ext.state || {}),
+                    mintDecimals: decimals,
+                },
+            };
+        }).filter(Boolean);
 
         const responseData: Partial<TokenDetails> = {
-            // Base Info from Token interface
             mintAddress: asset.id,
-            name: metadata.name || 'Unknown Token',
-            symbol: metadata.symbol || 'N/A',
-            logo: links.image,
-            decimals: decimals,
-            
-            // On-chain technical details
+            name,
+            symbol,
+            logo,
+            decimals,
             totalSupply,
             creatorAddress,
             mintAuthority: tokenInfo.mint_authority || null,
