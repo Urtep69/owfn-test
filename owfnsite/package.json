@@ -9,7 +9,7 @@
   "author": "OWFN",
   "license": "UNLICENSED",
   "dependencies": {
-    "@google/genai": "^0.12.0",
+    "@google/genai": "^1.13.0",
     "@solana/spl-token": "^0.4.7",
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-react": "^0.15.35",
