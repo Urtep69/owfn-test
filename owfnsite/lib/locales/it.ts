@@ -147,7 +147,6 @@ export const it = {
     make_donation: 'Fai una Donazione',
     donation_desc: 'Sostieni le nostre iniziative di impatto sociale donando criptovalute. Tutti i fondi vanno direttamente alla Tesoreria di Impatto.',
     donation_solana_warning: 'IMPORTANTE: Le donazioni per USDC e USDT sono attualmente accettate SOLO dalla rete Solana. Non inviare da nessun\'altra rete (ad es. Ethereum) poiché i fondi andranno persi e non raggiungeranno la loro destinazione.',
-    donation_fee_info: 'Le donazioni dirette sono attualmente esenti da commissioni. Al termine della prevendita, verrà attivata una commissione di trasferimento dello 0,5% su tutte le transazioni di $OWFN per finanziare perpetuamente la Tesoreria di Impatto.',
     select_token: 'Seleziona Token',
     amount: 'Importo',
     donations_form_title: 'Modulo di Donazione',
@@ -227,19 +226,9 @@ export const it = {
     case_update_3: 'Il finanziamento del progetto è iniziato ufficialmente. Siamo grati per la prima ondata di sostegno dalla comunità OWFN.',
 
     // Partnerships Page
-    partnerships_title: 'Partnership e Collaborazioni Future',
-    partnerships_focus_title: 'Il Nostro Focus Attuale',
-    partnerships_focus_desc: 'La nostra priorità assoluta in questa fase è garantire una prevendita di successo e costruire una solida e coinvolta base comunitaria. Questa è la roccia su cui verrà costruito il nostro impatto futuro.',
-    partnerships_post_presale_intro: 'Dopo la conclusione positiva della prevendita, il nostro team inizierà il processo di ricerca e valutazione attiva di partnership strategiche.',
-    partnerships_vision_title: 'Una Visione Condivisa per un Impatto Globale',
-    partnerships_vision_desc: 'Crediamo che il cambiamento vero e significativo nasca dalla collaborazione. Non stiamo solo cercando partner; stiamo cercando alleati che condividano i nostri valori fondamentali e siano profondamente impegnati a creare un bene sociale reale, trasparente e duraturo.',
-    partnerships_ideal_partner_title: 'Il Nostro Partner Ideale:',
-    partnerships_ideal_item_1: 'Condivide la nostra missione di fornire aiuto diretto e trasparente a chi ne ha bisogno.',
-    partnerships_ideal_item_2: 'Valorizza la completa trasparenza e responsabilità in tutte le operazioni.',
-    partnerships_ideal_item_3: 'È impegnato in una visione a lungo termine di impatto sostenibile, non in guadagni a breve termine.',
-    partnerships_invitation_title: 'Stai Pensando di Collaborare?',
-    partnerships_invitation_desc: 'Se questa visione risuona con la tua organizzazione, ti invitiamo a seguire i nostri progressi. Prepara la tua proposta delineando come una collaborazione potrebbe amplificare la nostra missione condivisa. I dettagli di contatto verranno resi più evidenti e apriremo canali formali di discussione dopo la conclusione della fase di prevendita.',
-    partnerships_thank_you: 'Grazie per il tuo interesse nel costruire un mondo migliore con noi.',
+    partnerships_title: 'Partnership',
+    partnerships_subtitle: 'Siamo attivamente alla ricerca di partnership con ONG, aziende e altri progetti.',
+    partnerships_contact_info: 'Contattaci a partnerships@owfn.org per collaborare.',
 
     // FAQ Page
     faq_title: 'Domande Frequenti',
@@ -318,15 +307,6 @@ export const it = {
     pool_age: 'Età Pool',
     on_chain_security: 'Sicurezza On-Chain',
     update_authority: 'Autorità di Aggiornamento',
-    holders: 'Detentori',
-    circulating_supply: 'Offerta Circolante',
-    token_distribution: 'Distribuzione Token',
-    contract_verified: 'Contratto Verificato',
-    is_honeypot: 'È Honeypot?',
-    check_not_available: 'Non Disponibile',
-    is_mintable: 'È Coniabile?',
-    is_freezable: 'È Congelabile?',
-    deployer_address: 'Indirizzo del Creatore',
     
     // Staking & Vesting
     staking_title: 'Metti in Stake OWFN, Guadagna Ricompense',

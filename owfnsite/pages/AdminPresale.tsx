@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -11,11 +10,9 @@ import {
     HELIUS_API_KEY, 
     HELIUS_API_BASE_URL, 
     PRESALE_DETAILS,
-    OWFN_MINT_ADDRESS,
-    TOKEN_DETAILS,
+    OWFN_MINT_ADDRESS
 } from '../constants.ts';
 import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User } from 'lucide-react';
-import { SolIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { Token } from '../types.ts';
 
@@ -25,13 +22,12 @@ interface PresaleTx {
     solAmount: number;
     owfnAmount: number;
     timestamp: number;
-    lamports: number;
 }
 
 interface AggregatedContributor {
     address: string;
     totalSol: number;
-    totalOwfn: bigint; // Use BigInt for precision
+    totalOwfn: number;
 }
 
 const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
@@ -86,7 +82,6 @@ export default function AdminPresale() {
                         solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
                         owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
                         timestamp: tx.timestamp,
-                        lamports: tx.nativeTransfers[0].amount,
                     }));
                 
                 allTxs.push(...parsedTxs);
@@ -118,40 +113,26 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        const contributorMap = new Map<string, { totalLamports: bigint }>();
+        const contributorMap = new Map<string, { totalSol: number }>();
         transactions.forEach(tx => {
-            const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n };
-            existing.totalLamports += BigInt(tx.lamports);
+            const existing = contributorMap.get(tx.from) ?? { totalSol: 0 };
+            existing.totalSol += tx.solAmount;
             contributorMap.set(tx.from, existing);
         });
         
-        const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * BigInt(LAMPORTS_PER_SOL);
-        const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
-
         return Array.from(contributorMap.entries()).map(([address, data]) => {
-            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
-            
-            // Perform all calculations with BigInt for precision
-            let totalOwfnInSmallestUnit = (data.totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
-
-            if (data.totalLamports >= bonusThresholdLamports) {
-                const bonusAmount = (totalOwfnInSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
-                totalOwfnInSmallestUnit += bonusAmount;
+            let owfnAmount = data.totalSol * PRESALE_DETAILS.rate;
+            if (data.totalSol >= PRESALE_DETAILS.bonusThreshold) {
+                owfnAmount *= (1 + PRESALE_DETAILS.bonusPercentage / 100);
             }
-
-            return { address, totalSol, totalOwfn: totalOwfnInSmallestUnit };
+            return { address, totalSol: data.totalSol, totalOwfn: owfnAmount };
         });
     }, [transactions]);
 
 
     const exportToCsv = useCallback(() => {
         const headers = ['contributor_address', 'total_sol_spent', 'total_owfn_to_receive'];
-        const rows = aggregatedContributors.map(c => {
-             const owfnAmount = Number(c.totalOwfn) / (10 ** TOKEN_DETAILS.decimals);
-             return [c.address, c.totalSol.toFixed(9), owfnAmount.toFixed(TOKEN_DETAILS.decimals)];
-        });
-
+        const rows = aggregatedContributors.map(c => [c.address, c.totalSol.toFixed(9), c.totalOwfn.toFixed(9)]);
         const csvContent = "data:text/csv;charset=utf-8," 
             + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
         
@@ -207,7 +188,7 @@ export default function AdminPresale() {
                                     sourceAta,
                                     destinationAta,
                                     sourceOwner,
-                                    contributor.totalOwfn // This is already a BigInt of the smallest unit
+                                    BigInt(Math.floor(contributor.totalOwfn)) // Use whole numbers for tokens
                                 )
                             );
                             return instructions;
@@ -248,11 +229,7 @@ export default function AdminPresale() {
 
     }, [wallet, connection, aggregatedContributors, t]);
     
-    const totalOwfnToDistribute = useMemo(() => {
-        const total = aggregatedContributors.reduce((sum, c) => sum + c.totalOwfn, 0n);
-        return Number(total) / (10 ** TOKEN_DETAILS.decimals);
-    }, [aggregatedContributors]);
-
+    const totalOwfnToDistribute = useMemo(() => aggregatedContributors.reduce((sum, c) => sum + c.totalOwfn, 0), [aggregatedContributors]);
     const estimatedFees = useMemo(() => aggregatedContributors.length * 0.000005, [aggregatedContributors]); // 5000 lamports per signature
 
     return (
@@ -273,7 +250,7 @@ export default function AdminPresale() {
             ) : (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<SolIcon className="w-6 h-6"/>} />
+                        <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<img src="https://www.owfn.org/solana.png" className="w-6 h-6"/>} />
                         <StatCard title={t('total_transactions')} value={stats.count} icon={<FileText />} />
                         <StatCard title={t('unique_contributors')} value={stats.contributors} icon={<User />} />
                     </div>

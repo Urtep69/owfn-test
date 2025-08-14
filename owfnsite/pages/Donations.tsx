@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -108,12 +108,6 @@ export default function Donations() {
             
             <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d max-w-2xl mx-auto">
                 <h2 className="text-2xl font-bold mb-6 text-center">{t('donations_form_title')}</h2>
-
-                <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-3 rounded-lg text-sm text-primary-700 dark:text-darkPrimary-300 mb-6 flex items-start gap-2">
-                    <Info size={18} className="flex-shrink-0 mt-0.5 text-primary-500 dark:text-darkPrimary-400" />
-                    <span>{t('donation_fee_info')}</span>
-                </div>
-
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-primary-600 dark:text-darkPrimary-400 mb-2">{t('select_token')}</label>

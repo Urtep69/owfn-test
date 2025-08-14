@@ -1,4 +1,3 @@
-
 export const es = {
     // Navigation
     home: 'Inicio',
@@ -148,7 +147,6 @@ export const es = {
     make_donation: 'Hacer una Donación',
     donation_desc: 'Apoya nuestras iniciativas de impacto social donando criptomonedas. Todos los fondos van directamente a la Tesorería de Impacto.',
     donation_solana_warning: `IMPORTANTE: Las donaciones de USDC y USDT se aceptan actualmente SOLO desde la red de Solana. No envíe desde ninguna otra red (por ejemplo, Ethereum), ya que los fondos se perderán y no llegarán a su destino.`,
-    donation_fee_info: 'Las donaciones directas actualmente no tienen comisiones. Después de que concluya la preventa, se activará una tarifa de transferencia del 0.5% en todas las transacciones de $OWFN para financiar perpetuamente la Tesorería de Impacto.',
     select_token: 'Seleccionar Token',
     amount: 'Cantidad',
     donations_form_title: 'Formulario de Donación',
@@ -228,20 +226,10 @@ export const es = {
     case_update_3: 'La financiación del proyecto comenzó oficialmente. Agradecemos la primera ola de apoyo de la comunidad OWFN.',
     
     // Partnerships Page
-    partnerships_title: 'Asociaciones y Colaboraciones Futuras',
-    partnerships_focus_title: 'Nuestro Enfoque Actual',
-    partnerships_focus_desc: 'Nuestra prioridad absoluta en esta etapa es asegurar una preventa exitosa y construir una base comunitaria sólida y comprometida. Este es el cimiento sobre el cual se construirá nuestro impacto futuro.',
-    partnerships_post_presale_intro: 'Una vez que la preventa concluya con éxito, nuestro equipo comenzará el proceso de buscar y evaluar activamente asociaciones estratégicas.',
-    partnerships_vision_title: 'Una Visión Compartida para un Impacto Global',
-    partnerships_vision_desc: 'Creemos que el cambio verdadero y significativo proviene de la colaboración. No solo buscamos socios; buscamos aliados que compartan nuestros valores fundamentales y estén profundamente comprometidos con la creación de un bien social real, transparente y duradero.',
-    partnerships_ideal_partner_title: 'Nuestro Socio Ideal:',
-    partnerships_ideal_item_1: 'Comparte nuestra misión de proporcionar ayuda directa y transparente a quienes la necesitan.',
-    partnerships_ideal_item_2: 'Valora la transparencia total y la rendición de cuentas en todas las operaciones.',
-    partnerships_ideal_item_3: 'Está comprometido con una visión a largo plazo de impacto sostenible, no con ganancias a corto plazo.',
-    partnerships_invitation_title: '¿Piensa en Colaborar?',
-    partnerships_invitation_desc: 'Si esta visión resuena con su organización, le invitamos a seguir nuestro progreso. Por favor, prepare su propuesta detallando cómo una colaboración podría amplificar nuestra misión compartida. Los detalles de contacto se harán más prominentes y abriremos canales formales de discusión una vez que se complete la fase de preventa.',
-    partnerships_thank_you: 'Gracias por su interés en construir un mundo mejor con nosotros.',
-
+    partnerships_title: 'Asociaciones',
+    partnerships_subtitle: 'Buscamos activamente asociaciones con ONG, corporaciones y otros proyectos.',
+    partnerships_contact_info: 'Contáctenos en partnerships@owfn.org para colaborar.',
+    
     // FAQ Page
     faq_title: 'Preguntas Frecuentes',
     faq_subtitle: 'Encuentra respuestas a las preguntas más comunes sobre OWFN.',
@@ -316,18 +304,9 @@ export const es = {
     decimals: 'Decimales',
     pool_info: 'Información del Pool',
     exchange: 'Exchange',
-    pool_age: 'Pool Creado',
+    pool_age: 'Antigüedad del Pool',
     on_chain_security: 'Seguridad On-Chain',
     update_authority: 'Autoridad de Actualización',
-    holders: 'Tenedores',
-    circulating_supply: 'Suministro Circulante',
-    token_distribution: 'Distribución de Tokens',
-    contract_verified: 'Contrato Verificado',
-    is_honeypot: '¿Es Honeypot?',
-    check_not_available: 'No Disponible',
-    is_mintable: '¿Se puede acuñar?',
-    is_freezable: '¿Se puede congelar?',
-    deployer_address: 'Dirección del Creador',
 
     // Staking & Vesting
     staking_title: 'Haz Staking de OWFN, Gana Recompensas',
