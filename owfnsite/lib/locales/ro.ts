@@ -505,4 +505,5 @@ export const ro = {
     contact_faq_title: 'Aveți o întrebare rapidă?',
     contact_faq_desc: `Multe răspunsuri pot fi găsite deja în secțiunea noastră de Întrebări Frecvente. Economisiți timp și consultați-o acum!`,
     contact_faq_button: 'Vezi Întrebările Frecvente',
+    contact_required_fields: 'Câmpurile marcate cu asterisc (*) sunt obligatorii.',
 };

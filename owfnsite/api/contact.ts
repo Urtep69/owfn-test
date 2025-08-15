@@ -39,11 +39,9 @@ export default async function handler(request: Request) {
             });
         }
 
-        // --- New data capture ---
         const submissionDate = new Date().toUTCString();
         const country = request.headers.get('x-vercel-ip-country') || 'N/A';
         
-        // Map reason key to recipient email and English text for the prompt
         const emailRecipientMap: Record<string, string> = {
             general: 'info@owfn.org',
             partnership: 'partnerships@owfn.org',
@@ -64,21 +62,26 @@ export default async function handler(request: Request) {
         const recipientEmail = emailRecipientMap[reason as string] || 'info@owfn.org';
         const reasonForPrompt = reasonTextMap[reason as string] || 'Other';
         
-        // Step 1: Use Gemini to format the email content with the new data
+        // Step 1: Use Gemini to analyze, translate, and format the email content
         const ai = new GoogleGenAI({ apiKey: geminiApiKey });
         
-        const prompt = `A user has submitted a contact form on the OWFN (Official World Family Network) website. Please format this information into a professional email subject and a clean, well-structured HTML body.
-        
-CRITICAL INSTRUCTION: The HTML body MUST start with a styled summary section containing all the submission details provided below. After the summary, add a horizontal rule (<hr>), followed by the user's original message.
+        const prompt = `A user has submitted a contact form on the OWFN (Official World Family Network) website. Your task is to process this information and generate a structured email for an administrator.
 
-Submission Details:
+First, analyze the user's message provided below to detect its original language.
+Then, create a concise summary of the message IN ENGLISH.
+Finally, create a full translation of the message IN ENGLISH.
+
+Use this analysis to format a professional email subject and a well-structured HTML body.
+
+Submission Details to include:
 - Sender Name: ${name}
 - Sender Email: ${email}
 - Reason for Contact: ${reasonForPrompt}
 - Submission Time (UTC): ${submissionDate}
 - Sender Country: ${country}
+- Detected Language: [The language you detected]
 
-Original Message:
+User's Original Message:
 ---
 ${message}
 ---`;
@@ -93,11 +96,11 @@ ${message}
                     properties: {
                         subject: {
                             type: Type.STRING,
-                            description: "A concise email subject line. Start with '[OWFN Contact]' followed by the reason for contact."
+                            description: "A concise email subject line. Start with '[OWFN Contact]' followed by the reason for contact and the sender's name."
                         },
                         htmlBody: {
                             type: Type.STRING,
-                            description: "The full, formatted body of the email in HTML. It MUST begin with a styled summary block containing all details (sender's name, email, reason, submission time, and country). This block should be followed by a horizontal rule (<hr>) and then the original, unmodified message from the user."
+                            description: "The full, formatted body of the email in HTML. It MUST contain the following sections in this exact order: 1. A styled 'Submission Details' block with all provided metadata including the detected language. 2. A section titled 'AI Summary (English)' with your concise summary. 3. A section titled 'AI Translation (English)' with your full translation. 4. A horizontal rule (<hr>). 5. The 'Original Message' section with the user's verbatim message."
                         }
                     },
                     propertyOrdering: ["subject", "htmlBody"],
@@ -116,14 +119,11 @@ ${message}
                 'Authorization': `Bearer ${resendApiKey}`
             },
             body: JSON.stringify({
-                // NOTE: For production, you must verify a domain with Resend (e.g., 'owfn.org') 
-                // and send from an address like 'Contact Form <noreply@owfn.org>'.
-                // 'onboarding@resend.dev' is for development/testing purposes.
                 from: 'Contact Form OWFN <contact@owfn.org>',
-                to: recipientEmail, // The project's contact email address
+                to: recipientEmail,
                 subject: emailContent.subject,
                 html: emailContent.htmlBody,
-                reply_to: email // Set the user's email as the reply-to address for easy response
+                reply_to: email
             })
         });
 

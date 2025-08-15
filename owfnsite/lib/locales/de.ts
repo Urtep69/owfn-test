@@ -505,4 +505,5 @@ export const de = {
     contact_faq_title: 'Haben Sie eine schnelle Frage?',
     contact_faq_desc: `Viele Antworten finden Sie bereits in unserem FAQ-Bereich. Sparen Sie Zeit und schauen Sie jetzt nach!`,
     contact_faq_button: 'FAQs anzeigen',
+    contact_required_fields: 'Mit einem Stern (*) markierte Felder sind Pflichtfelder.',
 };

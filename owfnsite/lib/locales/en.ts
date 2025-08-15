@@ -505,4 +505,5 @@ export const en = {
     contact_faq_title: 'Have a quick question?',
     contact_faq_desc: `Many answers can already be found in our FAQ section. Save time and check it out now!`,
     contact_faq_button: 'View FAQs',
+    contact_required_fields: 'Fields marked with an asterisk (*) are required.',
 };

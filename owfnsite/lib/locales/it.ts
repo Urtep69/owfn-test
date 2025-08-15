@@ -506,4 +506,5 @@ export const it = {
     contact_faq_title: 'Hai una domanda veloce?',
     contact_faq_desc: 'Molte risposte si trovano già nella nostra sezione FAQ. Risparmia tempo e controlla ora!',
     contact_faq_button: 'Visualizza le FAQ',
+    contact_required_fields: 'I campi contrassegnati da un asterisco (*) sono obbligatori.',
 };

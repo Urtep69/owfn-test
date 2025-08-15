@@ -100,22 +100,23 @@ export default function Contact() {
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
+                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400 -mb-2">{t('contact_required_fields')}</p>
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_name')}</label>
+                            <label htmlFor="name" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_name')} <span className="text-red-500">*</span></label>
                             <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500" />
                         </div>
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_email')}</label>
+                            <label htmlFor="email" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_email')} <span className="text-red-500">*</span></label>
                             <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500" />
                         </div>
                          <div>
-                            <label htmlFor="reason" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_reason')}</label>
+                            <label htmlFor="reason" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_reason')} <span className="text-red-500">*</span></label>
                             <select id="reason" value={reason} onChange={e => setReason(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500">
                                 {reasonOptions.map(opt => <option key={opt.key} value={opt.key}>{t(opt.labelKey)}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="message" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_message')}</label>
+                            <label htmlFor="message" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_message')} <span className="text-red-500">*</span></label>
                             <textarea id="message" value={message} onChange={e => setMessage(e.target.value)} required rows={5} className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500"></textarea>
                         </div>
                         {status === 'error' && (
