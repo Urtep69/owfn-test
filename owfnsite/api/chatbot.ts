@@ -56,7 +56,8 @@ export default async function handler(request: Request) {
             return new Response(stream, { status: 200, headers: { 'Content-Type': 'application/json-seq' } });
         }
 
-        const body = await request.json();
+        const bodyText = await request.text();
+        const body = JSON.parse(bodyText);
         const { history, question, langCode } = body;
 
         if (!question || typeof question !== 'string' || question.trim() === '') {
