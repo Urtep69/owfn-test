@@ -1,3 +1,4 @@
+
 export const zh = {
     // Navigation
     home: '首页',
@@ -17,6 +18,7 @@ export const zh = {
     airdrop: '空投',
     governance: '治理',
     maintenance_mode: '维护模式',
+    contact: '联系我们',
 
     // Sidebar Groups
     sidebar_explore: '探索',
@@ -471,4 +473,37 @@ export const zh = {
     airdrop_complete: '空投完成',
     airdrop_summary: '{success} 成功，{failed} 失败。',
     airdrop_log: '空投日志',
+
+    // Contact Page
+    contact_title: '联系我们',
+    contact_subtitle: '我们很乐意听取您的意见。请在下方选择最佳联系方式。',
+    contact_how_can_we_help: '我们能为您做些什么？',
+    contact_general_inquiries: '一般查询',
+    contact_general_desc: '有关项目的任何一般性问题。',
+    contact_partnerships: '合作伙伴',
+    contact_partnerships_desc: '合作建议和战略合作伙伴关系。',
+    contact_press_media: '新闻与媒体',
+    contact_press_desc: '记者、博主和媒体查询。',
+    contact_technical_support: '技术支持',
+    contact_support_desc: '网站、预售或钱包的技术问题。',
+    contact_socials_title: '加入对话',
+    contact_form_title: '给我们发送直接消息',
+    contact_form_name: '您的姓名',
+    contact_form_email: '您的电子邮件地址',
+    contact_form_reason: '联系原因',
+    contact_form_message: '您的消息',
+    contact_reason_general: '一般问题',
+    contact_reason_partnership: '合作建议',
+    contact_reason_press: '新闻查询',
+    contact_reason_support: '技术支持',
+    contact_reason_feedback: '反馈与建议',
+    contact_reason_other: '其他',
+    contact_send_message: '发送消息',
+    contact_sending: '发送中...',
+    contact_success_title: '谢谢！',
+    contact_success_message: '您的消息已发送。我们将尽快与您联系。',
+    contact_error_message: '发生错误。请稍后再试。',
+    contact_faq_title: '有快速问题吗？',
+    contact_faq_desc: '许多答案都可以在我们的常见问题部分找到。节省时间，立即查看！',
+    contact_faq_button: '查看常见问题',
 };

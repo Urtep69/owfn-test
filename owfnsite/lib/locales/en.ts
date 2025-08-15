@@ -1,3 +1,4 @@
+
 export const en = {
     // Navigation
     home: 'Home',
@@ -17,6 +18,7 @@ export const en = {
     airdrop: 'Airdrop',
     governance: 'Governance',
     maintenance_mode: 'Maintenance Mode',
+    contact: 'Contact',
 
     // Sidebar Groups
     sidebar_explore: 'Explore',
@@ -148,14 +150,14 @@ export const en = {
     make_donation: 'Make a Donation',
     donation_desc: 'Support our social impact initiatives by donating crypto. All funds go directly to the Impact Treasury.',
     donation_message_title: 'A Bridge of Hope, Built by You',
-    donation_message_p1: 'Beyond the code and the blockchain lies our true mission: humanity. Every transaction on this page is more than just a transfer of value; it\'s a helping hand extended across continents, a signal that no one needs to fear being forgotten.',
-    donation_message_p2_part1: 'Your contribution, regardless of the chosen cryptocurrency, transforms. It becomes the foundation of a new school, a safe haven where a child\'s potential can flourish. It turns into vital medical care for a family that had lost all hope. It becomes a warm meal for someone marginalized by society, a dignified home for an elder, or the materials needed to rebuild a community devastated by disaster. Through the transparency offered by the Solana blockchain, the ',
+    donation_message_p1: `Beyond the code and the blockchain lies our true mission: humanity. Every transaction on this page is more than just a transfer of value; it's a helping hand extended across continents, a signal that no one needs to fear being forgotten.`,
+    donation_message_p2_part1: `Your contribution, regardless of the chosen cryptocurrency, transforms. It becomes the foundation of a new school, a safe haven where a child's potential can flourish. It turns into vital medical care for a family that had lost all hope. It becomes a warm meal for someone marginalized by society, a dignified home for an elder, or the materials needed to rebuild a community devastated by disaster. Through the transparency offered by the Solana blockchain, the `,
     donation_message_p2_project_name: 'Official World Family Network',
-    donation_message_p2_part2: ' ensures your generosity reaches its destination with integrity and purpose.',
-    donation_message_p3: 'Your contribution, no matter the size, is a powerful statement of solidarity. It is proof that a global family, united by compassion, can change the world. You\'re not just making a donation; you\'re joining a movement dedicated to building a better future.',
+    donation_message_p2_part2: ` ensures your generosity reaches its destination with integrity and purpose.`,
+    donation_message_p3: `Your contribution, no matter the size, is a powerful statement of solidarity. It is proof that a global family, united by compassion, can change the world. You're not just making a donation; you're joining a movement dedicated to building a better future.`,
     donation_message_thanks: 'For this, we are deeply grateful.',
     donation_solana_warning: `IMPORTANT: Donations for USDC and USDT are currently accepted ONLY from the Solana network. Do not send from any other network (e.g., Ethereum) as the funds will be lost and will not reach their destination.`,
-    donation_fee_info: 'Direct donations are currently fee-free. After the presale concludes, a 0.5% transfer fee on all $OWFN transactions will be activated to perpetually fund the Impact Treasury.',
+    donation_fee_info: `Direct donations are currently fee-free. After the presale concludes, a 0.5% transfer fee on all $OWFN transactions will be activated to perpetually fund the Impact Treasury.`,
     select_token: 'Select Token',
     amount: 'Amount',
     donations_form_title: 'Donation Form',
@@ -237,16 +239,16 @@ export const en = {
     // Partnerships Page
     partnerships_title: 'Partnerships & Future Collaborations',
     partnerships_focus_title: 'Our Current Focus',
-    partnerships_focus_desc: 'Our absolute priority at this stage is to ensure a successful presale and build a strong, engaged community foundation. This is the bedrock upon which our future impact will be built.',
+    partnerships_focus_desc: `Our absolute priority at this stage is to ensure a successful presale and build a strong, engaged community foundation. This is the bedrock upon which our future impact will be built.`,
     partnerships_post_presale_intro: 'After the presale concludes successfully, our team will begin the process of actively seeking and evaluating strategic partnerships.',
     partnerships_vision_title: 'A Shared Vision for Global Impact',
-    partnerships_vision_desc: 'We believe that true, meaningful change comes from collaboration. We are not just looking for partners; we are looking for allies who share our core values and are deeply committed to creating real, transparent, and lasting social good.',
+    partnerships_vision_desc: `We believe that true, meaningful change comes from collaboration. We are not just looking for partners; we are looking for allies who share our core values and are deeply committed to creating real, transparent, and lasting social good.`,
     partnerships_ideal_partner_title: 'Our Ideal Partner:',
     partnerships_ideal_item_1: 'Shares our mission to provide direct, transparent aid to those in need.',
     partnerships_ideal_item_2: 'Values complete transparency and accountability in all operations.',
     partnerships_ideal_item_3: 'Is committed to a long-term vision of sustainable impact, not short-term gains.',
     partnerships_invitation_title: 'Thinking of Collaborating?',
-    partnerships_invitation_desc: 'If this vision resonates with your organization, we invite you to follow our progress. Please prepare your proposal outlining how a collaboration could amplify our shared mission. Contact details will be made more prominent, and we will open formal channels for discussion after the presale phase is complete.',
+    partnerships_invitation_desc: `If this vision resonates with your organization, we invite you to follow our progress. Please prepare your proposal outlining how a collaboration could amplify our shared mission. Contact details will be made more prominent, and we will open formal channels for discussion after the presale phase is complete.`,
     partnerships_thank_you: 'Thank you for your interest in building a better world with us.',
 
     // FAQ Page
@@ -266,11 +268,11 @@ export const en = {
     faq_a6: `You can find the detailed OWFN Whitepaper by clicking on the "Whitepaper" button in the header or the main section of our website.`,
     faq_q7: `How does OWFN make a real-world difference?`,
     faq_a7: `OWFN directly funds initiatives in critical areas such as healthcare (e.g., covering surgery costs, hospital modernization), education (e.g., building and renovating schools, kindergartens), and basic needs (e.g., providing food, shelter, clothing for the homeless, establishing nursing homes). We also respond to disaster relief and invest in sustainable community development projects. Every token contributes to these concrete actions, ensuring 100% real support for humanity.`,
-    faq_q8: 'How does my contribution, through buying tokens, truly help?',
+    faq_q8: `How does my contribution, by buying tokens, actually help?`,
     faq_a8: `Your contribution helps in two fundamental ways. First, when you purchase tokens during the presale, a significant portion of the funds goes directly into the Impact Treasury to launch our social projects. Second, to create a sustainable, long-term funding source, a small 0.5% transfer fee will be activated on all transactions *after* the presale period concludes. This fee is designed as an automatic micro-donation to the Impact Treasury. It means that every time the token is used in the future, it generates continuous support for our humanitarian causes, turning the entire ecosystem into a perpetual force for good. All these financial flows are fully transparent on the blockchain.`,
-    faq_q9: 'Beyond buying tokens, how else can I get involved and help OWFN?',
+    faq_q9: `Besides buying tokens, how else can I get involved and help OWFN?`,
     faq_a9: `Your involvement is crucial! Spreading the word about OWFN is incredibly powerful. Talk to your friends, family, and colleagues about our mission. Share our vision on social media, during your travels, or at work. Every conversation, every share, helps raise awareness and brings more people into our global family, amplifying our collective impact. Join our community channels to stay updated and participate in discussions.`,
-    faq_q10: 'Are there special instructions for donating USDC or USDT?',
+    faq_q10: `Are there any special instructions for donating USDC or USDT?`,
     faq_a10: `Yes, this is critically important. All donations of USDC and USDT must be sent *exclusively* from the Solana blockchain. Do not send from any other network (e.g., Ethereum), as the funds will be lost and will not reach their destination. This information is clearly displayed on the donations page as well.`,
 
     // Chatbot
@@ -301,7 +303,7 @@ export const en = {
     vote_success_alert: 'Your vote has been cast successfully!',
 
     // Footer
-    footer_copyright: '© {year} Official World Family Network. All Rights Reserved.',
+    footer_copyright: '© {year} Official World Family Network. All rights reserved.',
 
     // Token Detail Page
     token_detail_title: 'Token Analytics',
@@ -399,9 +401,9 @@ export const en = {
     airdrop_congratulations: 'Congratulations!',
     airdrop_eligible_message: 'Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.',
     airdrop_not_eligible: 'Not Eligible',
-    airdrop_not_eligible_message: 'Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!',
+    airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
     airdrop_info_box_title: 'About This Airdrop',
-    airdrop_info_box_desc: 'This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.',
+    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
 
     // Governance
     governance_title: 'Governance',
@@ -426,21 +428,20 @@ export const en = {
     no_active_cases_in_category: 'No active cases in this category at the moment.',
 
     // Maintenance
-    maintenance_heading: "We're making things better!",
-    maintenance_message: "Our platform is currently undergoing scheduled maintenance to improve your experience. We appreciate your patience and understanding. We'll be back online shortly.",
-    maintenance_stay_tuned: "Stay tuned for updates on our social channels:",
-    admin_controls: "Admin Controls",
-    maintenance_status: "Status",
-    maintenance_status_active: "ACTIVE",
-    maintenance_status_inactive: "INACTIVE",
-    activate_maintenance_mode: "Activate Maintenance",
-    deactivate_maintenance_mode: "Deactivate Maintenance",
-    admin_login: "Admin Login",
+    maintenance_heading: `We're making things better!`,
+    maintenance_message: `Our platform is currently undergoing scheduled maintenance to improve your experience. We appreciate your patience and understanding. We'll be back online shortly.`,
+    admin_controls: 'Admin Controls',
+    maintenance_status: 'Status',
+    maintenance_status_active: 'ACTIVE',
+    maintenance_status_inactive: 'INACTIVE',
+    activate_maintenance_mode: 'Activate Maintenance',
+    deactivate_maintenance_mode: 'Deactivate Maintenance',
+    admin_login: 'Admin Login',
     maintenance_login_denied: 'Connection denied. The platform is in maintenance mode. Only administrators can log in.',
 
     // Coming Soon
     coming_soon_title: 'Coming Soon',
-    coming_soon_desc: 'This feature is currently under development. We are working hard to bring it to you soon. Thank you for your patience and support.',
+    coming_soon_desc: `This feature is currently under development. We are working hard to bring it to you soon. Thank you for your patience and support.`,
     
     // Admin Presale
     presale_admin_title: 'Presale Admin',
@@ -457,7 +458,7 @@ export const en = {
     date: 'Date',
     transaction: 'Transaction',
     airdrop_tool_title: 'Airdrop Distribution Tool',
-    airdrop_warning: 'WARNING: This tool will initiate the mass distribution of OWFN tokens to all presale contributors. This action is irreversible. Ensure the presale has officially ended and all data is correct.',
+    airdrop_warning: `WARNING: This tool will initiate the mass distribution of OWFN tokens to all presale contributors. This action is irreversible. Ensure the presale has officially ended and all data is correct.`,
     total_owfn_to_distribute: 'Total OWFN to Distribute',
     your_owfn_balance: 'Your OWFN Balance',
     insufficient_owfn_balance: 'Insufficient OWFN balance to perform airdrop.',
@@ -465,10 +466,43 @@ export const en = {
     insufficient_sol_balance: 'Insufficient SOL balance for transaction fees.',
     estimated_tx_fees: 'Estimated transaction fees',
     start_airdrop: 'Start Airdrop',
-    airdrop_confirmation_prompt: 'Are you sure you want to start the airdrop? This will send OWFN tokens to {count} unique wallets and cannot be undone.',
+    airdrop_confirmation_prompt: `Are you sure you want to start the airdrop? This will send OWFN tokens to {count} unique wallets and cannot be undone.`,
     airdrop_in_progress: 'Airdrop in Progress... Do not close this window.',
     processing_batch: 'Processing batch {current} of {total}...',
     airdrop_complete: 'Airdrop Complete',
     airdrop_summary: '{success} successful, {failed} failed.',
     airdrop_log: 'Airdrop Log',
+
+    // Contact Page
+    contact_title: 'Get in Touch',
+    contact_subtitle: `We'd love to hear from you. Choose the best way to connect with us below.`,
+    contact_how_can_we_help: 'How can we help?',
+    contact_general_inquiries: 'General Inquiries',
+    contact_general_desc: 'For any general questions about the project.',
+    contact_partnerships: 'Partnerships',
+    contact_partnerships_desc: 'For collaboration proposals and strategic partnerships.',
+    contact_press_media: 'Press & Media',
+    contact_press_desc: 'For journalists, bloggers, and media inquiries.',
+    contact_technical_support: 'Technical Support',
+    contact_support_desc: 'For technical issues with the site, presale, or wallet.',
+    contact_socials_title: 'Join the Conversation',
+    contact_form_title: 'Send Us a Direct Message',
+    contact_form_name: 'Your Name',
+    contact_form_email: 'Your Email Address',
+    contact_form_reason: 'Reason for Contact',
+    contact_form_message: 'Your Message',
+    contact_reason_general: 'General Question',
+    contact_reason_partnership: 'Partnership Proposal',
+    contact_reason_press: 'Press Inquiry',
+    contact_reason_support: 'Technical Support',
+    contact_reason_feedback: 'Feedback & Suggestions',
+    contact_reason_other: 'Other',
+    contact_send_message: 'Send Message',
+    contact_sending: 'Sending...',
+    contact_success_title: 'Thank you!',
+    contact_success_message: `Your message has been sent. We will get back to you shortly.`,
+    contact_error_message: 'An error occurred. Please try again later.',
+    contact_faq_title: 'Have a quick question?',
+    contact_faq_desc: `Many answers can already be found in our FAQ section. Save time and check it out now!`,
+    contact_faq_button: 'View FAQs',
 };

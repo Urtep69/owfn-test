@@ -1,9 +1,8 @@
 
-
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
-    Home, Info, FileText, Map, Handshake, HelpCircle, 
+    Home, Info, FileText, Map, Handshake, HelpCircle, Mail,
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
     Heart, TrendingUp, Lock, Award, User, Vote, Shield
 } from 'lucide-react';
@@ -80,6 +79,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 { to: '/airdrop', label: t('airdrop'), icon: <Award size={20} /> },
                 { to: '/impact', label: t('impact_portal'), icon: <Heart size={20} /> },
                 { to: '/governance', label: t('governance'), icon: <Vote size={20} /> },
+                { to: '/contact', label: t('contact'), icon: <Mail size={20} /> },
             ]
         }
     ];

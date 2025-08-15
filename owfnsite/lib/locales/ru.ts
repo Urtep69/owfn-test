@@ -1,3 +1,4 @@
+
 export const ru = {
     // Navigation
     home: 'Главная',
@@ -17,6 +18,7 @@ export const ru = {
     airdrop: 'Аирдроп',
     governance: 'Управление',
     maintenance_mode: 'Режим обслуживания',
+    contact: 'Контакты',
     
     // Sidebar Groups
     sidebar_explore: 'Исследовать',
@@ -471,4 +473,37 @@ export const ru = {
     airdrop_complete: 'Аирдроп завершен',
     airdrop_summary: '{success} успешно, {failed} неудачно.',
     airdrop_log: 'Журнал аирдропа',
+
+    // Contact Page
+    contact_title: 'Свяжитесь с нами',
+    contact_subtitle: 'Мы будем рады услышать вас. Выберите лучший способ связаться с нами ниже.',
+    contact_how_can_we_help: 'Как мы можем вам помочь?',
+    contact_general_inquiries: 'Общие вопросы',
+    contact_general_desc: 'Для любых общих вопросов о проекте.',
+    contact_partnerships: 'Партнерство',
+    contact_partnerships_desc: 'Для предложений о сотрудничестве и стратегических партнерствах.',
+    contact_press_media: 'Пресса и СМИ',
+    contact_press_desc: 'Для журналистов, блоггеров и запросов СМИ.',
+    contact_technical_support: 'Техническая поддержка',
+    contact_support_desc: 'Для технических проблем с сайтом, предпродажей или кошельком.',
+    contact_socials_title: 'Присоединяйтесь к разговору',
+    contact_form_title: 'Отправьте нам прямое сообщение',
+    contact_form_name: 'Ваше имя',
+    contact_form_email: 'Ваш адрес электронной почты',
+    contact_form_reason: 'Причина обращения',
+    contact_form_message: 'Ваше сообщение',
+    contact_reason_general: 'Общий вопрос',
+    contact_reason_partnership: 'Предложение о партнерстве',
+    contact_reason_press: 'Запрос для прессы',
+    contact_reason_support: 'Техническая поддержка',
+    contact_reason_feedback: 'Отзывы и предложения',
+    contact_reason_other: 'Другое',
+    contact_send_message: 'Отправить сообщение',
+    contact_sending: 'Отправка...',
+    contact_success_title: 'Спасибо!',
+    contact_success_message: 'Ваше сообщение отправлено. Мы свяжемся с вами в ближайшее время.',
+    contact_error_message: 'Произошла ошибка. Пожалуйста, попробуйте позже.',
+    contact_faq_title: 'Есть быстрый вопрос?',
+    contact_faq_desc: 'Многие ответы уже можно найти в нашем разделе часто задаваемых вопросов. Сэкономьте время и проверьте его сейчас!',
+    contact_faq_button: 'Посмотреть ЧАВО',
 };

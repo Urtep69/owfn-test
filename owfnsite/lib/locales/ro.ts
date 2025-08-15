@@ -1,3 +1,4 @@
+
 export const ro = {
     // Navigation
     home: 'Acasă',
@@ -17,6 +18,7 @@ export const ro = {
     airdrop: 'Airdrop',
     governance: 'Guvernanță',
     maintenance_mode: 'Mod Mentenanță',
+    contact: 'Contact',
 
     // Sidebar Groups
     sidebar_explore: 'Explorare',
@@ -148,14 +150,14 @@ export const ro = {
     make_donation: 'Fă o Donație',
     donation_desc: 'Susține inițiativele noastre de impact social donând crypto. Toate fondurile merg direct către Trezoreria de Impact.',
     donation_message_title: 'Un Pod al Speranței, Construit de Tine',
-    donation_message_p1: 'Dincolo de cod și de blockchain, se află adevărata noastră misiune: umanitatea. Fiecare tranzacție de pe această pagină este mai mult decât un simplu transfer de valoare; este o mână de ajutor întinsă peste continente, un semnal că nimănui nu trebuie să-i fie teamă că a fost uitat.',
-    donation_message_p2_part1: 'Contribuția ta, indiferent de criptomoneda aleasă, se transformă. Devine fundația unei noi școli, un adăpost sigur unde potențialul unui copil poate înflori. Se transformă în îngrijire medicală vitală pentru o familie care își pierduse orice speranță. Devine o masă caldă pentru cineva marginalizat de societate, o casă demnă pentru un bătrân sau materialele necesare pentru a reconstrui o comunitate devastată de un dezastru. Prin transparența oferită de blockchain-ul Solana, ',
+    donation_message_p1: `Dincolo de cod și de blockchain, se află adevărata noastră misiune: umanitatea. Fiecare tranzacție de pe această pagină este mai mult decât un simplu transfer de valoare; este o mână de ajutor întinsă peste continente, un semnal că nimănui nu trebuie să-i fie teamă că a fost uitat.`,
+    donation_message_p2_part1: `Contribuția ta, indiferent de criptomoneda aleasă, se transformă. Devine fundația unei noi școli, un adăpost sigur unde potențialul unui copil poate înflori. Se transformă în îngrijire medicală vitală pentru o familie care își pierduse orice speranță. Devine o masă caldă pentru cineva marginalizat de societate, o casă demnă pentru un bătrân sau materialele necesare pentru a reconstrui o comunitate devastată de un dezastru. Prin transparența oferită de blockchain-ul Solana, `,
     donation_message_p2_project_name: 'Official World Family Network',
-    donation_message_p2_part2: ' se asigură că generozitatea ta ajunge la destinație cu integritate și scop.',
-    donation_message_p3: 'Contribuția ta, indiferent de mărime, este o declarație puternică de solidaritate. Este dovada că o familie globală, unită de compasiune, poate schimba lumea. Nu faci doar o donație; te alături unei mișcări dedicate construirii unui viitor mai bun.',
+    donation_message_p2_part2: ` se asigură că generozitatea ta ajunge la destinație cu integritate și scop.`,
+    donation_message_p3: `Contribuția ta, indiferent de mărime, este o declarație puternică de solidaritate. Este dovada că o familie globală, unită de compasiune, poate schimba lumea. Nu faci doar o donație; te alături unei mișcări dedicate construirii unui viitor mai bun.`,
     donation_message_thanks: 'Pentru acest lucru, îți suntem profund recunoscători.',
     donation_solana_warning: `IMPORTANT: Donațiile în USDC și USDT sunt acceptate momentan DOAR din rețeaua Solana. Nu trimiteți din altă rețea (de ex. Ethereum), deoarece tokenii se vor pierde și nu vor ajunge ca donație.`,
-    donation_fee_info: 'Donațiile directe sunt în prezent fără taxe. După încheierea prevânzării, o taxă de transfer de 0,5% pentru toate tranzacțiile cu $OWFN va fi activată pentru a finanța perpetuu Trezoreria de Impact.',
+    donation_fee_info: `Donațiile directe sunt în prezent fără taxe. După încheierea prevânzării, o taxă de transfer de 0,5% pentru toate tranzacțiile cu $OWFN va fi activată pentru a finanța perpetuu Trezoreria de Impact.`,
     select_token: 'Selectează Token',
     amount: 'Sumă',
     donations_form_title: 'Formular de Donație',
@@ -237,16 +239,16 @@ export const ro = {
     // Partnerships Page
     partnerships_title: 'Parteneriate și Colaborări Viitoare',
     partnerships_focus_title: 'Prioritatea Noastră Actuală',
-    partnerships_focus_desc: 'În această etapă, prioritatea noastră absolută este asigurarea succesului prevânzării și construirea unei fundații comunitare puternice și angajate. Acesta este fundamentul pe care se va clădi impactul nostru viitor.',
+    partnerships_focus_desc: `În această etapă, prioritatea noastră absolută este asigurarea succesului prevânzării și construirea unei fundații comunitare puternice și angajate. Acesta este fundamentul pe care se va clădi impactul nostru viitor.`,
     partnerships_post_presale_intro: 'După încheierea cu succes a prevânzării, echipa noastră va începe procesul de căutare activă și evaluare a parteneriatelor strategice.',
     partnerships_vision_title: 'O Viziune Comună pentru un Impact Global',
-    partnerships_vision_desc: 'Credem că schimbarea reală și semnificativă provine din colaborare. Nu căutăm doar parteneri; căutăm aliați care împărtășesc valorile noastre fundamentale și sunt profund dedicați creării unui bine social real, transparent și de durată.',
+    partnerships_vision_desc: `Credem că schimbarea reală și semnificativă provine din colaborare. Nu căutăm doar parteneri; căutăm aliați care împărtășesc valorile noastre fundamentale și sunt profund dedicați creării unui bine social real, transparent și de durată.`,
     partnerships_ideal_partner_title: 'Partenerul nostru Ideal:',
     partnerships_ideal_item_1: 'Împărtășește misiunea noastră de a oferi ajutor direct și transparent celor aflați în nevoie.',
     partnerships_ideal_item_2: 'Valorează transparența completă și responsabilitatea în toate operațiunile.',
     partnerships_ideal_item_3: 'Este dedicat unei viziuni pe termen lung a impactului sustenabil, nu câștigurilor pe termen scurt.',
     partnerships_invitation_title: 'Vă gândiți la o Colaborare?',
-    partnerships_invitation_desc: 'Dacă această viziune rezonează cu organizația dumneavoastră, vă invităm să urmăriți progresul nostru. Vă rugăm să pregătiți propunerea dumneavoastră, subliniind modul în care o colaborare ar putea amplifica misiunea noastră comună. Detaliile de contact vor fi mai proeminente și vom deschide canale formale de discuție după finalizarea etapei de prevânzare.',
+    partnerships_invitation_desc: `Dacă această viziune rezonează cu organizația dumneavoastră, vă invităm să urmăriți progresul nostru. Vă rugăm să pregătiți propunerea dumneavoastră, subliniind modul în care o colaborare ar putea amplifica misiunea noastră comună. Detaliile de contact vor fi mai proeminente și vom deschide canale formale de discuție după finalizarea etapei de prevânzare.`,
     partnerships_thank_you: 'Vă mulțumim pentru interesul acordat în construirea unei lumi mai bune alături de noi.',
 
     // FAQ Page
@@ -266,11 +268,11 @@ export const ro = {
     faq_a6: `Puteți găsi Whitepaper-ul detaliat al OWFN făcând clic pe butonul "Whitepaper" din antetul sau secțiunea principală a site-ului nostru.`,
     faq_q7: `Cum face OWFN o diferență în lumea reală?`,
     faq_a7: `OWFN finanțează direct inițiative în domenii critice precum sănătatea (de exemplu, acoperirea costurilor chirurgicale, modernizarea spitalelor), educația (de exemplu, construirea și renovarea școlilor, grădinițelor) și nevoile de bază (de exemplu, furnizarea de hrană, adăpost, îmbrăcăminte pentru persoanele fără adăpost, înființarea de cămine de bătrâni). De asemenea, răspundem la dezastre și investim în proiecte de dezvoltare comunitară durabilă. Fiecare token contribuie la aceste acțiuni concrete, asigurând un sprijin 100% real pentru umanitate.`,
-    faq_q8: 'Cum ajută cu adevărat contribuția mea, prin cumpărarea de jetoane?',
+    faq_q8: `Cum ajută efectiv contribuția mea, prin cumpărarea de tokenuri?`,
     faq_a8: `Contribuția ta ajută în două moduri fundamentale. În primul rând, când cumperi tokenuri în timpul prevânzării, o parte semnificativă a fondurilor merge direct în Trezoreria de Impact pentru a lansa proiectele noastre sociale. În al doilea rând, pentru a crea o sursă de finanțare durabilă pe termen lung, o mică taxă de transfer de 0,5% va fi activată pentru toate tranzacțiile *după* încheierea perioadei de prevânzare. Această taxă este concepută ca o micro-donație automată către Trezoreria de Impact. Înseamnă că de fiecare dată când tokenul este folosit în viitor, generează sprijin continuu pentru cauzele noastre umanitare, transformând întregul ecosistem într-o forță perpetuă pentru bine. Toate aceste fluxuri financiare sunt complet transparente pe blockchain.`,
-    faq_q9: 'Dincolo de cumpărarea de jetoane, cum altfel mă pot implica și ajuta OWFN?',
+    faq_q9: `Pe lângă cumpărarea de tokenuri, cum altfel mă pot implica și pot ajuta OWFN?`,
     faq_a9: `Implicarea dvs. este crucială! Răspândirea cuvântului despre OWFN este incredibil de puternică. Vorbiți cu prietenii, familia și colegii despre misiunea noastră. Împărtășiți viziunea noastră pe rețelele sociale, în timpul călătoriilor sau la locul de muncă. Fiecare conversație, fiecare distribuire, ajută la creșterea gradului de conștientizare și aduce mai mulți oameni în familia noastră globală, amplificând impactul nostru colectiv. Alăturați-vă canalelor noastre comunitare pentru a rămâne la curent și a participa la discuții.`,
-    faq_q10: 'Există instrucțiuni speciale pentru donarea de USDC sau USDT?',
+    faq_q10: `Există instrucțiuni speciale pentru donarea de USDC sau USDT?`,
     faq_a10: `Da, acest lucru este extrem de important. Toate donațiile de USDC și USDT trebuie trimise *exclusiv* de pe rețeaua Solana. Nu trimiteți din nicio altă rețea (de ex. Ethereum), deoarece fondurile se vor pierde și nu vor ajunge la destinație. Această informație este afișată clar și pe pagina de donații.`,
 
     // Chatbot
@@ -399,9 +401,9 @@ export const ro = {
     airdrop_congratulations: 'Felicitări!',
     airdrop_eligible_message: 'Portofelul tău este eligibil! Vei primi {amount} tokeni OWFN la următoarea distribuire.',
     airdrop_not_eligible: 'Neeligibil',
-    airdrop_not_eligible_message: 'Ne pare rău, această adresă de portofel nu este eligibilă pentru airdrop-ul curent. Fii activ în comunitatea noastră pentru oportunități viitoare!',
+    airdrop_not_eligible_message: `Ne pare rău, această adresă de portofel nu este eligibilă pentru airdrop-ul curent. Fii activ în comunitatea noastră pentru oportunități viitoare!`,
     airdrop_info_box_title: 'Despre acest Airdrop',
-    airdrop_info_box_desc: 'Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.',
+    airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
 
     // Governance
     governance_title: 'Guvernanță',
@@ -427,8 +429,7 @@ export const ro = {
 
     // Maintenance
     maintenance_heading: "Facem lucrurile mai bune!",
-    maintenance_message: "Platforma noastră este în prezent în mentenanță programată pentru a vă îmbunătăți experiența. Apreciem răbdarea și înțelegerea dumneavoastră. Vom reveni online în scurt timp.",
-    maintenance_stay_tuned: "Rămâneți la curent cu noutățile pe canalele noastre sociale:",
+    maintenance_message: `Platforma noastră este în prezent în mentenanță programată pentru a vă îmbunătăți experiența. Apreciem răbdarea și înțelegerea dumneavoastră. Vom reveni online în scurt timp.`,
     admin_controls: "Controale Admin",
     maintenance_status: "Stare",
     maintenance_status_active: "ACTIV",
@@ -440,7 +441,7 @@ export const ro = {
 
     // Coming Soon
     coming_soon_title: 'În Curând',
-    coming_soon_desc: 'Această funcționalitate este în curs de dezvoltare. Lucrăm intens pentru a o lansa cât mai curând posibil. Vă mulțumim pentru răbdare și sprijin.',
+    coming_soon_desc: `Această funcționalitate este în curs de dezvoltare. Lucrăm intens pentru a o lansa cât mai curând posibil. Vă mulțumim pentru răbdare și sprijin.`,
     
     // Admin Presale
     presale_admin_title: 'Admin Prevânzare',
@@ -457,7 +458,7 @@ export const ro = {
     date: 'Data',
     transaction: 'Tranzacție',
     airdrop_tool_title: 'Instrument de Distribuție Airdrop',
-    airdrop_warning: 'AVERTISMENT: Acest instrument va iniția distribuția în masă a tokenilor OWFN către toți contribuitorii la prevânzare. Această acțiune este ireversibilă. Asigurați-vă că prevânzarea s-a încheiat oficial și toate datele sunt corecte.',
+    airdrop_warning: `AVERTISMENT: Acest instrument va iniția distribuția în masă a tokenilor OWFN către toți contribuitorii la prevânzare. Această acțiune este ireversibilă. Asigurați-vă că prevânzarea s-a încheiat oficial și toate datele sunt corecte.`,
     total_owfn_to_distribute: 'Total OWFN de Distribuit',
     your_owfn_balance: 'Soldul Tău de OWFN',
     insufficient_owfn_balance: 'Sold insuficient de OWFN pentru a efectua airdrop-ul.',
@@ -465,10 +466,43 @@ export const ro = {
     insufficient_sol_balance: 'Sold insuficient de SOL pentru taxele de tranzacție.',
     estimated_tx_fees: 'Taxe de tranzacție estimate',
     start_airdrop: 'Pornește Airdrop',
-    airdrop_confirmation_prompt: 'Sunteți sigur că doriți să porniți airdrop-ul? Acest lucru va trimite tokeni OWFN către {count} portofele unice și nu poate fi anulat.',
+    airdrop_confirmation_prompt: `Sunteți sigur că doriți să porniți airdrop-ul? Acest lucru va trimite tokeni OWFN către {count} portofele unice și nu poate fi anulat.`,
     airdrop_in_progress: 'Airdrop în Desfășurare... Nu închideți această fereastră.',
     processing_batch: 'Se procesează lotul {current} din {total}...',
     airdrop_complete: 'Airdrop Finalizat',
     airdrop_summary: '{success} reușite, {failed} eșuate.',
     airdrop_log: 'Jurnal Airdrop',
+
+    // Contact Page
+    contact_title: 'Intrați în Legătură',
+    contact_subtitle: 'Ne-ar plăcea să auzim de la dumneavoastră. Alegeți mai jos cea mai bună modalitate de a ne contacta.',
+    contact_how_can_we_help: 'Cum vă putem ajuta?',
+    contact_general_inquiries: 'Întrebări Generale',
+    contact_general_desc: 'Pentru orice întrebare generală despre proiect.',
+    contact_partnerships: 'Parteneriate',
+    contact_partnerships_desc: 'Pentru propuneri de colaborare și parteneriate strategice.',
+    contact_press_media: 'Presă și Media',
+    contact_press_desc: 'Pentru jurnaliști, bloggeri și solicitări media.',
+    contact_technical_support: 'Suport Tehnic',
+    contact_support_desc: 'Pentru probleme tehnice legate de site, prevânzare sau portofel.',
+    contact_socials_title: 'Alăturați-vă Conversației',
+    contact_form_title: 'Trimiteți-ne un Mesaj Direct',
+    contact_form_name: 'Numele Dvs.',
+    contact_form_email: 'Adresa Dvs. de E-mail',
+    contact_form_reason: 'Motivul Contactului',
+    contact_form_message: 'Mesajul Dvs.',
+    contact_reason_general: 'Întrebare Generală',
+    contact_reason_partnership: 'Propunere de Parteneriat',
+    contact_reason_press: 'Solicitare de Presă',
+    contact_reason_support: 'Suport Tehnic',
+    contact_reason_feedback: 'Feedback și Sugestii',
+    contact_reason_other: 'Altele',
+    contact_send_message: 'Trimite Mesajul',
+    contact_sending: 'Se trimite...',
+    contact_success_title: 'Vă mulțumim!',
+    contact_success_message: `Mesajul dvs. a fost trimis. Vă vom contacta în cel mai scurt timp.`,
+    contact_error_message: 'A apărut o eroare. Vă rugăm să încercați din nou mai târziu.',
+    contact_faq_title: 'Aveți o întrebare rapidă?',
+    contact_faq_desc: `Multe răspunsuri pot fi găsite deja în secțiunea noastră de Întrebări Frecvente. Economisiți timp și consultați-o acum!`,
+    contact_faq_button: 'Vezi Întrebările Frecvente',
 };

@@ -1,3 +1,4 @@
+
 export const de = {
     // Navigation
     home: 'Startseite',
@@ -17,6 +18,7 @@ export const de = {
     airdrop: 'Airdrop',
     governance: 'Governance',
     maintenance_mode: 'Wartungsmodus',
+    contact: 'Kontakt',
     
     // Sidebar Groups
     sidebar_explore: 'Erkunden',
@@ -148,14 +150,14 @@ export const de = {
     make_donation: 'Spenden',
     donation_desc: 'Unterstützen Sie unsere sozialen Initiativen durch eine Krypto-Spende. Alle Gelder gehen direkt an die Impact Treasury.',
     donation_message_title: 'Eine Brücke der Hoffnung, von Ihnen gebaut',
-    donation_message_p1: 'Jenseits von Code und Blockchain liegt unsere wahre Mission: die Menschlichkeit. Jede Transaktion auf dieser Seite ist mehr als nur eine Wertübertragung; es ist eine helfende Hand, die über Kontinente hinweg ausgestreckt wird, ein Signal, dass niemand fürchten muss, vergessen zu werden.',
-    donation_message_p2_part1: 'Ihr Beitrag, unabhängig von der gewählten Kryptowährung, verwandelt sich. Er wird zum Fundament einer neuen Schule, einem sicheren Hafen, in dem das Potenzial eines Kindes aufblühen kann. Er verwandelt sich in lebenswichtige medizinische Versorgung für eine Familie, die alle Hoffnung verloren hatte. Er wird zu einer warmen Mahlzeit für jemanden, der von der Gesellschaft ausgegrenzt wird, zu einem würdigen Zuhause für einen Älteren oder zu den Materialien, die benötigt werden, um eine von einer Katastrophe zerstörte Gemeinschaft wieder aufzubauen. Durch die Transparenz, die die Solana-Blockchain bietet, stellt das ',
+    donation_message_p1: `Jenseits von Code und Blockchain liegt unsere wahre Mission: die Menschlichkeit. Jede Transaktion auf dieser Seite ist mehr als nur eine Wertübertragung; es ist eine helfende Hand, die über Kontinente hinweg ausgestreckt wird, ein Signal, dass niemand fürchten muss, vergessen zu werden.`,
+    donation_message_p2_part1: `Ihr Beitrag, unabhängig von der gewählten Kryptowährung, verwandelt sich. Er wird zum Fundament einer neuen Schule, einem sicheren Hafen, in dem das Potenzial eines Kindes aufblühen kann. Er verwandelt sich in lebenswichtige medizinische Versorgung für eine Familie, die alle Hoffnung verloren hatte. Er wird zu einer warmen Mahlzeit für jemanden, der von der Gesellschaft ausgegrenzt wird, zu einem würdigen Zuhause für einen Älteren oder zu den Materialien, die benötigt werden, um eine von einer Katastrophe zerstörte Gemeinschaft wieder aufzubauen. Durch die Transparenz, die die Solana-Blockchain bietet, stellt das `,
     donation_message_p2_project_name: 'Official World Family Network',
-    donation_message_p2_part2: ' sicher, dass Ihre Großzügigkeit ihr Ziel mit Integrität und Zweck erreicht.',
-    donation_message_p3: 'Ihr Beitrag, egal wie groß, ist ein starkes Zeichen der Solidarität. Er ist der Beweis, dass eine globale Familie, vereint durch Mitgefühl, die Welt verändern kann. Sie tätigen nicht nur eine Spende; Sie schließen sich einer Bewegung an, die sich dem Aufbau einer besseren Zukunft widmet.',
+    donation_message_p2_part2: ` sicher, dass Ihre Großzügigkeit ihr Ziel mit Integrität und Zweck erreicht.`,
+    donation_message_p3: `Ihr Beitrag, egal wie groß, ist ein starkes Zeichen der Solidarität. Er ist der Beweis, dass eine globale Familie, vereint durch Mitgefühl, die Welt verändern kann. Sie tätigen nicht nur eine Spende; Sie schließen sich einer Bewegung an, die sich dem Aufbau einer besseren Zukunft widmet.`,
     donation_message_thanks: 'Dafür sind wir Ihnen zutiefst dankbar.',
     donation_solana_warning: `WICHTIG: Spenden für USDC und USDT werden derzeit NUR aus dem Solana-Netzwerk akzeptiert. Senden Sie nicht von einem anderen Netzwerk (z.B. Ethereum), da die Gelder sonst verloren gehen und ihr Ziel nicht erreichen.`,
-    donation_fee_info: 'Direkte Spenden sind derzeit gebührenfrei. Nach Abschluss des Vorverkaufs wird eine Überweisungsgebühr von 0,5 % auf alle $OWFN-Transaktionen aktiviert, um die Impact Treasury dauerhaft zu finanzieren.',
+    donation_fee_info: `Direkte Spenden sind derzeit gebührenfrei. Nach Abschluss des Vorverkaufs wird eine Überweisungsgebühr von 0,5 % auf alle $OWFN-Transaktionen aktiviert, um die Impact Treasury dauerhaft zu finanzieren.`,
     select_token: 'Token auswählen',
     amount: 'Betrag',
     donations_form_title: 'Spendenformular',
@@ -237,16 +239,16 @@ export const de = {
     // Partnerships Page
     partnerships_title: 'Partnerschaften & zukünftige Kooperationen',
     partnerships_focus_title: 'Unser aktueller Fokus',
-    partnerships_focus_desc: 'Unsere absolute Priorität in dieser Phase ist es, einen erfolgreichen Vorverkauf zu gewährleisten und eine starke, engagierte Community-Grundlage zu schaffen. Dies ist das Fundament, auf dem unsere zukünftige Wirkung aufgebaut wird.',
+    partnerships_focus_desc: `Unsere absolute Priorität in dieser Phase ist es, einen erfolgreichen Vorverkauf zu gewährleisten und eine starke, engagierte Community-Grundlage zu schaffen. Dies ist das Fundament, auf dem unsere zukünftige Wirkung aufgebaut wird.`,
     partnerships_post_presale_intro: 'Nach erfolgreichem Abschluss des Vorverkaufs wird unser Team den Prozess der aktiven Suche und Bewertung strategischer Partnerschaften beginnen.',
     partnerships_vision_title: 'Eine gemeinsame Vision für globale Wirkung',
-    partnerships_vision_desc: 'Wir glauben, dass wahrer, bedeutungsvoller Wandel aus Zusammenarbeit entsteht. Wir suchen nicht nur Partner; wir suchen Verbündete, die unsere Grundwerte teilen und sich zutiefst dafür einsetzen, echtes, transparentes und dauerhaftes soziales Wohl zu schaffen.',
+    partnerships_vision_desc: `Wir glauben, dass wahrer, bedeutungsvoller Wandel aus Zusammenarbeit entsteht. Wir suchen nicht nur Partner; wir suchen Verbündete, die unsere Grundwerte teilen und sich zutiefst dafür einsetzen, echtes, transparentes und dauerhaftes soziales Wohl zu schaffen.`,
     partnerships_ideal_partner_title: 'Unser idealer Partner:',
     partnerships_ideal_item_1: 'Teilt unsere Mission, direkte, transparente Hilfe für Bedürftige zu leisten.',
     partnerships_ideal_item_2: 'Schätzt vollständige Transparenz und Rechenschaftspflicht in allen Operationen.',
     partnerships_ideal_item_3: 'Verpflichtet sich zu einer langfristigen Vision nachhaltiger Wirkung, nicht zu kurzfristigen Gewinnen.',
     partnerships_invitation_title: 'Denken Sie an eine Zusammenarbeit?',
-    partnerships_invitation_desc: 'Wenn diese Vision bei Ihrer Organisation Anklang findet, laden wir Sie ein, unseren Fortschritt zu verfolgen. Bitte bereiten Sie Ihren Vorschlag vor, in dem Sie darlegen, wie eine Zusammenarbeit unsere gemeinsame Mission verstärken könnte. Kontaktdaten werden nach Abschluss der Vorverkaufsphase prominenter gemacht, und wir werden formelle Kanäle für Diskussionen eröffnen.',
+    partnerships_invitation_desc: `Wenn diese Vision bei Ihrer Organisation Anklang findet, laden wir Sie ein, unseren Fortschritt zu verfolgen. Bitte bereiten Sie Ihren Vorschlag vor, in dem Sie darlegen, wie eine Zusammenarbeit unsere gemeinsame Mission verstärken könnte. Kontaktdaten werden nach Abschluss der Vorverkaufsphase prominenter gemacht, und wir werden formelle Kanäle für Diskussionen eröffnen.`,
     partnerships_thank_you: 'Vielen Dank für Ihr Interesse, mit uns eine bessere Welt zu bauen.',
     
     // FAQ Page
@@ -266,11 +268,11 @@ export const de = {
     faq_a6: `Das detaillierte OWFN-Whitepaper finden Sie, indem Sie auf die Schaltfläche "Whitepaper" in der Kopfzeile oder im Hauptbereich unserer Website klicken.`,
     faq_q7: `Wie bewirkt OWFN einen realen Unterschied?`,
     faq_a7: `OWFN finanziert direkt Initiativen in kritischen Bereichen wie Gesundheitswesen (z.B. Deckung von Operationskosten, Modernisierung von Krankenhäusern), Bildung (z.B. Bau und Renovierung von Schulen, Kindergärten) und Grundbedürfnisse (z.B. Bereitstellung von Nahrung, Unterkunft, Kleidung für Obdachlose, Einrichtung von Pflegeheimen). Wir reagieren auch auf Katastrophenhilfe und investieren in nachhaltige Gemeindeentwicklungsprojekte. Jeder Token trägt zu diesen konkreten Maßnahmen bei und gewährleistet 100% echte Unterstützung für die Menschheit.`,
-    faq_q8: 'Wie hilft mein Beitrag, durch den Kauf von Tokens, wirklich?',
+    faq_q8: `Wie hilft mein Beitrag durch den Kauf von Token wirklich?`,
     faq_a8: `Ihr Beitrag hilft auf zwei grundlegende Weisen. Erstens, wenn Sie während des Vorverkaufs Token kaufen, fließt ein erheblicher Teil der Mittel direkt in die Impact Treasury, um unsere sozialen Projekte zu starten. Zweitens, um eine nachhaltige, langfristige Finanzierungsquelle zu schaffen, wird eine geringe Überweisungsgebühr von 0,5 % auf alle Transaktionen *nach* Abschluss des Vorverkaufszeitraums aktiviert. Diese Gebühr ist als automatische Mikrospende an die Impact Treasury konzipiert. Das bedeutet, dass jedes Mal, wenn der Token in Zukunft verwendet wird, er kontinuierliche Unterstützung für unsere humanitären Zwecke generiert und das gesamte Ökosystem in eine dauerhafte Kraft für das Gute verwandelt. Alle diese Finanzströme sind auf der Blockchain vollständig transparent.`,
-    faq_q9: 'Über den Kauf von Tokens hinaus, wie kann ich mich sonst einbringen und OWFN helfen?',
+    faq_q9: `Wie kann ich mich außer dem Kauf von Token noch engagieren und OWFN helfen?`,
     faq_a9: `Ihr Engagement ist entscheidend! Die Verbreitung von Informationen über OWFN ist unglaublich wirkungsvoll. Sprechen Sie mit Ihren Freunden, Ihrer Familie und Ihren Kollegen über unsere Mission. Teilen Sie unsere Vision in den sozialen Medien, auf Reisen oder bei der Arbeit. Jedes Gespräch, jede Teilung trägt zur Sensibilisierung bei und bringt mehr Menschen in unsere globale Familie, was unsere kollektive Wirkung verstärkt. Treten Sie unseren Community-Kanälen bei, um auf dem Laufenden zu bleiben und an Diskussionen teilzunehmen.`,
-    faq_q10: 'Gibt es spezielle Anweisungen für die Spende von USDC oder USDT?',
+    faq_q10: `Gibt es spezielle Anweisungen für die Spende von USDC oder USDT?`,
     faq_a10: `Ja, das ist äußerst wichtig. Alle Spenden von USDC und USDT müssen *ausschließlich* aus dem Solana-Netzwerk gesendet werden. Senden Sie sie nicht von einem anderen Netzwerk (z. B. Ethereum), da die Gelder sonst verloren gehen und ihr Ziel nicht erreichen. Diese Information wird auch deutlich auf der Spendenseite angezeigt.`,
     
     // Chatbot
@@ -339,7 +341,7 @@ export const de = {
     risk_warnings: 'Sicherheitswarnungen',
     risk_passed: 'Sicherheitsprüfungen bestanden',
     verified_by_owfn: 'Verifiziert durch OWFN-Analyse',
-    no_risk_factors_found: 'Keine kritischen Risikofaktoren wie veränderbare Metadaten oder nicht widerrufene Berechtigungen gefunden.',
+    no_risk_factors_found: 'Keine kritischen Risikofactoren wie veränderbare Metadaten oder nicht widerrufene Berechtigungen gefunden.',
     risk_factors_found: 'Potenzielle Risiken erkannt. Bitte gehen Sie mit Vorsicht vor.',
     swap: 'Tauschen',
     
@@ -399,10 +401,10 @@ export const de = {
     airdrop_congratulations: 'Herzlichen Glückwunsch!',
     airdrop_eligible_message: 'Ihr Wallet ist berechtigt! Sie erhalten {amount} OWFN-Token bei der nächsten Verteilung.',
     airdrop_not_eligible: 'Nicht berechtigt',
-    airdrop_not_eligible_message: 'Leider ist diese Wallet-Adresse für den aktuellen Airdrop nicht berechtigt. Bleiben Sie in unserer Community aktiv für zukünftige Möglichkeiten!',
+    airdrop_not_eligible_message: `Leider ist diese Wallet-Adresse für den aktuellen Airdrop nicht berechtigt. Bleiben Sie in unserer Community aktiv für zukünftige Möglichkeiten!`,
     airdrop_info_box_title: 'Über diesen Airdrop',
-    airdrop_info_box_desc: 'Dieser Airdrop wurde entwickelt, um frühe Unterstützer und aktive Community-Mitglieder zu belohnen. Die Berechtigung basiert auf Faktoren wie der Teilnahme am Vorverkauf und dem Engagement bei Community-Events.',
-
+    airdrop_info_box_desc: `Dieser Airdrop wurde entwickelt, um frühe Unterstützer und aktive Community-Mitglieder zu belohnen. Die Berechtigung basiert auf Faktoren wie der Teilnahme am Vorverkauf und dem Engagement bei Community-Events.`,
+    
     // Governance
     governance_title: 'Governance',
     governance_subtitle: 'Beteiligen Sie sich an der Zukunft von OWFN, indem Sie über Vorschläge abstimmen.',
@@ -427,8 +429,7 @@ export const de = {
     
     // Maintenance
     maintenance_heading: "Wir machen die Dinge besser!",
-    maintenance_message: "Unsere Plattform wird derzeit planmäßig gewartet, um Ihre Erfahrung zu verbessern. Wir danken Ihnen für Ihre Geduld und Ihr Verständnis. Wir werden in Kürze wieder online sein.",
-    maintenance_stay_tuned: "Bleiben Sie über unsere sozialen Kanäle auf dem Laufenden:",
+    maintenance_message: `Unsere Plattform wird derzeit planmäßig gewartet, um Ihre Erfahrung zu verbessern. Wir danken Ihnen für Ihre Geduld und Ihr Verständnis. Wir werden in Kürze wieder online sein.`,
     admin_controls: "Admin-Steuerung",
     maintenance_status: "Status",
     maintenance_status_active: "AKTIV",
@@ -440,7 +441,7 @@ export const de = {
 
     // Coming Soon
     coming_soon_title: 'In Kürze verfügbar',
-    coming_soon_desc: 'Diese Funktion befindet sich derzeit in der Entwicklung. Wir arbeiten hart daran, sie Ihnen bald zur Verfügung zu stellen. Vielen Dank für Ihre Geduld und Unterstützung.',
+    coming_soon_desc: `Diese Funktion befindet sich derzeit in der Entwicklung. Wir arbeiten hart daran, sie Ihnen bald zur Verfügung zu stellen. Vielen Dank für Ihre Geduld und Unterstützung.`,
 
     // Admin Presale
     presale_admin_title: 'Vorverkaufs-Admin',
@@ -457,7 +458,7 @@ export const de = {
     date: 'Datum',
     transaction: 'Transaktion',
     airdrop_tool_title: 'Airdrop-Verteilungstool',
-    airdrop_warning: 'WARNUNG: Dieses Tool initiiert die Massenverteilung von OWFN-Token an alle Vorverkaufs-Beitragenden. Diese Aktion ist unumkehrbar. Stellen Sie sicher, dass der Vorverkauf offiziell beendet ist und alle Daten korrekt sind.',
+    airdrop_warning: `WARNUNG: Dieses Tool initiiert die Massenverteilung von OWFN-Token an alle Vorverkaufs-Beitragenden. Diese Aktion ist unumkehrbar. Stellen Sie sicher, dass der Vorverkauf offiziell beendet ist und alle Daten korrekt sind.`,
     total_owfn_to_distribute: 'Zu verteilende OWFN insgesamt',
     your_owfn_balance: 'Ihr OWFN-Guthaben',
     insufficient_owfn_balance: 'Unzureichendes OWFN-Guthaben zur Durchführung des Airdrops.',
@@ -465,10 +466,43 @@ export const de = {
     insufficient_sol_balance: 'Unzureichendes SOL-Guthaben für Transaktionsgebühren.',
     estimated_tx_fees: 'Geschätzte Transaktionsgebühren',
     start_airdrop: 'Airdrop starten',
-    airdrop_confirmation_prompt: 'Sind Sie sicher, dass Sie den Airdrop starten möchten? Dies sendet OWFN-Token an {count} einzigartige Wallets und kann nicht rückgängig gemacht werden.',
+    airdrop_confirmation_prompt: `Sind Sie sicher, dass Sie den Airdrop starten möchten? Dies sendet OWFN-Token an {count} einzigartige Wallets und kann nicht rückgängig gemacht werden.`,
     airdrop_in_progress: 'Airdrop läuft... Schließen Sie dieses Fenster nicht.',
     processing_batch: 'Verarbeite Stapel {current} von {total}...',
     airdrop_complete: 'Airdrop abgeschlossen',
     airdrop_summary: '{success} erfolgreich, {failed} fehlgeschlagen.',
     airdrop_log: 'Airdrop-Protokoll',
+    
+    // Contact Page
+    contact_title: 'Kontakt aufnehmen',
+    contact_subtitle: 'Wir würden uns freuen, von Ihnen zu hören. Wählen Sie unten den besten Weg, um mit uns in Kontakt zu treten.',
+    contact_how_can_we_help: 'Wie können wir Ihnen helfen?',
+    contact_general_inquiries: 'Allgemeine Anfragen',
+    contact_general_desc: 'Für allgemeine Fragen zum Projekt.',
+    contact_partnerships: 'Partnerschaften',
+    contact_partnerships_desc: 'Für Kooperationsvorschläge und strategische Partnerschaften.',
+    contact_press_media: 'Presse & Medien',
+    contact_press_desc: 'Für Journalisten, Blogger und Medienanfragen.',
+    contact_technical_support: 'Technischer Support',
+    contact_support_desc: 'Bei technischen Problemen mit der Website, dem Vorverkauf oder der Wallet.',
+    contact_socials_title: 'Nehmen Sie am Gespräch teil',
+    contact_form_title: 'Senden Sie uns eine direkte Nachricht',
+    contact_form_name: 'Ihr Name',
+    contact_form_email: 'Ihre E-Mail-Adresse',
+    contact_form_reason: 'Grund der Kontaktaufnahme',
+    contact_form_message: 'Ihre Nachricht',
+    contact_reason_general: 'Allgemeine Frage',
+    contact_reason_partnership: 'Partnerschaftsvorschlag',
+    contact_reason_press: 'Presseanfrage',
+    contact_reason_support: 'Technischer Support',
+    contact_reason_feedback: 'Feedback & Vorschläge',
+    contact_reason_other: 'Sonstiges',
+    contact_send_message: 'Nachricht senden',
+    contact_sending: 'Wird gesendet...',
+    contact_success_title: 'Vielen Dank!',
+    contact_success_message: `Ihre Nachricht wurde gesendet. Wir werden uns in Kürze bei Ihnen melden.`,
+    contact_error_message: 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
+    contact_faq_title: 'Haben Sie eine schnelle Frage?',
+    contact_faq_desc: `Viele Antworten finden Sie bereits in unserem FAQ-Bereich. Sparen Sie Zeit und schauen Sie jetzt nach!`,
+    contact_faq_button: 'FAQs anzeigen',
 };

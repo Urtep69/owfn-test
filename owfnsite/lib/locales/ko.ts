@@ -1,3 +1,4 @@
+
 export const ko = {
     // Navigation
     home: '홈',
@@ -17,6 +18,7 @@ export const ko = {
     airdrop: '에어드롭',
     governance: '거버넌스',
     maintenance_mode: '유지보수 모드',
+    contact: '문의하기',
 
     // Sidebar Groups
     sidebar_explore: '탐색',
@@ -471,4 +473,37 @@ export const ko = {
     airdrop_complete: '에어드롭 완료',
     airdrop_summary: '{success}개 성공, {failed}개 실패.',
     airdrop_log: '에어드롭 로그',
+
+    // Contact Page
+    contact_title: '문의하기',
+    contact_subtitle: '여러분의 의견을 듣고 싶습니다. 아래에서 가장 좋은 방법으로 저희에게 연락해주세요.',
+    contact_how_can_we_help: '어떻게 도와드릴까요?',
+    contact_general_inquiries: '일반 문의',
+    contact_general_desc: '프로젝트에 대한 일반적인 질문이 있으시면 문의해주세요.',
+    contact_partnerships: '파트너십',
+    contact_partnerships_desc: '협업 제안 및 전략적 파트너십을 위한 문의.',
+    contact_press_media: '언론 및 미디어',
+    contact_press_desc: '언론인, 블로거, 미디어 문의.',
+    contact_technical_support: '기술 지원',
+    contact_support_desc: '사이트, 프리세일, 지갑 관련 기술적 문제.',
+    contact_socials_title: '대화에 참여하세요',
+    contact_form_title: '직접 메시지 보내기',
+    contact_form_name: '이름',
+    contact_form_email: '이메일 주소',
+    contact_form_reason: '문의 이유',
+    contact_form_message: '메시지',
+    contact_reason_general: '일반 질문',
+    contact_reason_partnership: '파트너십 제안',
+    contact_reason_press: '언론 문의',
+    contact_reason_support: '기술 지원',
+    contact_reason_feedback: '피드백 및 제안',
+    contact_reason_other: '기타',
+    contact_send_message: '메시지 보내기',
+    contact_sending: '보내는 중...',
+    contact_success_title: '감사합니다!',
+    contact_success_message: '메시지가 전송되었습니다. 곧 연락드리겠습니다.',
+    contact_error_message: '오류가 발생했습니다. 나중에 다시 시도해주세요.',
+    contact_faq_title: '빠른 질문이 있으신가요?',
+    contact_faq_desc: '많은 답변은 FAQ 섹션에서 찾을 수 있습니다. 시간을 절약하고 지금 확인해보세요!',
+    contact_faq_button: 'FAQ 보기',
 };
