@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Link } from 'wouter';
-import { Info, Handshake, Newspaper, Wrench, Loader2, CheckCircle, HelpCircle } from 'lucide-react';
+import { Info, Handshake, Newspaper, Wrench, Loader2, CheckCircle, HelpCircle, MessageSquareWarning, Twitter, Send } from 'lucide-react';
+import { DiscordIcon } from '../components/IconComponents.tsx';
+import { PROJECT_LINKS } from '../constants.ts';
 
 const ContactCard = ({ icon, title, email, description }: { icon: React.ReactNode, title: string, email: string, description: string }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform">
@@ -17,6 +19,21 @@ const ContactCard = ({ icon, title, email, description }: { icon: React.ReactNod
         </div>
         <p className="text-primary-600 dark:text-darkPrimary-400">{description}</p>
     </div>
+);
+
+const SocialLinkCard = ({ icon, title, description, href }: { icon: React.ReactNode, title: string, description: string, href: string }) => (
+    <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform text-center"
+    >
+        <div className="flex items-center justify-center w-16 h-16 mb-4 bg-primary-100 dark:bg-darkPrimary-700 rounded-full text-accent-500 dark:text-darkAccent-400 mx-auto">
+            {icon}
+        </div>
+        <h3 className="text-xl font-bold text-primary-900 dark:text-darkPrimary-100 mb-2">{title}</h3>
+        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{description}</p>
+    </a>
 );
 
 
@@ -66,6 +83,13 @@ export default function Contact() {
         { icon: <Wrench size={24} />, titleKey: 'contact_technical_support', descKey: 'contact_support_desc', email: 'support@owfn.org' },
     ];
 
+    const socialLinks = [
+        { icon: <Twitter size={32} />, titleKey: 'contact_social_x_title', descKey: 'contact_social_x_desc', href: PROJECT_LINKS.x },
+        { icon: <Send size={32} />, titleKey: 'contact_social_telegram_channel_title', descKey: 'contact_social_telegram_channel_desc', href: PROJECT_LINKS.telegramChannel },
+        { icon: <Send size={32} />, titleKey: 'contact_social_telegram_group_title', descKey: 'contact_social_telegram_group_desc', href: PROJECT_LINKS.telegramGroup },
+        { icon: <DiscordIcon className="w-8 h-8" />, titleKey: 'contact_social_discord_title', descKey: 'contact_social_discord_desc', href: PROJECT_LINKS.discord },
+    ];
+
     return (
         <div className="animate-fade-in-up space-y-12">
             <div className="text-center">
@@ -90,6 +114,21 @@ export default function Contact() {
                 </div>
             </section>
             
+            <section>
+                <h2 className="text-3xl font-bold text-center mb-8">{t('contact_socials_title')}</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {socialLinks.map(link => (
+                        <SocialLinkCard 
+                            key={link.titleKey}
+                            icon={link.icon}
+                            title={t(link.titleKey)}
+                            description={t(link.descKey)}
+                            href={link.href}
+                        />
+                    ))}
+                </div>
+            </section>
+
             <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d-lg">
                 <h2 className="text-3xl font-bold text-center mb-8">{t('contact_form_title')}</h2>
                 {status === 'success' ? (
@@ -131,6 +170,16 @@ export default function Contact() {
                 )}
             </section>
             
+            <section>
+                <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-6 rounded-lg shadow-md flex items-start gap-4 border border-primary-200 dark:border-darkPrimary-700">
+                    <Info className="w-8 h-8 text-primary-500 dark:text-darkPrimary-400 flex-shrink-0 mt-1" />
+                    <div>
+                        <h3 className="font-bold text-lg text-primary-800 dark:text-darkPrimary-200">{t('contact_disclaimer_title')}</h3>
+                        <p className="text-sm text-primary-700 dark:text-darkPrimary-300 mt-1">{t('contact_disclaimer_message')}</p>
+                    </div>
+                </div>
+            </section>
+
             <section className="bg-accent-100/30 dark:bg-darkAccent-900/30 p-8 rounded-lg shadow-inner-3d flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                      <HelpCircle className="w-12 h-12 text-accent-600 dark:text-darkAccent-400 flex-shrink-0" />
