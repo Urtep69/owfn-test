@@ -66,7 +66,7 @@ export default async function handler(request: Request) {
             return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
         }
 
-        const apiKey = process.env.API_KEY;
+        const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
             console.error("CRITICAL: API_KEY environment variable is not set.");
             return new Response(JSON.stringify({ error: "Server configuration error. The site administrator needs to configure the API key." }), { status: 500, headers: { 'Content-Type': 'application/json' } });
