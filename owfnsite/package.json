@@ -11,6 +11,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@google/genai": "^1.13.0",
+    "@vercel/node": "^3.2.0",
     "@solana/spl-token": "^0.4.13",
     "@solana/wallet-adapter-base": "^0.9.27",
     "@solana/wallet-adapter-react": "^0.15.39",
