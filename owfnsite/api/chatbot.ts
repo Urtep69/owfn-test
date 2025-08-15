@@ -56,8 +56,13 @@ export default async function handler(request: Request) {
             return new Response(stream, { status: 200, headers: { 'Content-Type': 'application/json-seq' } });
         }
 
-        const bodyText = await request.text();
-        const body = JSON.parse(bodyText);
+        if (!request.body) {
+    throw new Error("Request body is missing.");
+}
+const reader = request.body.getReader();
+const { done, value } = await reader.read();
+const bodyText = new TextDecoder().decode(value);
+const body = JSON.parse(bodyText);
         const { history, question, langCode } = body;
 
         if (!question || typeof question !== 'string' || question.trim() === '') {
