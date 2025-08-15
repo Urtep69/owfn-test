@@ -432,7 +432,7 @@ export const en = {
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
     airdrop_info_box_title: 'About This Airdrop',
     airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
-
+    
     // Governance
     governance_title: 'Governance',
     governance_subtitle: 'Participate in the future of OWFN by voting on proposals.',

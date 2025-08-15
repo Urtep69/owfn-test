@@ -1,4 +1,3 @@
-
 export const de = {
     // Navigation
     home: 'Startseite',
@@ -229,6 +228,7 @@ export const de = {
     live_updates: 'Live-Updates',
     funding_milestones: 'Finanzierungsmeilensteine',
     milestone_25: 'Anfängliche Finanzierung für Materialien gesichert.',
+
     milestone_50: 'Bau/Implementierung beginnt.',
     milestone_75: 'Zwischenbericht und Überprüfung des Projekts.',
     milestone_100: 'Projekt abgeschlossen und Abschlussbericht ausgestellt.',
@@ -318,7 +318,7 @@ export const de = {
     whitepaper_features_desc: 'Die OWFN-Plattform bietet mehrere Schlüsselfunktionen zur Unterstützung ihrer Mission:',
     whitepaper_feature_presale: 'Ermöglicht frühen Unterstützern den Kauf von OWFN-Token vor dem öffentlichen Start.',
     whitepaper_feature_donations: 'Ein dediziertes Portal für direkte Krypto-Spenden an die Impact Treasury.',
-    whitepaper_feature_dashboard: 'Biedet Echtzeitüberwachung aller offiziellen Projekt-Wallets für vollständige Transparenz.',
+    whitepaper_feature_dashboard: 'Bietet Echtzeitüberwachung aller offiziellen Projekt-Wallets für vollständige Transparenz.',
     whitepaper_feature_impact_portal: 'Präsentiert spezifische soziale Fälle, die vom Projekt finanziert werden, damit die Community ihre Auswirkungen sehen kann.',
     whitepaper_community_title: 'Community & Offizielle Links',
     whitepaper_community_desc: 'Treten Sie unserer wachsenden Community bei und bleiben Sie über die neuesten Nachrichten auf dem Laufenden:',
@@ -369,7 +369,7 @@ export const de = {
     risk_warnings: 'Sicherheitswarnungen',
     risk_passed: 'Sicherheitsprüfungen bestanden',
     verified_by_owfn: 'Verifiziert durch OWFN-Analyse',
-    no_risk_factors_found: 'Keine kritischen Risikofactoren wie veränderbare Metadaten oder nicht widerrufene Berechtigungen gefunden.',
+    no_risk_factors_found: 'Keine kritischen Risikofaktoren wie veränderbare Metadaten oder nicht widerrufene Berechtigungen gefunden.',
     risk_factors_found: 'Potenzielle Risiken erkannt. Bitte gehen Sie mit Vorsicht vor.',
     swap: 'Tauschen',
     

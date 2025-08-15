@@ -1,4 +1,3 @@
-
 export const es = {
     // Navigation
     home: 'Inicio',
@@ -261,6 +260,7 @@ export const es = {
     faq_category_presale: 'Preventa e Inversión',
     faq_category_technical: 'Técnico y Token',
     faq_category_mission: 'Misión e Impacto',
+
     faq_category_security: 'Seguridad y Equipo',
     faq_q1: '¿Qué es OWFN?',
     faq_a1: `OWFN (Red Familiar Mundial Oficial) es un token basado en Solana diseñado para unir a familias a nivel mundial a través de la tecnología blockchain, centrándose en el impacto social, la educación, la salud y la ayuda humanitaria con total transparencia.`,
