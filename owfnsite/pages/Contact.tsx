@@ -22,9 +22,19 @@ const ContactCard = ({ icon, title, email, description }: { icon: React.ReactNod
 
 export default function Contact() {
     const { t } = useAppContext();
+
+    const reasonOptions = [
+        { key: 'general', labelKey: 'contact_reason_general' },
+        { key: 'partnership', labelKey: 'contact_reason_partnership' },
+        { key: 'press', labelKey: 'contact_reason_press' },
+        { key: 'support', labelKey: 'contact_reason_support' },
+        { key: 'feedback', labelKey: 'contact_reason_feedback' },
+        { key: 'other', labelKey: 'contact_reason_other' },
+    ];
+
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [reason, setReason] = useState(t('contact_reason_general'));
+    const [reason, setReason] = useState(reasonOptions[0].key);
     const [message, setMessage] = useState('');
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
@@ -54,15 +64,6 @@ export default function Contact() {
         { icon: <Handshake size={24} />, titleKey: 'contact_partnerships', descKey: 'contact_partnerships_desc', email: 'partnerships@owfn.org' },
         { icon: <Newspaper size={24} />, titleKey: 'contact_press_media', descKey: 'contact_press_desc', email: 'press@owfn.org' },
         { icon: <Wrench size={24} />, titleKey: 'contact_technical_support', descKey: 'contact_support_desc', email: 'support@owfn.org' },
-    ];
-
-    const reasonOptions = [
-        'contact_reason_general',
-        'contact_reason_partnership',
-        'contact_reason_press',
-        'contact_reason_support',
-        'contact_reason_feedback',
-        'contact_reason_other',
     ];
 
     return (
@@ -110,7 +111,7 @@ export default function Contact() {
                          <div>
                             <label htmlFor="reason" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_reason')}</label>
                             <select id="reason" value={reason} onChange={e => setReason(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500">
-                                {reasonOptions.map(opt => <option key={opt} value={t(opt)}>{t(opt)}</option>)}
+                                {reasonOptions.map(opt => <option key={opt.key} value={opt.key}>{t(opt.labelKey)}</option>)}
                             </select>
                         </div>
                         <div>
