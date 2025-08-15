@@ -1,7 +1,7 @@
 import type { ChatMessage } from '../types.ts';
 
 // Vercel Edge Runtime for speed and reliability
-export const runtime = 'edge';
+
 
 function buildValidHistory(history: unknown): ChatMessage[] {
     const cleanHistory = Array.isArray(history)
