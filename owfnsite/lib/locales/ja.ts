@@ -458,6 +458,7 @@ export const ja = {
     // Maintenance
     maintenance_heading: `現在改善中です！`,
     maintenance_message: `現在、より良い体験を提供するために、プラットフォームの定期メンテナンスを行っています。ご不便をおかけしますが、ご理解とご協力をお願いいたします。まもなくオンラインに戻ります。`,
+    maintenance_stay_tuned: `ソーシャルチャネルで最新情報をご確認ください：`,
     admin_controls: `管理者コントロール`,
     maintenance_status: `ステータス`,
     maintenance_status_active: `有効`,

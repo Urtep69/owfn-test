@@ -458,6 +458,7 @@ export const es = {
     // Maintenance
     maintenance_heading: `¡Estamos mejorando las cosas!`,
     maintenance_message: `Nuestra plataforma está actualmente en mantenimiento programado para mejorar tu experiencia. Agradecemos tu paciencia y comprensión. Volveremos a estar en línea en breve.`,
+    maintenance_stay_tuned: `Mantente atento a las actualizaciones en nuestros canales sociales:`,
     admin_controls: `Controles de Administrador`,
     maintenance_status: `Estado`,
     maintenance_status_active: `ACTIVO`,

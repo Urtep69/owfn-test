@@ -458,6 +458,7 @@ export const de = {
     // Maintenance
     maintenance_heading: `Wir machen die Dinge besser!`,
     maintenance_message: `Unsere Plattform wird derzeit planmäßig gewartet, um Ihre Erfahrung zu verbessern. Wir danken Ihnen für Ihre Geduld und Ihr Verständnis. Wir werden in Kürze wieder online sein.`,
+    maintenance_stay_tuned: `Bleiben Sie auf unseren sozialen Kanälen auf dem Laufenden:`,
     admin_controls: `Admin-Steuerung`,
     maintenance_status: `Status`,
     maintenance_status_active: `AKTIV`,

@@ -458,6 +458,7 @@ export const ro = {
     // Maintenance
     maintenance_heading: `Facem lucrurile mai bune!`,
     maintenance_message: `Platforma noastră este în prezent în mentenanță programată pentru a vă îmbunătăți experiența. Apreciem răbdarea și înțelegerea dumneavoastră. Vom reveni online în scurt timp.`,
+    maintenance_stay_tuned: `Rămâneți la curent cu noutățile pe canalele noastre sociale:`,
     admin_controls: `Controale Admin`,
     maintenance_status: `Stare`,
     maintenance_status_active: `ACTIV`,
