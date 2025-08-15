@@ -44,7 +44,7 @@ export default async function handler(request: Request) {
             return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405 });
         }
 
-        const apiKey = process.env.API_KEY;
+        const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
             console.error("CRITICAL: API_KEY environment variable is not set.");
             const stream = new ReadableStream({
