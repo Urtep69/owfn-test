@@ -77,12 +77,24 @@ export const Chatbot = () => {
         };
     }, []);
 
+    const formatTimestamp = (date: Date) => {
+        return date.toLocaleString(currentLanguage.code, {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    };
+
     const handleSend = async () => {
         if (input.trim() === '' || isLoading) return;
 
-        const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }] };
+        const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }], timestamp: new Date() };
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
         const currentInput = input;
+        const currentTime = new Date().toISOString();
 
         setMessages(prev => [...prev, userMessage]);
         setInput('');
@@ -104,13 +116,13 @@ export const Chatbot = () => {
         loadingIntervalRef.current = window.setInterval(updateLoadingText, 2500);
 
         try {
-            let fullResponse = '';
             let firstChunkReceived = false;
 
             await getChatbotResponse(
                 historyForApi,
                 currentInput,
                 currentLanguage.code,
+                currentTime,
                 (chunk) => { // onChunk: Append text to the last message
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
@@ -118,7 +130,7 @@ export const Chatbot = () => {
                         setIsLoading(false); // Stop loading animation
                     }
                     if (!firstChunkReceived) {
-                        setMessages(prev => [...prev, { role: 'model', parts: [{ text: chunk }] }]);
+                        setMessages(prev => [...prev, { role: 'model', parts: [{ text: chunk }], timestamp: new Date() }]);
                         firstChunkReceived = true;
                     } else {
                          setMessages(prev => {
@@ -136,7 +148,7 @@ export const Chatbot = () => {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
                     }
-                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: errorMsg }] }]);
+                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: errorMsg }], timestamp: new Date() }]);
                 }
             );
         } catch (error) {
@@ -145,7 +157,7 @@ export const Chatbot = () => {
                 window.clearInterval(loadingIntervalRef.current);
                 loadingIntervalRef.current = null;
             }
-             setMessages(prev => [...prev, { role: 'model', parts: [{ text: t('chatbot_error') }] }]);
+             setMessages(prev => [...prev, { role: 'model', parts: [{ text: t('chatbot_error') }], timestamp: new Date() }]);
         } finally {
             if (loadingIntervalRef.current) {
                 window.clearInterval(loadingIntervalRef.current);
@@ -187,14 +199,23 @@ export const Chatbot = () => {
             <div className="flex-1 p-4 overflow-y-auto">
                 <div className="space-y-4">
                     {messages.map((msg, index) => (
-                        <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
-                            <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
-                               <div className="text-sm whitespace-pre-wrap">
-                                   {msg.role === 'model' ? renderMessageWithLinks(msg.parts[0].text) : msg.parts[0].text}
-                               </div>
+                        <div key={index}>
+                            <div className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
+                                <div className="flex flex-col">
+                                    {msg.timestamp && (
+                                        <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mb-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                                            {formatTimestamp(msg.timestamp)}
+                                        </p>
+                                    )}
+                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
+                                       <div className="text-sm whitespace-pre-wrap">
+                                           {msg.role === 'model' ? renderMessageWithLinks(msg.parts[0].text) : msg.parts[0].text}
+                                       </div>
+                                    </div>
+                                </div>
+                                {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                             </div>
-                            {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                         </div>
                     ))}
                     {isLoading && (

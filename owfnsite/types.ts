@@ -52,6 +52,7 @@ export type Theme = 'light' | 'dark';
 export interface ChatMessage {
     role: 'user' | 'model';
     parts: { text: string }[];
+    timestamp?: Date;
 }
 
 export interface TokenExtensionState {

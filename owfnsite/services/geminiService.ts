@@ -5,6 +5,7 @@ export async function getChatbotResponse(
   history: ChatMessage[],
   question: string,
   langCode: string,
+  currentTime: string,
   onChunk: (chunk: string) => void,
   onError: (errorMsg: string) => void
 ): Promise<void> {
@@ -12,7 +13,7 @@ export async function getChatbotResponse(
     const response = await fetch('/api/chatbot', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history, question, langCode }),
+      body: JSON.stringify({ history, question, langCode, currentTime }),
     });
 
     // The server should always respond with 200 OK now, even for errors.
