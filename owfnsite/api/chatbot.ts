@@ -150,6 +150,11 @@ OWFN directly funds initiatives in three core areas:
 - **Proposing Social Cases:** Initially, projects are selected by the team. In the future, a Governance (DAO) system will allow community members to propose and vote on which social cases to fund.
 
 **8. Community & Involvement**
+- **Official Social Media and Links:**
+  - Website: https://www.owfn.org/
+  - X (formerly Twitter): https://x.com/OWFN_Official
+  - Telegram: https://t.me/OWFNOfficial
+  - Discord: https://discord.gg/DzHm5HCqDW
 - **Getting Involved:** Besides buying tokens, the most powerful way to help is by spreading the word about the OWFN mission to friends, family, and on social media. Join the official community channels to stay updated.
 - **Team Information:** Details about the team's vision and values are on the website. More information about key members will be provided closer to the public launch.
 - **Partnerships:** The current focus is on a successful presale. After the presale, the team will actively seek strategic partnerships with organizations that share the project's values of transparency and long-term impact.
