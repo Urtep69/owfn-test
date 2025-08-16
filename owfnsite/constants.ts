@@ -1,3 +1,4 @@
+
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
@@ -108,16 +109,12 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
             en: 'OWFN (Official World Family Network) is a Solana-based token designed to unite families globally through blockchain technology, focusing on social impact, education, health, and humanitarian aid with full transparency.',
             // Add other languages as needed
         },
-        security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
+        totalSupply: 18_000_000_000,
         circulatingSupply: 0,
-        poolCreated: '2024-07-20',
-        dextScore: { score: 99, maxScore: 99, points: [20, 25, 20, 20, 14] },
-        audit: { contractVerified: true, isHoneypot: false, isFreezable: false, isMintable: false, alerts: 0 },
-        communityTrust: { positiveVotes: 1200, negativeVotes: 50, tradeCount: 1, totalTrades: 1250 },
         pairAddress: '8Vq82rQfT2nqzH8c4g8x9a2avp13aWv12t1nCvZ5X3qg',
     },
     'SOL': {
@@ -130,13 +127,12 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         pricePerToken: 0,
         decimals: 9,
         description: { en: 'Solana is a high-performance blockchain supporting builders around the world creating crypto apps that scale today.' },
-        security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
+        totalSupply: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A',
         pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDC': {
@@ -149,13 +145,12 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         pricePerToken: 0,
         decimals: 6,
         description: { en: 'USDC is a fully collateralized US dollar stablecoin. It is an Ethereum-powered coin and is the product of a collaboration between Circle and Coinbase.' },
-        security: { isMutable: false, mintAuthorityRevoked: false, freezeAuthorityRevoked: false },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
+        totalSupply: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A',
         pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDT': {
@@ -168,13 +163,12 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         pricePerToken: 0,
         decimals: 6,
         description: { en: 'Tether (USDT) is a stablecoin pegged to the U.S. dollar. It is issued by the Hong Kong-based company Tether Limited.' },
-        security: { isMutable: false, mintAuthorityRevoked: false, freezeAuthorityRevoked: false },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
+        totalSupply: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A',
         pairAddress: '7xKXtg2CW87d97TXJSD40M5M5gajNdkgdsDEsMmL2trn', // SOL/USDT
     }
 };

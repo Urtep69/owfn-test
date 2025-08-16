@@ -32,6 +32,7 @@ import Airdrop from './pages/Airdrop.tsx';
 import Governance from './pages/Governance.tsx';
 import Maintenance from './pages/Maintenance.tsx';
 import AdminPresale from './pages/AdminPresale.tsx';
+import Contact from './pages/Contact.tsx';
 
 const AppContent = () => {
   const { isMaintenanceActive, solana } = useAppContext();
@@ -75,6 +76,7 @@ const AppContent = () => {
           <Route path="/impact"><ImpactPortal /></Route>
           <Route path="/partnerships"><Partnerships /></Route>
           <Route path="/faq"><FAQ /></Route>
+          <Route path="/contact"><Contact /></Route>
           <Route path="/governance">
             <ComingSoonWrapper>
               <Governance />

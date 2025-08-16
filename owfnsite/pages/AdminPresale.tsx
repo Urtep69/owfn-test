@@ -1,10 +1,8 @@
-
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
+import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount, ACCOUNT_SIZE } from '@solana/spl-token';
 
 import { 
     DISTRIBUTION_WALLETS, 
@@ -14,7 +12,7 @@ import {
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
 } from '../constants.ts';
-import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User } from 'lucide-react';
+import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User, PieChart, RotateCcw } from 'lucide-react';
 import { SolIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { Token } from '../types.ts';
@@ -58,9 +56,22 @@ export default function AdminPresale() {
     const [isAirdropping, setIsAirdropping] = useState(false);
     const [airdropProgress, setAirdropProgress] = useState({ current: 0, total: 0 });
     const [airdropLogs, setAirdropLogs] = useState<string[]>([]);
+    const [processedAddresses, setProcessedAddresses] = useState<Set<string>>(new Set());
     
     const adminOwfnBalance = useMemo(() => solana.userTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS)?.balance ?? 0, [solana.userTokens]);
     const adminSolBalance = useMemo(() => solana.userTokens.find(t => t.symbol === 'SOL')?.balance ?? 0, [solana.userTokens]);
+    
+    const [rentExemption, setRentExemption] = useState(0);
+
+    useEffect(() => {
+        if (connection) {
+            connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE)
+                .then(rent => {
+                    setRentExemption(rent / LAMPORTS_PER_SOL);
+                })
+                .catch(err => console.error("Failed to get rent exemption:", err));
+        }
+    }, [connection]);
 
     const fetchAllTransactions = useCallback(async () => {
         setLoading(true);
@@ -166,53 +177,59 @@ export default function AdminPresale() {
     const handleAirdrop = useCallback(async () => {
         if (!wallet.publicKey || !wallet.signAllTransactions) return;
 
-        const confirmation = window.confirm(t('airdrop_confirmation_prompt', { count: aggregatedContributors.length }));
+        const contributorsToProcess = aggregatedContributors.filter(c => !processedAddresses.has(c.address));
+
+        if (contributorsToProcess.length === 0 && aggregatedContributors.length > 0) {
+            alert("All contributors have been processed.");
+            return;
+        }
+
+        const confirmation = window.confirm(t('airdrop_confirmation_prompt', { count: contributorsToProcess.length }));
         if (!confirmation) return;
 
         setIsAirdropping(true);
-        setAirdropLogs([]);
-        setAirdropProgress({ current: 0, total: aggregatedContributors.length });
+        if (processedAddresses.size === 0) {
+            setAirdropLogs([]);
+        }
+        setAirdropLogs(prev => [...prev, `--- Starting airdrop run for ${contributorsToProcess.length} wallets. ---`]);
+        setAirdropProgress({ current: processedAddresses.size, total: aggregatedContributors.length });
 
         const BATCH_SIZE = 10;
         const sourceOwner = wallet.publicKey;
         const tokenMint = new PublicKey(OWFN_MINT_ADDRESS);
         const sourceAta = await getAssociatedTokenAddress(tokenMint, sourceOwner);
         
-        let successfulAirdrops = 0;
+        let successfulInThisRun = 0;
 
-        for (let i = 0; i < aggregatedContributors.length; i += BATCH_SIZE) {
-            const batch = aggregatedContributors.slice(i, i + BATCH_SIZE);
-            setAirdropLogs(prev => [...prev, t('processing_batch', { current: (i/BATCH_SIZE) + 1, total: Math.ceil(aggregatedContributors.length / BATCH_SIZE) })]);
+        for (let i = 0; i < contributorsToProcess.length; i += BATCH_SIZE) {
+            const batch = contributorsToProcess.slice(i, i + BATCH_SIZE);
+            setAirdropLogs(prev => [...prev, t('processing_batch', { current: Math.floor(i / BATCH_SIZE) + 1, total: Math.ceil(contributorsToProcess.length / BATCH_SIZE) })]);
             
             try {
                 const transactions: Transaction[] = [];
                 const latestBlockhash = await connection.getLatestBlockhash();
 
                 for (const contributor of batch) {
-                    const transaction = new Transaction().add(
-                        ...(await (async () => {
-                            const instructions = [];
-                            const recipient = new PublicKey(contributor.address);
-                            const destinationAta = await getAssociatedTokenAddress(tokenMint, recipient);
-                            
-                            try {
-                                await getAccount(connection, destinationAta);
-                            } catch (error) {
-                                // If ATA does not exist, add instruction to create it
-                                instructions.push(createAssociatedTokenAccountInstruction(sourceOwner, destinationAta, recipient, tokenMint));
-                            }
-                            
-                            instructions.push(
-                                createTransferInstruction(
-                                    sourceAta,
-                                    destinationAta,
-                                    sourceOwner,
-                                    contributor.totalOwfn // This is already a BigInt of the smallest unit
-                                )
-                            );
-                            return instructions;
-                        })())
+                    const transaction = new Transaction();
+                    const instructions = [];
+                    const recipient = new PublicKey(contributor.address);
+                    const destinationAta = await getAssociatedTokenAddress(tokenMint, recipient);
+
+                    try {
+                        await getAccount(connection, destinationAta);
+                    } catch (error) {
+                        instructions.push(createAssociatedTokenAccountInstruction(sourceOwner, destinationAta, recipient, tokenMint));
+                    }
+                    
+                    instructions.push(
+                        createTransferInstruction(
+                            sourceAta,
+                            destinationAta,
+                            sourceOwner,
+                            contributor.totalOwfn
+                        )
                     );
+                    transaction.add(...instructions);
                     transaction.recentBlockhash = latestBlockhash.blockhash;
                     transaction.feePayer = sourceOwner;
                     transactions.push(transaction);
@@ -225,9 +242,10 @@ export default function AdminPresale() {
                     const contributor = batch[j];
                     try {
                         const signature = await connection.sendRawTransaction(tx.serialize());
-                        await connection.confirmTransaction(signature, 'confirmed');
-                        setAirdropLogs(prev => [...prev, `✅ Success for ${contributor.address.slice(0,6)}... | Signature: ${signature.slice(0,10)}...`]);
-                        successfulAirdrops++;
+                        await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed');
+                        setProcessedAddresses(prev => new Set(prev).add(contributor.address));
+                        setAirdropLogs(prev => [...prev, `✅ Success for ${contributor.address.slice(0,6)}... | Sig: ${signature.slice(0,10)}...`]);
+                        successfulInThisRun++;
                     } catch (err) {
                         console.error(`Airdrop failed for ${contributor.address}:`, err);
                         setAirdropLogs(prev => [...prev, `❌ Failed for ${contributor.address.slice(0,6)}... | Error: ${(err as Error).message}`]);
@@ -237,23 +255,54 @@ export default function AdminPresale() {
                 }
             } catch (batchError) {
                  console.error(`Error processing batch starting at index ${i}:`, batchError);
-                 setAirdropLogs(prev => [...prev, `❌ Critical error in batch ${(i/BATCH_SIZE) + 1}: ${(batchError as Error).message}`]);
-                 // Also update progress for the whole failed batch
+                 const failedAddresses = batch.map(b => b.address.slice(0,6)).join(', ');
+                 setAirdropLogs(prev => [...prev, `❌ Critical error in batch (signing failed?): ${(batchError as Error).message}. Failed addresses: ${failedAddresses}`]);
                  setAirdropProgress(prev => ({ ...prev, current: prev.current + batch.length }));
             }
         }
         
         setIsAirdropping(false);
-        setAirdropLogs(prev => [...prev, t('airdrop_complete') + ` - ${t('airdrop_summary', { success: successfulAirdrops, failed: aggregatedContributors.length - successfulAirdrops })}`]);
+        const totalFailed = contributorsToProcess.length - successfulInThisRun;
+        setAirdropLogs(prev => [...prev, `--- Airdrop run complete. Success: ${successfulInThisRun}, Failed: ${totalFailed}. Total processed: ${processedAddresses.size + successfulInThisRun}/${aggregatedContributors.length} ---`]);
 
-    }, [wallet, connection, aggregatedContributors, t]);
+    }, [wallet, connection, aggregatedContributors, t, processedAddresses]);
+
+    const handleClearProgress = () => {
+        if (isAirdropping) {
+            alert("Cannot clear progress while an airdrop is in progress.");
+            return;
+        }
+        if (window.confirm("Are you sure you want to clear the airdrop progress and logs? This cannot be undone and is only for emergency resets.")) {
+            setProcessedAddresses(new Set());
+            setAirdropLogs([]);
+            setAirdropProgress({ current: 0, total: 0 });
+        }
+    };
     
     const totalOwfnToDistribute = useMemo(() => {
         const total = aggregatedContributors.reduce((sum, c) => sum + c.totalOwfn, 0n);
         return Number(total) / (10 ** TOKEN_DETAILS.decimals);
     }, [aggregatedContributors]);
 
-    const estimatedFees = useMemo(() => aggregatedContributors.length * 0.000005, [aggregatedContributors]); // 5000 lamports per signature
+    const estimatedFees = useMemo(() => {
+        if (rentExemption === 0) return { total: 0, signatures: 0, rent: 0 };
+        const signatureFee = 0.000005; // 5000 lamports
+        const contributorsToProcess = aggregatedContributors.filter(c => !processedAddresses.has(c.address));
+
+        const totalSignatures = contributorsToProcess.length * signatureFee;
+        // Worst-case: assume every remaining contributor needs a new ATA
+        const totalRent = contributorsToProcess.length * rentExemption; 
+        return {
+            total: totalSignatures + totalRent,
+            signatures: totalSignatures,
+            rent: totalRent,
+        };
+    }, [aggregatedContributors, rentExemption, processedAddresses]);
+
+    const isResuming = processedAddresses.size > 0 && processedAddresses.size < aggregatedContributors.length;
+    const airdropButtonText = isAirdropping 
+        ? t('airdrop_in_progress') 
+        : (isResuming ? 'Resume Airdrop' : t('start_airdrop'));
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -272,10 +321,11 @@ export default function AdminPresale() {
                 <div className="flex justify-center items-center py-20"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>
             ) : (
                 <>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<SolIcon className="w-6 h-6"/>} />
                         <StatCard title={t('total_transactions')} value={stats.count} icon={<FileText />} />
                         <StatCard title={t('unique_contributors')} value={stats.contributors} icon={<User />} />
+                        <StatCard title={t('total_owfn_to_distribute')} value={totalOwfnToDistribute.toLocaleString(undefined, { maximumFractionDigits: 0 })} icon={<PieChart />} />
                     </div>
 
                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md">
@@ -312,7 +362,12 @@ export default function AdminPresale() {
                     </div>
 
                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md space-y-4">
-                         <h2 className="text-xl font-bold">{t('airdrop_tool_title')}</h2>
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-bold">{t('airdrop_tool_title')}</h2>
+                            <button onClick={handleClearProgress} disabled={isAirdropping} className="flex items-center gap-2 text-xs bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-red-200 dark:hover:bg-red-900 disabled:opacity-50">
+                                <RotateCcw size={14} /> Clear Progress & Logs
+                            </button>
+                        </div>
                          <div className="bg-red-500/10 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-r-lg flex items-start gap-3">
                             <AlertTriangle className="w-8 h-8 flex-shrink-0"/>
                             <p className="text-sm font-semibold">{t('airdrop_warning')}</p>
@@ -328,26 +383,34 @@ export default function AdminPresale() {
                                 <p className="text-lg font-bold font-mono">{adminOwfnBalance.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
                                 {adminOwfnBalance < totalOwfnToDistribute && <p className="text-xs text-red-500 mt-1">{t('insufficient_owfn_balance')}</p>}
                             </div>
-                             <div className={`bg-primary-100 dark:bg-darkPrimary-700 p-4 rounded-lg ${adminSolBalance < estimatedFees ? 'border border-red-500' : ''}`}>
+                             <div className={`bg-primary-100 dark:bg-darkPrimary-700 p-4 rounded-lg ${adminSolBalance < estimatedFees.total ? 'border border-red-500' : ''}`}>
                                 <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('your_sol_balance')}</p>
                                 <p className="text-lg font-bold font-mono">{adminSolBalance.toFixed(6)}</p>
-                                <p className="text-xs text-primary-500 dark:text-darkPrimary-500 mt-1">{t('estimated_tx_fees')}: ~{estimatedFees.toFixed(6)} SOL</p>
-                                {adminSolBalance < estimatedFees && <p className="text-xs text-red-500 mt-1">{t('insufficient_sol_balance')}</p>}
+                                <p className="text-xs text-primary-500 dark:text-darkPrimary-500 mt-1">
+                                    {t('estimated_tx_fees')} (for remaining): ~{estimatedFees.total.toFixed(6)} SOL
+                                </p>
+                                {adminSolBalance < estimatedFees.total && <p className="text-xs text-red-500 mt-1">{t('insufficient_sol_balance')}</p>}
                             </div>
                          </div>
                         
                          <button 
                             onClick={handleAirdrop}
-                            disabled={isAirdropping || loading || adminOwfnBalance < totalOwfnToDistribute || adminSolBalance < estimatedFees}
+                            disabled={isAirdropping || loading || adminOwfnBalance < totalOwfnToDistribute || adminSolBalance < estimatedFees.total || aggregatedContributors.length === 0}
                             className="w-full flex items-center justify-center gap-2 bg-accent-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed"
                          >
                             {isAirdropping ? <Loader2 className="w-6 h-6 animate-spin"/> : <Send className="w-6 h-6" />}
-                            {isAirdropping ? t('airdrop_in_progress') : t('start_airdrop')}
+                            {airdropButtonText}
                          </button>
                         
-                         {isAirdropping && (
-                             <div className="w-full bg-primary-200 dark:bg-darkPrimary-700 rounded-full h-4">
-                                <div className="bg-green-500 h-4 rounded-full" style={{width: `${(airdropProgress.current / airdropProgress.total) * 100}%`}}></div>
+                         {(isAirdropping || airdropProgress.total > 0) && (
+                             <div>
+                                 <div className="flex justify-between text-sm font-semibold mb-1">
+                                    <span>Airdrop Progress</span>
+                                    <span>{airdropProgress.current} / {airdropProgress.total}</span>
+                                 </div>
+                                 <div className="w-full bg-primary-200 dark:bg-darkPrimary-700 rounded-full h-4">
+                                    <div className="bg-green-500 h-4 rounded-full transition-all duration-300" style={{width: `${(airdropProgress.current / (airdropProgress.total || 1)) * 100}%`}}></div>
+                                 </div>
                              </div>
                          )}
 
@@ -357,8 +420,8 @@ export default function AdminPresale() {
                                 <div className="space-y-1 text-xs font-mono">
                                     {airdropLogs.map((log, i) => (
                                         <div key={i} className="flex items-center gap-2">
-                                            {log.startsWith('✅') ? <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0"/> : (log.startsWith('❌') ? <XCircle className="w-3 h-3 text-red-500 flex-shrink-0"/> : <div className="w-3 h-3"></div>)}
-                                            <p>{log}</p>
+                                            {log.startsWith('✅') ? <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0"/> : (log.startsWith('❌') ? <XCircle className="w-3 h-3 text-red-500 flex-shrink-0"/> : <div className="w-3 h-3 flex-shrink-0"></div>)}
+                                            <p className="break-all">{log}</p>
                                         </div>
                                     ))}
                                 </div>
