@@ -5,7 +5,7 @@ export default async function handler(request: Request) {
         return new Response('Method Not Allowed', { status: 405 });
     }
 
-    const apiKey = process.env.API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
         console.error("API key is not configured in environment variables.");
         return new Response(JSON.stringify({ error: "API key not configured." }), {

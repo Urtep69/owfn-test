@@ -10,9 +10,9 @@ export default async function handler(request: Request) {
         });
     }
 
-    const HELIUS_API_KEY = process.env.API_KEY;
+    const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
     if (!HELIUS_API_KEY) {
-        return new Response(JSON.stringify({ error: "Server configuration error: Missing API Key." }), {
+        return new Response(JSON.stringify({ error: "Server configuration error: Missing Helius API Key." }), {
             status: 500, headers: { 'Content-Type': 'application/json' },
         });
     }

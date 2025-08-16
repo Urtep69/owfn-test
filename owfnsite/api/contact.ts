@@ -10,11 +10,11 @@ export default async function handler(request: Request) {
         });
     }
     
-    const geminiApiKey = process.env.API_KEY;
+    const geminiApiKey = process.env.GEMINI_API_KEY;
     const resendApiKey = process.env.RESEND_API_KEY;
 
     if (!geminiApiKey || !resendApiKey) {
-        console.error("CRITICAL: API_KEY or RESEND_API_KEY environment variable is not set.");
+        console.error("CRITICAL: GEMINI_API_KEY or RESEND_API_KEY environment variable is not set.");
         return new Response(JSON.stringify({ success: false, error: "Server configuration error." }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
