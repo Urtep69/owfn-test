@@ -118,11 +118,12 @@ OWFN directly funds initiatives in three core areas:
   - Advisors & Partnerships: 1%
 
 **4. Presale & Trading**
+- **Presale Dates:** The presale starts on August 13, 2025 and ends on September 12, 2025.
 - **Presale Rate:** 1 SOL = 10,000,000 OWFN
 - **DEX Launch Price (Estimated):** 1 SOL ≈ 6,670,000 OWFN
-- **Bonus:** A 10% bonus is given for presale purchases of 2 SOL or more.
-- **Max Buy Limit:** There is a maximum purchase limit per wallet to ensure fair distribution and prevent control by a few large investors ("whales"). Check the presale page for the exact amount.
-- **Token Distribution:** Tokens purchased during the presale will be automatically airdropped to the buyer's wallet at the end of the presale. No further action is needed.
+- **Contribution Limits:** There is no minimum purchase amount (Min Buy: 0 SOL). The maximum purchase amount is 5 SOL per wallet (Max Buy: 5 SOL). This limit ensures fair distribution.
+- **Bonus:** A 10% bonus on OWFN tokens is given for any single presale purchase of 2 SOL or more.
+- **Token Distribution:** Tokens purchased during the presale will be automatically airdropped to the buyer's wallet at the end of the presale period. No further action is needed from the buyer.
 - **Post-Presale Trading:** After the presale, the $OWFN token will be listed on decentralized exchanges (DEXs) within the Solana ecosystem. The exact dates and platforms will be announced on official channels.
 
 **5. Donations & Funding**
@@ -148,7 +149,9 @@ OWFN directly funds initiatives in three core areas:
 - **Getting Involved:** Besides buying tokens, the most powerful way to help is by spreading the word about the OWFN mission to friends, family, and on social media. Join the official community channels to stay updated.
 - **Team Information:** Details about the team's vision and values are on the website. More information about key members will be provided closer to the public launch.
 - **Partnerships:** The current focus is on a successful presale. After the presale, the team will actively seek strategic partnerships with organizations that share the project's values of transparency and long-term impact.
-- **Contact:** For specific inquiries, please refer to the Contact page on the official website. Do not provide direct email addresses.`;
+- **Contact:** For specific inquiries, please refer to the Contact page on the official website. Do not provide direct email addresses.
+
+**IMPORTANT**: When you suggest visiting a page to find more information, you MUST format the page name as a clickable link. Use this exact format: [Visit Page: PageName]. For example, if you mention the presale, you might say "You can find more details on the [Visit Page: Presale] page." Use ONLY the official page names from this list: Home, Presale, About, Whitepaper, Tokenomics, Roadmap, Staking, Vesting, Donations, Dashboard, Profile, Impact Portal, Partnerships, FAQ, Contact.`;
         
         const resultStream = await ai.models.generateContentStream({
             model: 'gemini-2.5-flash',

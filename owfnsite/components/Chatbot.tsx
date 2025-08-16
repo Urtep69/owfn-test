@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2 } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
@@ -6,6 +7,50 @@ import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
 
 const MAX_HISTORY_MESSAGES = 8; // Keep last 4 user/model pairs for context to prevent memory errors on the server.
+
+const pageNameToPath: { [key: string]: string } = {
+  'Home': '/',
+  'Presale': '/presale',
+  'About': '/about',
+  'Whitepaper': '/whitepaper',
+  'Tokenomics': '/tokenomics',
+  'Roadmap': '/roadmap',
+  'Staking': '/staking',
+  'Vesting': '/vesting',
+  'Donations': '/donations',
+  'Dashboard': '/dashboard',
+  'Profile': '/profile',
+  'Impact Portal': '/impact',
+  'Partnerships': '/partnerships',
+  'FAQ': '/faq',
+  'Contact': '/contact'
+};
+
+const renderMessageWithLinks = (text: string) => {
+    const linkRegex = /\[Visit Page: (.*?)\]/g;
+    const parts = text.split(linkRegex);
+
+    return (
+        <>
+            {parts.map((part, index) => {
+                // Every odd index is a matched page name
+                if (index % 2 === 1) {
+                    const path = pageNameToPath[part];
+                    if (path) {
+                        return (
+                            <Link key={index} href={path} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
+                                {part}
+                            </Link>
+                        );
+                    }
+                }
+                // Even indices are plain text
+                return <React.Fragment key={index}>{part}</React.Fragment>;
+            })}
+        </>
+    );
+};
+
 
 export const Chatbot = () => {
     const { t, currentLanguage } = useAppContext();
@@ -145,7 +190,9 @@ export const Chatbot = () => {
                         <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
                             <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
-                               <p className="text-sm whitespace-pre-wrap">{msg.parts[0].text}</p>
+                               <div className="text-sm whitespace-pre-wrap">
+                                   {msg.role === 'model' ? renderMessageWithLinks(msg.parts[0].text) : msg.parts[0].text}
+                               </div>
                             </div>
                             {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                         </div>
