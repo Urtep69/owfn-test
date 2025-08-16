@@ -1,4 +1,3 @@
-
 export const tr = {
     // Navigation
     home: `Anasayfa`,
@@ -292,6 +291,16 @@ export const tr = {
     faq_a14: `Bu, OWFN tokeninin otomatik olarak faiz üretecek şekilde programlandığı anlamına gelir. Tokenleri Solana uyumlu cüzdanınızda tutarak, token miktarınız zamanla %2'lik bir Yıllık Yüzde Getiri (APY) ile artacaktır. Onları stake etmeniz veya ek bir işlem yapmanız gerekmez; ödüller otomatik olarak birikir.`,
     faq_q15: `%0,5'lik transfer ücreti nedir ve ne zaman etkinleştirilecek?`,
     faq_a15: `Bu ücret, misyonumuzun uzun vadeli finansmanı için önemli bir mekanizmadır. Ön satış süresi sona erdikten *sonra* OWFN tokeni ile yapılan tüm işlemlere %0,5'lik bir ücret uygulanacaktır. Bu ücretten toplanan fonlar, sosyal projelerimizi sürekli olarak finanse etmek için otomatik olarak Etki Hazinesi'ne yönlendirilir. Böylece, her işlem ortak iyiliğe katkıda bulunur.`,
+    faq_q16: `Bu proje için neden Solana blok zincirini seçtiniz?`,
+    faq_a16: `Solana'yı olağanüstü hızı, çok düşük işlem maliyetleri ve yüksek ölçeklenebilirliği nedeniyle seçtik. Bu özellikler, bizim gibi küresel bir proje için çok önemlidir ve bağış yapma, satın alma veya token ticareti yapma gibi işlemlerde tüm kullanıcılar için verimli mikro işlemler ve hızlı ve erişilebilir bir deneyim sağlar.`,
+    faq_q17: `Bağışlarımın desteklediğiniz amaçlara ulaştığından nasıl emin olabilirim?`,
+    faq_a17: `Şeffaflık bizim için temel bir unsurdur. Sosyal amaçlar için ayrılan tüm fonlar, cüzdan adresi halka açık olan Etki Hazinesi aracılığıyla yönetilir. Solscan gibi bir Solana blok gezgini üzerinden tüm gelen ve giden işlemleri izleyebilirsiniz. Ayrıca, Etki Portalı'nda finanse edilen projeler hakkında düzenli güncellemeler ve ayrıntılı raporlar sunacağız.`,
+    faq_q18: `OWFN tarafından finanse edilecek bir sosyal vaka veya amaç önerebilir miyim?`,
+    faq_a18: `İlk aşamada projeler, ekibimiz tarafından etki ve fizibilite gibi katı kriterlere göre seçilir. Proje ilerledikçe, topluluk üyelerinin gelecekteki girişimleri önermelerine ve oylamalarına olanak tanıyan bir yönetişim sistemi (DAO) uygulayacağız, bu da size fonları yönlendirmede doğrudan bir rol verecektir.`,
+    faq_q19: `OWFN projesinin arkasında kim var? Ekip anonim mi?`,
+    faq_a19: `Ekibimizin vizyonu ve değerleri hakkındaki ayrıntılar web sitesinde sunulmaktadır. Halka açık lansmana yaklaştıkça, projenin başarısına katkıda bulunan kilit üyeler ve danışmanlar hakkında daha fazla şeffaflık sağlayacak, aynı zamanda onların güvenliğine ve gizliliğine saygı göstereceğiz.`,
+    faq_q20: `Projenin ve yatırımcıların fonlarını korumak için hangi güvenlik önlemlerini aldınız?`,
+    faq_a20: `Güvenlik bizim en büyük önceliğimizdir. Kritik fonları yönetmek için çoklu imza cüzdanları kullanıyoruz, bu da hiçbir işlemin tek bir kişi tarafından onaylanamayacağı anlamına gelir. Tokenin akıllı sözleşmesi, lansmandan önce olası güvenlik açıklarını belirlemek ve düzeltmek için saygın güvenlik firmaları tarafından denetlenecektir.`,
     
     // Chatbot
     chatbot_title: `OWFN Asistanı`,
