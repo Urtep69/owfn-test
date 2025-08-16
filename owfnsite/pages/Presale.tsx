@@ -299,7 +299,7 @@ export default function Presale() {
 
     const numValue = parseFloat(value);
     if (numValue > maxAllowedBuy) {
-        setError(t('presale_max_amount_error', { max: maxAllowedBuy.toFixed(4) }));
+        setError(t('presale_max_amount_error', { max: maxAllowedBuy.toFixed(6) }));
     } else {
         setError('');
     }
@@ -541,9 +541,9 @@ export default function Presale() {
                                     </div>
                                 ) : (
                                     <>
-                                        <span>{t('presale_you_contributed', { amount: userContribution.toFixed(4) })}</span>
+                                        <span>{t('presale_you_contributed', { amount: userContribution.toFixed(6) })}</span>
                                         <br/>
-                                        <span className="font-semibold">{t('presale_you_can_buy', { amount: maxAllowedBuy.toFixed(4) })}</span>
+                                        <span className="font-semibold">{t('presale_you_can_buy', { amount: maxAllowedBuy.toFixed(6) })}</span>
                                     </>
                                 )}
                             </div>
