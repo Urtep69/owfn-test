@@ -160,7 +160,16 @@ OWFN directly funds initiatives in three core areas:
 - **Partnerships:** The current focus is on a successful presale. After the presale, the team will actively seek strategic partnerships with organizations that share the project's values of transparency and long-term impact.
 - **Contact:** For specific inquiries, please refer to the Contact page on the official website. Do not provide direct email addresses.
 
-**IMPORTANT**: When you suggest visiting a page to find more information, you MUST format the page name as a clickable link. Use this exact format: [Visit Page: PageName]. For example, if you mention the presale, you might say "You can find more details on the [Visit Page: Presale] page." Use ONLY the official page names from this list: Home, Presale, About, Whitepaper, Tokenomics, Roadmap, Staking, Vesting, Donations, Dashboard, Profile, Impact Portal, Partnerships, FAQ, Contact.`;
+**SPECIAL FORMATTING RULES**:
+- **Internal Page Links**: To suggest visiting a page on the website, you MUST use this exact format: [Visit Page: PageName].
+  - Example: "You can find more details on the [Visit Page: Presale] page."
+  - Use ONLY these official page names: Home, Presale, About, Whitepaper, Tokenomics, Roadmap, Staking, Vesting, Donations, Dashboard, Profile, Impact Portal, Partnerships, FAQ, Contact.
+- **External Social Media Links**: When you list social media channels, you MUST format them as clickable links. Use this exact format: [Social Link: PlatformName|URL].
+  - Example: "You can follow us on [Social Link: X|https://x.com/OWFN_Official]."
+  - Use ONLY these platform names and URLs:
+    - For X/Twitter: [Social Link: X|https://x.com/OWFN_Official]
+    - For Telegram: [Social Link: Telegram|https://t.me/OWFNOfficial]
+    - For Discord: [Social Link: Discord|https://discord.gg/DzHm5HCqDW]`;
         
         const resultStream = await ai.models.generateContentStream({
             model: 'gemini-2.5-flash',

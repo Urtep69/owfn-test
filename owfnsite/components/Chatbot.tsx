@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
-import { MessageCircle, X, Send, User, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, User, Loader2, Twitter } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { OwfnIcon } from './IconComponents.tsx';
+import { OwfnIcon, DiscordIcon } from './IconComponents.tsx';
 
 const MAX_HISTORY_MESSAGES = 8; // Keep last 4 user/model pairs for context to prevent memory errors on the server.
 
@@ -26,29 +26,65 @@ const pageNameToPath: { [key: string]: string } = {
   'Contact': '/contact'
 };
 
-const renderMessageWithLinks = (text: string) => {
-    const linkRegex = /\[Visit Page: (.*?)\]/g;
-    const parts = text.split(linkRegex);
+const socialIconMap: { [key: string]: React.ReactNode } = {
+    'X': <Twitter className="w-4 h-4" />,
+    'Telegram': <Send className="w-4 h-4" />,
+    'Discord': <DiscordIcon className="w-4 h-4" />,
+};
 
-    return (
-        <>
-            {parts.map((part, index) => {
-                // Every odd index is a matched page name
-                if (index % 2 === 1) {
-                    const path = pageNameToPath[part];
-                    if (path) {
-                        return (
-                            <Link key={index} href={path} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
-                                {part}
-                            </Link>
-                        );
-                    }
-                }
-                // Even indices are plain text
-                return <React.Fragment key={index}>{part}</React.Fragment>;
-            })}
-        </>
-    );
+
+const renderMessageContent = (text: string) => {
+    const regex = /\[(Visit Page): (.*?)\]|\[(Social Link): (.*?)\|(.*?)\]/g;
+    const result: (string | JSX.Element)[] = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+        // Push the text before the match
+        if (match.index > lastIndex) {
+            result.push(text.substring(lastIndex, match.index));
+        }
+        
+        // match[1] is 'Visit Page', match[2] is page name
+        // OR
+        // match[3] is 'Social Link', match[4] is platform, match[5] is URL
+
+        if (match[1] === 'Visit Page') {
+            const pageName = match[2];
+            const path = pageNameToPath[pageName];
+            if (path) {
+                result.push(
+                    <Link key={match.index} href={path} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
+                        {pageName}
+                    </Link>
+                );
+            } else {
+                result.push(`[Visit Page: ${pageName}]`); // Fallback
+            }
+        } else if (match[3] === 'Social Link') {
+            const platformName = match[4];
+            const url = match[5];
+            const icon = socialIconMap[platformName];
+            if (url && platformName) {
+                 result.push(
+                    <a key={match.index} href={url} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80 inline-flex items-center gap-1.5">
+                        {icon} {platformName}
+                    </a>
+                );
+            } else {
+                 result.push(`[Social Link: ${platformName}|${url}]`); // Fallback
+            }
+        }
+
+        lastIndex = regex.lastIndex;
+    }
+
+    // Push the remaining text after the last match
+    if (lastIndex < text.length) {
+        result.push(text.substring(lastIndex));
+    }
+
+    return <>{result.map((part, i) => <React.Fragment key={i}>{part}</React.Fragment>)}</>;
 };
 
 
@@ -210,7 +246,7 @@ export const Chatbot = () => {
                                     )}
                                     <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
                                        <div className="text-sm whitespace-pre-wrap">
-                                           {msg.role === 'model' ? renderMessageWithLinks(msg.parts[0].text) : msg.parts[0].text}
+                                           {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
                                        </div>
                                     </div>
                                 </div>
