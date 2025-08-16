@@ -29,6 +29,8 @@ const pageNameToPath: { [key: string]: string } = {
 const socialIconMap: { [key: string]: React.ReactNode } = {
     'X': <Twitter className="w-4 h-4" />,
     'Telegram': <Send className="w-4 h-4" />,
+    'Telegram Group': <Send className="w-4 h-4" />,
+    'Telegram Channel': <Send className="w-4 h-4" />,
     'Discord': <DiscordIcon className="w-4 h-4" />,
 };
 
