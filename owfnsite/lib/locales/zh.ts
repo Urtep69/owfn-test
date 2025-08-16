@@ -1,4 +1,3 @@
-
 export const zh = {
     // Navigation
     home: `首页`,
@@ -534,4 +533,15 @@ export const zh = {
     contact_faq_title: `有快速问题吗？`,
     contact_faq_desc: `许多答案都可以在我们的常见问题部分找到。节省时间，立即查看！`,
     contact_faq_button: `查看常见问题`,
+    contact_required_fields: `带星号 (*) 的字段是必填项。`,
+    contact_disclaimer_title: `关于我们沟通政策的说明`,
+    contact_disclaimer_message: `为确保我们的团队能够有效地支持社区并推进项目，我们优先处理与官方世界家庭网络直接相关的查询。与主题无关、垃圾邮件或未经请求的消息可能不会收到回复。感谢您的理解和帮助我们专注于我们的使命。`,
+    contact_social_x_title: `X.com / Twitter`,
+    contact_social_x_desc: `关注我们以获取实时更新、新闻和公告。`,
+    contact_social_telegram_channel_title: `Telegram 频道`,
+    contact_social_telegram_channel_desc: `订阅以获取重要公告和官方新闻。`,
+    contact_social_telegram_group_title: `Telegram 群组`,
+    contact_social_telegram_group_desc: `加入我们的社区群组，与其他成员讨论和互动。`,
+    contact_social_discord_title: `Discord 服务器`,
+    contact_social_discord_desc: `成为我们活跃社区的一员，进行讨论和支持。`,
 };
