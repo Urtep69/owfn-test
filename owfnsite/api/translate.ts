@@ -1,33 +1,27 @@
 import { GoogleGenAI } from "@google/genai";
 
-export default async function handler(request: Request) {
-    if (request.method !== 'POST') {
-        return new Response('Method Not Allowed', { status: 405 });
+export default async function handler(req: any, res: any) {
+    if (req.method !== 'POST') {
+        return res.status(405).send('Method Not Allowed');
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
         console.error("API key is not configured in environment variables.");
-        return new Response(JSON.stringify({ error: "API key not configured." }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(500).json({ error: "API key not configured." });
     }
     
     let text: string = '';
     let targetLanguage: string = '';
 
     try {
-        const body = await request.json();
-        text = body.text;
-        targetLanguage = body.targetLanguage;
+        const { text: reqText, targetLanguage: reqTargetLanguage } = req.body;
+        text = reqText;
+        targetLanguage = reqTargetLanguage;
         
         if (!text || !text.trim()) {
             // If there's no text, just return it without calling the API.
-            return new Response(JSON.stringify({ text: text || '' }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return res.status(200).json({ text: text || '' });
         }
         
         const ai = new GoogleGenAI({ apiKey });
@@ -47,16 +41,10 @@ export default async function handler(request: Request) {
         if (!translatedText || !translatedText.trim()) {
              console.warn(`[GRACEFUL FALLBACK] Translation result from Gemini was empty. Target: ${targetLanguage}, Input: "${text.substring(0,100)}...". Returning original text.`);
              // Return the original text as a fallback instead of an error.
-             return new Response(JSON.stringify({ text: text }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            });
+             return res.status(200).json({ text: text });
         }
         
-        return new Response(JSON.stringify({ text: translatedText.trim() }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(200).json({ text: translatedText.trim() });
 
     } catch (error) {
         console.error(`[CATCH BLOCK FALLBACK] Gemini translation API error. Target: ${targetLanguage}, Input Text: "${text.substring(0, 100)}..."`, error);
@@ -64,9 +52,6 @@ export default async function handler(request: Request) {
         // On server error, fall back to the original text to prevent the "(Translation failed)" message.
         // The client will receive a 200 OK with the original text, effectively hiding the server error from the end-user
         // but logging it here for debugging. This prevents a broken UI state.
-        return new Response(JSON.stringify({ text: text }), {
-            status: 200, 
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(200).json({ text: text });
     }
 }

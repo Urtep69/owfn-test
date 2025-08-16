@@ -1,13 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-export const runtime = 'edge'; // Vercel Edge runtime
-
-export default async function handler(request: Request) {
-    if (request.method !== 'POST') {
-        return new Response(JSON.stringify({ success: false, error: 'Method Not Allowed' }), {
-            status: 405,
-            headers: { 'Content-Type': 'application/json' }
-        });
+export default async function handler(req: any, res: any) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ success: false, error: 'Method Not Allowed' });
     }
     
     const geminiApiKey = process.env.GEMINI_API_KEY;
@@ -15,32 +10,23 @@ export default async function handler(request: Request) {
 
     if (!geminiApiKey || !resendApiKey) {
         console.error("CRITICAL: GEMINI_API_KEY or RESEND_API_KEY environment variable is not set.");
-        return new Response(JSON.stringify({ success: false, error: "Server configuration error." }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        return res.status(500).json({ success: false, error: "Server configuration error." });
     }
 
     try {
-        const { name, email, reason, message } = await request.json();
+        const { name, email, reason, message } = req.body;
 
         // Basic validation
         if (!name || !email || !reason || !message || !name.trim() || !email.trim() || !message.trim()) {
-            return new Response(JSON.stringify({ success: false, error: 'All fields are required.' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
+            return res.status(400).json({ success: false, error: 'All fields are required.' });
         }
         
         if (!/^\S+@\S+\.\S+$/.test(email)) {
-             return new Response(JSON.stringify({ success: false, error: 'Invalid email format.' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
+             return res.status(400).json({ success: false, error: 'Invalid email format.' });
         }
 
         const submissionDate = new Date().toUTCString();
-        const country = request.headers.get('x-vercel-ip-country') || 'N/A';
+        const country = req.headers['x-vercel-ip-country'] || 'N/A';
         
         const emailRecipientMap: Record<string, string> = {
             general: 'info@owfn.org',
@@ -133,16 +119,10 @@ ${message}
             throw new Error('Failed to send email via Resend.');
         }
 
-        return new Response(JSON.stringify({ success: true, message: 'Message sent successfully.' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(200).json({ success: true, message: 'Message sent successfully.' });
 
     } catch (error) {
         console.error('Contact form API error:', error);
-        return new Response(JSON.stringify({ success: false, error: 'An error occurred while processing your message.' }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(500).json({ success: false, error: 'An error occurred while processing your message.' });
     }
 }

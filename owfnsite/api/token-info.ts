@@ -1,20 +1,15 @@
 import type { TokenDetails } from '../types.ts';
 
-export default async function handler(request: Request) {
-    const url = new URL(request.url);
-    const mintAddress = url.searchParams.get('mint');
+export default async function handler(req: any, res: any) {
+    const { mint: mintAddress } = req.query;
 
     if (!mintAddress) {
-        return new Response(JSON.stringify({ error: "Mint address is required" }), {
-            status: 400, headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(400).json({ error: "Mint address is required" });
     }
 
     const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
     if (!HELIUS_API_KEY) {
-        return new Response(JSON.stringify({ error: "Server configuration error: Missing Helius API Key." }), {
-            status: 500, headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(500).json({ error: "Server configuration error: Missing Helius API Key." });
     }
 
     try {
@@ -110,15 +105,11 @@ export default async function handler(request: Request) {
             tokenExtensions,
         };
 
-        return new Response(JSON.stringify(responseData), {
-            status: 200, headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(200).json(responseData);
 
     } catch (error) {
         console.error(`Token Info API error for mint ${mintAddress}:`, error);
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
-        return new Response(JSON.stringify({ error: `Failed to fetch token data. Reason: ${errorMessage}` }), {
-            status: 500, headers: { 'Content-Type': 'application/json' },
-        });
+        return res.status(500).json({ error: `Failed to fetch token data. Reason: ${errorMessage}` });
     }
 }

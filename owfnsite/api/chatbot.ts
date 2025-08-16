@@ -1,9 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 
-// Vercel Edge Runtime for speed and reliability
-export const runtime = 'edge';
-
 /**
  * The definitive, "anti-crash" history builder. This function is
  * hyper-defensive, designed to create a perfectly valid history.
@@ -57,25 +54,22 @@ function buildValidHistory(history: unknown): ChatMessage[] {
 }
 
 
-export default async function handler(request: Request) {
-    const encoder = new TextEncoder();
-
+export default async function handler(req: any, res: any) {
     try {
-        if (request.method !== 'POST') {
-            return new Response(JSON.stringify({ error: 'Method Not Allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
+        if (req.method !== 'POST') {
+            return res.status(405).json({ error: 'Method Not Allowed' });
         }
 
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
             console.error("CRITICAL: GEMINI_API_KEY environment variable is not set.");
-            return new Response(JSON.stringify({ error: "Server configuration error. The site administrator needs to configure the API key." }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+            return res.status(500).json({ error: "Server configuration error. The site administrator needs to configure the API key." });
         }
 
-        const body = await request.json();
-        const { history, question, langCode } = body;
+        const { history, question, langCode } = req.body;
 
         if (!question || typeof question !== 'string' || question.trim() === '') {
-            return new Response(JSON.stringify({ error: 'Invalid question provided.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+            return res.status(400).json({ error: 'Invalid question provided.' });
         }
         
         const validHistory = buildValidHistory(history);
@@ -85,7 +79,6 @@ export default async function handler(request: Request) {
         
         let languageName = 'English';
         try {
-            // Intl.DisplayNames is not available in all Edge runtimes, so we add a check.
             if (typeof Intl.DisplayNames === 'function') {
                 languageName = new Intl.DisplayNames(['en'], { type: 'language' }).of(langCode || 'en') || 'English';
             }
@@ -132,7 +125,6 @@ export default async function handler(request: Request) {
 - **Q1 2026 (Expansion):** Global aid expansion, NGO partnerships, voting platform development.
 - **Q2 2026 & Beyond (Sustained Impact):** Full DAO implementation, long-term impact fund.`;
         
-        // Switched to stateless generateContentStream for better stability on the Edge.
         const resultStream = await ai.models.generateContentStream({
             model: 'gemini-2.5-flash',
             contents,
@@ -142,49 +134,42 @@ export default async function handler(request: Request) {
             }
         });
 
-        const stream = new ReadableStream({
-            async start(controller) {
-                const sendJsonMessage = (data: object) => {
-                    controller.enqueue(encoder.encode(JSON.stringify(data) + '\n'));
-                };
+        res.writeHead(200, {
+            'Content-Type': 'application/json-seq', 
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+        });
 
-                try {
-                    for await (const chunk of resultStream) {
-                        if (chunk.candidates?.[0]?.finishReason === 'SAFETY') {
-                           sendJsonMessage({ type: 'error', data: "The response was blocked due to safety filters. Please try rephrasing your question." });
-                           break; 
-                        }
-                        const text = chunk.text;
-                        if (text) {
-                            sendJsonMessage({ type: 'chunk', data: text });
-                        }
-                    }
-                    sendJsonMessage({ type: 'end' });
-                } catch (streamError) {
-                    console.error("Error during chatbot response streaming:", streamError);
-                    try {
-                        sendJsonMessage({ type: 'error', data: "An error occurred while generating the response. The stream has been terminated." });
-                    } catch {}
-                } finally {
-                    try { controller.close(); } catch {}
+        const sendJsonMessage = (data: object) => {
+            res.write(JSON.stringify(data) + '\n');
+        };
+
+        try {
+            for await (const chunk of resultStream) {
+                if (chunk.candidates?.[0]?.finishReason === 'SAFETY') {
+                   sendJsonMessage({ type: 'error', data: "The response was blocked due to safety filters. Please try rephrasing your question." });
+                   break; 
+                }
+                const text = chunk.text;
+                if (text) {
+                    sendJsonMessage({ type: 'chunk', data: text });
                 }
             }
-        });
-
-        return new Response(stream, {
-            headers: {
-                'Content-Type': 'application/json-seq', 
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-            }
-        });
+            sendJsonMessage({ type: 'end' });
+        } catch (streamError) {
+            console.error("Error during chatbot response streaming:", streamError);
+            try {
+                sendJsonMessage({ type: 'error', data: "An error occurred while generating the response. The stream has been terminated." });
+            } catch {}
+        } finally {
+            res.end();
+        }
 
     } catch (error) {
-        console.error("Fatal error in chatbot handler before streaming:", error);
-        const errorMessage = "I'm sorry, I couldn't establish a connection with the AI. This might be a temporary server issue or a network timeout. Please try again in a moment.";
-        return new Response(JSON.stringify({ error: errorMessage }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        console.error("Fatal error in chatbot handler:", error);
+        if (!res.headersSent) {
+            const errorMessage = "I'm sorry, I couldn't establish a connection with the AI. This might be a temporary server issue or a network timeout. Please try again in a moment.";
+            res.status(500).json({ error: errorMessage });
+        }
     }
 }
