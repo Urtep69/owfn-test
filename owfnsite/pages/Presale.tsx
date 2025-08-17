@@ -294,7 +294,10 @@ export default function Presale() {
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSolAmount(value);
+    // Allow only numbers and a single dot
+    if (/^[0-9]*\.?[0-9]*$/.test(value)) {
+        setSolAmount(value);
+    }
 
     if (value === '' || isNaN(parseFloat(value))) {
         setError('');
@@ -311,7 +314,7 @@ export default function Presale() {
 
   const { owfnAmount, bonusApplied } = useMemo(() => {
     const numAmount = parseFloat(solAmount);
-    if (isNaN(numAmount) || numAmount <= 0) {
+    if (isNaN(numAmount) || numAmount <= 0 || solAmount.trim() === '') {
         return { owfnAmount: 0, bonusApplied: false };
     }
 
@@ -327,7 +330,7 @@ export default function Presale() {
         const lamports = integerPart * LAMPORTS_PER_SOL_BIGINT + BigInt(fractionalPart);
 
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * LAMPORTS_PER_SOL_BIGINT;
+        const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * 10**9)) ;
         
         let totalOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
 
@@ -556,7 +559,8 @@ export default function Presale() {
                             <div className="flex-grow relative">
                                 <input 
                                     id="buy-amount"
-                                    type="number"
+                                    type="text"
+                                    inputMode="decimal"
                                     value={solAmount}
                                     onChange={handleAmountChange}
                                     className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
@@ -575,7 +579,7 @@ export default function Presale() {
                         {error && <p className="text-red-500 dark:text-red-400 text-sm mt-2 text-center" aria-live="polite">{error}</p>}
                         <p className="text-sm text-primary-600 dark:text-darkPrimary-400 mt-2 text-center flex items-center justify-center">
                             {t('presale_buying_owfn', { amount: isNaN(owfnAmount) ? '0.00' : owfnAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) })}
-                            {bonusApplied && <span className="ml-1.5 text-xs font-bold text-green-500 dark:text-green-400">(+10% Bonus!)</span>}
+                            {bonusApplied && <span className="ml-1.5 text-xs font-bold text-green-500 dark:text-green-400">(+{PRESALE_DETAILS.bonusPercentage}% Bonus!)</span>}
                             <span className="ml-1.5 cursor-pointer" title={t('presale_estimate_tooltip')}>
                                 <Info size={14} />
                             </span>

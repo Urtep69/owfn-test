@@ -1,11 +1,10 @@
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS, MOCK_TOKEN_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -173,7 +172,7 @@ export const useSolana = (): UseSolanaReturn => {
     } finally {
         setLoading(false);
     }
-  }, [connection]);
+  }, []);
 
   useEffect(() => {
     if (connected && address) {
@@ -206,12 +205,12 @@ export const useSolana = (): UseSolanaReturn => {
             const mintAddress = KNOWN_TOKEN_MINT_ADDRESSES[tokenSymbol];
             if (!mintAddress) throw new Error(`Unknown token symbol: ${tokenSymbol}`);
 
-            const mintPublicKey = new PublicKey(mintAddress);
-            const tokenInfo = userTokens.find(t => t.symbol === tokenSymbol);
-            if (!tokenInfo) throw new Error(`Token ${tokenSymbol} not found in user's wallet.`);
+            const tokenDetails = MOCK_TOKEN_DETAILS[tokenSymbol];
+            if (!tokenDetails) throw new Error(`Token details for ${tokenSymbol} not found in constants.`);
             
-            const decimals = tokenInfo.decimals;
-
+            const decimals = tokenDetails.decimals;
+            const mintPublicKey = new PublicKey(mintAddress);
+            
             const fromTokenAccount = await getAssociatedTokenAddress(mintPublicKey, publicKey);
             const toTokenAccount = await getAssociatedTokenAddress(mintPublicKey, toPublicKey);
             
@@ -220,7 +219,7 @@ export const useSolana = (): UseSolanaReturn => {
                     fromTokenAccount,
                     toTokenAccount,
                     publicKey,
-                    amount * Math.pow(10, decimals) 
+                    Math.round(amount * Math.pow(10, decimals))
                 )
             );
         }
@@ -260,7 +259,7 @@ export const useSolana = (): UseSolanaReturn => {
     } finally {
         setLoading(false);
     }
-  }, [connected, publicKey, connection, walletSendTransaction, userTokens, address, getWalletBalances]);
+  }, [connected, publicKey, connection, walletSendTransaction, address, getWalletBalances]);
   
   // Memoize the userStats object to prevent unnecessary re-renders in consuming components.
   const userStats = useMemo(() => ({ 

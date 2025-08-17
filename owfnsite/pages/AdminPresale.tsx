@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -137,13 +138,12 @@ export default function AdminPresale() {
         });
         
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * BigInt(LAMPORTS_PER_SOL);
+        const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * 10**9));
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
 
         return Array.from(contributorMap.entries()).map(([address, data]) => {
             const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
             
-            // Perform all calculations with BigInt for precision
             let totalOwfnInSmallestUnit = (data.totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
 
             if (data.totalLamports >= bonusThresholdLamports) {
