@@ -1,7 +1,4 @@
 
-
-
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -51,12 +48,16 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
+  const { publicKey, connected, connecting, wallet, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
+
+  const isWalletSelected = !!wallet;
+  const isWalletReady = connected && !!publicKey;
+  const derivedLoading = loading || connecting || (isWalletSelected && !isWalletReady);
 
   const connectWallet = useCallback(() => {
     if (!connected) {
@@ -298,7 +299,7 @@ export const useSolana = (): UseSolanaReturn => {
     connected,
     address,
     userTokens,
-    loading: loading || connecting || (connected && !publicKey),
+    loading: derivedLoading,
     connection,
     userStats: { 
         totalDonated: 0,
