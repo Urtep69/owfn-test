@@ -1,5 +1,4 @@
 
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -200,7 +199,7 @@ export const useSolana = (): UseSolanaReturn => {
                 SystemProgram.transfer({
                     fromPubkey: publicKey,
                     toPubkey: toPublicKey,
-                    lamports: Math.round(amount * LAMPORTS_PER_SOL), // Use Math.round to prevent float errors
+                    lamports: amount * LAMPORTS_PER_SOL,
                 })
             );
         } else {
@@ -226,25 +225,13 @@ export const useSolana = (): UseSolanaReturn => {
             );
         }
 
-        // Fetch a fresher blockhash using 'confirmed' commitment to maximize validity time for mobile wallets.
-        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
-        transaction.recentBlockhash = blockhash;
-        transaction.feePayer = publicKey;
-
-        // Skip preflight to delegate simulation to the wallet app, which is more reliable on mobile.
-        const signature = await walletSendTransaction(transaction, connection, {
-            skipPreflight: true,
-        });
-        
-        // Use 'confirmed' commitment for faster user feedback after successful signing.
-        await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature }, 'confirmed');
+        const signature = await walletSendTransaction(transaction, connection);
+        await connection.confirmTransaction(signature, 'processed');
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
-        if (address) {
-            balanceCache.delete(address); // Invalidate cache after a transaction
-            getWalletBalances(address).then(setUserTokens);
-        }
+        balanceCache.delete(address!); // Invalidate cache after a transaction
+        getWalletBalances(address!).then(setUserTokens);
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
     } catch (error) {
