@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
-import { MessageCircle, X, Send, User, Loader2, Twitter } from 'lucide-react';
+import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Expand, Shrink } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -93,6 +93,7 @@ const renderMessageContent = (text: string) => {
 export const Chatbot = () => {
     const { t, currentLanguage } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
+    const [isMaximized, setIsMaximized] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -214,7 +215,10 @@ export const Chatbot = () => {
     if (!isOpen) {
         return (
             <button
-                onClick={() => setIsOpen(true)}
+                onClick={() => {
+                    setIsOpen(true);
+                    setIsMaximized(false);
+                }}
                 className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
                 aria-label="Open Chatbot"
             >
@@ -223,16 +227,28 @@ export const Chatbot = () => {
         );
     }
 
+    const containerClasses = isMaximized
+        ? 'fixed inset-0 w-full h-full flex flex-col bg-white dark:bg-darkPrimary-800 z-50 animate-fade-in-up'
+        : 'fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50';
+
     return (
-        <div className="fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50">
-            <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
+        <div className={containerClasses}>
+            <header className={`flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white ${isMaximized ? '' : 'rounded-t-lg'}`}>
                 <div className="flex items-center space-x-2">
                     <OwfnIcon className="w-6 h-6" />
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
-                <button onClick={() => setIsOpen(false)} className="hover:opacity-75">
-                    <X size={24} />
-                </button>
+                <div className="flex items-center">
+                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-2 hover:bg-black/10 rounded-full transition-colors" aria-label={isMaximized ? "Restore chat window" : "Maximize chat window"}>
+                        {isMaximized ? <Shrink size={18} /> : <Expand size={18} />}
+                    </button>
+                    <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-black/10 rounded-full transition-colors" aria-label="Minimize chat window">
+                        <Minus size={20} />
+                    </button>
+                    <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-black/10 rounded-full transition-colors" aria-label="Close chat window">
+                        <X size={24} />
+                    </button>
+                </div>
             </header>
             <div className="flex-1 p-4 overflow-y-auto">
                 <div className="space-y-4">
