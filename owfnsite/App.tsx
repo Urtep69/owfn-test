@@ -14,7 +14,7 @@ import { TorusWalletAdapter } from '@solana/wallet-adapter-torus';
 import { TrustWalletAdapter } from '@solana/wallet-adapter-trust';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
-import { ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from './constants.ts';
+import { ADMIN_WALLET_ADDRESS } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
 
 import Home from './pages/Home.tsx';
@@ -99,7 +99,7 @@ const AppContent = () => {
 
 function App() {
   const network = WalletAdapterNetwork.Mainnet;
-  const endpoint = useMemo(() => HELIUS_RPC_URL, []);
+  const endpoint = useMemo(() => "https://api.mainnet-beta.solana.com", []);
   
   const wallets = useMemo(
     () => [

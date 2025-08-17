@@ -13,8 +13,6 @@ import {
     TOKEN_ALLOCATIONS, 
     ROADMAP_DATA,
     DISTRIBUTION_WALLETS,
-    HELIUS_API_BASE_URL,
-    HELIUS_API_KEY,
 } from '../constants.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { PresaleTransaction } from '../types.ts';
@@ -32,42 +30,44 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
         }
     }, [newTransaction]);
     
-    useEffect(() => {
-        const fetchTransactions = async () => {
-            setLoading(true);
-            try {
-                const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions');
-                const data = await response.json();
-                
-                const parsedTxs: PresaleTransaction[] = data
-                    .filter((tx: any) => 
-                        tx.timestamp >= presaleStartTimestamp &&
-                        tx.type === 'NATIVE_TRANSFER' && 
-                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
-                    )
-                    .map((tx: any) => ({
-                        id: tx.signature,
-                        address: tx.nativeTransfers[0].fromUserAccount,
-                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
-                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                        time: new Date(tx.timestamp * 1000),
-                    }));
-                
-                setTransactions(parsedTxs.slice(0, 20));
-            } catch (error) {
-                console.error("Failed to fetch presale transactions:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchTransactions = useCallback(async () => {
+        setLoading(true);
+        try {
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            const url = `/api/address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to fetch transactions');
+            const data = await response.json();
+            
+            if (data.error) throw new Error(data.error);
 
+            const parsedTxs: PresaleTransaction[] = data
+                .filter((tx: any) => 
+                    tx.timestamp >= presaleStartTimestamp &&
+                    tx.type === 'NATIVE_TRANSFER' && 
+                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
+                )
+                .map((tx: any) => ({
+                    id: tx.signature,
+                    address: tx.nativeTransfers[0].fromUserAccount,
+                    solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
+                    owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                    time: new Date(tx.timestamp * 1000),
+                }));
+            
+            setTransactions(parsedTxs.slice(0, 20));
+        } catch (error) {
+            console.error("Failed to fetch presale transactions:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
         fetchTransactions();
         const interval = setInterval(fetchTransactions, 30000); // refresh every 30 seconds
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchTransactions]);
 
 
     return (
@@ -159,11 +159,13 @@ export default function Presale() {
             let lastSignature: string | undefined = undefined;
 
             while(true) {
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const url = `/api/address-transactions?address=${DISTRIBUTION_WALLETS.presale}${lastSignature ? `&before=${lastSignature}` : ''}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
                 
+                if (data.error) throw new Error(data.error);
+
                 allTxs.push(...data);
                 
                 if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
@@ -258,10 +260,13 @@ export default function Presale() {
             let allTxs: any[] = [];
             let lastSignature: string | undefined = undefined;
             while(true) {
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const url = `/api/address-transactions?address=${DISTRIBUTION_WALLETS.presale}${lastSignature ? `&before=${lastSignature}` : ''}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
+                
+                if (data.error) throw new Error(data.error);
+
                 allTxs.push(...data);
                 if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
                     break;

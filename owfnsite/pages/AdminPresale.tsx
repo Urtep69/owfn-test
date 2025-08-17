@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -7,8 +6,6 @@ import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedT
 
 import { 
     DISTRIBUTION_WALLETS, 
-    HELIUS_API_KEY, 
-    HELIUS_API_BASE_URL, 
     PRESALE_DETAILS,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
@@ -81,10 +78,12 @@ export default function AdminPresale() {
 
         try {
             while (true) {
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const url = `/api/address-transactions?address=${DISTRIBUTION_WALLETS.presale}${lastSignature ? `&before=${lastSignature}` : ''}`;
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
+                if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
+
+                if (data.error) throw new Error(data.error);
 
                 const parsedTxs: PresaleTx[] = data
                     .filter((tx: any) => 
@@ -105,9 +104,9 @@ export default function AdminPresale() {
 
                 if (data.length < 100) {
                     break; 
-                } else {
-                    lastSignature = data[data.length - 1].signature;
                 }
+                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
+                if (!lastSignature) break;
             }
             setTransactions(allTxs);
         } catch (error) {
@@ -115,7 +114,7 @@ export default function AdminPresale() {
         } finally {
             setLoading(false);
         }
-    }, [connection]);
+    }, []);
 
     useEffect(() => {
         fetchAllTransactions();
