@@ -50,7 +50,7 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
+  const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const { setVisible } = useWalletModal();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
@@ -297,7 +297,7 @@ export const useSolana = (): UseSolanaReturn => {
     connected,
     address,
     userTokens,
-    loading,
+    loading: loading || connecting,
     connection,
     userStats: { 
         totalDonated: 0,
