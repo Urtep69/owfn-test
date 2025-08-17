@@ -8,10 +8,10 @@ import type { GovernanceProposal } from '../types.ts';
 
 const Countdown = ({ endDate }: { endDate: Date }) => {
     const { t } = useAppContext();
-    const [timeLeft, setTimeLeft] = useState<{d: number, h: number, m: number, s: number} | {}>({});
+    const [timeLeft, setTimeLeft] = useState<{[key: string]: number}>({});
 
     React.useEffect(() => {
-        const timerId = setInterval(() => {
+        const calculate = () => {
             const difference = +endDate - +new Date();
             if (difference > 0) {
                 setTimeLeft({
@@ -20,27 +20,23 @@ const Countdown = ({ endDate }: { endDate: Date }) => {
                     m: Math.floor((difference / 1000 / 60) % 60),
                     s: Math.floor((difference / 1000) % 60),
                 });
-            } else {
-                setTimeLeft({});
-                clearInterval(timerId); // CRITICAL FIX: Stop the interval when the countdown is over.
+                return true; // Timer should continue
+            }
+            setTimeLeft({});
+            return false; // Timer should stop
+        };
+
+        // Initial calculation to set the state immediately
+        calculate();
+
+        const timerId = setInterval(() => {
+            if (!calculate()) {
+                clearInterval(timerId); // Stop the timer when it reaches zero
             }
         }, 1000);
 
-        // Perform initial calculation to avoid 1-second delay
-        const difference = +endDate - +new Date();
-        if (difference <= 0) {
-            setTimeLeft({});
-            clearInterval(timerId); // Clear immediately if already expired
-        } else {
-             setTimeLeft({
-                d: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                h: Math.floor((difference / (1000 * 60 * 60)) % 24),
-                m: Math.floor((difference / 1000 / 60) % 60),
-                s: Math.floor((difference / 1000) % 60),
-            });
-        }
-
-        return () => clearInterval(timerId); // Standard cleanup
+        // Standard cleanup to prevent memory leaks on unmount
+        return () => clearInterval(timerId);
     }, [endDate]);
 
     const timerComponents = Object.entries(timeLeft)

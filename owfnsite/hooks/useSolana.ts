@@ -186,7 +186,7 @@ export const useSolana = (): UseSolanaReturn => {
                 SystemProgram.transfer({
                     fromPubkey: publicKey,
                     toPubkey: toPublicKey,
-                    lamports: Math.round(amount * LAMPORTS_PER_SOL), // Use Math.round to prevent float errors
+                    lamports: Math.round(amount * LAMPORTS_PER_SOL),
                 })
             );
         } else {
@@ -212,23 +212,10 @@ export const useSolana = (): UseSolanaReturn => {
             );
         }
         
-        const latestBlockhash = await connection.getLatestBlockhash('confirmed');
-        transaction.recentBlockhash = latestBlockhash.blockhash;
-        transaction.feePayer = publicKey;
-
-        // **RELIABILITY FIX**: Let the wallet adapter handle preflight, which is crucial for mobile compatibility.
-        // **RELIABILITY FIX**: Use the modern, robust confirmation strategy with blockhash and height.
+        // The wallet adapter's `sendTransaction` function handles the entire lifecycle:
+        // fetching a recent blockhash, signing, sending, and confirming the transaction.
+        // Relying on it is the standard, most robust method, especially for mobile compatibility.
         const signature = await walletSendTransaction(transaction, connection);
-        
-        const confirmation = await connection.confirmTransaction({
-            signature,
-            blockhash: latestBlockhash.blockhash,
-            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-        }, 'confirmed');
-
-        if (confirmation.value.err) {
-            throw new Error(`Transaction confirmation failed: ${JSON.stringify(confirmation.value.err)}`);
-        }
 
         console.log(`Transaction successful with signature: ${signature}`);
         
