@@ -14,6 +14,7 @@ export default async function handler(req: any, res: any) {
     
     const HELIUS_API_BASE_URL = 'https://api.helius.xyz';
     
+    // Updated to v0 as requested by the user. Note: Helius recommends migrating to v1.
     let url = `${HELIUS_API_BASE_URL}/v0/addresses/${address}/transactions?api-key=${HELIUS_API_KEY}`;
     if (before) {
         url += `&before=${before}`;

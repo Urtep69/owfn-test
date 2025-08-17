@@ -12,7 +12,7 @@ export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenan
 // The Helius API key has been moved to a server-side environment variable for security.
 // Client-side calls now go through internal API routes.
 // This public RPC URL is used for general on-chain read operations via the ConnectionProvider.
-export const SOLANA_RPC_URL = 'https://api.mainnet-beta.solana.com';
+export const SOLANA_RPC_URL = 'https://ssc-dao.genesysgo.net/';
 
 export const TOKEN_DETAILS = {
   totalSupply: 18_000_000_000,
