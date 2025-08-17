@@ -226,15 +226,17 @@ export const useSolana = (): UseSolanaReturn => {
             );
         }
 
-        // Fetch the latest blockhash right before sending to maximize its validity time, crucial for mobile wallets.
-        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+        // Fetch a fresher blockhash using 'confirmed' commitment to maximize validity time for mobile wallets.
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = publicKey;
 
-        // The wallet adapter signs and sends the transaction. We omit preflight options that might cause issues on mobile.
-        const signature = await walletSendTransaction(transaction, connection);
+        // Skip preflight to delegate simulation to the wallet app, which is more reliable on mobile.
+        const signature = await walletSendTransaction(transaction, connection, {
+            skipPreflight: true,
+        });
         
-        // Use a robust confirmation strategy with a 'confirmed' commitment for faster user feedback.
+        // Use 'confirmed' commitment for faster user feedback after successful signing.
         await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature }, 'confirmed');
 
         console.log(`Transaction successful with signature: ${signature}`);
