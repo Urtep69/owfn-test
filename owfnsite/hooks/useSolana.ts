@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, ComputeBudgetProgram, VersionedTransaction, TransactionMessage } from '@solana/web3.js';
@@ -52,12 +52,35 @@ export const useSolana = (): UseSolanaReturn => {
   const { setVisible } = useWalletModal();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
+  const wasConnectedRef = useRef(false);
+
+  if (connected) {
+    wasConnectedRef.current = true;
+  }
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
 
-  const isWalletSelected = !!wallet;
-  const isWalletReady = connected && !!publicKey;
-  const derivedLoading = loading || connecting || (isWalletSelected && !isWalletReady);
+  const disconnectAndClear = useCallback(async () => {
+      await disconnect();
+      wasConnectedRef.current = false;
+      try {
+          // This helps prevent auto-reconnection issues after a manual disconnect.
+          localStorage.removeItem('wallet-adapter-wallet-name');
+      } catch (e) {
+          console.warn("Could not clear wallet name from storage", e);
+      }
+  }, [disconnect]);
+
+  const derivedLoading = useMemo(() => {
+    // The wallet is in a loading/unstable state if:
+    // 1. We are doing an internal async operation (e.g., fetching balances).
+    // 2. The wallet adapter itself reports it's in the process of connecting.
+    // 3. We *know* a wallet was previously connected, but we currently don't have a public key.
+    //    This is the key fix for the mobile race condition where the wallet state flickers upon
+    //    returning to the browser, preventing the UI from incorrectly showing a "Connect" state.
+    return loading || connecting || (wasConnectedRef.current && !publicKey);
+  }, [loading, connecting, publicKey, wasConnectedRef]);
+
 
   const connectWallet = useCallback(() => {
     if (!connected) {
@@ -311,7 +334,7 @@ export const useSolana = (): UseSolanaReturn => {
     stakedBalance: 0,
     earnedRewards: 0,
     connectWallet,
-    disconnectWallet: disconnect,
+    disconnectWallet: disconnectAndClear,
     getWalletBalances,
     sendTransaction,
     stakeTokens: notImplemented,
