@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
@@ -301,8 +300,6 @@ export default function Presale() {
     const numValue = parseFloat(value);
     if (numValue > maxAllowedBuy) {
         setError(t('presale_max_amount_error', { max: maxAllowedBuy.toFixed(6) }));
-    } else if (numValue > 0 && numValue < PRESALE_DETAILS.minBuy) {
-        setError(t('presale_min_amount_error', { min: PRESALE_DETAILS.minBuy }));
     } else {
         setError('');
     }
@@ -349,7 +346,7 @@ export default function Presale() {
 
 
   const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
-  const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) < PRESALE_DETAILS.minBuy || parseFloat(solAmount) > maxAllowedBuy;
+  const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) <= 0 || parseFloat(solAmount) > maxAllowedBuy;
 
   const handleBuy = async () => {
         if (!solana.connected) {
@@ -533,7 +530,7 @@ export default function Presale() {
                             </p>
                         </div>
                         <p className="text-sm text-primary-700 dark:text-darkPrimary-300 mb-2 text-center">
-                            {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
+                            {t('presale_buy_info_max_only', { max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
                         {solana.connected && (
                             <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 mb-3 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
@@ -560,13 +557,13 @@ export default function Presale() {
                                     onChange={handleAmountChange}
                                     className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
                                     placeholder="0.00"
-                                    disabled={maxAllowedBuy < PRESALE_DETAILS.minBuy || isCheckingContribution || presaleStatus !== 'active'}
+                                    disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
                                 />
                             </div>
                             <button 
                                 onClick={handleBuy}
                                 className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                                disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy < PRESALE_DETAILS.minBuy || presaleStatus !== 'active'))}
+                                disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
                             >
                                 {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
                             </button>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
-import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize, Shrink } from 'lucide-react';
+import { MessageCircle, X, Send, User, Loader2, Twitter } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -97,8 +97,6 @@ export const Chatbot = () => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
-    const [isFullScreen, setIsFullScreen] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
 
@@ -204,7 +202,6 @@ export const Chatbot = () => {
                 loadingIntervalRef.current = null;
             }
             setIsLoading(false);
-            inputRef.current?.focus();
         }
     };
 
@@ -227,23 +224,15 @@ export const Chatbot = () => {
     }
 
     return (
-        <div className={`fixed ${isFullScreen ? 'inset-0 w-full h-full max-w-full max-h-full rounded-none' : 'bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] rounded-lg'} flex flex-col bg-white dark:bg-darkPrimary-800 shadow-3d-lg animate-slide-in z-50`}>
+        <div className="fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50">
             <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
                 <div className="flex items-center space-x-2">
                     <OwfnIcon className="w-6 h-6" />
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
-                <div className="flex items-center space-x-1">
-                    <button onClick={() => setIsOpen(false)} className="hover:opacity-75 p-1" title="Minimize" aria-label="Minimize Chat">
-                        <Minus size={20} />
-                    </button>
-                    <button onClick={() => setIsFullScreen(prev => !prev)} className="hover:opacity-75 p-1" title={isFullScreen ? "Restore" : "Maximize"} aria-label={isFullScreen ? "Restore chat window" : "Maximize chat window"}>
-                        {isFullScreen ? <Shrink size={20} /> : <Maximize size={20} />}
-                    </button>
-                    <button onClick={() => setIsOpen(false)} className="hover:opacity-75 p-1" title="Close" aria-label="Close Chat">
-                        <X size={24} />
-                    </button>
-                </div>
+                <button onClick={() => setIsOpen(false)} className="hover:opacity-75">
+                    <X size={24} />
+                </button>
             </header>
             <div className="flex-1 p-4 overflow-y-auto">
                 <div className="space-y-4">
@@ -284,7 +273,6 @@ export const Chatbot = () => {
             <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
                 <div className="relative">
                     <input
-                        ref={inputRef}
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}

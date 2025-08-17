@@ -1,12 +1,9 @@
 
-
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, ComputeBudgetProgram, VersionedTransaction, TransactionMessage } from '@solana/web3.js';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { WalletSendTransactionError } from '@solana/wallet-adapter-base';
 import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
@@ -195,21 +192,14 @@ export const useSolana = (): UseSolanaReturn => {
 
     try {
         const toPublicKey = new PublicKey(to);
-        const instructions: TransactionInstruction[] = [];
-        
-        // Set a compute budget limit for the transaction. This is good practice.
-        instructions.push(
-            ComputeBudgetProgram.setComputeUnitLimit({
-                units: 200_000,
-            })
-        );
+        const transaction = new Transaction();
         
         if (tokenSymbol === 'SOL') {
-            instructions.push(
+            transaction.add(
                 SystemProgram.transfer({
                     fromPubkey: publicKey,
                     toPubkey: toPublicKey,
-                    lamports: Math.round(amount * LAMPORTS_PER_SOL),
+                    lamports: amount * LAMPORTS_PER_SOL,
                 })
             );
         } else {
@@ -225,7 +215,7 @@ export const useSolana = (): UseSolanaReturn => {
             const fromTokenAccount = await getAssociatedTokenAddress(mintPublicKey, publicKey);
             const toTokenAccount = await getAssociatedTokenAddress(mintPublicKey, toPublicKey);
             
-            instructions.push(
+            transaction.add(
                 createTransferInstruction(
                     fromTokenAccount,
                     toTokenAccount,
@@ -234,26 +224,9 @@ export const useSolana = (): UseSolanaReturn => {
                 )
             );
         }
-        
-        // --- VERSIONED TRANSACTION IMPLEMENTATION ---
-        const latestBlockhash = await connection.getLatestBlockhash('confirmed');
-        const messageV0 = new TransactionMessage({
-            payerKey: publicKey,
-            recentBlockhash: latestBlockhash.blockhash,
-            instructions,
-        }).compileToV0Message();
-        
-        const transaction = new VersionedTransaction(messageV0);
-        // --- END VERSIONED TRANSACTION IMPLEMENTATION ---
 
         const signature = await walletSendTransaction(transaction, connection);
-        
-        // Use a more robust confirmation strategy
-        await connection.confirmTransaction({
-            signature,
-            blockhash: latestBlockhash.blockhash,
-            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-        }, 'confirmed');
+        await connection.confirmTransaction(signature, 'processed');
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
@@ -264,26 +237,7 @@ export const useSolana = (): UseSolanaReturn => {
     } catch (error) {
         console.error("Transaction failed:", error);
         setLoading(false);
-        
-        let messageKey = 'transaction_failed_alert';
-        let errorMessage = '';
-
-        if (error instanceof WalletSendTransactionError || (error instanceof Error && error.name.includes('Wallet'))) {
-            errorMessage = error.message;
-        } else if (error instanceof Error) {
-            errorMessage = error.message;
-        }
-
-        if (errorMessage) {
-            const lowerCaseError = errorMessage.toLowerCase();
-            if (lowerCaseError.includes('user rejected') || lowerCaseError.includes('request rejected')) {
-                messageKey = 'transaction_failed_user_rejected';
-            } else if (lowerCaseError.includes('insufficient funds') || lowerCaseError.includes('insufficient lamports')) {
-                messageKey = 'transaction_failed_insufficient_funds';
-            }
-        }
-    
-        return { success: false, messageKey: messageKey };
+        return { success: false, messageKey: 'transaction_failed_alert' };
     }
   }, [connected, publicKey, connection, walletSendTransaction, userTokens, address, getWalletBalances]);
   
