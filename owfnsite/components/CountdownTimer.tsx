@@ -31,15 +31,23 @@ const TimeUnit = ({ value, label }: { value: number; label: string }) => (
 );
 
 export const CountdownTimer: React.FC<CountdownTimerProps> = ({ endDate, t }) => {
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(endDate));
+  const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft(endDate));
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setTimeLeft(calculateTimeLeft(endDate));
+    // Set an interval that updates the time left every second.
+    const timerId = setInterval(() => {
+      const newTimeLeft = calculateTimeLeft(endDate);
+      setTimeLeft(newTimeLeft);
+
+      // If the countdown is finished, clear the interval to prevent memory leaks.
+      if (Object.values(newTimeLeft).every(v => v === 0)) {
+        clearInterval(timerId);
+      }
     }, 1000);
 
-    return () => clearTimeout(timer);
-  });
+    // Clean up the interval when the component unmounts.
+    return () => clearInterval(timerId);
+  }, [endDate]);
 
   return (
     <div className="flex flex-col items-center">

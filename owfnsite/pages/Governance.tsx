@@ -1,3 +1,5 @@
+
+
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Vote, PlusCircle, CheckCircle, ThumbsUp, ThumbsDown, X } from 'lucide-react';
@@ -6,33 +8,45 @@ import type { GovernanceProposal } from '../types.ts';
 
 const Countdown = ({ endDate }: { endDate: Date }) => {
     const { t } = useAppContext();
-    const calculateTimeLeft = () => {
-        const difference = +endDate - +new Date();
-        let timeLeft: {d: number, h: number, m: number} | {} = {};
+    const [timeLeft, setTimeLeft] = useState<{d: number, h: number, m: number, s: number} | {}>({});
 
-        if (difference > 0) {
-            timeLeft = {
+    React.useEffect(() => {
+        const timerId = setInterval(() => {
+            const difference = +endDate - +new Date();
+            if (difference > 0) {
+                setTimeLeft({
+                    d: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                    h: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                    m: Math.floor((difference / 1000 / 60) % 60),
+                    s: Math.floor((difference / 1000) % 60),
+                });
+            } else {
+                setTimeLeft({});
+                clearInterval(timerId); // CRITICAL FIX: Stop the interval when the countdown is over.
+            }
+        }, 1000);
+
+        // Perform initial calculation to avoid 1-second delay
+        const difference = +endDate - +new Date();
+        if (difference <= 0) {
+            setTimeLeft({});
+            clearInterval(timerId); // Clear immediately if already expired
+        } else {
+             setTimeLeft({
                 d: Math.floor(difference / (1000 * 60 * 60 * 24)),
                 h: Math.floor((difference / (1000 * 60 * 60)) % 24),
                 m: Math.floor((difference / 1000 / 60) % 60),
-            };
+                s: Math.floor((difference / 1000) % 60),
+            });
         }
-        return timeLeft;
-    };
 
-    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-
-    React.useEffect(() => {
-        const timer = setTimeout(() => {
-            setTimeLeft(calculateTimeLeft());
-        }, 60000); // update every minute
-        return () => clearTimeout(timer);
-    });
+        return () => clearInterval(timerId); // Standard cleanup
+    }, [endDate]);
 
     const timerComponents = Object.entries(timeLeft)
-        .map(([interval, value]) => `${value}${interval}`);
+        .map(([interval, value]) => `${String(value).padStart(2, '0')}${interval}`);
 
-    return <span>{timerComponents.length > 0 ? timerComponents.join(' ') : 'Ended'}</span>;
+    return <span>{timerComponents.length > 0 ? timerComponents.join(':') : 'Ended'}</span>;
 };
 
 const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {

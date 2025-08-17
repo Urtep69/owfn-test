@@ -159,7 +159,12 @@ export const useSolana = (): UseSolanaReturn => {
 
   useEffect(() => {
     if (connected && address) {
-      getWalletBalances(address).then(setUserTokens);
+      getWalletBalances(address)
+        .then(setUserTokens)
+        .catch(error => {
+            console.error("Failed to get wallet balances due to an API or network error:", error);
+            setUserTokens([]); // Set a safe empty state to prevent crashes
+        });
     } else {
       setUserTokens([]);
       balanceCache.clear(); // Clear cache on disconnect
@@ -230,7 +235,10 @@ export const useSolana = (): UseSolanaReturn => {
         if (address) {
             balanceCache.delete(address); // Invalidate cache after a transaction
             setTimeout(() => {
-                getWalletBalances(address).then(setUserTokens);
+                getWalletBalances(address).then(setUserTokens).catch(err => {
+                    console.error("Failed to refresh balances after transaction:", err);
+                    setUserTokens([]);
+                });
             }, 1500); // Give RPCs a bit more time to sync
         }
         

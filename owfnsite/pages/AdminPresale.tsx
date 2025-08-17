@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -139,18 +141,21 @@ export default function AdminPresale() {
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
         const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * 10**9));
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
+        const lamportsPerSolBigInt = BigInt(LAMPORTS_PER_SOL);
 
         return Array.from(contributorMap.entries()).map(([address, data]) => {
-            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
+            // Use Number() only for display values, not for calculations
+            const totalSolForDisplay = Number(data.totalLamports) / LAMPORTS_PER_SOL;
             
-            let totalOwfnInSmallestUnit = (data.totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
+            // Perform all financial calculations with BigInt for precision
+            let totalOwfnInSmallestUnit = (data.totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / lamportsPerSolBigInt;
 
             if (data.totalLamports >= bonusThresholdLamports) {
                 const bonusAmount = (totalOwfnInSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
                 totalOwfnInSmallestUnit += bonusAmount;
             }
 
-            return { address, totalSol, totalOwfn: totalOwfnInSmallestUnit };
+            return { address, totalSol: totalSolForDisplay, totalOwfn: totalOwfnInSmallestUnit };
         });
     }, [transactions]);
 
