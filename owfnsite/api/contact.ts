@@ -1,5 +1,3 @@
-
-
 import { GoogleGenAI, Type } from "@google/genai";
 
 export default async function handler(req: any, res: any) {
@@ -18,13 +16,11 @@ export default async function handler(req: any, res: any) {
     try {
         const { name, email, reason, message } = req.body;
 
-        // Enhanced validation
+        // Basic validation
         if (!name || !email || !reason || !message || !name.trim() || !email.trim() || !message.trim()) {
             return res.status(400).json({ success: false, error: 'All fields are required.' });
         }
-        if (name.length > 100 || email.length > 100 || message.length > 5000) {
-            return res.status(400).json({ success: false, error: 'Input field too long.' });
-        }
+        
         if (!/^\S+@\S+\.\S+$/.test(email)) {
              return res.status(400).json({ success: false, error: 'Invalid email format.' });
         }

@@ -1,10 +1,11 @@
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, PRESALE_DETAILS, MOCK_TOKEN_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -67,10 +68,10 @@ export const useSolana = (): UseSolanaReturn => {
       
     setLoading(true);
     try {
-        const response = await fetch(`/api/wallet-assets?address=${walletAddress}`);
+        const response = await fetch(`/api/get-wallet-assets?address=${walletAddress}`);
         
         if (!response.ok) {
-            console.error('API Error fetching assets:', await response.text());
+            console.error('API Error:', await response.text());
             throw new Error('Failed to fetch assets from API');
         }
 
@@ -155,16 +156,11 @@ export const useSolana = (): UseSolanaReturn => {
     } finally {
         setLoading(false);
     }
-  }, []);
+  }, [connection]);
 
   useEffect(() => {
     if (connected && address) {
-      getWalletBalances(address)
-        .then(setUserTokens)
-        .catch(error => {
-            console.error("Failed to get wallet balances due to an API or network error:", error);
-            setUserTokens([]); // Set a safe empty state to prevent crashes
-        });
+      getWalletBalances(address).then(setUserTokens);
     } else {
       setUserTokens([]);
       balanceCache.clear(); // Clear cache on disconnect
@@ -172,7 +168,7 @@ export const useSolana = (): UseSolanaReturn => {
   }, [connected, address, getWalletBalances]);
 
   const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
-    if (!connected || !publicKey || !walletSendTransaction) {
+    if (!connected || !publicKey) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
     setLoading(true);
@@ -186,19 +182,19 @@ export const useSolana = (): UseSolanaReturn => {
                 SystemProgram.transfer({
                     fromPubkey: publicKey,
                     toPubkey: toPublicKey,
-                    lamports: Math.round(amount * LAMPORTS_PER_SOL),
+                    lamports: amount * LAMPORTS_PER_SOL,
                 })
             );
         } else {
             const mintAddress = KNOWN_TOKEN_MINT_ADDRESSES[tokenSymbol];
             if (!mintAddress) throw new Error(`Unknown token symbol: ${tokenSymbol}`);
 
-            const tokenDetails = MOCK_TOKEN_DETAILS[tokenSymbol];
-            if (!tokenDetails) throw new Error(`Token details for ${tokenSymbol} not found in constants.`);
-            
-            const decimals = tokenDetails.decimals;
             const mintPublicKey = new PublicKey(mintAddress);
+            const tokenInfo = userTokens.find(t => t.symbol === tokenSymbol);
+            if (!tokenInfo) throw new Error(`Token ${tokenSymbol} not found in user's wallet.`);
             
+            const decimals = tokenInfo.decimals;
+
             const fromTokenAccount = await getAssociatedTokenAddress(mintPublicKey, publicKey);
             const toTokenAccount = await getAssociatedTokenAddress(mintPublicKey, toPublicKey);
             
@@ -207,61 +203,55 @@ export const useSolana = (): UseSolanaReturn => {
                     fromTokenAccount,
                     toTokenAccount,
                     publicKey,
-                    Math.round(amount * Math.pow(10, decimals))
+                    amount * Math.pow(10, decimals) 
                 )
             );
         }
+
+        // --- CRITICAL FIX FOR MOBILE ---
+        // 1. Explicitly set the fee payer
+        transaction.feePayer = publicKey;
         
-        // The wallet adapter's `sendTransaction` function handles the entire lifecycle:
-        // fetching a recent blockhash, signing, sending, and confirming the transaction.
-        // Relying on it is the standard, most robust method, especially for mobile compatibility.
+        // 2. Fetch and set the latest blockhash
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+        // --- END OF MOBILE FIX ---
+
         const signature = await walletSendTransaction(transaction, connection);
+        await connection.confirmTransaction(signature, 'processed');
 
         console.log(`Transaction successful with signature: ${signature}`);
-        
-        if (address) {
-            balanceCache.delete(address); // Invalidate cache after a transaction
-            setTimeout(() => {
-                getWalletBalances(address).then(setUserTokens).catch(err => {
-                    console.error("Failed to refresh balances after transaction:", err);
-                    setUserTokens([]);
-                });
-            }, 1500); // Give RPCs a bit more time to sync
-        }
-        
+        setLoading(false);
+        balanceCache.delete(address!); // Invalidate cache after a transaction
+        getWalletBalances(address!).then(setUserTokens);
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
     } catch (error) {
         console.error("Transaction failed:", error);
-        return { success: false, messageKey: 'transaction_failed_alert' };
-    } finally {
         setLoading(false);
+        return { success: false, messageKey: 'transaction_failed_alert' };
     }
-  }, [connected, publicKey, connection, walletSendTransaction, address, getWalletBalances]);
+  }, [connected, publicKey, connection, walletSendTransaction, userTokens, address, getWalletBalances]);
   
-  // Memoize the userStats object to prevent unnecessary re-renders in consuming components.
-  const userStats = useMemo(() => ({ 
-      totalDonated: 0,
-      projectsSupported: 0,
-      votesCast: 0,
-      donations: [],
-      votedProposalIds: []
-  }), []);
-
-  // Wrap the placeholder function in useCallback to ensure it's a stable reference.
-  const notImplemented = useCallback(async (..._args: any[]): Promise<any> => {
+  const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
       alert("This feature is coming soon and requires on-chain programs to be deployed.");
       return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
-  }, []);
+  }
 
-  const value = useMemo(() => ({
+  return {
     connected,
     address,
     userTokens,
     loading,
     connection,
-    userStats,
+    userStats: { 
+        totalDonated: 0,
+        projectsSupported: 0,
+        votesCast: 0,
+        donations: [],
+        votedProposalIds: []
+    },
     stakedBalance: 0,
     earnedRewards: 0,
     connectWallet,
@@ -273,10 +263,5 @@ export const useSolana = (): UseSolanaReturn => {
     claimRewards: notImplemented,
     claimVestedTokens: notImplemented,
     voteOnProposal: notImplemented,
-  }), [
-    connected, address, userTokens, loading, connection, userStats,
-    connectWallet, disconnect, getWalletBalances, sendTransaction, notImplemented
-  ]);
-
-  return value;
+  };
 };

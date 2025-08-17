@@ -6,15 +6,9 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
-import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack';
-import { CoinbaseWalletAdapter } from '@solana/wallet-adapter-coinbase';
-import { ExodusWalletAdapter } from '@solana/wallet-adapter-exodus';
-import { LedgerWalletAdapter } from '@solana/wallet-adapter-ledger';
-import { TorusWalletAdapter } from '@solana/wallet-adapter-torus';
-import { TrustWalletAdapter } from '@solana/wallet-adapter-trust';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
-import { ADMIN_WALLET_ADDRESS } from './constants.ts';
+import { ADMIN_WALLET_ADDRESS, SOLANA_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
 
 import Home from './pages/Home.tsx';
@@ -99,18 +93,12 @@ const AppContent = () => {
 
 function App() {
   const network = WalletAdapterNetwork.Mainnet;
-  const endpoint = useMemo(() => "https://api.mainnet-beta.solana.com", []);
+  const endpoint = useMemo(() => SOLANA_RPC_URL, []);
   
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
-      new BackpackWalletAdapter(),
-      new CoinbaseWalletAdapter(),
-      new ExodusWalletAdapter(),
-      new LedgerWalletAdapter(),
-      new TorusWalletAdapter(),
-      new TrustWalletAdapter(),
     ],
     []
   );

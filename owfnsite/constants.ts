@@ -9,6 +9,10 @@ export const OWFN_LOGO_URL: string = owfnLogo;
 export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenance mode globally
 
+// The Helius API key has been moved to a server-side environment variable for security.
+// Client-side calls now go through internal API routes.
+// This public RPC URL is used for general on-chain read operations via the ConnectionProvider.
+export const SOLANA_RPC_URL = 'https://api.mainnet-beta.solana.com';
 
 export const TOKEN_DETAILS = {
   totalSupply: 18_000_000_000,

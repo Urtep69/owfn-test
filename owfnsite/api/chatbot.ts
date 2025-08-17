@@ -1,5 +1,3 @@
-
-
 import { GoogleGenAI } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 

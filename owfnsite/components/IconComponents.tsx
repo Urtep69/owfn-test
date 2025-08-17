@@ -1,75 +1,57 @@
+
 import React, { useState } from 'react';
 import { Image } from 'lucide-react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from '../lib/assets.ts';
 
-const FallbackIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-    <div className={`${className} rounded-full bg-primary-200 dark:bg-darkPrimary-700 flex items-center justify-center`}>
-        <Image className="w-4/6 h-4/6 text-primary-400 dark:text-darkPrimary-500" />
-    </div>
-);
-
-const SafeImage = ({ src, alt, className, specialClassName = '' }: { src: string; alt: string; className: string; specialClassName?: string }) => {
-    const [hasError, setHasError] = useState(false);
-    if (hasError) {
-        return <FallbackIcon className={className} />;
-    }
-    return (
-        <img 
-            src={src}
-            alt={alt}
-            className={`${className} ${specialClassName} object-cover`}
-            onError={() => setHasError(true)}
-        />
-    );
-};
-
 export const OwfnIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <SafeImage
+  <img 
     src={owfnLogo} 
     alt="OWFN Logo" 
-    className={className}
-    specialClassName="rounded-full border-2 border-accent-600 dark:border-darkAccent-700"
+    className={`${className} rounded-full border-2 border-accent-600 dark:border-darkAccent-700 object-cover`} 
   />
 );
 
 export const SolIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <SafeImage
+  <img 
     src={solanaLogo} 
     alt="Solana Logo" 
-    className={className}
-    specialClassName="rounded-full"
+    className={`${className} rounded-full object-cover`} 
   />
 );
 
 export const UsdcIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <SafeImage
+  <img 
     src={usdcLogo} 
     alt="USD Coin Logo" 
-    className={className}
-    specialClassName="rounded-full"
+    className={`${className} rounded-full object-cover`} 
   />
 );
 
 export const UsdtIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
-  <SafeImage
+  <img 
     src={usdtLogo} 
     alt="Tether Logo" 
-    className={className}
-    specialClassName="rounded-full"
+    className={`${className} rounded-full object-cover`} 
   />
 );
 
 export const GenericTokenIcon = ({ uri, className = 'w-6 h-6' }: { uri?: string, className?: string }) => {
-    if (!uri) {
-        return <FallbackIcon className={className} />;
+    const [hasError, setHasError] = useState(false);
+
+    if (uri && !hasError) {
+        return (
+            <img 
+                src={uri} 
+                alt="Token Logo" 
+                className={`${className} rounded-full object-cover bg-primary-200 dark:bg-darkPrimary-700`} 
+                onError={() => setHasError(true)}
+            />
+        );
     }
     return (
-        <SafeImage
-            src={uri} 
-            alt="Token Logo" 
-            className={className}
-            specialClassName="rounded-full bg-primary-200 dark:bg-darkPrimary-700"
-        />
+        <div className={`${className} rounded-full bg-primary-200 dark:bg-darkPrimary-700 flex items-center justify-center`}>
+            <Image className="w-4/6 h-4/6 text-primary-400 dark:text-darkPrimary-500" />
+        </div>
     );
 };
 

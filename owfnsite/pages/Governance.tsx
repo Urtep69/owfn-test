@@ -1,5 +1,3 @@
-
-
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Vote, PlusCircle, CheckCircle, ThumbsUp, ThumbsDown, X } from 'lucide-react';
@@ -8,41 +6,33 @@ import type { GovernanceProposal } from '../types.ts';
 
 const Countdown = ({ endDate }: { endDate: Date }) => {
     const { t } = useAppContext();
-    const [timeLeft, setTimeLeft] = useState<{[key: string]: number}>({});
+    const calculateTimeLeft = () => {
+        const difference = +endDate - +new Date();
+        let timeLeft: {d: number, h: number, m: number} | {} = {};
+
+        if (difference > 0) {
+            timeLeft = {
+                d: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                h: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                m: Math.floor((difference / 1000 / 60) % 60),
+            };
+        }
+        return timeLeft;
+    };
+
+    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
     React.useEffect(() => {
-        const calculate = () => {
-            const difference = +endDate - +new Date();
-            if (difference > 0) {
-                setTimeLeft({
-                    d: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                    h: Math.floor((difference / (1000 * 60 * 60)) % 24),
-                    m: Math.floor((difference / 1000 / 60) % 60),
-                    s: Math.floor((difference / 1000) % 60),
-                });
-                return true; // Timer should continue
-            }
-            setTimeLeft({});
-            return false; // Timer should stop
-        };
-
-        // Initial calculation to set the state immediately
-        calculate();
-
-        const timerId = setInterval(() => {
-            if (!calculate()) {
-                clearInterval(timerId); // Stop the timer when it reaches zero
-            }
-        }, 1000);
-
-        // Standard cleanup to prevent memory leaks on unmount
-        return () => clearInterval(timerId);
-    }, [endDate]);
+        const timer = setTimeout(() => {
+            setTimeLeft(calculateTimeLeft());
+        }, 60000); // update every minute
+        return () => clearTimeout(timer);
+    });
 
     const timerComponents = Object.entries(timeLeft)
-        .map(([interval, value]) => `${String(value).padStart(2, '0')}${interval}`);
+        .map(([interval, value]) => `${value}${interval}`);
 
-    return <span>{timerComponents.length > 0 ? timerComponents.join(':') : 'Ended'}</span>;
+    return <span>{timerComponents.length > 0 ? timerComponents.join(' ') : 'Ended'}</span>;
 };
 
 const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {

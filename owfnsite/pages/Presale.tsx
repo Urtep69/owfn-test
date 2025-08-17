@@ -30,44 +30,42 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
         }
     }, [newTransaction]);
     
-    const fetchTransactions = useCallback(async () => {
-        setLoading(true);
-        try {
-            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
-            const url = `/api/address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Failed to fetch transactions');
-            const data = await response.json();
-            
-            if (data.error) throw new Error(data.error);
-
-            const parsedTxs: PresaleTransaction[] = data
-                .filter((tx: any) => 
-                    tx.timestamp >= presaleStartTimestamp &&
-                    tx.type === 'NATIVE_TRANSFER' && 
-                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
-                )
-                .map((tx: any) => ({
-                    id: tx.signature,
-                    address: tx.nativeTransfers[0].fromUserAccount,
-                    solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
-                    owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                    time: new Date(tx.timestamp * 1000),
-                }));
-            
-            setTransactions(parsedTxs.slice(0, 20));
-        } catch (error) {
-            console.error("Failed to fetch presale transactions:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
     useEffect(() => {
+        const fetchTransactions = async () => {
+            setLoading(true);
+            try {
+                const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+                const url = `/api/get-address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch transactions');
+                const data = await response.json();
+                
+                const parsedTxs: PresaleTransaction[] = data
+                    .filter((tx: any) => 
+                        tx.timestamp >= presaleStartTimestamp &&
+                        tx.type === 'NATIVE_TRANSFER' && 
+                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
+                    )
+                    .map((tx: any) => ({
+                        id: tx.signature,
+                        address: tx.nativeTransfers[0].fromUserAccount,
+                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
+                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                        time: new Date(tx.timestamp * 1000),
+                    }));
+                
+                setTransactions(parsedTxs.slice(0, 20));
+            } catch (error) {
+                console.error("Failed to fetch presale transactions:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchTransactions();
         const interval = setInterval(fetchTransactions, 30000); // refresh every 30 seconds
         return () => clearInterval(interval);
-    }, [fetchTransactions]);
+    }, []);
 
 
     return (
@@ -146,7 +144,6 @@ export default function Presale() {
   const [endReason, setEndReason] = useState<'date' | 'hardcap' | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  // Fetches the total amount of SOL contributed to the presale so far.
   const fetchPresaleProgress = useCallback(async () => {
         if (new Date() < PRESALE_DETAILS.startDate) {
             setSoldSOL(0);
@@ -159,13 +156,14 @@ export default function Presale() {
             let lastSignature: string | undefined = undefined;
 
             while(true) {
-                const url = `/api/address-transactions?address=${DISTRIBUTION_WALLETS.presale}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                let url = `/api/get-address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
+                if (lastSignature) {
+                    url += `&before=${lastSignature}`;
+                }
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
                 
-                if (data.error) throw new Error(data.error);
-
                 allTxs.push(...data);
                 
                 if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
@@ -190,7 +188,6 @@ export default function Presale() {
         }
     }, []);
 
-  // Effect to calculate the current state of the presale (pending, active, ended) and update the countdown timer.
   useEffect(() => {
     const calculateState = () => {
         const now = new Date();
@@ -240,14 +237,13 @@ export default function Presale() {
     return () => clearInterval(timer);
   }, [soldSOL]);
 
-  // Effect to periodically fetch the presale progress.
+
   useEffect(() => {
     fetchPresaleProgress();
     const interval = setInterval(fetchPresaleProgress, 60000);
     return () => clearInterval(interval);
   }, [fetchPresaleProgress]);
 
-  // Effect to fetch the current user's total contribution when their wallet is connected.
   useEffect(() => {
     const fetchUserContribution = async () => {
         if (!solana.connected || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
@@ -260,13 +256,13 @@ export default function Presale() {
             let allTxs: any[] = [];
             let lastSignature: string | undefined = undefined;
             while(true) {
-                const url = `/api/address-transactions?address=${DISTRIBUTION_WALLETS.presale}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                let url = `/api/get-address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
+                if (lastSignature) {
+                    url += `&before=${lastSignature}`;
+                }
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
-                
-                if (data.error) throw new Error(data.error);
-
                 allTxs.push(...data);
                 if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
                     break;
@@ -299,10 +295,7 @@ export default function Presale() {
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow only numbers and a single dot
-    if (/^[0-9]*\.?[0-9]*$/.test(value)) {
-        setSolAmount(value);
-    }
+    setSolAmount(value);
 
     if (value === '' || isNaN(parseFloat(value))) {
         setError('');
@@ -319,7 +312,7 @@ export default function Presale() {
 
   const { owfnAmount, bonusApplied } = useMemo(() => {
     const numAmount = parseFloat(solAmount);
-    if (isNaN(numAmount) || numAmount <= 0 || solAmount.trim() === '') {
+    if (isNaN(numAmount) || numAmount <= 0) {
         return { owfnAmount: 0, bonusApplied: false };
     }
 
@@ -335,7 +328,7 @@ export default function Presale() {
         const lamports = integerPart * LAMPORTS_PER_SOL_BIGINT + BigInt(fractionalPart);
 
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * 10**9)) ;
+        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * LAMPORTS_PER_SOL_BIGINT;
         
         let totalOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
 
@@ -564,8 +557,7 @@ export default function Presale() {
                             <div className="flex-grow relative">
                                 <input 
                                     id="buy-amount"
-                                    type="text"
-                                    inputMode="decimal"
+                                    type="number"
                                     value={solAmount}
                                     onChange={handleAmountChange}
                                     className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
@@ -581,10 +573,10 @@ export default function Presale() {
                                 {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
                             </button>
                         </div>
-                        {error && <p className="text-red-500 dark:text-red-400 text-sm mt-2 text-center" aria-live="polite">{error}</p>}
+                        {error && <p className="text-red-500 dark:text-red-400 text-sm mt-2 text-center">{error}</p>}
                         <p className="text-sm text-primary-600 dark:text-darkPrimary-400 mt-2 text-center flex items-center justify-center">
                             {t('presale_buying_owfn', { amount: isNaN(owfnAmount) ? '0.00' : owfnAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) })}
-                            {bonusApplied && <span className="ml-1.5 text-xs font-bold text-green-500 dark:text-green-400">(+{PRESALE_DETAILS.bonusPercentage}% Bonus!)</span>}
+                            {bonusApplied && <span className="ml-1.5 text-xs font-bold text-green-500 dark:text-green-400">(+10% Bonus!)</span>}
                             <span className="ml-1.5 cursor-pointer" title={t('presale_estimate_tooltip')}>
                                 <Info size={14} />
                             </span>

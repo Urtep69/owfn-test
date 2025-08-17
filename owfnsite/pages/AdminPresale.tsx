@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -75,42 +74,44 @@ export default function AdminPresale() {
 
     const fetchAllTransactions = useCallback(async () => {
         setLoading(true);
-        let allTxs: PresaleTx[] = [];
+        let allTxsData: any[] = [];
         let lastSignature: string | undefined = undefined;
 
         try {
             while (true) {
-                const url = `/api/address-transactions?address=${DISTRIBUTION_WALLETS.presale}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                let url = `/api/get-address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
+                if (lastSignature) {
+                    url += `&before=${lastSignature}`;
+                }
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions');
+                if (!response.ok) throw new Error('Failed to fetch transactions from API');
                 const data = await response.json();
 
-                if (data.error) throw new Error(data.error);
-
-                const parsedTxs: PresaleTx[] = data
-                    .filter((tx: any) => 
-                        tx.type === 'NATIVE_TRANSFER' && 
-                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                        tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111' // System Program
-                    )
-                    .map((tx: any): PresaleTx => ({
-                        signature: tx.signature,
-                        from: tx.nativeTransfers[0].fromUserAccount,
-                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
-                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                        timestamp: tx.timestamp,
-                        lamports: tx.nativeTransfers[0].amount,
-                    }));
-                
-                allTxs.push(...parsedTxs);
+                allTxsData.push(...data);
 
                 if (data.length < 100) {
-                    break; 
+                    break;
+                } else {
+                    lastSignature = data[data.length - 1].signature;
                 }
-                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
-                if (!lastSignature) break;
             }
-            setTransactions(allTxs);
+
+            const parsedTxs: PresaleTx[] = allTxsData
+                .filter((tx: any) => 
+                    tx.type === 'NATIVE_TRANSFER' && 
+                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                    tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111' // System Program
+                )
+                .map((tx: any): PresaleTx => ({
+                    signature: tx.signature,
+                    from: tx.nativeTransfers[0].fromUserAccount,
+                    solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
+                    owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                    timestamp: tx.timestamp,
+                    lamports: tx.nativeTransfers[0].amount,
+                }));
+
+            setTransactions(parsedTxs);
         } catch (error) {
             console.error("Failed to fetch all presale transactions:", error);
         } finally {
@@ -139,23 +140,21 @@ export default function AdminPresale() {
         });
         
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * 10**9));
+        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * BigInt(LAMPORTS_PER_SOL);
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
-        const lamportsPerSolBigInt = BigInt(LAMPORTS_PER_SOL);
 
         return Array.from(contributorMap.entries()).map(([address, data]) => {
-            // Use Number() only for display values, not for calculations
-            const totalSolForDisplay = Number(data.totalLamports) / LAMPORTS_PER_SOL;
+            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
             
-            // Perform all financial calculations with BigInt for precision
-            let totalOwfnInSmallestUnit = (data.totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / lamportsPerSolBigInt;
+            // Perform all calculations with BigInt for precision
+            let totalOwfnInSmallestUnit = (data.totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
 
             if (data.totalLamports >= bonusThresholdLamports) {
                 const bonusAmount = (totalOwfnInSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
                 totalOwfnInSmallestUnit += bonusAmount;
             }
 
-            return { address, totalSol: totalSolForDisplay, totalOwfn: totalOwfnInSmallestUnit };
+            return { address, totalSol, totalOwfn: totalOwfnInSmallestUnit };
         });
     }, [transactions]);
 
