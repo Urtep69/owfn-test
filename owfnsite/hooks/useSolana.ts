@@ -1,13 +1,11 @@
 
-
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, PRESALE_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -70,11 +68,28 @@ export const useSolana = (): UseSolanaReturn => {
       
     setLoading(true);
     try {
-        const response = await fetch(`/api/get-wallet-assets?address=${walletAddress}`);
+        const response = await fetch(HELIUS_RPC_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 'my-id',
+                method: 'getAssetsByOwner',
+                params: {
+                    ownerAddress: walletAddress,
+                    page: 1,
+                    limit: 1000,
+                    displayOptions: {
+                        showFungible: true,
+                        showNativeBalance: true,
+                    },
+                },
+            }),
+        });
         
         if (!response.ok) {
-            console.error('API Error:', await response.text());
-            throw new Error('Failed to fetch assets from API');
+            console.error('Helius API Error:', await response.text());
+            throw new Error('Failed to fetch assets from Helius');
         }
 
         const { result } = await response.json();
@@ -127,8 +142,8 @@ export const useSolana = (): UseSolanaReturn => {
 
         if (splMintsToFetch) {
             try {
-                const priceRes = await fetch(`/api/get-token-prices?mints=${splMintsToFetch}`);
-                if (!priceRes.ok) throw new Error(`Price API failed with status ${priceRes.status}`);
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${splMintsToFetch}`);
+                if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
                 
                 const priceData = await priceRes.json();
                 
@@ -144,8 +159,7 @@ export const useSolana = (): UseSolanaReturn => {
                     });
                 }
             } catch (priceError) {
-                console.error("Could not fetch token prices from internal API:", priceError);
-                // Gracefully continue, tokens without prices will have value 0
+                console.error("Could not fetch token prices from Jupiter API:", priceError);
             }
         }
         
@@ -210,15 +224,6 @@ export const useSolana = (): UseSolanaReturn => {
                 )
             );
         }
-
-        // --- CRITICAL FIX FOR MOBILE ---
-        // 1. Explicitly set the fee payer
-        transaction.feePayer = publicKey;
-        
-        // 2. Fetch and set the latest blockhash
-        const { blockhash } = await connection.getLatestBlockhash();
-        transaction.recentBlockhash = blockhash;
-        // --- END OF MOBILE FIX ---
 
         const signature = await walletSendTransaction(transaction, connection);
         await connection.confirmTransaction(signature, 'processed');

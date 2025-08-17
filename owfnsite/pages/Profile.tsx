@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -109,18 +108,12 @@ export default function Profile() {
                                 {/* Column 2: Balance */}
                                 <div className="text-right font-mono">
                                     <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
-                                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400">
-                                        {token.pricePerToken > 0 
-                                            ? `@ $${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}`
-                                            : `@ $--`}
-                                    </p>
+                                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
                                 </div>
 
                                 {/* Column 3: Value */}
                                 <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
-                                    {token.pricePerToken > 0 
-                                        ? `$${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
-                                        : `$--`}
+                                    ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                 </div>
                             </div>
                         ))}

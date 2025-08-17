@@ -9,10 +9,10 @@ export const OWFN_LOGO_URL: string = owfnLogo;
 export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenance mode globally
 
-// The Helius API key has been moved to a server-side environment variable for security.
-// Client-side calls now go through internal API routes.
-// This public RPC URL is used for general on-chain read operations via the ConnectionProvider.
-export const SOLANA_RPC_URL = 'https://ssc-dao.genesysgo.net/';
+export const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
+export const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+export const HELIUS_API_BASE_URL = 'https://api.helius.xyz';
+
 
 export const TOKEN_DETAILS = {
   totalSupply: 18_000_000_000,

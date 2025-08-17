@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
-import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Expand, Shrink } from 'lucide-react';
+import { MessageCircle, X, Send, User, Loader2, Twitter } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -99,11 +99,6 @@ export const Chatbot = () => {
     const [loadingText, setLoadingText] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
-
-    const [isMinimized, setIsMinimized] = useState(false);
-    const [isMaximized, setIsMaximized] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
-
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -207,7 +202,6 @@ export const Chatbot = () => {
                 loadingIntervalRef.current = null;
             }
             setIsLoading(false);
-            inputRef.current?.focus();
         }
     };
 
@@ -228,102 +222,75 @@ export const Chatbot = () => {
             </button>
         );
     }
-    
-    const containerClasses = `
-        fixed z-50 flex flex-col bg-white dark:bg-darkPrimary-800 shadow-3d-lg transition-all duration-300 ease-in-out
-        ${isMinimized
-            ? 'bottom-5 right-5 w-full max-w-sm rounded-lg'
-            : isMaximized
-                ? 'inset-0 w-full h-full max-w-none max-h-none rounded-none'
-                : 'bottom-5 right-5 w-full max-w-sm rounded-lg h-full max-h-[70vh] animate-slide-in'
-        }
-    `;
 
     return (
-        <div className={containerClasses}>
-            <header 
-                className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg flex-shrink-0 cursor-pointer"
-                onClick={() => isMinimized && setIsMinimized(false)}
-            >
+        <div className="fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50">
+            <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
                 <div className="flex items-center space-x-2">
                     <OwfnIcon className="w-6 h-6" />
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
-                <div className="flex items-center space-x-2">
-                     <button onClick={(e) => { e.stopPropagation(); setIsMinimized(prev => !prev); }} className="p-1 rounded-full hover:bg-black/20" aria-label={isMinimized ? "Restore chat" : "Minimize chat"}>
-                        <Minus size={20} />
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); setIsMaximized(prev => !prev); if (!isMaximized) { setIsMinimized(false); } }} className="p-1 rounded-full hover:bg-black/20" aria-label={isMaximized ? "Restore chat size" : "Maximize chat"}>
-                        {isMaximized ? <Shrink size={20} /> : <Expand size={20} />}
-                    </button>
-                    <button onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} className="p-1 rounded-full hover:bg-black/20">
-                        <X size={20} />
+                <button onClick={() => setIsOpen(false)} className="hover:opacity-75">
+                    <X size={24} />
+                </button>
+            </header>
+            <div className="flex-1 p-4 overflow-y-auto">
+                <div className="space-y-4">
+                    {messages.map((msg, index) => (
+                        <div key={index}>
+                            <div className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
+                                <div className="flex flex-col">
+                                    {msg.timestamp && (
+                                        <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mb-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                                            {formatTimestamp(msg.timestamp)}
+                                        </p>
+                                    )}
+                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
+                                       <div className="text-sm whitespace-pre-wrap">
+                                           {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
+                                       </div>
+                                    </div>
+                                </div>
+                                {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
+                            </div>
+                        </div>
+                    ))}
+                    {isLoading && (
+                         <div className="flex items-start gap-3 justify-start">
+                            <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />
+                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none">
+                                <div className="flex items-center space-x-2 text-sm text-primary-600 dark:text-darkPrimary-300">
+                                    <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
+                                    <span>{loadingText}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
+            </div>
+            <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
+                <div className="relative">
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder={t('chatbot_placeholder')}
+                        className="w-full p-3 pr-20 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
+                        disabled={isLoading}
+                    />
+                    <button
+                        onClick={handleSend}
+                        disabled={isLoading || input.trim() === ''}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
+                        aria-label="Send message"
+                    >
+                       {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }
                     </button>
                 </div>
-            </header>
-
-            {!isMinimized && (
-                <>
-                    <div className="flex-1 p-4 overflow-y-auto">
-                        <div className="space-y-4">
-                            {messages.map((msg, index) => (
-                                <div key={index}>
-                                    <div className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                        {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
-                                        <div className="flex flex-col">
-                                            {msg.timestamp && (
-                                                <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mb-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                                                    {formatTimestamp(msg.timestamp)}
-                                                </p>
-                                            )}
-                                            <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
-                                               <div className="text-sm whitespace-pre-wrap">
-                                                   {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
-                                               </div>
-                                            </div>
-                                        </div>
-                                        {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
-                                    </div>
-                                </div>
-                            ))}
-                            {isLoading && (
-                                 <div className="flex items-start gap-3 justify-start">
-                                    <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />
-                                    <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none">
-                                        <div className="flex items-center space-x-2 text-sm text-primary-600 dark:text-darkPrimary-300">
-                                            <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
-                                            <span>{loadingText}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                            <div ref={messagesEndRef} />
-                        </div>
-                    </div>
-                    <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
-                        <div className="relative">
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyPress={handleKeyPress}
-                                placeholder={t('chatbot_placeholder')}
-                                className="w-full p-3 pr-20 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
-                                disabled={isLoading}
-                            />
-                            <button
-                                onClick={handleSend}
-                                disabled={isLoading || input.trim() === ''}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
-                                aria-label="Send message"
-                            >
-                               {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }
-                            </button>
-                        </div>
-                    </div>
-                </>
-            )}
+            </div>
         </div>
     );
 };

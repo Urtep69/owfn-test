@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -7,6 +6,8 @@ import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedT
 
 import { 
     DISTRIBUTION_WALLETS, 
+    HELIUS_API_KEY, 
+    HELIUS_API_BASE_URL, 
     PRESALE_DETAILS,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
@@ -74,50 +75,46 @@ export default function AdminPresale() {
 
     const fetchAllTransactions = useCallback(async () => {
         setLoading(true);
-        let allTxsData: any[] = [];
+        let allTxs: PresaleTx[] = [];
         let lastSignature: string | undefined = undefined;
 
         try {
             while (true) {
-                let url = `/api/get-address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
-                if (lastSignature) {
-                    url += `&before=${lastSignature}`;
-                }
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions from API');
+                if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
                 const data = await response.json();
 
-                allTxsData.push(...data);
+                const parsedTxs: PresaleTx[] = data
+                    .filter((tx: any) => 
+                        tx.type === 'NATIVE_TRANSFER' && 
+                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                        tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111' // System Program
+                    )
+                    .map((tx: any): PresaleTx => ({
+                        signature: tx.signature,
+                        from: tx.nativeTransfers[0].fromUserAccount,
+                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
+                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                        timestamp: tx.timestamp,
+                        lamports: tx.nativeTransfers[0].amount,
+                    }));
+                
+                allTxs.push(...parsedTxs);
 
                 if (data.length < 100) {
-                    break;
+                    break; 
                 } else {
                     lastSignature = data[data.length - 1].signature;
                 }
             }
-
-            const parsedTxs: PresaleTx[] = allTxsData
-                .filter((tx: any) => 
-                    tx.type === 'NATIVE_TRANSFER' && 
-                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                    tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111' // System Program
-                )
-                .map((tx: any): PresaleTx => ({
-                    signature: tx.signature,
-                    from: tx.nativeTransfers[0].fromUserAccount,
-                    solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
-                    owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                    timestamp: tx.timestamp,
-                    lamports: tx.nativeTransfers[0].amount,
-                }));
-
-            setTransactions(parsedTxs);
+            setTransactions(allTxs);
         } catch (error) {
             console.error("Failed to fetch all presale transactions:", error);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [connection]);
 
     useEffect(() => {
         fetchAllTransactions();

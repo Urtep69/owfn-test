@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
@@ -13,6 +12,8 @@ import {
     TOKEN_ALLOCATIONS, 
     ROADMAP_DATA,
     DISTRIBUTION_WALLETS,
+    HELIUS_API_BASE_URL,
+    HELIUS_API_KEY,
 } from '../constants.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { PresaleTransaction } from '../types.ts';
@@ -35,7 +36,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
             setLoading(true);
             try {
                 const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
-                const url = `/api/get-address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
@@ -156,10 +157,7 @@ export default function Presale() {
             let lastSignature: string | undefined = undefined;
 
             while(true) {
-                let url = `/api/get-address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
-                if (lastSignature) {
-                    url += `&before=${lastSignature}`;
-                }
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
@@ -256,10 +254,7 @@ export default function Presale() {
             let allTxs: any[] = [];
             let lastSignature: string | undefined = undefined;
             while(true) {
-                let url = `/api/get-address-transactions?address=${DISTRIBUTION_WALLETS.presale}`;
-                if (lastSignature) {
-                    url += `&before=${lastSignature}`;
-                }
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
