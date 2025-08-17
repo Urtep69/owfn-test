@@ -200,7 +200,7 @@ export const useSolana = (): UseSolanaReturn => {
                 SystemProgram.transfer({
                     fromPubkey: publicKey,
                     toPubkey: toPublicKey,
-                    lamports: Math.round(amount * LAMPORTS_PER_SOL), // Round to avoid float errors
+                    lamports: Math.round(amount * LAMPORTS_PER_SOL), // Use Math.round to prevent float errors
                 })
             );
         } else {
@@ -226,22 +226,23 @@ export const useSolana = (): UseSolanaReturn => {
             );
         }
 
-        // Use a more robust method for sending and confirming transactions
-        const {
-            context: { slot: minContextSlot },
-            value: { blockhash, lastValidBlockHeight }
-        } = await connection.getLatestBlockhashAndContext();
-        
+        // Fetch the latest blockhash right before sending to maximize its validity time, crucial for mobile wallets.
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = publicKey;
 
-        const signature = await walletSendTransaction(transaction, connection, { minContextSlot });
-        await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
+        // The wallet adapter signs and sends the transaction. We omit preflight options that might cause issues on mobile.
+        const signature = await walletSendTransaction(transaction, connection);
+        
+        // Use a robust confirmation strategy with a 'confirmed' commitment for faster user feedback.
+        await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature }, 'confirmed');
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
-        balanceCache.delete(address!); // Invalidate cache after a transaction
-        getWalletBalances(address!).then(setUserTokens);
+        if (address) {
+            balanceCache.delete(address); // Invalidate cache after a transaction
+            getWalletBalances(address).then(setUserTokens);
+        }
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
     } catch (error) {
