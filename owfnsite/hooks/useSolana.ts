@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -297,7 +298,7 @@ export const useSolana = (): UseSolanaReturn => {
     connected,
     address,
     userTokens,
-    loading: loading || connecting,
+    loading: loading || connecting || (connected && !publicKey),
     connection,
     userStats: { 
         totalDonated: 0,
