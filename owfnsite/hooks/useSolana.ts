@@ -4,6 +4,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { WalletSendTransactionError } from '@solana/wallet-adapter-base';
 import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
@@ -199,7 +200,7 @@ export const useSolana = (): UseSolanaReturn => {
                 SystemProgram.transfer({
                     fromPubkey: publicKey,
                     toPubkey: toPublicKey,
-                    lamports: amount * LAMPORTS_PER_SOL,
+                    lamports: Math.round(amount * LAMPORTS_PER_SOL), // Use Math.round for safety
                 })
             );
         } else {
@@ -237,7 +238,26 @@ export const useSolana = (): UseSolanaReturn => {
     } catch (error) {
         console.error("Transaction failed:", error);
         setLoading(false);
-        return { success: false, messageKey: 'transaction_failed_alert' };
+        
+        let messageKey = 'transaction_failed_alert';
+        let errorMessage = '';
+
+        if (error instanceof WalletSendTransactionError || (error instanceof Error && error.name.includes('Wallet'))) {
+            errorMessage = error.message;
+        } else if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        if (errorMessage) {
+            const lowerCaseError = errorMessage.toLowerCase();
+            if (lowerCaseError.includes('user rejected') || lowerCaseError.includes('request rejected')) {
+                messageKey = 'transaction_failed_user_rejected';
+            } else if (lowerCaseError.includes('insufficient funds') || lowerCaseError.includes('insufficient lamports')) {
+                messageKey = 'transaction_failed_insufficient_funds';
+            }
+        }
+    
+        return { success: false, messageKey: messageKey };
     }
   }, [connected, publicKey, connection, walletSendTransaction, userTokens, address, getWalletBalances]);
   
