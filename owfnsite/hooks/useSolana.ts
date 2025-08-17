@@ -1,8 +1,9 @@
 
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction, ComputeBudgetProgram } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { WalletSendTransactionError } from '@solana/wallet-adapter-base';
 import type { Token } from '../types.ts';
@@ -195,12 +196,51 @@ export const useSolana = (): UseSolanaReturn => {
         const toPublicKey = new PublicKey(to);
         const transaction = new Transaction();
         
+        // --- PRIORITY FEES IMPLEMENTATION ---
+        // 1. Set a safe compute unit limit for our simple transfers.
+        transaction.add(
+            ComputeBudgetProgram.setComputeUnitLimit({
+                units: 200_000,
+            })
+        );
+        
+        // 2. Dynamically fetch and set a priority fee to increase transaction success rate.
+        try {
+            const priorityFeeResponse = await fetch(HELIUS_RPC_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: '1',
+                    method: 'getPriorityFeeEstimate',
+                    params: [{
+                        "accountKeys": [publicKey.toBase58(), to], // Accounts being written to
+                        "options": { "priorityLevel": "High" } // Request a high priority fee
+                    }]
+                }),
+            });
+            const { result } = await priorityFeeResponse.json();
+            const microLamports = result?.priorityFeeEstimate;
+            
+            if (microLamports && microLamports > 0) {
+                 transaction.add(
+                    ComputeBudgetProgram.setComputeUnitPrice({
+                        microLamports: Math.ceil(microLamports),
+                    })
+                 );
+                 console.log(`Added priority fee: ${Math.ceil(microLamports)} microLamports`);
+            }
+        } catch (feeError) {
+            console.warn("Could not fetch priority fee, sending transaction without it.", feeError);
+        }
+        // --- END PRIORITY FEES IMPLEMENTATION ---
+        
         if (tokenSymbol === 'SOL') {
             transaction.add(
                 SystemProgram.transfer({
                     fromPubkey: publicKey,
                     toPubkey: toPublicKey,
-                    lamports: Math.round(amount * LAMPORTS_PER_SOL), // Use Math.round for safety
+                    lamports: Math.round(amount * LAMPORTS_PER_SOL),
                 })
             );
         } else {
@@ -227,7 +267,14 @@ export const useSolana = (): UseSolanaReturn => {
         }
 
         const signature = await walletSendTransaction(transaction, connection);
-        await connection.confirmTransaction(signature, 'processed');
+        
+        // Use a more robust confirmation strategy
+        const latestBlockhash = await connection.getLatestBlockhash('confirmed');
+        await connection.confirmTransaction({
+            signature,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+        }, 'confirmed');
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
