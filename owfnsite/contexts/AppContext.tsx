@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
@@ -36,13 +36,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
-  const addSocialCase = (newCase: SocialCase) => {
+  const addSocialCase = useCallback((newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
-  };
+  }, []);
   
-  const addVestingSchedule = (schedule: VestingSchedule) => {
+  const addVestingSchedule = useCallback((schedule: VestingSchedule) => {
     setVestingSchedules(prev => [schedule, ...prev]);
-  };
+  }, []);
 
   const addProposal = useCallback(async (proposalData: { title: string; description: string; endDate: Date; }) => {
     const newTitleTranslations: Record<string, string> = { en: proposalData.title };
@@ -100,7 +100,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   }, []);
 
-  const value = {
+  const value = useMemo(() => ({
     theme,
     toggleTheme,
     t,
@@ -116,7 +116,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addProposal,
     voteOnProposal,
     isMaintenanceActive,
-  };
+  }), [
+    theme, toggleTheme, t, setLang, currentLanguage, supportedLanguages, 
+    solana, socialCases, addSocialCase, vestingSchedules, addVestingSchedule,
+    proposals, addProposal, voteOnProposal, isMaintenanceActive
+  ]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

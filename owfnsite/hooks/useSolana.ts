@@ -1,5 +1,4 @@
 
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -186,7 +185,7 @@ export const useSolana = (): UseSolanaReturn => {
   }, [connected, address, getWalletBalances]);
 
   const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
-    if (!connected || !publicKey) {
+    if (!connected || !publicKey || !walletSendTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
     setLoading(true);
@@ -225,52 +224,67 @@ export const useSolana = (): UseSolanaReturn => {
                 )
             );
         }
-
-        // Fetch the latest blockhash right before sending to maximize its validity time, crucial for mobile wallets.
-        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
-        transaction.recentBlockhash = blockhash;
+        
+        const latestBlockhash = await connection.getLatestBlockhash('confirmed');
+        transaction.recentBlockhash = latestBlockhash.blockhash;
         transaction.feePayer = publicKey;
 
-        // The wallet adapter signs and sends the transaction. We omit preflight options that might cause issues on mobile.
+        // **RELIABILITY FIX**: Let the wallet adapter handle preflight, which is crucial for mobile compatibility.
+        // **RELIABILITY FIX**: Use the modern, robust confirmation strategy with blockhash and height.
         const signature = await walletSendTransaction(transaction, connection);
         
-        // Use a robust confirmation strategy with a 'confirmed' commitment for faster user feedback.
-        await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature }, 'confirmed');
+        const confirmation = await connection.confirmTransaction({
+            signature,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+        }, 'confirmed');
+
+        if (confirmation.value.err) {
+            throw new Error(`Transaction confirmation failed: ${JSON.stringify(confirmation.value.err)}`);
+        }
 
         console.log(`Transaction successful with signature: ${signature}`);
-        setLoading(false);
+        
         if (address) {
             balanceCache.delete(address); // Invalidate cache after a transaction
-            getWalletBalances(address).then(setUserTokens);
+            setTimeout(() => {
+                getWalletBalances(address).then(setUserTokens);
+            }, 1500); // Give RPCs a bit more time to sync
         }
+        
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
     } catch (error) {
         console.error("Transaction failed:", error);
-        setLoading(false);
         return { success: false, messageKey: 'transaction_failed_alert' };
+    } finally {
+        setLoading(false);
     }
   }, [connected, publicKey, connection, walletSendTransaction, userTokens, address, getWalletBalances]);
   
-  const notImplemented = async (..._args: any[]): Promise<any> => {
+  // Memoize the userStats object to prevent unnecessary re-renders in consuming components.
+  const userStats = useMemo(() => ({ 
+      totalDonated: 0,
+      projectsSupported: 0,
+      votesCast: 0,
+      donations: [],
+      votedProposalIds: []
+  }), []);
+
+  // Wrap the placeholder function in useCallback to ensure it's a stable reference.
+  const notImplemented = useCallback(async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
       alert("This feature is coming soon and requires on-chain programs to be deployed.");
       return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
-  }
+  }, []);
 
-  return {
+  const value = useMemo(() => ({
     connected,
     address,
     userTokens,
     loading,
     connection,
-    userStats: { 
-        totalDonated: 0,
-        projectsSupported: 0,
-        votesCast: 0,
-        donations: [],
-        votedProposalIds: []
-    },
+    userStats,
     stakedBalance: 0,
     earnedRewards: 0,
     connectWallet,
@@ -282,5 +296,10 @@ export const useSolana = (): UseSolanaReturn => {
     claimRewards: notImplemented,
     claimVestedTokens: notImplemented,
     voteOnProposal: notImplemented,
-  };
+  }), [
+    connected, address, userTokens, loading, connection, userStats,
+    connectWallet, disconnect, getWalletBalances, sendTransaction, notImplemented
+  ]);
+
+  return value;
 };

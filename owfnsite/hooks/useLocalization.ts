@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useMemo } from 'react';
 import { translations } from '../lib/locales/index.ts';
 import { SUPPORTED_LANGUAGES } from '../constants.ts';
@@ -39,5 +40,12 @@ export const useLocalization = () => {
 
   const currentLanguage = useMemo(() => SUPPORTED_LANGUAGES.find(l => l.code === language) as Language, [language]);
 
-  return { t, setLang, currentLanguage, supportedLanguages: SUPPORTED_LANGUAGES };
+  const value = useMemo(() => ({
+    t,
+    setLang,
+    currentLanguage,
+    supportedLanguages: SUPPORTED_LANGUAGES
+  }), [t, setLang, currentLanguage]);
+
+  return value;
 };

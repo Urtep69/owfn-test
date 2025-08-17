@@ -6,6 +6,12 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
+import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack';
+import { CoinbaseWalletAdapter } from '@solana/wallet-adapter-coinbase';
+import { ExodusWalletAdapter } from '@solana/wallet-adapter-exodus';
+import { LedgerWalletAdapter } from '@solana/wallet-adapter-ledger';
+import { TorusWalletAdapter } from '@solana/wallet-adapter-torus';
+import { TrustWalletAdapter } from '@solana/wallet-adapter-trust';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from './constants.ts';
@@ -99,6 +105,12 @@ function App() {
     () => [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
+      new BackpackWalletAdapter(),
+      new CoinbaseWalletAdapter(),
+      new ExodusWalletAdapter(),
+      new LedgerWalletAdapter(),
+      new TorusWalletAdapter(),
+      new TrustWalletAdapter(),
     ],
     []
   );

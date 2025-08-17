@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
@@ -145,6 +146,7 @@ export default function Presale() {
   const [endReason, setEndReason] = useState<'date' | 'hardcap' | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
+  // Fetches the total amount of SOL contributed to the presale so far.
   const fetchPresaleProgress = useCallback(async () => {
         if (new Date() < PRESALE_DETAILS.startDate) {
             setSoldSOL(0);
@@ -186,6 +188,7 @@ export default function Presale() {
         }
     }, []);
 
+  // Effect to calculate the current state of the presale (pending, active, ended) and update the countdown timer.
   useEffect(() => {
     const calculateState = () => {
         const now = new Date();
@@ -235,13 +238,14 @@ export default function Presale() {
     return () => clearInterval(timer);
   }, [soldSOL]);
 
-
+  // Effect to periodically fetch the presale progress.
   useEffect(() => {
     fetchPresaleProgress();
     const interval = setInterval(fetchPresaleProgress, 60000);
     return () => clearInterval(interval);
   }, [fetchPresaleProgress]);
 
+  // Effect to fetch the current user's total contribution when their wallet is connected.
   useEffect(() => {
     const fetchUserContribution = async () => {
         if (!solana.connected || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
@@ -568,7 +572,7 @@ export default function Presale() {
                                 {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
                             </button>
                         </div>
-                        {error && <p className="text-red-500 dark:text-red-400 text-sm mt-2 text-center">{error}</p>}
+                        {error && <p className="text-red-500 dark:text-red-400 text-sm mt-2 text-center" aria-live="polite">{error}</p>}
                         <p className="text-sm text-primary-600 dark:text-darkPrimary-400 mt-2 text-center flex items-center justify-center">
                             {t('presale_buying_owfn', { amount: isNaN(owfnAmount) ? '0.00' : owfnAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) })}
                             {bonusApplied && <span className="ml-1.5 text-xs font-bold text-green-500 dark:text-green-400">(+10% Bonus!)</span>}
