@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -61,14 +62,22 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                                     <div>
                                         <p className="font-semibold">{token.symbol}</p>
                                         <p className="text-xs text-primary-500 dark:text-darkPrimary-500">
-                                            @ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}
+                                            {token.pricePerToken > 0 
+                                                ? `@ $${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}`
+                                                : `@ $--`
+                                            }
                                         </p>
                                     </div>
                                 </div>
                                 {/* Balance & Value */}
                                 <div className="text-right">
                                     <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p>
-                                    <p className="text-xs text-primary-500 dark:text-darkPrimary-400">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                    <p className="text-xs text-primary-500 dark:text-darkPrimary-400">
+                                        {token.pricePerToken > 0 
+                                            ? `$${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                            : `$--`
+                                        }
+                                    </p>
                                 </div>
                             </div>
                         )) : (

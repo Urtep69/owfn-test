@@ -1,4 +1,6 @@
 
+
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -125,8 +127,8 @@ export const useSolana = (): UseSolanaReturn => {
 
         if (splMintsToFetch) {
             try {
-                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${splMintsToFetch}`);
-                if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
+                const priceRes = await fetch(`/api/get-token-prices?mints=${splMintsToFetch}`);
+                if (!priceRes.ok) throw new Error(`Price API failed with status ${priceRes.status}`);
                 
                 const priceData = await priceRes.json();
                 
@@ -142,7 +144,8 @@ export const useSolana = (): UseSolanaReturn => {
                     });
                 }
             } catch (priceError) {
-                console.error("Could not fetch token prices from Jupiter API:", priceError);
+                console.error("Could not fetch token prices from internal API:", priceError);
+                // Gracefully continue, tokens without prices will have value 0
             }
         }
         
