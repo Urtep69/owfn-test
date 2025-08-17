@@ -100,6 +100,7 @@ export const Chatbot = () => {
     const [loadingText, setLoadingText] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -107,6 +108,15 @@ export const Chatbot = () => {
 
     useEffect(scrollToBottom, [messages, isLoading, loadingText]);
     
+    useEffect(() => {
+        // When the chat is open and not loading, focus the input field.
+        // This handles both opening the chat and finishing a response.
+        // A small timeout ensures the input is not disabled anymore when focus is called.
+        if (isOpen && !isLoading) {
+            setTimeout(() => inputRef.current?.focus(), 100);
+        }
+    }, [isOpen, isLoading]);
+
     // Cleanup interval on component unmount
     useEffect(() => {
         return () => {
@@ -289,6 +299,7 @@ export const Chatbot = () => {
             <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
                 <div className="relative">
                     <input
+                        ref={inputRef}
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
