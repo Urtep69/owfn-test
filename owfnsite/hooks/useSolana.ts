@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -199,7 +200,7 @@ export const useSolana = (): UseSolanaReturn => {
                 SystemProgram.transfer({
                     fromPubkey: publicKey,
                     toPubkey: toPublicKey,
-                    lamports: amount * LAMPORTS_PER_SOL,
+                    lamports: Math.round(amount * LAMPORTS_PER_SOL), // Round to avoid float errors
                 })
             );
         } else {
@@ -225,8 +226,17 @@ export const useSolana = (): UseSolanaReturn => {
             );
         }
 
-        const signature = await walletSendTransaction(transaction, connection);
-        await connection.confirmTransaction(signature, 'processed');
+        // Use a more robust method for sending and confirming transactions
+        const {
+            context: { slot: minContextSlot },
+            value: { blockhash, lastValidBlockHeight }
+        } = await connection.getLatestBlockhashAndContext();
+        
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = publicKey;
+
+        const signature = await walletSendTransaction(transaction, connection, { minContextSlot });
+        await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature });
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
