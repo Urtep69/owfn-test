@@ -67,7 +67,11 @@ const AppContent = () => {
             </ComingSoonWrapper>
           </Route>
           <Route path="/donations"><Donations /></Route>
-          <Route path="/dashboard/token/:mint"><TokenDetail /></Route>
+          <Route path="/dashboard/token/:mint">
+            <ComingSoonWrapper>
+              <TokenDetail />
+            </ComingSoonWrapper>
+          </Route>
           <Route path="/dashboard"><Dashboard /></Route>
           <Route path="/profile"><Profile /></Route>
           <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
