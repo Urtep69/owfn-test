@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Info } from 'lucide-react';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -98,6 +98,22 @@ export default function Donations() {
                     {t('donation_desc')}
                 </p>
             </div>
+            
+            <div className="bg-white dark:bg-darkPrimary-800 p-8 md:p-12 rounded-2xl shadow-3d-lg transform hover:scale-[1.02] transition-transform duration-300">
+                <div className="max-w-4xl mx-auto text-center space-y-4">
+                    <h2 className="text-3xl font-bold text-primary-800 dark:text-darkPrimary-200">{t('donation_message_title')}</h2>
+                    <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{t('donation_message_p1')}</p>
+                    <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed">
+                        {t('donation_message_p2_part1')}
+                        <span className="font-bold text-accent-600 dark:text-darkAccent-400">
+                            {t('donation_message_p2_project_name')}
+                        </span>
+                        {t('donation_message_p2_part2')}
+                    </p>
+                    <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{t('donation_message_p3')}</p>
+                    <p className="font-bold text-primary-800 dark:text-darkPrimary-200 pt-2">{t('donation_message_thanks')}</p>
+                </div>
+            </div>
 
             <div className="bg-accent-100/30 dark:bg-darkAccent-900/30 border-l-4 border-accent-500 dark:border-darkAccent-500 text-accent-800 dark:text-darkAccent-200 p-4 rounded-md shadow-md flex items-start space-x-3">
                 <AlertTriangle className="h-6 w-6 text-accent-500 dark:text-darkAccent-500 flex-shrink-0 mt-0.5" />
@@ -108,6 +124,12 @@ export default function Donations() {
             
             <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d max-w-2xl mx-auto">
                 <h2 className="text-2xl font-bold mb-6 text-center">{t('donations_form_title')}</h2>
+
+                <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-3 rounded-lg text-sm text-primary-700 dark:text-darkPrimary-300 mb-6 flex items-start gap-2">
+                    <Info size={18} className="flex-shrink-0 mt-0.5 text-primary-500 dark:text-darkPrimary-400" />
+                    <span>{t('donation_fee_info')}</span>
+                </div>
+
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-primary-600 dark:text-darkPrimary-400 mb-2">{t('select_token')}</label>

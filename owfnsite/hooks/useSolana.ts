@@ -1,11 +1,10 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_API_KEY, PRESALE_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -24,7 +23,6 @@ export interface UseSolanaReturn {
   stakedBalance: number;
   earnedRewards: number;
   connection: Connection;
-  connectWallet: () => void;
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
   sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
@@ -42,27 +40,26 @@ const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
     'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
 };
 
+const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
+
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
-  const { setVisible } = useWalletModal();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
 
-  const connectWallet = useCallback(() => {
-    if (!connected) {
-      setVisible(true);
-    }
-  }, [connected, setVisible]);
-
   const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
+    const cached = balanceCache.get(walletAddress);
+    if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
+        return cached.data;
+    }
+      
     setLoading(true);
     try {
-        const url = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
-        
-        const response = await fetch(url, {
+        const response = await fetch(HELIUS_RPC_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -157,19 +154,9 @@ export const useSolana = (): UseSolanaReturn => {
             }
         }
         
-        // This logic incorrectly assigned a value to the OWFN token based on the presale rate,
-        // even without liquidity. It has been removed to avoid confusion. The token value will
-        // now correctly be $0 until it has a market price.
-        /*
-        const owfnToken = allTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS);
-        if (owfnToken && owfnToken.pricePerToken === 0 && solPrice > 0) {
-            const presaleRate = PRESALE_DETAILS.rate;
-            owfnToken.pricePerToken = solPrice / presaleRate;
-            owfnToken.usdValue = owfnToken.balance * owfnToken.pricePerToken;
-        }
-        */
-        
-        return allTokens.sort((a,b) => b.usdValue - a.usdValue);
+        const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
+        balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
+        return sortedTokens;
 
     } catch (error) {
         console.error("Error fetching wallet balances:", error);
@@ -184,11 +171,12 @@ export const useSolana = (): UseSolanaReturn => {
       getWalletBalances(address).then(setUserTokens);
     } else {
       setUserTokens([]);
+      balanceCache.clear(); // Clear cache on disconnect
     }
   }, [connected, address, getWalletBalances]);
 
   const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
-    if (!connected || !publicKey) {
+    if (!connected || !publicKey || !signTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
     setLoading(true);
@@ -228,12 +216,30 @@ export const useSolana = (): UseSolanaReturn => {
             );
         }
 
-        const signature = await walletSendTransaction(transaction, connection);
-        await connection.confirmTransaction(signature, 'processed');
+        const latestBlockHash = await connection.getLatestBlockhash('confirmed');
+        transaction.recentBlockhash = latestBlockHash.blockhash;
+        transaction.feePayer = publicKey;
+
+        // **THE FIX**: Separate signing from sending for better mobile reliability.
+        // 1. Sign the transaction using the wallet adapter. This handles mobile deep-linking.
+        const signedTransaction = await signTransaction(transaction);
+
+        // 2. Send the signed transaction to the network ourselves.
+        const signature = await connection.sendRawTransaction(signedTransaction.serialize());
+        
+        // 3. Confirm the transaction.
+        await connection.confirmTransaction({
+            blockhash: latestBlockHash.blockhash,
+            lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+            signature: signature
+        }, 'confirmed');
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
-        getWalletBalances(address!).then(setUserTokens);
+        if (address) {
+            balanceCache.delete(address); // Invalidate cache after a transaction
+            getWalletBalances(address).then(setUserTokens);
+        }
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
     } catch (error) {
@@ -241,7 +247,7 @@ export const useSolana = (): UseSolanaReturn => {
         setLoading(false);
         return { success: false, messageKey: 'transaction_failed_alert' };
     }
-  }, [connected, publicKey, connection, walletSendTransaction, userTokens, address, getWalletBalances]);
+  }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
@@ -264,7 +270,6 @@ export const useSolana = (): UseSolanaReturn => {
     },
     stakedBalance: 0,
     earnedRewards: 0,
-    connectWallet,
     disconnectWallet: disconnect,
     getWalletBalances,
     sendTransaction,

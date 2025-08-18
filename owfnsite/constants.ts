@@ -1,11 +1,11 @@
 
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from './components/IconComponents.tsx';
+import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
 
 
 export const OWFN_MINT_ADDRESS = 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B';
-export const OWFN_LOGO_URL = 'https://www.owfn.org/owfn.png';
+export const OWFN_LOGO_URL: string = owfnLogo;
 export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenance mode globally
 
@@ -44,7 +44,7 @@ export const TOKEN_ALLOCATIONS: TokenAllocation[] = [
   { name: 'Impact Treasury & Social Initiatives', value: 6300000000, percentage: 35, color: '#b89b74' },
   { name: 'Community & Ecosystem Growth', value: 5400000000, percentage: 30, color: '#9e825c' },
   { name: 'Presale & Liquidity', value: 2880000000, percentage: 16, color: '#eac06a' },
-  { name: 'Team & Founders', value: 270000000, percentage: 15, color: '#f0d090' },
+  { name: 'Team & Founders', value: 2700000000, percentage: 15, color: '#f0d090' },
   { name: 'Marketing & Business Development', value: 540000000, percentage: 3, color: '#d2b48c' },
   { name: 'Advisors & Partnerships', value: 180000000, percentage: 1, color: '#846944' },
 ];
@@ -64,7 +64,7 @@ export const PRESALE_DETAILS = {
   rate: 10000000,
   bonusThreshold: 2, // Minimum SOL to get the bonus
   bonusPercentage: 10, // 10% bonus
-  startDate: new Date('2025-08-12T00:00:00Z'),
+  startDate: new Date('2025-08-13T00:00:00Z'),
   endDate: new Date('2025-09-12T00:00:00Z')
 };
 
@@ -100,7 +100,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         name: 'Official World Family Network',
         symbol: 'OWFN',
         mintAddress: OWFN_MINT_ADDRESS,
-        logo: React.createElement(OwfnIcon),
+        logo: owfnLogo,
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
@@ -109,73 +109,66 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
             en: 'OWFN (Official World Family Network) is a Solana-based token designed to unite families globally through blockchain technology, focusing on social impact, education, health, and humanitarian aid with full transparency.',
             // Add other languages as needed
         },
-        security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
+        totalSupply: 18_000_000_000,
         circulatingSupply: 0,
-        poolCreated: '2024-07-20',
-        dextScore: { score: 99, maxScore: 99, points: [20, 25, 20, 20, 14] },
-        audit: { contractVerified: true, isHoneypot: false, isFreezable: false, isMintable: false, alerts: 0 },
-        communityTrust: { positiveVotes: 1200, negativeVotes: 50, tradeCount: 1, totalTrades: 1250 },
         pairAddress: '8Vq82rQfT2nqzH8c4g8x9a2avp13aWv12t1nCvZ5X3qg',
     },
     'SOL': {
         name: 'Solana',
         symbol: 'SOL',
         mintAddress: 'So11111111111111111111111111111111111111112',
-        logo: React.createElement(SolIcon),
+        logo: solanaLogo,
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
         decimals: 9,
         description: { en: 'Solana is a high-performance blockchain supporting builders around the world creating crypto apps that scale today.' },
-        security: { isMutable: false, mintAuthorityRevoked: true, freezeAuthorityRevoked: true },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
+        totalSupply: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A',
         pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDC': {
         name: 'USD Coin',
         symbol: 'USDC',
         mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a',
-        logo: React.createElement(UsdcIcon),
+        logo: usdcLogo,
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
         decimals: 6,
         description: { en: 'USDC is a fully collateralized US dollar stablecoin. It is an Ethereum-powered coin and is the product of a collaboration between Circle and Coinbase.' },
-        security: { isMutable: false, mintAuthorityRevoked: false, freezeAuthorityRevoked: false },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
+        totalSupply: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A',
         pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDT': {
         name: 'Tether',
         symbol: 'USDT',
         mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-        logo: React.createElement(UsdtIcon),
+        logo: usdtLogo,
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
         decimals: 6,
         description: { en: 'Tether (USDT) is a stablecoin pegged to the U.S. dollar. It is issued by the Hong Kong-based company Tether Limited.' },
-        security: { isMutable: false, mintAuthorityRevoked: false, freezeAuthorityRevoked: false },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
+        totalSupply: 0,
         circulatingSupply: 0,
-        poolCreated: 'N/A',
         pairAddress: '7xKXtg2CW87d97TXJSD40M5M5gajNdkgdsDEsMmL2trn', // SOL/USDT
     }
 };
