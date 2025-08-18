@@ -34,17 +34,14 @@ export default async function handler(req: any, res: any) {
             throw new Error('Failed to parse Helius API response. The response was not valid JSON.');
         });
         
-        // Handle JSON-RPC errors, which are returned with a 200 OK status but contain an 'error' object.
         if (heliusResponse.error) {
             console.error(`Helius RPC Error for mint ${mintAddress}:`, heliusResponse.error);
             const rpcErrorMessage = `Helius RPC Error: ${heliusResponse.error.message} (Code: ${heliusResponse.error.code})`;
-            // A 502 Bad Gateway is appropriate as the upstream service (Helius) returned an error.
             return res.status(502).json({ error: rpcErrorMessage });
         }
         
         const asset = heliusResponse.result;
         
-        // Handle cases where Helius returns a successful response but no asset is found.
         if (!asset || !asset.id) {
             const notFoundMessage = `Token mint not found or invalid response from Helius for address: ${mintAddress}`;
             return res.status(404).json({ error: notFoundMessage });
@@ -75,25 +72,18 @@ export default async function handler(req: any, res: any) {
         
         let totalSupply: number = 0;
         const supplyRaw = tokenInfo?.supply;
-        
-        if (supplyRaw !== null && supplyRaw !== undefined) {
-            try {
-                const supplyBigInt = BigInt(String(supplyRaw).split('.')[0]);
-                const decimalsBigInt = BigInt(decimals);
 
-                if (decimalsBigInt === 0n) {
-                    totalSupply = Number(supplyBigInt);
-                } else {
-                    const divisor = 10n ** decimalsBigInt;
-                    const wholePart = supplyBigInt / divisor;
-                    const fractionalPart = supplyBigInt % divisor;
-                    const fractionalString = fractionalPart.toString().padStart(Number(decimalsBigInt), '0');
-                    const fullNumberString = `${wholePart}.${fractionalString}`;
-                    totalSupply = parseFloat(fullNumberString);
+        if (supplyRaw !== null && supplyRaw !== undefined && decimals !== undefined) {
+            try {
+                // Using Number is more robust against various formats (including scientific notation)
+                // that BigInt might reject. Precision loss is acceptable for display purposes.
+                const supplyNum = Number(supplyRaw);
+                if (!isNaN(supplyNum)) {
+                    totalSupply = supplyNum / Math.pow(10, decimals);
                 }
             } catch (e) {
-                console.error(`Could not parse or calculate supply for mint ${mintAddress}. Supply raw: "${supplyRaw}". Error: ${e instanceof Error ? e.message : String(e)}`);
-                totalSupply = 0;
+                console.error(`Could not parse or calculate supply for mint ${mintAddress}. Supply raw: "${supplyRaw}", Decimals: ${decimals}. Error: ${e instanceof Error ? e.message : String(e)}`);
+                totalSupply = 0; // fallback
             }
         }
 
