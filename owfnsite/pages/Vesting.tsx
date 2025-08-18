@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, Calendar, Lock, Unlock, PlusCircle } from 'lucide-react';

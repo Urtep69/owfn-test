@@ -1,4 +1,3 @@
-
 import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
