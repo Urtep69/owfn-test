@@ -17,20 +17,26 @@ export default async function handler(req: any, res: any) {
         let allTxs: any[] = [];
         let lastSignature: string | undefined = undefined;
 
+        const isPresaleTx = (tx: any): boolean => {
+            return (
+                tx.timestamp >= presaleStartTimestamp &&
+                tx.type === 'NATIVE_TRANSFER' &&
+                Array.isArray(tx.nativeTransfers) &&
+                tx.nativeTransfers.length > 0 &&
+                tx.nativeTransfers[0].toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                tx.nativeTransfers[0].fromUserAccount !== DISTRIBUTION_WALLETS.presale
+            );
+        };
+
         // A single, reusable fetch loop
         const fetchAllPresaleTxs = async () => {
              while (true) {
-                const url = `https://api.helius.xyz/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions/?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const url = `https://api.helius.xyz/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
+                if (!response.ok) throw new Error(`Failed to fetch transactions from Helius: ${response.statusText}`);
                 const data = await response.json();
                 
-                const presaleTxs = data.filter((tx: any) => 
-                    tx.timestamp >= presaleStartTimestamp &&
-                    tx.type === 'NATIVE_TRANSFER' && 
-                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                    tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111'
-                );
+                const presaleTxs = data.filter(isPresaleTx);
                 
                 allTxs.push(...presaleTxs);
 
@@ -70,17 +76,13 @@ export default async function handler(req: any, res: any) {
         }
 
         if (mode === 'transactions') {
-            const url = `https://api.helius.xyz/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions/?api-key=${HELIUS_API_KEY}`;
+            const url = `https://api.helius.xyz/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
             const response = await fetch(url);
-            if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
+            if (!response.ok) throw new Error(`Failed to fetch transactions from Helius: ${response.statusText}`);
             const data = await response.json();
             
             const parsedTxs: PresaleTransaction[] = data
-                .filter((tx: any) => 
-                    tx.timestamp >= presaleStartTimestamp &&
-                    tx.type === 'NATIVE_TRANSFER' && 
-                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
-                )
+                .filter(isPresaleTx)
                 .slice(0, parseInt(limit)) // Manually limit the results since API doesn't support it
                 .map((tx: any) => ({
                     id: tx.signature,
