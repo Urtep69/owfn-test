@@ -19,13 +19,11 @@ import type { PresaleTransaction } from '../types.ts';
 const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransaction | null }) => {
     const { t } = useAppContext();
     const [transactions, setTransactions] = useState<PresaleTransaction[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [isPolling, setIsPolling] = useState(true);
-    const lastTxId = useRef<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [connectionStatus, setConnectionStatus] = useState<'live' | 'error'>('live');
 
     const fetchLatestTransactions = useCallback(async (isInitial = false) => {
-        if (!isPolling && !isInitial) return;
-        if (isInitial) setLoading(true);
+        if (isInitial) setIsLoading(true);
         
         try {
             const response = await fetch(`/api/presale-info?mode=transactions&limit=20`);
@@ -33,7 +31,6 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
             
             const fetchedTxs: PresaleTransaction[] = await response.json();
             
-            // Convert time strings back to Date objects
             fetchedTxs.forEach(tx => tx.time = new Date(tx.time));
 
             setTransactions(prev => {
@@ -42,23 +39,21 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                 const merged = [...uniqueFetched, ...prev].sort((a, b) => b.time.getTime() - a.time.getTime());
                 return merged.slice(0, 20);
             });
-
-            if (fetchedTxs.length > 0) {
-                lastTxId.current = fetchedTxs[0].id;
-            }
+            
+            setConnectionStatus('live');
 
         } catch (error) {
             console.error("Failed to fetch presale transactions:", error);
-            setIsPolling(false); // Stop polling on error
+            setConnectionStatus('error');
         } finally {
-            if (isInitial) setLoading(false);
+            if (isInitial) setIsLoading(false);
         }
-    }, [isPolling]);
+    }, []);
 
     // Initial fetch
     useEffect(() => {
         fetchLatestTransactions(true);
-    }, []);
+    }, [fetchLatestTransactions]);
 
     // Polling mechanism
     useEffect(() => {
@@ -84,10 +79,10 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
         <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 h-full flex flex-col">
             <div className="flex items-center justify-between gap-2 mb-4">
                  <div className="flex items-center gap-2">
-                    <div className={`w-2.5 h-2.5 rounded-full ${isPolling ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
+                    <div className={`w-2.5 h-2.5 rounded-full ${connectionStatus === 'live' ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
                     <h3 className="text-primary-900 dark:text-darkPrimary-100 font-bold">{t('live_presale_feed')}</h3>
                 </div>
-                {isPolling ? <Wifi size={16} className="text-green-500" /> : <WifiOff size={16} className="text-red-500" />}
+                {connectionStatus === 'live' ? <Wifi size={16} className="text-green-500" /> : <WifiOff size={16} className="text-red-500" />}
             </div>
             <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 dark:text-darkPrimary-400 pb-2 border-b border-primary-200 dark:border-darkPrimary-700 font-semibold">
                 <span className="col-span-2">{t('wallet')}</span>
@@ -95,7 +90,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                 <span className="text-right">{t('owfn_received')}</span>
             </div>
             <div className="flex-grow overflow-y-auto space-y-1 pr-1 -mr-2 mt-2">
-                {loading ? (
+                {isLoading ? (
                      <div className="flex justify-center items-center h-full">
                         <Loader2 className="w-6 h-6 animate-spin text-accent-500 dark:text-darkAccent-500" />
                     </div>

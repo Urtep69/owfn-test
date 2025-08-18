@@ -67,13 +67,15 @@ export const useSolana = (): UseSolanaReturn => {
 
         const rawTokens = await response.json();
         
-        // Deserialize the logo component information back into React elements
         const allTokens: Token[] = rawTokens.map((token: any) => ({
             ...token,
             logo: KNOWN_TOKEN_ICONS[token.mintAddress] || React.createElement(GenericTokenIcon, { uri: token.logoUri }),
         }));
         
-        balanceCache.set(walletAddress, { data: allTokens, timestamp: Date.now() });
+        // Only cache successful, non-empty responses
+        if (allTokens.length > 0) {
+            balanceCache.set(walletAddress, { data: allTokens, timestamp: Date.now() });
+        }
         return allTokens;
 
     } catch (error) {

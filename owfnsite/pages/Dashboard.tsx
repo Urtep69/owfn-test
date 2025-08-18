@@ -1,33 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import type { Wallet, Token } from '../types.ts';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
+import { GenericTokenIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 
-const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'> }) => {
-    const { t, solana } = useAppContext();
-    const [loading, setLoading] = useState(true);
-    const [balances, setBalances] = useState<Token[]>([]);
-    const [totalValue, setTotalValue] = useState(0);
+type WalletData = {
+    loading: boolean;
+    tokens: Token[];
+    totalValue: number;
+}
 
-    useEffect(() => {
-        const fetchBalances = async () => {
-            setLoading(true);
-            const fetchedBalances = await solana.getWalletBalances(walletInfo.address);
-            setBalances(fetchedBalances);
-            setTotalValue(fetchedBalances.reduce((sum, token) => sum + token.usdValue, 0));
-            setLoading(false);
-        };
-        fetchBalances();
-    }, [walletInfo.address, solana.getWalletBalances]);
+const WalletCard = ({ name, address, data }: { name: string, address: string, data: WalletData }) => {
+    const { t } = useAppContext();
+    const { loading, tokens, totalValue } = data;
 
     return (
         <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-            <h3 className="text-xl font-bold mb-1">{walletInfo.name}</h3>
+            <h3 className="text-xl font-bold mb-1">{name}</h3>
             <div className="mb-4">
-                <AddressDisplay address={walletInfo.address} />
+                <AddressDisplay address={address} />
             </div>
             {loading ? (
                 <div className="space-y-3 animate-pulse">
@@ -37,14 +30,13 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                     </div>
                     <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded w-full"></div>
                     <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded w-full"></div>
-                    <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded w-full"></div>
                 </div>
             ) : (
                 <>
                     <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
                         <div>
                             <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('token_types')}</p>
-                            <p className="text-2xl font-bold">{balances.length}</p>
+                            <p className="text-2xl font-bold">{tokens.length}</p>
                         </div>
                         <div className="text-right">
                              <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('total_value')}</p>
@@ -53,12 +45,13 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                     </div>
 
                     <div className="space-y-1 max-h-60 overflow-y-auto pr-2">
-                        {balances.length > 0 ? balances.map(token => (
+                        {tokens.length > 0 ? tokens.map(token => (
                              <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/dashboard`}>
                                 <a className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors cursor-pointer">
-                                    {/* Asset Info */}
                                     <div className="flex items-center space-x-3">
-                                        <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">{token.logo}</div>
+                                        <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                                            {React.isValidElement(token.logo) ? token.logo : <GenericTokenIcon uri={token.logo as string} className="w-8 h-8" />}
+                                        </div>
                                         <div>
                                             <p className="font-semibold">{token.symbol}</p>
                                             <p className="text-xs text-primary-500 dark:text-darkPrimary-500">
@@ -66,7 +59,6 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                                             </p>
                                         </div>
                                     </div>
-                                    {/* Balance & Value */}
                                     <div className="text-right">
                                         <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p>
                                         <p className="text-xs text-primary-500 dark:text-darkPrimary-400">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
@@ -95,6 +87,54 @@ export default function Dashboard() {
         { name: t('wallet_name_marketing'), address: DISTRIBUTION_WALLETS.marketing },
         { name: t('wallet_name_advisors'), address: DISTRIBUTION_WALLETS.advisors },
     ];
+    
+    const [walletsData, setWalletsData] = useState<Record<string, WalletData>>(() => {
+        const initialState: Record<string, WalletData> = {};
+        wallets.forEach(w => {
+            initialState[w.address] = { loading: true, tokens: [], totalValue: 0 };
+        });
+        return initialState;
+    });
+
+    const fetchAllBalances = useCallback(async () => {
+        try {
+            const addresses = wallets.map(w => w.address);
+            const response = await fetch('/api/batch-wallet-balances', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ addresses }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch batch balances');
+            }
+
+            const data: Record<string, Token[]> = await response.json();
+            
+            const newState: Record<string, WalletData> = {};
+            for (const address in data) {
+                const tokens = data[address];
+                const totalValue = tokens.reduce((sum, token) => sum + token.usdValue, 0);
+                newState[address] = { loading: false, tokens, totalValue };
+            }
+            setWalletsData(prevState => ({...prevState, ...newState}));
+
+        } catch (error) {
+            console.error("Error fetching batch wallet balances:", error);
+            // Set all to non-loading with empty data on error
+            setWalletsData(prevState => {
+                const errorState = { ...prevState };
+                wallets.forEach(w => {
+                     errorState[w.address] = { loading: false, tokens: [], totalValue: 0 };
+                });
+                return errorState;
+            });
+        }
+    }, [wallets.map(w => w.address).join(',')]); // Dependency on joined addresses string
+
+    useEffect(() => {
+        fetchAllBalances();
+    }, [fetchAllBalances]);
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -106,7 +146,12 @@ export default function Dashboard() {
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {wallets.map(wallet => (
-                    <WalletCard key={wallet.address} walletInfo={wallet} />
+                    <WalletCard 
+                        key={wallet.address} 
+                        name={wallet.name}
+                        address={wallet.address}
+                        data={walletsData[wallet.address]} 
+                    />
                 ))}
             </div>
         </div>
