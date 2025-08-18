@@ -18,15 +18,30 @@ export default async function handler(req: any, res: any) {
         let lastSignature: string | undefined = undefined;
 
         const isPresaleTx = (tx: any): boolean => {
+            // This robust filter prevents crashes from malformed transaction data.
+            // Temporarily removed the date check to allow recent test transactions to be visible.
+            // The original check was: tx.timestamp >= presaleStartTimestamp
+            
+            if (
+                tx.type !== 'NATIVE_TRANSFER' ||
+                !Array.isArray(tx.nativeTransfers) ||
+                tx.nativeTransfers.length === 0
+            ) {
+                return false;
+            }
+
+            const transfer = tx.nativeTransfers[0];
+            // Defensive check for required properties
+            if (!transfer || !transfer.toUserAccount || !transfer.fromUserAccount) {
+                return false; 
+            }
+
             return (
-                tx.timestamp >= presaleStartTimestamp &&
-                tx.type === 'NATIVE_TRANSFER' &&
-                Array.isArray(tx.nativeTransfers) &&
-                tx.nativeTransfers.length > 0 &&
-                tx.nativeTransfers[0].toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                tx.nativeTransfers[0].fromUserAccount !== DISTRIBUTION_WALLETS.presale
+                transfer.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                transfer.fromUserAccount !== DISTRIBUTION_WALLETS.presale
             );
         };
+
 
         // A single, reusable fetch loop
         const fetchAllPresaleTxs = async () => {
