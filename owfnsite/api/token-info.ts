@@ -10,10 +10,12 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Mint address is required and must be a string." });
     }
 
-    // Get API key from environment variables (more secure and standard for server-side)
-    const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
+    // Hardcode API key to resolve environment variable issue on the deployment platform.
+    const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
+
     if (!HELIUS_API_KEY) {
-        console.error("Server configuration error: HELIUS_API_KEY is not set in environment variables.");
+        // This block is now a safeguard and should never be reached.
+        console.error("Server configuration error: HELIUS_API_KEY is not set.");
         return res.status(500).json({ error: "Server configuration error. API key is missing." });
     }
 
