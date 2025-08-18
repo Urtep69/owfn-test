@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { DISTRIBUTION_WALLETS } from '../constants.ts';
+import { DISTRIBUTION_WALLETS, OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
 import type { Wallet, Token } from '../types.ts';
-import { GenericTokenIcon } from '../components/IconComponents.tsx';
+import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 
 type WalletData = {
@@ -11,6 +11,13 @@ type WalletData = {
     tokens: Token[];
     totalValue: number;
 }
+
+const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
+    [OWFN_MINT_ADDRESS]: <OwfnIcon />,
+    [KNOWN_TOKEN_MINT_ADDRESSES.SOL]: <SolIcon />,
+    [KNOWN_TOKEN_MINT_ADDRESSES.USDC]: <UsdcIcon />,
+    [KNOWN_TOKEN_MINT_ADDRESSES.USDT]: <UsdtIcon />,
+};
 
 const WalletCard = ({ name, address, data }: { name: string, address: string, data: WalletData }) => {
     const { t } = useAppContext();
@@ -109,11 +116,16 @@ export default function Dashboard() {
                 throw new Error('Failed to fetch batch balances');
             }
 
-            const data: Record<string, Token[]> = await response.json();
+            const data: Record<string, any[]> = await response.json();
             
             const newState: Record<string, WalletData> = {};
             for (const address in data) {
-                const tokens = data[address];
+                const rawTokens = data[address];
+                const tokens: Token[] = rawTokens.map((token: any) => ({
+                    ...token,
+                    logo: KNOWN_TOKEN_ICONS[token.mintAddress] || <GenericTokenIcon uri={token.logoUri} />,
+                }));
+
                 const totalValue = tokens.reduce((sum, token) => sum + token.usdValue, 0);
                 newState[address] = { loading: false, tokens, totalValue };
             }

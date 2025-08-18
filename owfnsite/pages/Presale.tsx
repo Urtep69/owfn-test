@@ -106,7 +106,11 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                              <OwfnIcon className="w-3.5 h-3.5" /> {(tx.owfnAmount / 1_000_000).toFixed(2)}M
                         </div>
                     </div>
-                )) : null}
+                )) : (
+                    <div className="text-center py-8 text-primary-500 dark:text-darkPrimary-400">
+                        <p>No transactions yet.</p>
+                    </div>
+                )}
             </div>
         </div>
     );

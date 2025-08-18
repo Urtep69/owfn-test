@@ -1,14 +1,5 @@
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import type { Token } from '../types.ts';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
-import React from 'react';
-
-const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
-    'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B': React.createElement(OwfnIcon, null),
-    'So11111111111111111111111111111111111111112': React.createElement(SolIcon, null),
-    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon, null),
-    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
-};
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
@@ -20,9 +11,9 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "An array of wallet addresses is required." });
     }
 
-    const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
+    const HELIUS_API_KEY = "a37ba545-d429-43e3-8f6d-d51128c49da9";
     if (!HELIUS_API_KEY) {
-        console.error("CRITICAL: HELIUS_API_KEY environment variable is not set.");
+        console.error("CRITICAL: HELIUS_API_KEY is not set.");
         return res.status(500).json({ error: "Server configuration error. API key is missing." });
     }
 
@@ -58,14 +49,14 @@ export default async function handler(req: any, res: any) {
         const batchResults = await heliusResponse.json();
 
         // 2. Process the batch response
-        const walletsData: Record<string, Token[]> = {};
+        const walletsData: Record<string, any[]> = {};
         const allSplMints = new Set<string>();
 
         batchResults.forEach((result: any, index: number) => {
             const ownerAddress = addresses[index];
             const items = result.result?.items || [];
             const nativeBalance = result.result?.nativeBalance;
-            const walletTokens: Token[] = [];
+            const walletTokens: any[] = [];
 
             if (nativeBalance && nativeBalance.lamports > 0) {
                 const balance = nativeBalance.lamports / LAMPORTS_PER_SOL;
@@ -77,7 +68,7 @@ export default async function handler(req: any, res: any) {
                     symbol: 'SOL',
                     pricePerToken: nativeBalance.price_per_sol || 0,
                     usdValue: nativeBalance.total_price || (balance * (nativeBalance.price_per_sol || 0)),
-                    logo: KNOWN_TOKEN_ICONS['So11111111111111111111111111111111111111112']
+                    logoUri: null
                 });
             }
 
@@ -89,7 +80,7 @@ export default async function handler(req: any, res: any) {
                         decimals: asset.token_info.decimals,
                         name: asset.content?.metadata?.name || 'Unknown Token',
                         symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
-                        logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
+                        logoUri: asset.content?.links?.image,
                         usdValue: 0,
                         pricePerToken: 0,
                     });

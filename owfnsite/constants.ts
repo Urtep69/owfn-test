@@ -6,7 +6,7 @@ import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
 // It is recommended to use a separate, restricted API key for client-side RPC requests.
 // This key should be stored in an environment variable exposed to the client build process.
 // For example: `process.env.VITE_HELIUS_API_KEY` or a similar mechanism.
-const CLIENT_FACING_HELIUS_API_KEY = 'YOUR_CLIENT_FACING_HELIUS_API_KEY_HERE';
+const CLIENT_FACING_HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
 export const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${CLIENT_FACING_HELIUS_API_KEY}`;
 
 export const OWFN_MINT_ADDRESS = 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B';

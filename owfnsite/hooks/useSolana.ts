@@ -72,10 +72,8 @@ export const useSolana = (): UseSolanaReturn => {
             logo: KNOWN_TOKEN_ICONS[token.mintAddress] || React.createElement(GenericTokenIcon, { uri: token.logoUri }),
         }));
         
-        // Only cache successful, non-empty responses
-        if (allTokens.length > 0) {
-            balanceCache.set(walletAddress, { data: allTokens, timestamp: Date.now() });
-        }
+        // Cache successful responses, even if empty, to prevent re-fetching for known empty wallets.
+        balanceCache.set(walletAddress, { data: allTokens, timestamp: Date.now() });
         return allTokens;
 
     } catch (error) {
