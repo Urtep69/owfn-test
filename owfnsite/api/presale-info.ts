@@ -5,8 +5,9 @@ import type { PresaleTransaction, AdminPresaleTx } from '../types.ts';
 // Helper function to find the relevant presale transfer within a transaction object.
 // This is more robust as it iterates through all native transfers and filters out internal movements.
 const findPresaleTransfer = (tx: any): any | null => {
-    // Basic validation to prevent crashes on malformed data from Helius.
-    if (tx?.type !== 'NATIVE_TRANSFER' || !Array.isArray(tx.nativeTransfers)) {
+    // A more robust check. We only care if there are native SOL transfers.
+    // The top-level `type` can vary (e.g., 'TRANSFER', 'NATIVE_TRANSFER').
+    if (!tx || !Array.isArray(tx.nativeTransfers) || tx.nativeTransfers.length === 0) {
         return null;
     }
     
