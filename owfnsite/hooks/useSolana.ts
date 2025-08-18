@@ -1,8 +1,8 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
-import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
+import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
 import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
@@ -175,7 +175,7 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, address, getWalletBalances]);
 
-  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
+ const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
     if (!connected || !publicKey || !signTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
@@ -183,14 +183,14 @@ export const useSolana = (): UseSolanaReturn => {
 
     try {
         const toPublicKey = new PublicKey(to);
-        const transaction = new Transaction();
+        const instructions: TransactionInstruction[] = [];
         
         if (tokenSymbol === 'SOL') {
-            transaction.add(
+            instructions.push(
                 SystemProgram.transfer({
                     fromPubkey: publicKey,
                     toPubkey: toPublicKey,
-                    lamports: amount * LAMPORTS_PER_SOL,
+                    lamports: Math.round(amount * LAMPORTS_PER_SOL),
                 })
             );
         } else {
@@ -202,42 +202,65 @@ export const useSolana = (): UseSolanaReturn => {
             if (!tokenInfo) throw new Error(`Token ${tokenSymbol} not found in user's wallet.`);
             
             const decimals = tokenInfo.decimals;
+            const transferAmount = BigInt(Math.round(amount * Math.pow(10, decimals)));
 
             const fromTokenAccount = await getAssociatedTokenAddress(mintPublicKey, publicKey);
             const toTokenAccount = await getAssociatedTokenAddress(mintPublicKey, toPublicKey);
             
-            transaction.add(
+            try {
+                await getAccount(connection, toTokenAccount, 'confirmed');
+            } catch (error) {
+                if (error instanceof Error && (error.name === 'TokenAccountNotFoundError' || error.message.includes('not found'))) {
+                    instructions.push(
+                        createAssociatedTokenAccountInstruction(
+                            publicKey,
+                            toTokenAccount,
+                            toPublicKey,
+                            mintPublicKey
+                        )
+                    );
+                } else {
+                    throw error;
+                }
+            }
+            
+            instructions.push(
                 createTransferInstruction(
                     fromTokenAccount,
                     toTokenAccount,
                     publicKey,
-                    amount * Math.pow(10, decimals) 
+                    transferAmount
                 )
             );
         }
 
-        const latestBlockHash = await connection.getLatestBlockhash('confirmed');
-        transaction.recentBlockhash = latestBlockHash.blockhash;
-        transaction.feePayer = publicKey;
+        const latestBlockHash = await connection.getLatestBlockhash('finalized');
+        
+        const messageV0 = new TransactionMessage({
+            payerKey: publicKey,
+            recentBlockhash: latestBlockHash.blockhash,
+            instructions,
+        }).compileToV0Message();
 
-        // **THE FIX**: Separate signing from sending for better mobile reliability.
-        // 1. Sign the transaction using the wallet adapter. This handles mobile deep-linking.
+        const transaction = new VersionedTransaction(messageV0);
+
         const signedTransaction = await signTransaction(transaction);
 
-        // 2. Send the signed transaction to the network ourselves.
-        const signature = await connection.sendRawTransaction(signedTransaction.serialize());
+        const signature = await connection.sendTransaction(signedTransaction, {
+            skipPreflight: false,
+            preflightCommitment: 'finalized',
+        });
         
-        // 3. Confirm the transaction.
         await connection.confirmTransaction({
             blockhash: latestBlockHash.blockhash,
             lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
             signature: signature
-        }, 'confirmed');
+        }, 'finalized');
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
         if (address) {
-            balanceCache.delete(address); // Invalidate cache after a transaction
+            balanceCache.delete(address);
             getWalletBalances(address).then(setUserTokens);
         }
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
