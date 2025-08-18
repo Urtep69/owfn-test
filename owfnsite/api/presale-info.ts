@@ -3,25 +3,18 @@ import { PRESALE_DETAILS, DISTRIBUTION_WALLETS } from '../constants.ts';
 import type { PresaleTransaction, AdminPresaleTx } from '../types.ts';
 
 // This function identifies a valid presale contribution within a Helius enriched transaction.
-// It iterates through native SOL transfers and finds one that is directed TO the presale wallet
-// and is NOT FROM another internal project wallet. This is the most direct and reliable method.
+// For testing purposes, the filter for internal project wallets has been removed.
+// It now identifies any native SOL transfer TO the presale wallet as a valid transaction for the feed.
 const findPresaleTransfer = (tx: any): { fromUserAccount: string, amount: number } | null => {
     // A transaction must have nativeTransfers to be a SOL contribution.
     if (!tx || !Array.isArray(tx.nativeTransfers) || tx.nativeTransfers.length === 0) {
         return null;
     }
 
-    // Create a set of all internal project wallets to filter out internal movements.
-    const allProjectWallets = new Set(Object.values(DISTRIBUTION_WALLETS));
-
-    // Find the first valid transfer that matches our criteria.
+    // Find the first valid transfer that is directed TO the presale wallet.
+    // The check against internal project wallets has been removed to allow test transactions to appear.
     for (const transfer of tx.nativeTransfers) {
-        // A valid contribution must be TO the presale wallet...
-        if (transfer.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-            // ...and must NOT be FROM another project wallet.
-            transfer.fromUserAccount && !allProjectWallets.has(transfer.fromUserAccount)) {
-            
-            // Return the sender and the amount in lamports.
+        if (transfer.toUserAccount === DISTRIBUTION_WALLETS.presale && transfer.fromUserAccount) {
             return {
                 fromUserAccount: transfer.fromUserAccount,
                 amount: transfer.amount 
@@ -29,7 +22,7 @@ const findPresaleTransfer = (tx: any): { fromUserAccount: string, amount: number
         }
     }
 
-    // If no such transfer is found after checking all of them, it's not a valid contribution.
+    // If no such transfer is found, it's not a contribution.
     return null;
 };
 
