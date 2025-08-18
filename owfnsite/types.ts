@@ -65,7 +65,8 @@ export interface TokenExtension {
 }
 
 export interface TokenDetails extends Token {
-    description?: Record<string, string>;
+    description?: string;
+    links?: Record<string, string>;
     marketCap?: number;
     volume24h?: number;
     price24hChange?: number;
@@ -74,12 +75,6 @@ export interface TokenDetails extends Token {
     circulatingSupply?: number;
     
     priceSol?: number;
-    priceChange?: {
-        m5: number;
-        h1: number;
-        h6: number;
-        h24: number;
-    };
     liquidity?: number;
     pairAddress?: string;
     fdv?: number;
