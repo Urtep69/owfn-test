@@ -292,28 +292,14 @@ export default function Presale() {
     const value = e.target.value;
     setSolAmount(value);
 
-    // Don't show errors for empty input, the button will be disabled anyway.
-    if (value === '' || value.endsWith('.') || value === '0') {
+    if (value === '' || isNaN(parseFloat(value))) {
         setError('');
         return;
     }
 
     const numValue = parseFloat(value);
-    if (isNaN(numValue)) {
-        // This case handles invalid text input if type="number" fails to prevent it.
-        // The button will be disabled by the isAmountInvalid logic.
-        setError('');
-        return;
-    }
-    
-    // This is the core logic the user requested.
-    // Show an error if the entered value is positive but below the minimum.
-    if (numValue > 0 && numValue < PRESALE_DETAILS.minBuy) {
-        setError(t('presale_min_amount_error', { min: PRESALE_DETAILS.minBuy }));
-    // Show an error if the value exceeds the maximum allowed for this user.
-    } else if (numValue > maxAllowedBuy) {
-        setError(t('presale_max_amount_error', { max: maxAllowedBuy.toFixed(2) }));
-    // If the amount is valid, clear any existing error messages.
+    if (numValue > maxAllowedBuy) {
+        setError(t('presale_max_amount_error', { max: maxAllowedBuy.toFixed(6) }));
     } else {
         setError('');
     }
@@ -360,7 +346,7 @@ export default function Presale() {
 
 
   const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
-  const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) < PRESALE_DETAILS.minBuy || parseFloat(solAmount) > maxAllowedBuy;
+  const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) <= 0 || parseFloat(solAmount) > maxAllowedBuy;
 
   const handleBuy = async () => {
         if (!solana.connected) {
@@ -544,7 +530,7 @@ export default function Presale() {
                             </p>
                         </div>
                         <p className="text-sm text-primary-700 dark:text-darkPrimary-300 mb-2 text-center">
-                            {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
+                            {t('presale_buy_info_max_only', { max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
                         {solana.connected && (
                             <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 mb-3 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">

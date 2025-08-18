@@ -225,8 +225,17 @@ export const useSolana = (): UseSolanaReturn => {
             );
         }
 
+        const latestBlockHash = await connection.getLatestBlockhash('confirmed');
+        transaction.recentBlockhash = latestBlockHash.blockhash;
+        transaction.feePayer = publicKey;
+
         const signature = await walletSendTransaction(transaction, connection);
-        await connection.confirmTransaction(signature, 'processed');
+        
+        await connection.confirmTransaction({
+            blockhash: latestBlockHash.blockhash,
+            lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+            signature: signature
+        }, 'confirmed');
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);

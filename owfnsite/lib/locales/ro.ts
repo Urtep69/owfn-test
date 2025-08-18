@@ -136,7 +136,6 @@ export const ro = {
     presale_footer_copyright: `© {year} Official World Family Network | Toate drepturile rezervate.`,
     presale_amount_error: `Suma trebuie să fie între {min} și {max} SOL.`,
     presale_max_amount_error: `Suma nu trebuie să depășească {max} SOL.`,
-    presale_min_amount_error: `Suma trebuie să fie de cel puțin {min} SOL.`,
     live_presale_feed: `Feed Live Prevânzare`,
     wallet: `Portofel`,
     sol_spent: `SOL Cheltuit`,
@@ -455,7 +454,7 @@ export const ro = {
     no_active_proposals: `Momentan nu există propuneri active.`,
     no_past_proposals: `Nu există propuneri anterioare de afișat.`,
     no_active_cases_in_category: `Nu există cazuri active în această categorie în acest moment.`,
-    
+
     // Maintenance
     maintenance_heading: `Facem lucrurile mai bune!`,
     maintenance_message: `Platforma noastră este în prezent în mentenanță programată pentru a vă îmbunătăți experiența. Apreciem răbdarea și înțelegerea dumneavoastră. Vom reveni online în scurt timp.`,

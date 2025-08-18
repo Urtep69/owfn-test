@@ -136,7 +136,6 @@ export const en = {
     presale_footer_copyright: `© {year} Official World Family Network | All rights reserved.`,
     presale_amount_error: `The amount must be between {min} and {max} SOL.`,
     presale_max_amount_error: `The amount must not exceed {max} SOL.`,
-    presale_min_amount_error: `The amount must be at least {min} SOL.`,
     live_presale_feed: `Live Presale Feed`,
     wallet: `Wallet`,
     sol_spent: `SOL Spent`,
@@ -455,7 +454,7 @@ export const en = {
     no_active_proposals: `There are currently no active proposals.`,
     no_past_proposals: `There are no past proposals to display.`,
     no_active_cases_in_category: `There are currently no active cases in this category.`,
-    
+
     // Maintenance
     maintenance_heading: `We're making things better!`,
     maintenance_message: `Our platform is currently undergoing scheduled maintenance to improve your experience. We appreciate your patience and understanding. We'll be back online shortly.`,
