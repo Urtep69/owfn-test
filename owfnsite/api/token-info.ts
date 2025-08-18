@@ -26,29 +26,35 @@ export default async function handler(req: any, res: any) {
         });
 
         if (!response.ok) {
-            throw new Error(`Helius API returned status ${response.status}`);
+            const errorText = await response.text().catch(() => 'Could not retrieve error body.');
+            throw new Error(`Helius API returned status ${response.status}: ${errorText}`);
         }
         
         const heliusResponse = await response.json().catch(() => {
-            throw new Error('Failed to parse Helius API response.');
+            throw new Error('Failed to parse Helius API response. The response was not valid JSON.');
         });
         
+        // Handle JSON-RPC errors, which are returned with a 200 OK status but contain an 'error' object.
         if (heliusResponse.error) {
             console.error(`Helius RPC Error for mint ${mintAddress}:`, heliusResponse.error);
-            throw new Error(`Helius RPC Error: ${heliusResponse.error.message} (Code: ${heliusResponse.error.code})`);
+            const rpcErrorMessage = `Helius RPC Error: ${heliusResponse.error.message} (Code: ${heliusResponse.error.code})`;
+            // A 502 Bad Gateway is appropriate as the upstream service (Helius) returned an error.
+            return res.status(502).json({ error: rpcErrorMessage });
         }
         
-        const asset = heliusResponse?.result;
+        const asset = heliusResponse.result;
         
+        // Handle cases where Helius returns a successful response but no asset is found.
         if (!asset || !asset.id) {
-            throw new Error(`Token mint not found or invalid response from Helius.`);
+            const notFoundMessage = `Token mint not found or invalid response from Helius for address: ${mintAddress}`;
+            return res.status(404).json({ error: notFoundMessage });
         }
         
-        const content = asset?.content;
-        const tokenInfo = asset?.token_info;
-        const authorities = asset?.authorities;
-        const ownership = asset?.ownership;
-        const splTokenInfo = asset?.spl_token_info;
+        const content = asset.content;
+        const tokenInfo = asset.token_info;
+        const authorities = asset.authorities;
+        const ownership = asset.ownership;
+        const splTokenInfo = asset.spl_token_info;
 
         const name = content?.metadata?.name ?? 'Unknown Token';
         const symbol = content?.metadata?.symbol ?? 'N/A';
@@ -56,7 +62,7 @@ export default async function handler(req: any, res: any) {
         const decimals = tokenInfo?.decimals ?? 0;
         
         const creatorAddress = authorities?.find((a: any) => a?.scopes?.includes('owner'))?.address 
-            || authorities?.[0]?.address
+            || (Array.isArray(authorities) && authorities[0]?.address)
             || ownership?.owner 
             || 'Unknown';
 
@@ -72,29 +78,22 @@ export default async function handler(req: any, res: any) {
         
         if (supplyRaw !== null && supplyRaw !== undefined) {
             try {
-                // This robust calculation avoids crashes with extremely large numbers.
-                // 1. Create a BigInt from the raw supply string, defensively removing any decimals.
                 const supplyBigInt = BigInt(String(supplyRaw).split('.')[0]);
                 const decimalsBigInt = BigInt(decimals);
 
                 if (decimalsBigInt === 0n) {
-                    totalSupply = Number(supplyBigInt); // No division needed.
+                    totalSupply = Number(supplyBigInt);
                 } else {
-                    // 2. Perform division using BigInt math to maintain precision.
                     const divisor = 10n ** decimalsBigInt;
                     const wholePart = supplyBigInt / divisor;
                     const fractionalPart = supplyBigInt % divisor;
-                    
-                    // 3. Manually construct the final number as a string.
-                    const fractionalString = fractionalPart.toString().padStart(decimals, '0');
+                    const fractionalString = fractionalPart.toString().padStart(Number(decimalsBigInt), '0');
                     const fullNumberString = `${wholePart}.${fractionalString}`;
-
-                    // 4. Use parseFloat, which safely handles large number strings.
                     totalSupply = parseFloat(fullNumberString);
                 }
             } catch (e) {
                 console.error(`Could not parse or calculate supply for mint ${mintAddress}. Supply raw: "${supplyRaw}". Error: ${e instanceof Error ? e.message : String(e)}`);
-                totalSupply = 0; // Fallback on error
+                totalSupply = 0;
             }
         }
 
@@ -130,6 +129,6 @@ export default async function handler(req: any, res: any) {
     } catch (error) {
         console.error(`Token Info API error for mint ${mintAddress}:`, error);
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
-        return res.status(500).json({ error: `Failed to fetch token data. Reason: ${errorMessage}` });
+        return res.status(500).json({ error: `Failed to process token data. Reason: ${errorMessage}` });
     }
 }
