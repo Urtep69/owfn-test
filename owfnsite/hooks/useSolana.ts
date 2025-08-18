@@ -3,7 +3,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, PRESALE_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -12,7 +12,6 @@ export interface UseSolanaReturn {
   address: string | null;
   userTokens: Token[];
   loading: boolean;
-  error: string | null;
   userStats: {
     totalDonated: number;
     projectsSupported: number;
@@ -48,7 +47,6 @@ export const useSolana = (): UseSolanaReturn => {
   const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
 
@@ -59,43 +57,120 @@ export const useSolana = (): UseSolanaReturn => {
     }
       
     setLoading(true);
-    setError(null); // Reset error on new fetch
     try {
-        const response = await fetch(`/api/wallet-balances?walletAddress=${walletAddress}`);
+        const response = await fetch(HELIUS_RPC_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 'my-id',
+                method: 'getAssetsByOwner',
+                params: {
+                    ownerAddress: walletAddress,
+                    page: 1,
+                    limit: 1000,
+                    displayOptions: {
+                        showFungible: true,
+                        showNativeBalance: true,
+                    },
+                },
+            }),
+        });
         
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: `Server error: ${response.status}` }));
-            throw new Error(errorData.error || 'Failed to fetch assets from API');
+            console.error('Helius API Error:', await response.text());
+            throw new Error('Failed to fetch assets from Helius');
         }
 
-        const rawTokens = await response.json();
+        const { result } = await response.json();
         
-        const allTokens: Token[] = rawTokens.map((token: any) => ({
-            ...token,
-            logo: KNOWN_TOKEN_ICONS[token.mintAddress] || React.createElement(GenericTokenIcon, { uri: token.logoUri }),
-        }));
-        
-        balanceCache.set(walletAddress, { data: allTokens, timestamp: Date.now() });
-        return allTokens;
+        if (!result) {
+             return [];
+        }
+       
+        const allTokens: Token[] = [];
+        let solPrice = 0;
 
-    } catch (err) {
-        const error = err as Error;
+        // Process native SOL balance first using data directly from Helius
+        if (result.nativeBalance && result.nativeBalance.lamports > 0) {
+            const pricePerSol = result.nativeBalance.price_per_sol || 0;
+            const balance = result.nativeBalance.lamports / LAMPORTS_PER_SOL;
+            solPrice = pricePerSol;
+
+            const solToken: Token = {
+                mintAddress: 'So11111111111111111111111111111111111111112',
+                balance: balance,
+                decimals: 9,
+                name: 'Solana',
+                symbol: 'SOL',
+                logo: React.createElement(SolIcon, null),
+                pricePerToken: pricePerSol,
+                usdValue: result.nativeBalance.total_price || (balance * pricePerSol),
+            };
+            allTokens.push(solToken);
+        }
+
+        // Process SPL tokens from the 'items' array
+        const splTokens: Token[] = (result.items || [])
+            .filter((asset: any) => asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed)
+            .map((asset: any): Token => ({
+                mintAddress: asset.id,
+                balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
+                decimals: asset.token_info.decimals,
+                name: asset.content?.metadata?.name || 'Unknown Token',
+                symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
+                logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
+                usdValue: 0,
+                pricePerToken: 0,
+            }));
+
+        allTokens.push(...splTokens);
+
+        if (allTokens.length === 0) return [];
+        
+        const splMintsToFetch = splTokens.map(t => t.mintAddress).join(',');
+
+        if (splMintsToFetch) {
+            try {
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${splMintsToFetch}`);
+                if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
+                
+                const priceData = await priceRes.json();
+                
+                if (priceData.data) {
+                     allTokens.forEach(token => {
+                        if (token.mintAddress === 'So11111111111111111111111111111111111111112') return; // Skip SOL
+                        const priceInfo = priceData.data[token.mintAddress];
+                        if (priceInfo && priceInfo.price) {
+                            const price = priceInfo.price;
+                            token.pricePerToken = price;
+                            token.usdValue = token.balance * price;
+                        }
+                    });
+                }
+            } catch (priceError) {
+                console.error("Could not fetch token prices from Jupiter API:", priceError);
+            }
+        }
+        
+        const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
+        balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
+        return sortedTokens;
+
+    } catch (error) {
         console.error("Error fetching wallet balances:", error);
-        setError(error.message || "An unknown error occurred while fetching balances.");
-        return []; // Return empty array but error state is now set
+        return [];
     } finally {
         setLoading(false);
     }
-  }, []);
+  }, [connection]);
 
   useEffect(() => {
     if (connected && address) {
-      setError(null); // Clear previous errors
       getWalletBalances(address).then(setUserTokens);
     } else {
       setUserTokens([]);
-      setError(null); // Clear errors on disconnect
-      balanceCache.clear();
+      balanceCache.clear(); // Clear cache on disconnect
     }
   }, [connected, address, getWalletBalances]);
 
@@ -207,7 +282,6 @@ export const useSolana = (): UseSolanaReturn => {
     address,
     userTokens,
     loading,
-    error,
     connection,
     userStats: { 
         totalDonated: 0,

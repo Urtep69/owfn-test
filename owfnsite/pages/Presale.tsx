@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'wouter';
-import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift, Wifi, WifiOff } from 'lucide-react';
+import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
 import { 
@@ -12,77 +12,167 @@ import {
     TOKEN_ALLOCATIONS, 
     ROADMAP_DATA,
     DISTRIBUTION_WALLETS,
+    HELIUS_API_BASE_URL,
+    HELIUS_API_KEY,
 } from '../constants.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { PresaleTransaction } from '../types.ts';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransaction | null }) => {
     const { t } = useAppContext();
     const [transactions, setTransactions] = useState<PresaleTransaction[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [connectionStatus, setConnectionStatus] = useState<'live' | 'error'>('live');
-
-    const fetchLatestTransactions = useCallback(async (isInitial = false) => {
-        if (isInitial) setIsLoading(true);
-        
-        try {
-            const response = await fetch(`/api/presale-info?mode=transactions&limit=20`);
-            if (!response.ok) throw new Error('Failed to fetch initial transactions');
-            
-            const fetchedTxs: PresaleTransaction[] = await response.json();
-            
-            fetchedTxs.forEach(tx => tx.time = new Date(tx.time));
-
-            setTransactions(prev => {
-                const existingIds = new Set(prev.map(p => p.id));
-                const uniqueFetched = fetchedTxs.filter(p => !existingIds.has(p.id));
-                const merged = [...uniqueFetched, ...prev].sort((a, b) => b.time.getTime() - a.time.getTime());
-                return merged.slice(0, 20);
-            });
-            
-            setConnectionStatus('live');
-
-        } catch (error) {
-            console.error("Failed to fetch presale transactions:", error);
-            setConnectionStatus('error');
-        } finally {
-            if (isInitial) setIsLoading(false);
-        }
-    }, []);
-
-    // Initial fetch
-    useEffect(() => {
-        fetchLatestTransactions(true);
-    }, [fetchLatestTransactions]);
-
-    // Polling mechanism
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            fetchLatestTransactions();
-        }, 15000); // Poll every 15 seconds
-
-        return () => clearInterval(intervalId);
-    }, [fetchLatestTransactions]);
+    const [loading, setLoading] = useState(true);
+    const wsRef = useRef<WebSocket | null>(null);
 
     // Effect to handle the user's own new transaction for immediate feedback
     useEffect(() => {
         if (newTransaction) {
             setTransactions(prev => {
-                if (prev.some(tx => tx.id === newTransaction.id)) return prev;
-                const newTxs = [newTransaction, ...prev].sort((a, b) => b.time.getTime() - a.time.getTime());
-                return newTxs.slice(0, 20);
+                // Prevent adding a duplicate if the transaction arrived via WebSocket first
+                if (prev.some(tx => tx.id === newTransaction.id)) {
+                    return prev;
+                }
+                return [newTransaction, ...prev.slice(0, 19)];
             });
         }
     }, [newTransaction]);
+    
+    // Effect to fetch initial transactions and set up WebSocket connection
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchInitialTransactions = async () => {
+            if (!isMounted) return;
+            setLoading(true);
+            try {
+                const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch initial transactions');
+                const data = await response.json();
+                
+                const parsedTxs: PresaleTransaction[] = data
+                    .filter((tx: any) => 
+                        tx.timestamp >= presaleStartTimestamp &&
+                        tx.type === 'NATIVE_TRANSFER' && 
+                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
+                    )
+                    .map((tx: any) => ({
+                        id: tx.signature,
+                        address: tx.nativeTransfers[0].fromUserAccount,
+                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
+                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                        time: new Date(tx.timestamp * 1000),
+                    }));
+                
+                if (isMounted) {
+                    setTransactions(prev => {
+                        // Merge initial with any potential new local transactions, avoiding duplicates
+                        const existingIds = new Set(prev.map(p => p.id));
+                        const uniqueFetched = parsedTxs.filter(p => !existingIds.has(p.id));
+                        return [...prev, ...uniqueFetched].slice(0, 20);
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch presale transactions:", error);
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+
+        const connectWebSocket = () => {
+            const heliusWsUrl = `wss://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+            wsRef.current = new WebSocket(heliusWsUrl);
+
+            wsRef.current.onopen = () => {
+                console.log("WebSocket connected for Live Presale Feed");
+                wsRef.current?.send(JSON.stringify({
+                    jsonrpc: "2.0",
+                    id: 1,
+                    method: "transactionSubscribe",
+                    params: [{
+                        accountInclude: [DISTRIBUTION_WALLETS.presale]
+                    }, {
+                        commitment: "finalized",
+                        encoding: "jsonParsed",
+                        transactionDetails: "full",
+                        showRewards: false
+                    }]
+                }));
+            };
+
+            wsRef.current.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.method === "transactionNotification") {
+                        const tx = data.params.result.transaction;
+                        const signature = tx.signatures[0];
+
+                        // Look for native SOL transfers to our presale wallet
+                        const nativeTransfer = tx.message.instructions.find((inst: any) => 
+                            inst.program === 'system' && 
+                            inst.parsed?.type === 'transfer' &&
+                            inst.parsed?.info?.destination === DISTRIBUTION_WALLETS.presale
+                        );
+                        
+                        if (nativeTransfer) {
+                            const newTx: PresaleTransaction = {
+                                id: signature,
+                                address: nativeTransfer.parsed.info.source,
+                                solAmount: nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL,
+                                owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                                time: new Date(), // Use current time for live feed
+                            };
+
+                            if (isMounted) {
+                                setTransactions(prev => {
+                                    if (prev.some(t => t.id === newTx.id)) {
+                                        return prev; // Already have this one
+                                    }
+                                    return [newTx, ...prev.slice(0, 19)];
+                                });
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error parsing WebSocket message:", e);
+                }
+            };
+            
+            wsRef.current.onclose = () => {
+                console.log("WebSocket disconnected. Attempting to reconnect in 5 seconds...");
+                if (isMounted) {
+                    setTimeout(connectWebSocket, 5000);
+                }
+            };
+
+            wsRef.current.onerror = (error) => {
+                console.error("WebSocket error:", error);
+                wsRef.current?.close(); // This will trigger the onclose reconnect logic
+            };
+        };
+
+        fetchInitialTransactions();
+        connectWebSocket();
+
+        return () => {
+            isMounted = false;
+            if (wsRef.current) {
+                wsRef.current.onclose = null; // Prevent reconnection on unmount
+                wsRef.current.close();
+                console.log("WebSocket disconnected on component unmount.");
+            }
+        };
+    }, []);
+
 
     return (
         <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 h-full flex flex-col">
-            <div className="flex items-center justify-between gap-2 mb-4">
-                 <div className="flex items-center gap-2">
-                    <div className={`w-2.5 h-2.5 rounded-full ${connectionStatus === 'live' ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
-                    <h3 className="text-primary-900 dark:text-darkPrimary-100 font-bold">{t('live_presale_feed')}</h3>
-                </div>
-                {connectionStatus === 'live' ? <Wifi size={16} className="text-green-500" /> : <WifiOff size={16} className="text-red-500" />}
+            <div className="flex items-center gap-2 mb-4">
+                <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
+                <h3 className="text-primary-900 dark:text-darkPrimary-100 font-bold">{t('live_presale_feed')}</h3>
             </div>
             <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 dark:text-darkPrimary-400 pb-2 border-b border-primary-200 dark:border-darkPrimary-700 font-semibold">
                 <span className="col-span-2">{t('wallet')}</span>
@@ -90,12 +180,12 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                 <span className="text-right">{t('owfn_received')}</span>
             </div>
             <div className="flex-grow overflow-y-auto space-y-1 pr-1 -mr-2 mt-2">
-                {isLoading ? (
+                {loading ? (
                      <div className="flex justify-center items-center h-full">
                         <Loader2 className="w-6 h-6 animate-spin text-accent-500 dark:text-darkAccent-500" />
                     </div>
                 ) : transactions.length > 0 ? transactions.map((tx) => (
-                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md transition-colors ${tx.time.getTime() > Date.now() - 15000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10 animate-pulse' : ''}`}>
+                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 10000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
                         <div className="col-span-2 flex items-center gap-2">
                            <AddressDisplay address={tx.address} className="text-xs" />
                         </div>
@@ -106,11 +196,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                              <OwfnIcon className="w-3.5 h-3.5" /> {(tx.owfnAmount / 1_000_000).toFixed(2)}M
                         </div>
                     </div>
-                )) : (
-                    <div className="text-center py-8 text-primary-500 dark:text-darkPrimary-400">
-                        <p>No transactions yet.</p>
-                    </div>
-                )}
+                )) : null}
             </div>
         </div>
     );
@@ -163,39 +249,41 @@ export default function Presale() {
             setSoldSOL(0);
             return;
         }
+
         try {
-            const response = await fetch(`/api/presale-info?mode=progress`);
-            if (!response.ok) throw new Error('Failed to fetch presale progress');
-            const data = await response.json();
-            setSoldSOL(data.totalContributed);
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            let allTxs: any[] = [];
+            let lastSignature: string | undefined = undefined;
+
+            while(true) {
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch transactions');
+                const data = await response.json();
+                
+                allTxs.push(...data);
+                
+                if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
+                    break;
+                }
+                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
+                if (!lastSignature) break;
+            }
+            
+            const presaleTxs = allTxs.filter((tx: any) => 
+                tx.timestamp >= presaleStartTimestamp &&
+                tx.type === 'NATIVE_TRANSFER' && 
+                tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111'
+            );
+
+            const totalContributed = presaleTxs.reduce((sum: number, tx: any) => sum + (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL), 0);
+            setSoldSOL(totalContributed);
         } catch (error) {
             console.error("Failed to fetch presale progress:", error);
             setSoldSOL(0);
         }
     }, []);
-
-  const fetchUserContribution = useCallback(async () => {
-    if (!solana.connected || !solana.address) {
-        setUserContribution(0);
-        return;
-    }
-    setIsCheckingContribution(true);
-    try {
-         const response = await fetch(`/api/presale-info?mode=user&walletAddress=${solana.address}`);
-        if (!response.ok) throw new Error('Failed to fetch user contribution');
-        const data = await response.json();
-        setUserContribution(data.userContribution);
-    } catch (error) {
-        console.error("Failed to fetch user contribution:", error);
-        setUserContribution(0);
-    } finally {
-        setIsCheckingContribution(false);
-    }
-  }, [solana.connected, solana.address]);
-
-  useEffect(() => {
-      fetchUserContribution();
-  }, [fetchUserContribution]);
 
   useEffect(() => {
     const calculateState = () => {
@@ -252,6 +340,50 @@ export default function Presale() {
     const interval = setInterval(fetchPresaleProgress, 60000);
     return () => clearInterval(interval);
   }, [fetchPresaleProgress]);
+
+  useEffect(() => {
+    const fetchUserContribution = async () => {
+        if (!solana.connected || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
+            setUserContribution(0);
+            return;
+        }
+        setIsCheckingContribution(true);
+        try {
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            let allTxs: any[] = [];
+            let lastSignature: string | undefined = undefined;
+            while(true) {
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch transactions');
+                const data = await response.json();
+                allTxs.push(...data);
+                if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
+                    break;
+                }
+                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
+                if (!lastSignature) break;
+            }
+
+            const userTxs = allTxs.filter((tx: any) => 
+                    tx.timestamp >= presaleStartTimestamp &&
+                    tx.type === 'NATIVE_TRANSFER' && 
+                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                    tx.nativeTransfers[0]?.fromUserAccount === solana.address
+                );
+
+            const totalContributed = userTxs.reduce((sum: number, tx: any) => sum + (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL), 0);
+            setUserContribution(totalContributed);
+        } catch (error) {
+            console.error("Failed to fetch user contribution:", error);
+            setUserContribution(0);
+        } finally {
+            setIsCheckingContribution(false);
+        }
+    };
+
+    fetchUserContribution();
+  }, [solana.connected, solana.address]);
 
   const maxAllowedBuy = Math.max(0, PRESALE_DETAILS.maxBuy - userContribution);
 
@@ -362,18 +494,14 @@ export default function Presale() {
                 id: result.signature,
                 address: solana.address!,
                 solAmount: numSolAmount,
-                owfnAmount: numSolAmount * PRESALE_DETAILS.rate,
+                owfnAmount: numSolAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
                 time: new Date(),
             };
             setLatestPurchase(newTx);
             setSolAmount('');
-            
-            // Re-fetch data from the server after a short delay to allow the indexer to catch up.
-            // This ensures the UI shows the most accurate on-chain data.
-            setTimeout(() => {
-                fetchPresaleProgress();
-                fetchUserContribution();
-            }, 2500);
+            setUserContribution(prev => prev + numSolAmount);
+            setSoldSOL(prev => prev + numSolAmount);
+            fetchPresaleProgress(); // Re-fetch progress immediately
         } else {
             alert(t(result.messageKey));
         }

@@ -6,6 +6,8 @@ import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedT
 
 import { 
     DISTRIBUTION_WALLETS, 
+    HELIUS_API_KEY, 
+    HELIUS_API_BASE_URL, 
     PRESALE_DETAILS,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
@@ -13,7 +15,16 @@ import {
 import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User, PieChart, RotateCcw } from 'lucide-react';
 import { SolIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { Token, AdminPresaleTx } from '../types.ts';
+import type { Token } from '../types.ts';
+
+interface PresaleTx {
+    signature: string;
+    from: string;
+    solAmount: number;
+    owfnAmount: number;
+    timestamp: number;
+    lamports: number;
+}
 
 interface AggregatedContributor {
     address: string;
@@ -39,7 +50,7 @@ export default function AdminPresale() {
     const wallet = useWallet();
 
     const [loading, setLoading] = useState(true);
-    const [transactions, setTransactions] = useState<AdminPresaleTx[]>([]);
+    const [transactions, setTransactions] = useState<PresaleTx[]>([]);
     const [stats, setStats] = useState({ sol: 0, count: 0, contributors: 0 });
 
     const [isAirdropping, setIsAirdropping] = useState(false);
@@ -64,20 +75,46 @@ export default function AdminPresale() {
 
     const fetchAllTransactions = useCallback(async () => {
         setLoading(true);
+        let allTxs: PresaleTx[] = [];
+        let lastSignature: string | undefined = undefined;
+
         try {
-            const response = await fetch('/api/presale-info?mode=admin-all');
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({error: 'Failed to fetch presale transactions'}));
-                throw new Error(errorData.error);
+            while (true) {
+                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
+                const data = await response.json();
+
+                const parsedTxs: PresaleTx[] = data
+                    .filter((tx: any) => 
+                        tx.type === 'NATIVE_TRANSFER' && 
+                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                        tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111' // System Program
+                    )
+                    .map((tx: any): PresaleTx => ({
+                        signature: tx.signature,
+                        from: tx.nativeTransfers[0].fromUserAccount,
+                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
+                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                        timestamp: tx.timestamp,
+                        lamports: tx.nativeTransfers[0].amount,
+                    }));
+                
+                allTxs.push(...parsedTxs);
+
+                if (data.length < 100) {
+                    break; 
+                } else {
+                    lastSignature = data[data.length - 1].signature;
+                }
             }
-            const data: AdminPresaleTx[] = await response.json();
-            setTransactions(data);
+            setTransactions(allTxs);
         } catch (error) {
             console.error("Failed to fetch all presale transactions:", error);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [connection]);
 
     useEffect(() => {
         fetchAllTransactions();

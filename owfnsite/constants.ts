@@ -1,18 +1,18 @@
+
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
 
 
-// It is recommended to use a separate, restricted API key for client-side RPC requests.
-// This key should be stored in an environment variable exposed to the client build process.
-// For example: `process.env.VITE_HELIUS_API_KEY` or a similar mechanism.
-const CLIENT_FACING_HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
-export const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${CLIENT_FACING_HELIUS_API_KEY}`;
-
 export const OWFN_MINT_ADDRESS = 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B';
 export const OWFN_LOGO_URL: string = owfnLogo;
 export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenance mode globally
+
+export const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
+export const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+export const HELIUS_API_BASE_URL = 'https://api.helius.xyz';
+
 
 export const TOKEN_DETAILS = {
   totalSupply: 18_000_000_000,

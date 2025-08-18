@@ -148,12 +148,3 @@ export interface PresaleTransaction {
   owfnAmount: number;
   time: Date;
 }
-
-export interface AdminPresaleTx {
-    signature: string;
-    from: string;
-    solAmount: number;
-    owfnAmount: number;
-    timestamp: number;
-    lamports: number;
-}
