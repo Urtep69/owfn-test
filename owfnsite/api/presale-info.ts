@@ -2,35 +2,35 @@ import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { PRESALE_DETAILS, DISTRIBUTION_WALLETS } from '../constants.ts';
 import type { PresaleTransaction, AdminPresaleTx } from '../types.ts';
 
-// New, more robust helper function based on account balance changes.
-// This is the ground truth and avoids issues with Helius's parsing variations.
-const findPresaleTransferV3 = (tx: any): { fromUserAccount: string, amount: number } | null => {
-    if (!tx || !Array.isArray(tx.accountData)) {
+// This function identifies a valid presale contribution within a Helius enriched transaction.
+// It iterates through native SOL transfers and finds one that is directed TO the presale wallet
+// and is NOT FROM another internal project wallet. This is the most direct and reliable method.
+const findPresaleTransfer = (tx: any): { fromUserAccount: string, amount: number } | null => {
+    // A transaction must have nativeTransfers to be a SOL contribution.
+    if (!tx || !Array.isArray(tx.nativeTransfers) || tx.nativeTransfers.length === 0) {
         return null;
     }
 
-    // Find the balance change for the presale wallet.
-    const presaleAccountData = tx.accountData.find((acc: any) => acc.account === DISTRIBUTION_WALLETS.presale);
-
-    // A contribution must result in a positive balance change for the presale wallet.
-    if (!presaleAccountData || presaleAccountData.nativeBalanceChange <= 0) {
-        return null;
-    }
-
-    // The transaction fee payer is the most reliable indicator of the sender for simple transfers.
-    const sender = tx.feePayer;
-
-    // Filter out internal transfers where the sender is another project wallet.
+    // Create a set of all internal project wallets to filter out internal movements.
     const allProjectWallets = new Set(Object.values(DISTRIBUTION_WALLETS));
-    if (allProjectWallets.has(sender)) {
-        return null;
+
+    // Find the first valid transfer that matches our criteria.
+    for (const transfer of tx.nativeTransfers) {
+        // A valid contribution must be TO the presale wallet...
+        if (transfer.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+            // ...and must NOT be FROM another project wallet.
+            transfer.fromUserAccount && !allProjectWallets.has(transfer.fromUserAccount)) {
+            
+            // Return the sender and the amount in lamports.
+            return {
+                fromUserAccount: transfer.fromUserAccount,
+                amount: transfer.amount 
+            };
+        }
     }
 
-    // Return the sender and the exact amount of lamports received.
-    return {
-        fromUserAccount: sender,
-        amount: presaleAccountData.nativeBalanceChange 
-    };
+    // If no such transfer is found after checking all of them, it's not a valid contribution.
+    return null;
 };
 
 
@@ -60,8 +60,8 @@ export default async function handler(req: any, res: any) {
                     break;
                 }
                 
-                // Filter transactions based on the robust balance change logic.
-                const validTxs = data.filter(tx => findPresaleTransferV3(tx) !== null);
+                // Filter transactions based on the robust transfer logic.
+                const validTxs = data.filter(tx => findPresaleTransfer(tx) !== null);
                 allValidTxs.push(...validTxs);
 
                 // Stop paginating for performance. This limit is sufficient for pre-launch demonstration.
@@ -81,7 +81,7 @@ export default async function handler(req: any, res: any) {
             if (mode === 'admin-all') {
                 const parsedTxs: AdminPresaleTx[] = allTxs
                     .map((tx: any) => {
-                        const transfer = findPresaleTransferV3(tx);
+                        const transfer = findPresaleTransfer(tx);
                         if (!transfer) return null;
                         return {
                             signature: tx.signature,
@@ -99,7 +99,7 @@ export default async function handler(req: any, res: any) {
 
             if (mode === 'progress') {
                 const totalContributed = allTxs.reduce((sum: number, tx: any) => {
-                    const transfer = findPresaleTransferV3(tx);
+                    const transfer = findPresaleTransfer(tx);
                     return sum + (transfer ? transfer.amount / LAMPORTS_PER_SOL : 0);
                 }, 0);
                 return res.status(200).json({ totalContributed });
@@ -108,7 +108,7 @@ export default async function handler(req: any, res: any) {
             if (mode === 'user') {
                 if (!walletAddress) return res.status(400).json({ error: 'Wallet address required for user mode.' });
                 const userContribution = allTxs.reduce((sum: number, tx: any) => {
-                    const transfer = findPresaleTransferV3(tx);
+                    const transfer = findPresaleTransfer(tx);
                     if (transfer && transfer.fromUserAccount === walletAddress) {
                         return sum + (transfer.amount / LAMPORTS_PER_SOL);
                     }
@@ -133,7 +133,7 @@ export default async function handler(req: any, res: any) {
             
             const parsedTxs: PresaleTransaction[] = data
                 .map((tx: any) => {
-                    const transfer = findPresaleTransferV3(tx);
+                    const transfer = findPresaleTransfer(tx);
                     if (!transfer) return null;
                     return {
                         id: tx.signature,
