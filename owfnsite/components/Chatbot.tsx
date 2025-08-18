@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
-import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize, Shrink } from 'lucide-react';
+import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Expand, Shrink } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -93,13 +93,13 @@ const renderMessageContent = (text: string) => {
 export const Chatbot = () => {
     const { t, currentLanguage } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
+    const [isMaximized, setIsMaximized] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
-    const [isFullScreen, setIsFullScreen] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
 
     const scrollToBottom = () => {
@@ -108,6 +108,16 @@ export const Chatbot = () => {
 
     useEffect(scrollToBottom, [messages, isLoading, loadingText]);
     
+    useEffect(() => {
+        if (isOpen) {
+            // Use a timeout to ensure focus happens after the slide-in animation starts
+            const timer = setTimeout(() => {
+                inputRef.current?.focus();
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen]);
+
     // Cleanup interval on component unmount
     useEffect(() => {
         return () => {
@@ -227,20 +237,20 @@ export const Chatbot = () => {
     }
 
     return (
-        <div className={`fixed ${isFullScreen ? 'inset-0 w-full h-full max-w-full max-h-full rounded-none' : 'bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] rounded-lg'} flex flex-col bg-white dark:bg-darkPrimary-800 shadow-3d-lg animate-slide-in z-50`}>
-            <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
+        <div className={`fixed flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg z-50 transition-all duration-300 ease-in-out ${isMaximized ? 'inset-4' : 'bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] animate-slide-in'}`}>
+            <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg flex-shrink-0">
                 <div className="flex items-center space-x-2">
                     <OwfnIcon className="w-6 h-6" />
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
-                    <button onClick={() => setIsOpen(false)} className="hover:opacity-75 p-1" title="Minimize" aria-label="Minimize Chat">
-                        <Minus size={20} />
+                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-2 rounded-full hover:bg-black/20 transition-colors" aria-label={isMaximized ? "Restore" : "Maximize"}>
+                        {isMaximized ? <Shrink size={18} /> : <Expand size={18} />}
                     </button>
-                    <button onClick={() => setIsFullScreen(prev => !prev)} className="hover:opacity-75 p-1" title={isFullScreen ? "Restore" : "Maximize"} aria-label={isFullScreen ? "Restore chat window" : "Maximize chat window"}>
-                        {isFullScreen ? <Shrink size={20} /> : <Maximize size={20} />}
+                    <button onClick={() => setIsOpen(false)} className="p-2 rounded-full hover:bg-black/20 transition-colors" aria-label="Minimize">
+                        <Minus size={18} />
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="hover:opacity-75 p-1" title="Close" aria-label="Close Chat">
+                    <button onClick={() => setIsOpen(false)} className="p-2 rounded-full hover:bg-black/20 transition-colors" aria-label="Close">
                         <X size={24} />
                     </button>
                 </div>
@@ -281,7 +291,7 @@ export const Chatbot = () => {
                     <div ref={messagesEndRef} />
                 </div>
             </div>
-            <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
+            <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
                 <div className="relative">
                     <input
                         ref={inputRef}

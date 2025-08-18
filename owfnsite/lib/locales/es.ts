@@ -136,6 +136,7 @@ export const es = {
     presale_footer_copyright: `© {year} Red Familiar Mundial Oficial | Todos los derechos reservados.`,
     presale_amount_error: `La cantidad debe estar entre {min} y {max} SOL.`,
     presale_max_amount_error: `La cantidad no debe exceder los {max} SOL.`,
+    presale_min_amount_error: `La cantidad debe ser de al menos {min} SOL.`,
     live_presale_feed: `Feed de Preventa en Vivo`,
     wallet: `Billetera`,
     sol_spent: `SOL Gastado`,

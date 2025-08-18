@@ -105,10 +105,12 @@ export const en = {
     you_receive: `You Receive`,
     min_buy: `Min buy`,
     max_buy: `Max buy`,
+    invalid_amount: `Amount must be between {min} and {max} SOL.`,
     presale_purchase_success_alert: `Purchase successful! You contributed {amount} SOL. Your {owfnAmount} OWFN tokens are reserved and will be automatically airdropped to your wallet at the end of the presale.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Sold {progress}%`,
     presale_buy_info: `Buy (Min: {min} SOL, Max: {max} SOL)`,
+    presale_buy_info_max_only: `Buy (Max: {max} SOL per wallet)`,
     buy: `Buy`,
     presale_buying_owfn: `Buying {amount} $OWFN`,
     presale_estimate_tooltip: `This is an estimate. The final amount may vary.`,
@@ -132,8 +134,9 @@ export const en = {
     presale_dyor_nfa_title: `DYOR, NFA`,
     presale_dyor_nfa_desc: `Do Your Own Research. Not Financial Advice.`,
     presale_footer_copyright: `© {year} Official World Family Network | All rights reserved.`,
-    presale_min_amount_error: `Amount must be at least {min} SOL.`,
+    presale_amount_error: `The amount must be between {min} and {max} SOL.`,
     presale_max_amount_error: `The amount must not exceed {max} SOL.`,
+    presale_min_amount_error: `The amount must be at least {min} SOL.`,
     live_presale_feed: `Live Presale Feed`,
     wallet: `Wallet`,
     sol_spent: `SOL Spent`,
@@ -323,9 +326,7 @@ export const en = {
 
     // Alerts & Messages
     transaction_success_alert: `Transaction successful! You sent {amount} {tokenSymbol}.`,
-    transaction_failed_alert: `Transaction failed. Please try again. The network may be busy.`,
-    transaction_failed_insufficient_funds: `Transaction failed: Insufficient SOL for transaction amount and fees.`,
-    transaction_failed_user_rejected: `Transaction failed: You rejected the request in your wallet.`,
+    transaction_failed_alert: `Transaction failed. Please try again.`,
     translation_error_alert: `An error occurred during translation. The case was not created. Please try again.`,
     invalid_amount_generic: `Please enter a valid amount.`,
     vote_success_alert: `Your vote has been cast successfully!`,
@@ -454,7 +455,7 @@ export const en = {
     no_active_proposals: `There are currently no active proposals.`,
     no_past_proposals: `There are no past proposals to display.`,
     no_active_cases_in_category: `There are currently no active cases in this category.`,
-
+    
     // Maintenance
     maintenance_heading: `We're making things better!`,
     maintenance_message: `Our platform is currently undergoing scheduled maintenance to improve your experience. We appreciate your patience and understanding. We'll be back online shortly.`,

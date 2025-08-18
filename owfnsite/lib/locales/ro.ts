@@ -105,10 +105,12 @@ export const ro = {
     you_receive: `Primești`,
     min_buy: `Cumpărare minimă`,
     max_buy: `Cumpărare maximă`,
+    invalid_amount: `Suma trebuie să fie între {min} și {max} SOL.`,
     presale_purchase_success_alert: `Cumpărare reușită! Ați contribuit cu {amount} SOL. Tokenurile dumneavoastră de {owfnAmount} OWFN sunt rezervate și vor fi trimise automat prin airdrop în portofelul dumneavoastră la sfârșitul prevânzării.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Vândut {progress}%`,
     presale_buy_info: `Cumpără (Min: {min} SOL, Max: {max} SOL)`,
+    presale_buy_info_max_only: `Cumpără (Max: {max} SOL per portofel)`,
     buy: `Cumpără`,
     presale_buying_owfn: `Cumperi {amount} $OWFN`,
     presale_estimate_tooltip: `Aceasta este o estimare. Suma finală poate varia.`,
@@ -132,8 +134,9 @@ export const ro = {
     presale_dyor_nfa_title: `DYOR, NFA`,
     presale_dyor_nfa_desc: `Fă-ți Propria Cercetare. Nu este un Sfat Financiar.`,
     presale_footer_copyright: `© {year} Official World Family Network | Toate drepturile rezervate.`,
-    presale_min_amount_error: `Suma trebuie să fie de cel puțin {min} SOL.`,
+    presale_amount_error: `Suma trebuie să fie între {min} și {max} SOL.`,
     presale_max_amount_error: `Suma nu trebuie să depășească {max} SOL.`,
+    presale_min_amount_error: `Suma trebuie să fie de cel puțin {min} SOL.`,
     live_presale_feed: `Feed Live Prevânzare`,
     wallet: `Portofel`,
     sol_spent: `SOL Cheltuit`,
@@ -323,9 +326,7 @@ export const ro = {
 
     // Alerts & Messages
     transaction_success_alert: `Tranzacție reușită! Ați trimis {amount} {tokenSymbol}.`,
-    transaction_failed_alert: `Tranzacție eșuată. Vă rugăm să încercați din nou. Rețeaua ar putea fi ocupată.`,
-    transaction_failed_insufficient_funds: `Tranzacție eșuată: Fonduri SOL insuficiente pentru suma tranzacției și taxe.`,
-    transaction_failed_user_rejected: `Tranzacție eșuată: Ați respins solicitarea în portofel.`,
+    transaction_failed_alert: `Tranzacție eșuată. Vă rugăm să încercați din nou.`,
     translation_error_alert: `A apărut o eroare în timpul traducerii. Cazul nu a fost creat. Vă rugăm să încercați din nou.`,
     invalid_amount_generic: `Vă rugăm să introduceți o sumă validă.`,
     vote_success_alert: `Votul dumneavoastră a fost înregistrat cu succes!`,
@@ -454,7 +455,7 @@ export const ro = {
     no_active_proposals: `Momentan nu există propuneri active.`,
     no_past_proposals: `Nu există propuneri anterioare de afișat.`,
     no_active_cases_in_category: `Nu există cazuri active în această categorie în acest moment.`,
-
+    
     // Maintenance
     maintenance_heading: `Facem lucrurile mai bune!`,
     maintenance_message: `Platforma noastră este în prezent în mentenanță programată pentru a vă îmbunătăți experiența. Apreciem răbdarea și înțelegerea dumneavoastră. Vom reveni online în scurt timp.`,
