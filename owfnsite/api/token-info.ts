@@ -39,7 +39,6 @@ export default async function handler(req: any, res: any) {
             throw new Error(`Token mint not found or invalid response from Helius.`);
         }
         
-        // **DEFINITIVE FIX**: Use optional chaining for all nested property access
         const content = asset?.content;
         const tokenInfo = asset?.token_info;
         const authorities = asset?.authorities;
@@ -66,15 +65,20 @@ export default async function handler(req: any, res: any) {
         let totalSupply: number = 0;
         const supplyRaw = tokenInfo?.supply;
         
-        if (supplyRaw != null) {
+        if (supplyRaw !== null && supplyRaw !== undefined) {
             try {
-                // Use standard Number and Math.pow for maximum stability, accepting
-                // potential precision loss for extremely large numbers over a server crash.
-                totalSupply = Number(supplyRaw) / Math.pow(10, decimals);
+                // Use BigInt for safe handling of large u64 numbers returned as strings/numbers
+                const supplyBigInt = BigInt(String(supplyRaw));
+                const divisor = 10n ** BigInt(decimals);
+                const totalSupplyWhole = supplyBigInt / divisor;
+                
+                // Note: This conversion can lose precision for extremely large supplies,
+                // but it prevents crashes and is suitable for display purposes.
+                totalSupply = Number(totalSupplyWhole);
+
             } catch (e) {
-                console.error(`Error calculating total supply for mint ${mintAddress}. Supply: "${supplyRaw}", Decimals: ${decimals}. Error: ${e instanceof Error ? e.message : String(e)}`);
-                // Fallback to 0 if any error occurs during calculation
-                totalSupply = 0;
+                console.error(`Could not parse or calculate supply for mint ${mintAddress}. Supply raw: "${supplyRaw}". Error: ${e instanceof Error ? e.message : String(e)}`);
+                totalSupply = 0; // Fallback on error
             }
         }
 
