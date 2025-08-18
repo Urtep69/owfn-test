@@ -33,6 +33,11 @@ export default async function handler(req: any, res: any) {
             throw new Error('Failed to parse Helius API response.');
         });
         
+        if (heliusResponse.error) {
+            console.error(`Helius RPC Error for mint ${mintAddress}:`, heliusResponse.error);
+            throw new Error(`Helius RPC Error: ${heliusResponse.error.message} (Code: ${heliusResponse.error.code})`);
+        }
+        
         const asset = heliusResponse?.result;
         
         if (!asset || !asset.id) {
