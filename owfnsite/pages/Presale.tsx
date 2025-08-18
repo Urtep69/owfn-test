@@ -174,6 +174,29 @@ export default function Presale() {
         }
     }, []);
 
+  const fetchUserContribution = useCallback(async () => {
+    if (!solana.connected || !solana.address) {
+        setUserContribution(0);
+        return;
+    }
+    setIsCheckingContribution(true);
+    try {
+         const response = await fetch(`/api/presale-info?mode=user&walletAddress=${solana.address}`);
+        if (!response.ok) throw new Error('Failed to fetch user contribution');
+        const data = await response.json();
+        setUserContribution(data.userContribution);
+    } catch (error) {
+        console.error("Failed to fetch user contribution:", error);
+        setUserContribution(0);
+    } finally {
+        setIsCheckingContribution(false);
+    }
+  }, [solana.connected, solana.address]);
+
+  useEffect(() => {
+      fetchUserContribution();
+  }, [fetchUserContribution]);
+
   useEffect(() => {
     const calculateState = () => {
         const now = new Date();
@@ -229,29 +252,6 @@ export default function Presale() {
     const interval = setInterval(fetchPresaleProgress, 60000);
     return () => clearInterval(interval);
   }, [fetchPresaleProgress]);
-
-  useEffect(() => {
-    const fetchUserContribution = async () => {
-        if (!solana.connected || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
-            setUserContribution(0);
-            return;
-        }
-        setIsCheckingContribution(true);
-        try {
-             const response = await fetch(`/api/presale-info?mode=user&walletAddress=${solana.address}`);
-            if (!response.ok) throw new Error('Failed to fetch user contribution');
-            const data = await response.json();
-            setUserContribution(data.userContribution);
-        } catch (error) {
-            console.error("Failed to fetch user contribution:", error);
-            setUserContribution(0);
-        } finally {
-            setIsCheckingContribution(false);
-        }
-    };
-
-    fetchUserContribution();
-  }, [solana.connected, solana.address]);
 
   const maxAllowedBuy = Math.max(0, PRESALE_DETAILS.maxBuy - userContribution);
 
@@ -362,14 +362,18 @@ export default function Presale() {
                 id: result.signature,
                 address: solana.address!,
                 solAmount: numSolAmount,
-                owfnAmount: numSolAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
+                owfnAmount: numSolAmount * PRESALE_DETAILS.rate,
                 time: new Date(),
             };
             setLatestPurchase(newTx);
             setSolAmount('');
-            setUserContribution(prev => prev + numSolAmount);
-            setSoldSOL(prev => prev + numSolAmount);
-            fetchPresaleProgress(); // Re-fetch progress immediately
+            
+            // Re-fetch data from the server after a short delay to allow the indexer to catch up.
+            // This ensures the UI shows the most accurate on-chain data.
+            setTimeout(() => {
+                fetchPresaleProgress();
+                fetchUserContribution();
+            }, 2500);
         } else {
             alert(t(result.messageKey));
         }
