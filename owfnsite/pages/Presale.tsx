@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
@@ -133,7 +134,7 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 
 
 export default function Presale() {
-  const { t, solana } = useAppContext();
+  const { t, solana, setWalletModalOpen } = useAppContext();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -350,7 +351,7 @@ export default function Presale() {
 
   const handleBuy = async () => {
         if (!solana.connected) {
-            solana.connectWallet();
+            setWalletModalOpen(true);
             return;
         }
         if (presaleStatus !== 'active') return;

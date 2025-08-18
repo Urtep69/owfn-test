@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -24,8 +25,8 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
 );
 
 export default function Profile() {
-    const { t, solana } = useAppContext();
-    const { connected, address, userTokens, loading, connectWallet, userStats } = solana;
+    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { connected, address, userTokens, loading, userStats } = solana;
 
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
@@ -43,7 +44,7 @@ export default function Profile() {
                 <h1 className="text-2xl font-bold mb-2">{t('my_profile')}</h1>
                 <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_connect_prompt')}</p>
                 <button
-                    onClick={() => connectWallet()}
+                    onClick={() => setWalletModalOpen(true)}
                     disabled={loading}
                     className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
                 >

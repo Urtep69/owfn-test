@@ -23,6 +23,8 @@ interface AppContextType {
   addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
   isMaintenanceActive: boolean;
+  isWalletModalOpen: boolean;
+  setWalletModalOpen: (isOpen: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -30,7 +32,11 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, toggleTheme] = useTheme();
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
+  const [isWalletModalOpen, setWalletModalOpen] = useState(false);
+  
+  // Pass modal setters to the solana hook through a temporary context provider
   const solana = useSolana();
+
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
@@ -116,6 +122,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addProposal,
     voteOnProposal,
     isMaintenanceActive,
+    isWalletModalOpen,
+    setWalletModalOpen,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

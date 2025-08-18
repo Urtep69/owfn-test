@@ -3,13 +3,13 @@ import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
+import { WalletConnectModal } from './components/WalletConnectModal.tsx';
 
 import Home from './pages/Home.tsx';
 import Presale from './pages/Presale.tsx';
@@ -35,7 +35,7 @@ import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana } = useAppContext();
+  const { isMaintenanceActive, solana, isWalletModalOpen, setWalletModalOpen } = useAppContext();
   const { connected, address } = solana;
   const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
 
@@ -87,11 +87,12 @@ const AppContent = () => {
           <Route path="/"><Home /></Route>
         </Switch>
       </Layout>
+      <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setWalletModalOpen(false)} />
     </Router>
   );
 };
 
-function App() {
+const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const network = WalletAdapterNetwork.Mainnet;
   const endpoint = useMemo(() => HELIUS_RPC_URL, []);
   
@@ -102,17 +103,24 @@ function App() {
     ],
     []
   );
-
+  
   return (
-    <ConnectionProvider endpoint={endpoint}>
+     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <AppProvider>
-            <AppContent />
-          </AppProvider>
-        </WalletModalProvider>
+        {children}
       </WalletProvider>
     </ConnectionProvider>
+  )
+}
+
+
+function App() {
+  return (
+    <WalletWrapper>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </WalletWrapper>
   );
 }
 

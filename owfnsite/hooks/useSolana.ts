@@ -1,7 +1,6 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
@@ -24,7 +23,6 @@ export interface UseSolanaReturn {
   stakedBalance: number;
   earnedRewards: number;
   connection: Connection;
-  connectWallet: () => void;
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
   sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
@@ -48,17 +46,10 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
-  const { setVisible } = useWalletModal();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
-
-  const connectWallet = useCallback(() => {
-    if (!connected) {
-      setVisible(true);
-    }
-  }, [connected, setVisible]);
 
   const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
     const cached = balanceCache.get(walletAddress);
@@ -185,7 +176,7 @@ export const useSolana = (): UseSolanaReturn => {
   }, [connected, address, getWalletBalances]);
 
   const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
-    if (!connected || !publicKey) {
+    if (!connected || !publicKey || !signTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
     setLoading(true);
@@ -229,8 +220,14 @@ export const useSolana = (): UseSolanaReturn => {
         transaction.recentBlockhash = latestBlockHash.blockhash;
         transaction.feePayer = publicKey;
 
-        const signature = await walletSendTransaction(transaction, connection);
+        // **THE FIX**: Separate signing from sending for better mobile reliability.
+        // 1. Sign the transaction using the wallet adapter. This handles mobile deep-linking.
+        const signedTransaction = await signTransaction(transaction);
+
+        // 2. Send the signed transaction to the network ourselves.
+        const signature = await connection.sendRawTransaction(signedTransaction.serialize());
         
+        // 3. Confirm the transaction.
         await connection.confirmTransaction({
             blockhash: latestBlockHash.blockhash,
             lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
@@ -239,8 +236,10 @@ export const useSolana = (): UseSolanaReturn => {
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
-        balanceCache.delete(address!); // Invalidate cache after a transaction
-        getWalletBalances(address!).then(setUserTokens);
+        if (address) {
+            balanceCache.delete(address); // Invalidate cache after a transaction
+            getWalletBalances(address).then(setUserTokens);
+        }
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
     } catch (error) {
@@ -248,7 +247,7 @@ export const useSolana = (): UseSolanaReturn => {
         setLoading(false);
         return { success: false, messageKey: 'transaction_failed_alert' };
     }
-  }, [connected, publicKey, connection, walletSendTransaction, userTokens, address, getWalletBalances]);
+  }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
@@ -271,7 +270,6 @@ export const useSolana = (): UseSolanaReturn => {
     },
     stakedBalance: 0,
     earnedRewards: 0,
-    connectWallet,
     disconnectWallet: disconnect,
     getWalletBalances,
     sendTransaction,
