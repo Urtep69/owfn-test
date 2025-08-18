@@ -1,4 +1,5 @@
 import type { TokenDetails } from '../types.ts';
+import { HELIUS_API_KEY } from '../constants.ts';
 
 export default async function handler(req: any, res: any) {
     const { mint: mintAddress } = req.query;
@@ -7,7 +8,6 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Mint address is required" });
     }
 
-    const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
     if (!HELIUS_API_KEY) {
         return res.status(500).json({ error: "Server configuration error: Missing Helius API Key." });
     }
