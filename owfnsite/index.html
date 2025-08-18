@@ -22,12 +22,19 @@
     <meta name="twitter:url" content="https://www.owfn.org/" />
     <meta name="twitter:site" content="@OWFN_Official" />
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         darkMode: 'class',
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
             colors: {
               'primary': { // Light Theme
                 '50': '#fafafa',
@@ -107,8 +114,22 @@
     </script>
     <style>
         html {
-            /* Reduce base font size to make UI text smaller across the site */
             font-size: 15px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-primary-100 {
+            background-color: #f4f4f5;
+        }
+        .dark .dark-bg-gradient {
+            background-image: radial-gradient(at 27% 37%, hsla(215, 20%, 15%, 1) 0px, transparent 50%), 
+                              radial-gradient(at 97% 21%, hsla(200, 25%, 20%, 1) 0px, transparent 50%),
+                              radial-gradient(at 52% 99%, hsla(240, 20%, 22%, 1) 0px, transparent 50%),
+                              radial-gradient(at 10% 29%, hsla(220, 18%, 18%, 1) 0px, transparent 50%),
+                              radial-gradient(at 97% 96%, hsla(190, 15%, 15%, 1) 0px, transparent 50%),
+                              radial-gradient(at 33% 50%, hsla(230, 22%, 19%, 1) 0px, transparent 50%),
+                              radial-gradient(at 79% 53%, hsla(210, 17%, 16%, 1) 0px, transparent 50%);
         }
     </style>
 <script type="importmap">
@@ -133,7 +154,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-primary-100 dark:bg-darkPrimary-900">
+  <body class="bg-primary-100 dark:bg-darkPrimary-900 dark:dark-bg-gradient">
     <div id="root"></div>
     <script type="module" src="/bundle.js"></script>
   <script type="module" src="/index.tsx"></script>
