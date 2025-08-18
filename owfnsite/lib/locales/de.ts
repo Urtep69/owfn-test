@@ -369,6 +369,7 @@ export const de = {
     no_risk_factors_found: `Keine kritischen Risikofaktoren wie veränderbare Metadaten oder nicht widerrufene Berechtigungen gefunden.`,
     risk_factors_found: `Potenzielle Risiken erkannt. Bitte gehen Sie mit Vorsicht vor.`,
     swap: `Tauschen`,
+    revoked: `Widerrufen`,
     
     // Staking & Vesting
     staking_title: `OWFN staken, Belohnungen verdienen`,

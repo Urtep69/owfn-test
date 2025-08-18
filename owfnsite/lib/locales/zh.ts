@@ -1,3 +1,4 @@
+
 export const zh = {
     // Navigation
     home: `首页`,
@@ -104,12 +105,10 @@ export const zh = {
     you_receive: `您收到`,
     min_buy: `最小购买量`,
     max_buy: `最大购买量`,
-    invalid_amount: `金额必须在 {min} 和 {max} SOL 之间。`,
     presale_purchase_success_alert: `购买成功！您贡献了 {amount} SOL。您的 {owfnAmount} OWFN 代币已预留，并将在预售结束时自动空投到您的钱包。`,
     presale_header_subtitle: `官方世界家庭网络 - $OWFN`,
     presale_sold_progress: `已售出 {progress}%`,
     presale_buy_info: `购买（最小：{min} SOL，最大：{max} SOL）`,
-    presale_buy_info_max_only: `购买（最大：{max} SOL/钱包）`,
     buy: `购买`,
     presale_buying_owfn: `正在购买 {amount} $OWFN`,
     presale_estimate_tooltip: `这是一个估算值，最终金额可能会有所不同。`,
@@ -134,7 +133,6 @@ export const zh = {
     presale_dyor_nfa_desc: `请自行研究。非财务建议。`,
     presale_footer_copyright: `© {year} 官方世界家庭网络 | 保留所有权利。`,
     presale_amount_error: `金额必须在 {min} 和 {max} SOL 之间。`,
-    presale_max_amount_error: `金额不得超过 {max} SOL。`,
     live_presale_feed: `实时预售动态`,
     wallet: `钱包`,
     sol_spent: `花费的 SOL`,
@@ -160,8 +158,6 @@ export const zh = {
     select_token: `选择代币`,
     amount: `金额`,
     donations_form_title: `捐赠表格`,
-    donations_stats_title: `实时捐赠统计（模拟）`,
-    donated: `已捐赠`,
     donation_success_alert: `捐赠成功！感谢您捐赠 {amount} {tokenSymbol}。`,
     donation_no_token_balance: `您没有任何 {symbol}。`,
     
@@ -371,6 +367,7 @@ export const zh = {
     no_risk_factors_found: `未发现可变元数据或未撤销权限等关键风险因素。`,
     risk_factors_found: `检测到潜在风险。请谨慎操作。`,
     swap: `交换`,
+    revoked: `已撤销`,
     
     // Staking & Vesting
     staking_title: `质押 OWFN，赚取奖励`,
@@ -429,7 +426,6 @@ export const zh = {
     airdrop_eligible_message: `您的钱包符合资格！您将在即将到来的分发中收到 {amount} OWFN 代币。`,
     airdrop_not_eligible: `不符合资格`,
     airdrop_not_eligible_message: `抱歉，此钱包地址不符合当前空投资格。请继续活跃在我们的社区中，以获得未来的机会！`,
-    airdrop_info_box_title: `关于此次空投`,
     airdrop_info_box_desc: `此次空投旨在奖励早期支持者和活跃的社区成员。资格基于参与预售和社区活动等因素。`,
     
     // Governance
@@ -542,6 +538,5 @@ export const zh = {
     contact_social_telegram_channel_desc: `订阅以获取重要公告和官方新闻。`,
     contact_social_telegram_group_title: `Telegram 群组`,
     contact_social_telegram_group_desc: `加入我们的社区群组，与其他成员讨论和互动。`,
-    contact_social_discord_title: `Discord 服务器`,
     contact_social_discord_desc: `成为我们活跃社区的一员，进行讨论和支持。`,
 };

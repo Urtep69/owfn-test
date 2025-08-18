@@ -294,7 +294,7 @@ export const es = {
     faq_q17: `¿Cómo puedo estar seguro de que mis donaciones llegan a las causas que apoyan?`,
     faq_a17: `La transparencia es fundamental para nosotros. Todos los fondos destinados a causas sociales se gestionan a través de la Tesorería de Impacto, cuya dirección de billetera es pública. Puede monitorear todas las transacciones entrantes y salientes en un explorador de bloques de Solana, como Solscan. Además, en el Portal de Impacto, proporcionaremos actualizaciones periódicas e informes detallados sobre los proyectos financiados.`,
     faq_q18: `¿Puedo proponer un caso social o una causa para que sea financiada por OWFN?`,
-    faq_a18: `En la fase inicial, los proyectos son seleccionados por nuestro equipo en base a estrictos criterios de impacto y viabilidad. A medida que el proyecto avance, implementaremos un sistema de gobernanza (DAO) que permitirá a los miembros de la comunidad proponer y votar sobre futuras iniciativas, dándole un papel directo en la dirección de los fondos.`,
+    faq_a18: `En la fase inicial, los proyectos son seleccionados por nuestro equipo en base a estrictos criterios de impacto y viabilidad. A medida que el proyecto avanza, implementaremos un sistema de gobernanza (DAO) que permitirá a los miembros de la comunidad proponer y votar sobre futuras iniciativas, dándole un papel directo en la dirección de los fondos.`,
     faq_q19: `¿Quién está detrás del proyecto OWFN? ¿El equipo es anónimo?`,
     faq_a19: `Los detalles sobre la visión y los valores de nuestro equipo se presentan en el sitio web. A medida que nos acerquemos al lanzamiento público, proporcionaremos más transparencia sobre los miembros clave y asesores que contribuyen al éxito del proyecto, respetando al mismo tiempo su seguridad y privacidad.`,
     faq_q20: `¿Qué medidas de seguridad han tomado para proteger los fondos del proyecto y de los inversores?`,
@@ -369,6 +369,7 @@ export const es = {
     no_risk_factors_found: `No se encontraron factores de riesgo críticos como metadatos mutables o autoridades no revocadas.`,
     risk_factors_found: `Se detectaron riesgos potenciales. Proceda con precaución.`,
     swap: `Intercambiar`,
+    revoked: `Revocado`,
 
     // Staking & Vesting
     staking_title: `Haz Staking de OWFN, Gana Recompensas`,

@@ -369,6 +369,7 @@ export const ro = {
     no_risk_factors_found: `Nu au fost găsiți factori de risc critici, cum ar fi metadate mutabile sau autorități nerevocate.`,
     risk_factors_found: `Riscuri potențiale detectate. Vă rugăm să procedați cu prudență.`,
     swap: `Schimbă`,
+    revoked: `Revocat`,
     
     // Staking & Vesting
     staking_title: `Depune OWFN, Câștigă Recompense`,

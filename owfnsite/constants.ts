@@ -112,7 +112,6 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         holders: 0,
         totalSupply: 18_000_000_000,
         circulatingSupply: 0,
-        pairAddress: '8Vq82rQfT2nqzH8c4g8x9a2avp13aWv12t1nCvZ5X3qg',
     },
     'SOL': {
         name: 'Solana',
@@ -130,7 +129,6 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         holders: 0,
         totalSupply: 0,
         circulatingSupply: 0,
-        pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDC': {
         name: 'USD Coin',
@@ -148,7 +146,6 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         holders: 0,
         totalSupply: 0,
         circulatingSupply: 0,
-        pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDT': {
         name: 'Tether',
@@ -166,6 +163,5 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         holders: 0,
         totalSupply: 0,
         circulatingSupply: 0,
-        pairAddress: '7xKXtg2CW87d97TXJSD40M5M5gajNdkgdsDEsMmL2trn', // SOL/USDT
     }
 };

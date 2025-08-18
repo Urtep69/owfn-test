@@ -369,6 +369,7 @@ export const ja = {
     no_risk_factors_found: `変更可能なメタデータや取り消されていない権限などの重大なリスク要因は見つかりませんでした。`,
     risk_factors_found: `潜在的なリスクが検出されました。注意して進めてください。`,
     swap: `スワップ`,
+    revoked: `失効済み`,
     
     // Staking & Vesting
     staking_title: `OWFNをステークして報酬を獲得`,

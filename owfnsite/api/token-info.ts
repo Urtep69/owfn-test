@@ -31,7 +31,7 @@ export default async function handler(req: any, res: any) {
         
         const asset = heliusData.result;
         if (!asset || !asset.id) {
-            return res.status(404).json({ error: `Token not found.` });
+            return res.status(404).json({ error: `Token data not found.` });
         }
 
         // --- Parse Helius Data ---
@@ -46,8 +46,9 @@ export default async function handler(req: any, res: any) {
 
         let totalSupply = 0;
         try {
-            totalSupply = Number(tokenInfo.supply) / Math.pow(10, decimals);
-        } catch { /* Fails gracefully */ }
+            // Defensive parsing for potentially very large numbers
+            totalSupply = parseFloat(tokenInfo.supply) / Math.pow(10, decimals);
+        } catch { /* Fails gracefully, remains 0 */ }
         
         const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
         const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
@@ -90,7 +91,8 @@ export default async function handler(req: any, res: any) {
                     );
 
                     responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
-                    responseData.marketCap = primaryPair.fdv || 0;
+                    responseData.marketCap = primaryPair.marketCap ?? 0; // Use marketCap directly if available
+                    responseData.fdv = primaryPair.fdv ?? 0;
                     responseData.volume24h = primaryPair.volume?.h24 || 0;
                     responseData.price24hChange = primaryPair.priceChange?.h24 || 0;
                     responseData.liquidity = primaryPair.liquidity?.usd || 0;
@@ -107,6 +109,7 @@ export default async function handler(req: any, res: any) {
             }
         } catch (dexError) {
             console.warn(`Could not fetch market data for ${mintAddress} from DexScreener:`, dexError);
+            // Gracefully continue without market data, the frontend will handle this
         }
 
         return res.status(200).json(responseData);

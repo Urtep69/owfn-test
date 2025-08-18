@@ -67,12 +67,6 @@ const InfoRow = ({ label, children }: { label: string, children: React.ReactNode
     </div>
 );
 
-const AuthorityRow = ({ label, address }: { label: string, address?: string | null }) => (
-    <InfoRow label={label}>
-        {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold">Revoked</span>}
-    </InfoRow>
-);
-
 const LinkButton = ({ href, icon, text }: { href: string, icon: React.ReactNode, text: string }) => (
     <a href={href} target="_blank" rel="noopener noreferrer" className="flex-grow flex items-center justify-center gap-2 bg-primary-100 dark:bg-darkPrimary-700 hover:bg-primary-200 dark:hover:bg-darkPrimary-600 text-primary-700 dark:text-darkPrimary-200 font-semibold py-2 px-3 rounded-md transition-colors">
         {icon}{text}
@@ -95,6 +89,12 @@ export default function TokenDetail() {
     const [token, setToken] = useState<Partial<TokenDetails> | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    
+    const AuthorityRow = ({ label, address }: { label: string, address?: string | null }) => (
+        <InfoRow label={label}>
+            {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold">{t('revoked')}</span>}
+        </InfoRow>
+    );
 
     useEffect(() => {
         if (!mintAddress) {
@@ -170,7 +170,7 @@ export default function TokenDetail() {
             </header>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <StatCard title={t('pricePerToken')} value={isMarketDataAvailable ? `$${token.pricePerToken?.toPrecision(4)}` : 'N/A'} change={token.price24hChange} icon={<DollarSign />} />
+                <StatCard title={t('pricePerToken', {defaultValue: 'Price'})} value={isMarketDataAvailable ? `$${token.pricePerToken?.toPrecision(4)}` : 'N/A'} change={token.price24hChange} icon={<DollarSign />} />
                 <StatCard title={t('market_cap')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.marketCap)}` : 'N/A'} icon={<BarChart2 />} />
                 <StatCard title={t('volume_24h')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.volume24h)}` : 'N/A'} icon={<Repeat />} />
             </div>
@@ -198,7 +198,7 @@ export default function TokenDetail() {
                             </InfoCard>
                         </>
                     ) : (
-                        <div className="lg:col-span-2 text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner-3d">
+                        <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner-3d">
                             <p className="text-primary-600 dark:text-darkPrimary-400">Live market data is not available for this token. It may not be listed on a decentralized exchange yet.</p>
                         </div>
                     )}
