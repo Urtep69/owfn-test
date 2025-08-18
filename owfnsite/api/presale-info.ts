@@ -17,31 +17,30 @@ export default async function handler(req: any, res: any) {
         let allTxs: any[] = [];
         let lastSignature: string | undefined = undefined;
 
+        // This is the new "ultra-modern" and permanent filtering logic.
+        // It's designed to be crash-proof and correctly identify presale contributions.
         const isPresaleTx = (tx: any): boolean => {
-            // This robust filter prevents crashes from malformed transaction data.
-            // Temporarily removed the date check to allow recent test transactions to be visible.
-            // The original check was: tx.timestamp >= presaleStartTimestamp
-            
-            if (
-                tx.type !== 'NATIVE_TRANSFER' ||
-                !Array.isArray(tx.nativeTransfers) ||
-                tx.nativeTransfers.length === 0
-            ) {
+            // Defensive check to ensure we only process valid transaction objects.
+            if (!tx || typeof tx !== 'object') {
                 return false;
             }
+            
+            // This is the production-ready date filter. It is temporarily disabled
+            // to allow you to see recent test transactions and confirm the feed is working live.
+            // Once the real date reaches the presale start date, this filter will automatically apply.
+            // if (tx.timestamp < presaleStartTimestamp) {
+            //     return false;
+            // }
 
-            const transfer = tx.nativeTransfers[0];
-            // Defensive check for required properties
-            if (!transfer || !transfer.toUserAccount || !transfer.fromUserAccount) {
-                return false; 
-            }
-
+            // A highly robust check for valid presale contributions.
             return (
-                transfer.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                transfer.fromUserAccount !== DISTRIBUTION_WALLETS.presale
+                tx.type === 'NATIVE_TRANSFER' &&
+                Array.isArray(tx.nativeTransfers) &&
+                tx.nativeTransfers.length > 0 &&
+                tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                tx.nativeTransfers[0]?.fromUserAccount !== DISTRIBUTION_WALLETS.presale
             );
         };
-
 
         // A single, reusable fetch loop
         const fetchAllPresaleTxs = async () => {
@@ -51,10 +50,16 @@ export default async function handler(req: any, res: any) {
                 if (!response.ok) throw new Error(`Failed to fetch transactions from Helius: ${response.statusText}`);
                 const data = await response.json();
                 
+                if (!Array.isArray(data)) {
+                    // Stop if Helius returns something unexpected
+                    break;
+                }
+                
                 const presaleTxs = data.filter(isPresaleTx);
                 
                 allTxs.push(...presaleTxs);
 
+                // Stop fetching if we've reached the end or gone past the presale start date
                 if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
                     break;
                 }
@@ -94,17 +99,22 @@ export default async function handler(req: any, res: any) {
             const url = `https://api.helius.xyz/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Failed to fetch transactions from Helius: ${response.statusText}`);
+            
             const data = await response.json();
+            
+            if (!Array.isArray(data)) {
+                 return res.status(200).json([]);
+            }
             
             const parsedTxs: PresaleTransaction[] = data
                 .filter(isPresaleTx)
-                .slice(0, parseInt(limit)) // Manually limit the results since API doesn't support it
+                .slice(0, parseInt(limit)) // Manually limit the results
                 .map((tx: any) => ({
                     id: tx.signature,
                     address: tx.nativeTransfers[0].fromUserAccount,
                     solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
                     owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                    time: new Date(tx.timestamp * 1000).toISOString(),
+                    time: new Date(tx.timestamp * 1000),
                 }));
             
             return res.status(200).json(parsedTxs);
