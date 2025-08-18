@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, CheckCircle, XCircle, Gift, Loader2 } from 'lucide-react';

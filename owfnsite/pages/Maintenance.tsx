@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wrench, Twitter, Send } from 'lucide-react';

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, TrendingUp, Gift, Database, HeartHandshake } from 'lucide-react';

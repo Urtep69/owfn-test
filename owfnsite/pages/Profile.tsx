@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -94,29 +93,31 @@ export default function Profile() {
                         </div>
                         {/* Token List */}
                         {userTokens.map(token => (
-                            <div key={token.mintAddress} className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg transition-colors duration-200 opacity-75 cursor-not-allowed">
-                                {/* Column 1: Asset Info */}
-                                <div className="flex items-center space-x-4">
-                                    <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                                        {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
+                           <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
+                                <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors duration-200 cursor-pointer">
+                                    {/* Column 1: Asset Info */}
+                                    <div className="flex items-center space-x-4">
+                                        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                                            {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
+                                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
-                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
+
+                                    {/* Column 2: Balance */}
+                                    <div className="text-right font-mono">
+                                        <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
+                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
                                     </div>
-                                </div>
 
-                                {/* Column 2: Balance */}
-                                <div className="text-right font-mono">
-                                    <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
-                                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
-                                </div>
-
-                                {/* Column 3: Value */}
-                                <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
-                                    ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                                </div>
-                            </div>
+                                    {/* Column 3: Value */}
+                                    <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
+                                        ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                    </div>
+                                </a>
+                            </Link>
                         ))}
                     </div>
                 ) : (

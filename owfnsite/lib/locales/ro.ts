@@ -105,12 +105,10 @@ export const ro = {
     you_receive: `Primești`,
     min_buy: `Cumpărare minimă`,
     max_buy: `Cumpărare maximă`,
-    invalid_amount: `Suma trebuie să fie între {min} și {max} SOL.`,
     presale_purchase_success_alert: `Cumpărare reușită! Ați contribuit cu {amount} SOL. Tokenurile dumneavoastră de {owfnAmount} OWFN sunt rezervate și vor fi trimise automat prin airdrop în portofelul dumneavoastră la sfârșitul prevânzării.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Vândut {progress}%`,
     presale_buy_info: `Cumpără (Min: {min} SOL, Max: {max} SOL)`,
-    presale_buy_info_max_only: `Cumpără (Max: {max} SOL per portofel)`,
     buy: `Cumpără`,
     presale_buying_owfn: `Cumperi {amount} $OWFN`,
     presale_estimate_tooltip: `Aceasta este o estimare. Suma finală poate varia.`,
@@ -135,7 +133,6 @@ export const ro = {
     presale_dyor_nfa_desc: `Fă-ți Propria Cercetare. Nu este un Sfat Financiar.`,
     presale_footer_copyright: `© {year} Official World Family Network | Toate drepturile rezervate.`,
     presale_amount_error: `Suma trebuie să fie între {min} și {max} SOL.`,
-    presale_max_amount_error: `Suma nu trebuie să depășească {max} SOL.`,
     live_presale_feed: `Feed Live Prevânzare`,
     wallet: `Portofel`,
     sol_spent: `SOL Cheltuit`,
@@ -372,6 +369,7 @@ export const ro = {
     no_risk_factors_found: `Nu au fost găsiți factori de risc critici, cum ar fi metadate mutabile sau autorități nerevocate.`,
     risk_factors_found: `Riscuri potențiale detectate. Vă rugăm să procedați cu prudență.`,
     swap: `Schimbă`,
+    revoked: `Revocat`,
     
     // Staking & Vesting
     staking_title: `Depune OWFN, Câștigă Recompense`,

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Menu, X, LogOut, Wallet } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';

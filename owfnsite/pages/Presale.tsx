@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -25,21 +24,33 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
     const { t } = useAppContext();
     const [transactions, setTransactions] = useState<PresaleTransaction[]>([]);
     const [loading, setLoading] = useState(true);
+    const wsRef = useRef<WebSocket | null>(null);
 
+    // Effect to handle the user's own new transaction for immediate feedback
     useEffect(() => {
         if (newTransaction) {
-            setTransactions(prev => [newTransaction, ...prev.slice(0, 19)]);
+            setTransactions(prev => {
+                // Prevent adding a duplicate if the transaction arrived via WebSocket first
+                if (prev.some(tx => tx.id === newTransaction.id)) {
+                    return prev;
+                }
+                return [newTransaction, ...prev.slice(0, 19)];
+            });
         }
     }, [newTransaction]);
     
+    // Effect to fetch initial transactions and set up WebSocket connection
     useEffect(() => {
-        const fetchTransactions = async () => {
+        let isMounted = true;
+
+        const fetchInitialTransactions = async () => {
+            if (!isMounted) return;
             setLoading(true);
             try {
                 const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
                 const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions');
+                if (!response.ok) throw new Error('Failed to fetch initial transactions');
                 const data = await response.json();
                 
                 const parsedTxs: PresaleTransaction[] = data
@@ -56,17 +67,104 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         time: new Date(tx.timestamp * 1000),
                     }));
                 
-                setTransactions(parsedTxs.slice(0, 20));
+                if (isMounted) {
+                    setTransactions(prev => {
+                        // Merge initial with any potential new local transactions, avoiding duplicates
+                        const existingIds = new Set(prev.map(p => p.id));
+                        const uniqueFetched = parsedTxs.filter(p => !existingIds.has(p.id));
+                        return [...prev, ...uniqueFetched].slice(0, 20);
+                    });
+                }
             } catch (error) {
                 console.error("Failed to fetch presale transactions:", error);
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
 
-        fetchTransactions();
-        const interval = setInterval(fetchTransactions, 30000); // refresh every 30 seconds
-        return () => clearInterval(interval);
+        const connectWebSocket = () => {
+            const heliusWsUrl = `wss://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+            wsRef.current = new WebSocket(heliusWsUrl);
+
+            wsRef.current.onopen = () => {
+                console.log("WebSocket connected for Live Presale Feed");
+                wsRef.current?.send(JSON.stringify({
+                    jsonrpc: "2.0",
+                    id: 1,
+                    method: "transactionSubscribe",
+                    params: [{
+                        accountInclude: [DISTRIBUTION_WALLETS.presale]
+                    }, {
+                        commitment: "finalized",
+                        encoding: "jsonParsed",
+                        transactionDetails: "full",
+                        showRewards: false
+                    }]
+                }));
+            };
+
+            wsRef.current.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.method === "transactionNotification") {
+                        const tx = data.params.result.transaction;
+                        const signature = tx.signatures[0];
+
+                        // Look for native SOL transfers to our presale wallet
+                        const nativeTransfer = tx.message.instructions.find((inst: any) => 
+                            inst.program === 'system' && 
+                            inst.parsed?.type === 'transfer' &&
+                            inst.parsed?.info?.destination === DISTRIBUTION_WALLETS.presale
+                        );
+                        
+                        if (nativeTransfer) {
+                            const newTx: PresaleTransaction = {
+                                id: signature,
+                                address: nativeTransfer.parsed.info.source,
+                                solAmount: nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL,
+                                owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                                time: new Date(), // Use current time for live feed
+                            };
+
+                            if (isMounted) {
+                                setTransactions(prev => {
+                                    if (prev.some(t => t.id === newTx.id)) {
+                                        return prev; // Already have this one
+                                    }
+                                    return [newTx, ...prev.slice(0, 19)];
+                                });
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error parsing WebSocket message:", e);
+                }
+            };
+            
+            wsRef.current.onclose = () => {
+                console.log("WebSocket disconnected. Attempting to reconnect in 5 seconds...");
+                if (isMounted) {
+                    setTimeout(connectWebSocket, 5000);
+                }
+            };
+
+            wsRef.current.onerror = (error) => {
+                console.error("WebSocket error:", error);
+                wsRef.current?.close(); // This will trigger the onclose reconnect logic
+            };
+        };
+
+        fetchInitialTransactions();
+        connectWebSocket();
+
+        return () => {
+            isMounted = false;
+            if (wsRef.current) {
+                wsRef.current.onclose = null; // Prevent reconnection on unmount
+                wsRef.current.close();
+                console.log("WebSocket disconnected on component unmount.");
+            }
+        };
     }, []);
 
 
@@ -87,7 +185,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         <Loader2 className="w-6 h-6 animate-spin text-accent-500 dark:text-darkAccent-500" />
                     </div>
                 ) : transactions.length > 0 ? transactions.map((tx) => (
-                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 5000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
+                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 10000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
                         <div className="col-span-2 flex items-center gap-2">
                            <AddressDisplay address={tx.address} className="text-xs" />
                         </div>
@@ -299,9 +397,34 @@ export default function Presale() {
     }
 
     const numValue = parseFloat(value);
-    if (numValue > maxAllowedBuy) {
-        setError(t('presale_max_amount_error', { max: maxAllowedBuy.toFixed(6) }));
+    if ((numValue > 0 && numValue < PRESALE_DETAILS.minBuy) || numValue > maxAllowedBuy) {
+        setError(t('presale_amount_error', { min: PRESALE_DETAILS.minBuy.toFixed(2), max: maxAllowedBuy.toFixed(6) }));
     } else {
+        setError('');
+    }
+  };
+  
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || isNaN(parseFloat(value))) {
+        return;
+    }
+
+    const numValue = parseFloat(value);
+    let correctedValue = value;
+
+    if (numValue > 0 && numValue < PRESALE_DETAILS.minBuy) {
+        correctedValue = String(PRESALE_DETAILS.minBuy);
+    } else if (numValue > maxAllowedBuy) {
+        correctedValue = maxAllowedBuy.toFixed(6);
+    }
+    
+    if (correctedValue !== value) {
+        setSolAmount(correctedValue);
+    }
+    
+    const correctedNum = parseFloat(correctedValue);
+    if (correctedNum >= PRESALE_DETAILS.minBuy && correctedNum <= maxAllowedBuy) {
         setError('');
     }
   };
@@ -347,7 +470,9 @@ export default function Presale() {
 
 
   const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
-  const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) <= 0 || parseFloat(solAmount) > maxAllowedBuy;
+  const numSolAmount = parseFloat(solAmount);
+  const isAmountInvalid = isNaN(numSolAmount) || numSolAmount < PRESALE_DETAILS.minBuy || numSolAmount > maxAllowedBuy;
+
 
   const handleBuy = async () => {
         if (!solana.connected) {
@@ -355,28 +480,27 @@ export default function Presale() {
             return;
         }
         if (presaleStatus !== 'active') return;
-
-        const numAmount = parseFloat(solAmount);
+        
         if (isAmountInvalid) return;
 
-        const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numAmount, 'SOL');
+        const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numSolAmount, 'SOL');
 
         if (result.success && result.signature) {
             alert(t('presale_purchase_success_alert', { 
-                amount: numAmount.toFixed(2), 
+                amount: numSolAmount.toFixed(2), 
                 owfnAmount: owfnAmount.toLocaleString() 
             }));
             const newTx: PresaleTransaction = {
                 id: result.signature,
                 address: solana.address!,
-                solAmount: numAmount,
-                owfnAmount: numAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
+                solAmount: numSolAmount,
+                owfnAmount: numSolAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
                 time: new Date(),
             };
             setLatestPurchase(newTx);
             setSolAmount('');
-            setUserContribution(prev => prev + numAmount);
-            setSoldSOL(prev => prev + numAmount);
+            setUserContribution(prev => prev + numSolAmount);
+            setSoldSOL(prev => prev + numSolAmount);
             fetchPresaleProgress(); // Re-fetch progress immediately
         } else {
             alert(t(result.messageKey));
@@ -531,7 +655,7 @@ export default function Presale() {
                             </p>
                         </div>
                         <p className="text-sm text-primary-700 dark:text-darkPrimary-300 mb-2 text-center">
-                            {t('presale_buy_info_max_only', { max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
+                            {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
                         {solana.connected && (
                             <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 mb-3 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
@@ -556,6 +680,7 @@ export default function Presale() {
                                     type="number"
                                     value={solAmount}
                                     onChange={handleAmountChange}
+                                    onBlur={handleBlur}
                                     className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
                                     placeholder="0.00"
                                     disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
@@ -32,10 +31,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, toggleTheme] = useTheme();
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
-  const [isWalletModalOpen, setWalletModalOpen] = useState(false);
-  
-  // Pass modal setters to the solana hook through a temporary context provider
   const solana = useSolana();
+  const [isWalletModalOpen, setWalletModalOpen] = useState(false);
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
