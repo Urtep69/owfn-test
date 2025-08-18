@@ -20,7 +20,7 @@ export default async function handler(req: any, res: any) {
         // A single, reusable fetch loop
         const fetchAllPresaleTxs = async () => {
              while (true) {
-                const url = `https://api.helius.xyz/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
+                const url = `https://api.helius.xyz/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions/?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
                 const data = await response.json();
@@ -70,7 +70,7 @@ export default async function handler(req: any, res: any) {
         }
 
         if (mode === 'transactions') {
-            const url = `https://api.helius.xyz/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
+            const url = `https://api.helius.xyz/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions/?api-key=${HELIUS_API_KEY}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
             const data = await response.json();

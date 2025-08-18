@@ -20,78 +20,82 @@ export default async function handler(req: any, res: any) {
     try {
         const heliusUrl = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
         
-        // 1. Create a batch request for Helius
-        const batchRequest = addresses.map((address, index) => ({
-            jsonrpc: '2.0',
-            id: `wallet-${index}`,
-            method: 'getAssetsByOwner',
-            params: {
-                ownerAddress: address,
-                page: 1,
-                limit: 1000,
-                displayOptions: {
-                    showFungible: true,
-                    showNativeBalance: true,
-                },
-            },
-        }));
+        // Use Promise.allSettled to fetch all balances in parallel, preventing one failure from stopping all.
+        const promises = addresses.map(ownerAddress =>
+            fetch(heliusUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: `wallet-${ownerAddress}`,
+                    method: 'getAssetsByOwner',
+                    params: {
+                        ownerAddress,
+                        page: 1,
+                        limit: 1000,
+                        displayOptions: {
+                            showFungible: true,
+                            showNativeBalance: true,
+                        },
+                    },
+                }),
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(`Helius API failed for ${ownerAddress} with status ${response.status}`);
+                }
+                return response.json();
+            })
+        );
 
-        const heliusResponse = await fetch(heliusUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(batchRequest),
-        });
+        const results = await Promise.allSettled(promises);
 
-        if (!heliusResponse.ok) {
-            throw new Error(`Helius batch API failed with status ${heliusResponse.status}`);
-        }
-
-        const batchResults = await heliusResponse.json();
-
-        // 2. Process the batch response
         const walletsData: Record<string, any[]> = {};
         const allSplMints = new Set<string>();
 
-        batchResults.forEach((result: any, index: number) => {
+        results.forEach((result, index) => {
             const ownerAddress = addresses[index];
-            const items = result.result?.items || [];
-            const nativeBalance = result.result?.nativeBalance;
-            const walletTokens: any[] = [];
+            if (result.status === 'fulfilled') {
+                const heliusData = result.value;
+                const items = heliusData.result?.items || [];
+                const nativeBalance = heliusData.result?.nativeBalance;
+                const walletTokens: any[] = [];
 
-            if (nativeBalance && nativeBalance.lamports > 0) {
-                const balance = nativeBalance.lamports / LAMPORTS_PER_SOL;
-                walletTokens.push({
-                    mintAddress: 'So11111111111111111111111111111111111111112',
-                    balance: balance,
-                    decimals: 9,
-                    name: 'Solana',
-                    symbol: 'SOL',
-                    pricePerToken: nativeBalance.price_per_sol || 0,
-                    usdValue: nativeBalance.total_price || (balance * (nativeBalance.price_per_sol || 0)),
-                    logoUri: null
-                });
-            }
-
-            items.forEach((asset: any) => {
-                if (asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
+                if (nativeBalance && nativeBalance.lamports > 0) {
+                    const balance = nativeBalance.lamports / LAMPORTS_PER_SOL;
                     walletTokens.push({
-                        mintAddress: asset.id,
-                        balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
-                        decimals: asset.token_info.decimals,
-                        name: asset.content?.metadata?.name || 'Unknown Token',
-                        symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
-                        logoUri: asset.content?.links?.image,
-                        usdValue: 0,
-                        pricePerToken: 0,
+                        mintAddress: 'So11111111111111111111111111111111111111112',
+                        balance: balance,
+                        decimals: 9,
+                        name: 'Solana',
+                        symbol: 'SOL',
+                        pricePerToken: nativeBalance.price_per_sol || 0,
+                        usdValue: nativeBalance.total_price || (balance * (nativeBalance.price_per_sol || 0)),
+                        logoUri: null
                     });
-                    allSplMints.add(asset.id);
                 }
-            });
-            
-            walletsData[ownerAddress] = walletTokens;
+
+                items.forEach((asset: any) => {
+                    if (asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
+                        walletTokens.push({
+                            mintAddress: asset.id,
+                            balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
+                            decimals: asset.token_info.decimals,
+                            name: asset.content?.metadata?.name || 'Unknown Token',
+                            symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
+                            logoUri: asset.content?.links?.image,
+                            usdValue: 0,
+                            pricePerToken: 0,
+                        });
+                        allSplMints.add(asset.id);
+                    }
+                });
+                walletsData[ownerAddress] = walletTokens;
+            } else {
+                 console.error(`Failed to fetch assets for ${ownerAddress}:`, result.reason);
+                 walletsData[ownerAddress] = []; // Ensure the key exists even on failure
+            }
         });
 
-        // 3. Fetch all prices in a single batch from Jupiter
         if (allSplMints.size > 0) {
             try {
                 const mintsToFetch = Array.from(allSplMints).join(',');
@@ -117,7 +121,6 @@ export default async function handler(req: any, res: any) {
             }
         }
         
-        // 4. Sort tokens within each wallet by USD value
         for (const address in walletsData) {
             walletsData[address].sort((a, b) => b.usdValue - a.usdValue);
         }
