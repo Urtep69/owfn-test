@@ -49,18 +49,15 @@ export default async function handler(req: any, res: any) {
                     break;
                 }
                 
-                const relevantTxs = data.filter(tx => 
-                    // This is the production-ready date filter. It will automatically apply
-                    // once the presale start date is reached. It is correctly placed here to
-                    // stop pagination once we go too far back in time.
-                    tx.timestamp >= presaleStartTimestamp
-                );
-                
-                const validTxs = relevantTxs.filter(tx => findPresaleTransfer(tx) !== null);
+                // IMPORTANT: The date filter is intentionally removed to allow test transactions
+                // to be visible for progress/user contribution before the official start date in 2025.
+                // We will paginate until we have a reasonable amount for a demo or run out of data.
+                const validTxs = data.filter(tx => findPresaleTransfer(tx) !== null);
                 allValidTxs.push(...validTxs);
 
-                if (relevantTxs.length < data.length) {
-                    // We've hit transactions before the presale start, so we can stop.
+                // Stop paginating to avoid fetching the entire history of the wallet, which could be slow.
+                // This limit is sufficient for pre-launch demonstration purposes.
+                if (allValidTxs.length > 500 || data.length < 100) {
                     break;
                 }
                 
