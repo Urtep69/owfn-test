@@ -5,7 +5,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_API_KEY, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -42,9 +42,6 @@ const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
     'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
 };
 
-const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
-const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
-
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
@@ -61,14 +58,11 @@ export const useSolana = (): UseSolanaReturn => {
   }, [connected, setVisible]);
 
   const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
-    const cached = balanceCache.get(walletAddress);
-    if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
-        return cached.data;
-    }
-      
     setLoading(true);
     try {
-        const response = await fetch(HELIUS_RPC_URL, {
+        const url = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
+        
+        const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -163,9 +157,19 @@ export const useSolana = (): UseSolanaReturn => {
             }
         }
         
-        const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
-        balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
-        return sortedTokens;
+        // This logic incorrectly assigned a value to the OWFN token based on the presale rate,
+        // even without liquidity. It has been removed to avoid confusion. The token value will
+        // now correctly be $0 until it has a market price.
+        /*
+        const owfnToken = allTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS);
+        if (owfnToken && owfnToken.pricePerToken === 0 && solPrice > 0) {
+            const presaleRate = PRESALE_DETAILS.rate;
+            owfnToken.pricePerToken = solPrice / presaleRate;
+            owfnToken.usdValue = owfnToken.balance * owfnToken.pricePerToken;
+        }
+        */
+        
+        return allTokens.sort((a,b) => b.usdValue - a.usdValue);
 
     } catch (error) {
         console.error("Error fetching wallet balances:", error);
@@ -180,7 +184,6 @@ export const useSolana = (): UseSolanaReturn => {
       getWalletBalances(address).then(setUserTokens);
     } else {
       setUserTokens([]);
-      balanceCache.clear(); // Clear cache on disconnect
     }
   }, [connected, address, getWalletBalances]);
 
@@ -230,7 +233,6 @@ export const useSolana = (): UseSolanaReturn => {
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
-        balanceCache.delete(address!); // Invalidate cache after a transaction
         getWalletBalances(address!).then(setUserTokens);
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
