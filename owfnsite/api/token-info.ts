@@ -67,15 +67,26 @@ export default async function handler(req: any, res: any) {
         
         if (supplyRaw !== null && supplyRaw !== undefined) {
             try {
-                // Use BigInt for safe handling of large u64 numbers returned as strings/numbers
-                const supplyBigInt = BigInt(String(supplyRaw));
-                const divisor = 10n ** BigInt(decimals);
-                const totalSupplyWhole = supplyBigInt / divisor;
-                
-                // Note: This conversion can lose precision for extremely large supplies,
-                // but it prevents crashes and is suitable for display purposes.
-                totalSupply = Number(totalSupplyWhole);
+                // This robust calculation avoids crashes with extremely large numbers.
+                // 1. Create a BigInt from the raw supply string, defensively removing any decimals.
+                const supplyBigInt = BigInt(String(supplyRaw).split('.')[0]);
+                const decimalsBigInt = BigInt(decimals);
 
+                if (decimalsBigInt === 0n) {
+                    totalSupply = Number(supplyBigInt); // No division needed.
+                } else {
+                    // 2. Perform division using BigInt math to maintain precision.
+                    const divisor = 10n ** decimalsBigInt;
+                    const wholePart = supplyBigInt / divisor;
+                    const fractionalPart = supplyBigInt % divisor;
+                    
+                    // 3. Manually construct the final number as a string.
+                    const fractionalString = fractionalPart.toString().padStart(decimals, '0');
+                    const fullNumberString = `${wholePart}.${fractionalString}`;
+
+                    // 4. Use parseFloat, which safely handles large number strings.
+                    totalSupply = parseFloat(fullNumberString);
+                }
             } catch (e) {
                 console.error(`Could not parse or calculate supply for mint ${mintAddress}. Supply raw: "${supplyRaw}". Error: ${e instanceof Error ? e.message : String(e)}`);
                 totalSupply = 0; // Fallback on error
