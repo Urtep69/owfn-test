@@ -5,6 +5,7 @@ import { DISTRIBUTION_WALLETS, OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES } f
 import type { Wallet, Token } from '../types.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import { AlertTriangle } from 'lucide-react';
 
 type WalletData = {
     loading: boolean;
@@ -102,8 +103,18 @@ export default function Dashboard() {
         });
         return initialState;
     });
+    const [error, setError] = useState<string | null>(null);
 
     const fetchAllBalances = useCallback(async () => {
+        setError(null);
+        setWalletsData(prevState => {
+            const loadingState: Record<string, WalletData> = {};
+            wallets.forEach(w => {
+                loadingState[w.address] = { loading: true, tokens: [], totalValue: 0 };
+            });
+            return loadingState;
+        });
+
         try {
             const addresses = wallets.map(w => w.address);
             const response = await fetch('/api/batch-wallet-balances', {
@@ -113,14 +124,15 @@ export default function Dashboard() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch batch balances');
+                const errorData = await response.json().catch(() => ({error: `Server error: ${response.status}`}));
+                throw new Error(errorData.error || 'Failed to fetch batch balances');
             }
 
             const data: Record<string, any[]> = await response.json();
             
             const newState: Record<string, WalletData> = {};
-            for (const address in data) {
-                const rawTokens = data[address];
+            for (const address of addresses) {
+                const rawTokens = data[address] || [];
                 const tokens: Token[] = rawTokens.map((token: any) => ({
                     ...token,
                     logo: KNOWN_TOKEN_ICONS[token.mintAddress] || <GenericTokenIcon uri={token.logoUri} />,
@@ -129,11 +141,11 @@ export default function Dashboard() {
                 const totalValue = tokens.reduce((sum, token) => sum + token.usdValue, 0);
                 newState[address] = { loading: false, tokens, totalValue };
             }
-            setWalletsData(prevState => ({...prevState, ...newState}));
+            setWalletsData(newState);
 
-        } catch (error) {
-            console.error("Error fetching batch wallet balances:", error);
-            // Set all to non-loading with empty data on error
+        } catch (err) {
+            console.error("Error fetching batch wallet balances:", err);
+            setError(err instanceof Error ? err.message : 'An unknown error occurred while fetching wallet data.');
             setWalletsData(prevState => {
                 const errorState = { ...prevState };
                 wallets.forEach(w => {
@@ -142,7 +154,7 @@ export default function Dashboard() {
                 return errorState;
             });
         }
-    }, [wallets.map(w => w.address).join(',')]); // Dependency on joined addresses string
+    }, [wallets.map(w => w.address).join(',')]);
 
     useEffect(() => {
         fetchAllBalances();
@@ -156,6 +168,17 @@ export default function Dashboard() {
                     {t('wallet_monitor_desc')}
                 </p>
             </div>
+            {error && (
+                <div className="bg-red-500/10 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-r-lg" role="alert">
+                    <div className="flex items-center">
+                        <AlertTriangle className="h-6 w-6 mr-3"/>
+                        <div>
+                            <p className="font-bold">Failed to load dashboard data</p>
+                            <p className="text-sm">{error}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {wallets.map(wallet => (
                     <WalletCard 

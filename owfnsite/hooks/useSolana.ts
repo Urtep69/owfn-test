@@ -12,6 +12,7 @@ export interface UseSolanaReturn {
   address: string | null;
   userTokens: Token[];
   loading: boolean;
+  error: string | null;
   userStats: {
     totalDonated: number;
     projectsSupported: number;
@@ -47,6 +48,7 @@ export const useSolana = (): UseSolanaReturn => {
   const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
 
@@ -57,12 +59,13 @@ export const useSolana = (): UseSolanaReturn => {
     }
       
     setLoading(true);
+    setError(null); // Reset error on new fetch
     try {
         const response = await fetch(`/api/wallet-balances?walletAddress=${walletAddress}`);
         
         if (!response.ok) {
-            console.error('Wallet Balances API Error:', await response.text());
-            throw new Error('Failed to fetch assets from API');
+            const errorData = await response.json().catch(() => ({ error: `Server error: ${response.status}` }));
+            throw new Error(errorData.error || 'Failed to fetch assets from API');
         }
 
         const rawTokens = await response.json();
@@ -72,13 +75,14 @@ export const useSolana = (): UseSolanaReturn => {
             logo: KNOWN_TOKEN_ICONS[token.mintAddress] || React.createElement(GenericTokenIcon, { uri: token.logoUri }),
         }));
         
-        // Cache successful responses, even if empty, to prevent re-fetching for known empty wallets.
         balanceCache.set(walletAddress, { data: allTokens, timestamp: Date.now() });
         return allTokens;
 
-    } catch (error) {
+    } catch (err) {
+        const error = err as Error;
         console.error("Error fetching wallet balances:", error);
-        return [];
+        setError(error.message || "An unknown error occurred while fetching balances.");
+        return []; // Return empty array but error state is now set
     } finally {
         setLoading(false);
     }
@@ -86,10 +90,12 @@ export const useSolana = (): UseSolanaReturn => {
 
   useEffect(() => {
     if (connected && address) {
+      setError(null); // Clear previous errors
       getWalletBalances(address).then(setUserTokens);
     } else {
       setUserTokens([]);
-      balanceCache.clear(); // Clear cache on disconnect
+      setError(null); // Clear errors on disconnect
+      balanceCache.clear();
     }
   }, [connected, address, getWalletBalances]);
 
@@ -201,6 +207,7 @@ export const useSolana = (): UseSolanaReturn => {
     address,
     userTokens,
     loading,
+    error,
     connection,
     userStats: { 
         totalDonated: 0,

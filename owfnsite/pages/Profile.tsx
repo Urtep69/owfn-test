@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2, AlertTriangle } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { ImpactBadge, ImpactNFT } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
@@ -25,7 +25,7 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
 
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, loading, userStats } = solana;
+    const { connected, address, userTokens, loading, userStats, error } = solana;
 
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
@@ -82,6 +82,12 @@ export default function Profile() {
                     <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
                         <Loader2 className="w-6 h-6 animate-spin" />
                         <span>{t('profile_loading_tokens')}</span>
+                    </div>
+                ) : error ? (
+                    <div className="text-center py-8 text-red-600 dark:text-red-400">
+                        <AlertTriangle className="mx-auto w-10 h-10 mb-3" />
+                        <p className="font-bold">Could not load wallet data.</p>
+                        <p className="text-sm mt-1">{error}</p>
                     </div>
                 ) : userTokens.length > 0 ? (
                     <div className="space-y-2">
