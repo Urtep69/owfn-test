@@ -24,6 +24,8 @@ interface AppContextType {
   isMaintenanceActive: boolean;
   isWalletModalOpen: boolean;
   setWalletModalOpen: (isOpen: boolean) => void;
+  isWelcomeModalOpen: boolean;
+  setWelcomeModalOpen: (isOpen: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -33,6 +35,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
   const solana = useSolana();
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
+  const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
@@ -121,6 +124,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isMaintenanceActive,
     isWalletModalOpen,
     setWalletModalOpen,
+    isWelcomeModalOpen,
+    setWelcomeModalOpen,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

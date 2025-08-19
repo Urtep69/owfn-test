@@ -543,4 +543,13 @@ export const es = {
     contact_social_telegram_group_desc: `Únase a nuestro grupo comunitario para discutir y participar con otros miembros.`,
     contact_social_discord_title: `Servidor de Discord`,
     contact_social_discord_desc: `Forme parte de nuestra comunidad activa para discusiones y soporte.`,
+
+    // Welcome Modal
+    welcome_modal_title: 'Sé Parte del Cambio',
+    welcome_modal_subtitle: 'Construye el Futuro con Nosotros.',
+    welcome_modal_text: '¡Bienvenido a la Red Familiar Mundial! No estás solo en un sitio, sino al comienzo de un movimiento global. Cada acción aquí contribuye a un impacto real y transparente. Explora, conéctate y ayúdanos a construir un mundo mejor.',
+    welcome_modal_button_presale: 'Únete a la Preventa',
+    welcome_modal_button_whitepaper: 'Leer el Whitepaper',
+    welcome_modal_button_impact: 'Ver Nuestro Impacto',
+    welcome_modal_button_explore: 'Explorar el Sitio',
 };

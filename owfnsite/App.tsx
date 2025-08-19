@@ -9,6 +9,7 @@ import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
 import { WalletConnectModal } from './components/WalletConnectModal.tsx';
+import { WelcomeModal } from './components/WelcomeModal.tsx';
 
 import Home from './pages/Home.tsx';
 import Presale from './pages/Presale.tsx';
@@ -34,9 +35,20 @@ import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana, isWalletModalOpen, setWalletModalOpen } = useAppContext();
+  const { isMaintenanceActive, solana, isWalletModalOpen, setWalletModalOpen, isWelcomeModalOpen, setWelcomeModalOpen } = useAppContext();
   const { connected, address } = solana;
   const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
+
+  useEffect(() => {
+    // Show the welcome modal only once to new users.
+    const hasSeenWelcome = localStorage.getItem('owfn-welcome-seen');
+    if (!hasSeenWelcome) {
+      setTimeout(() => {
+        setWelcomeModalOpen(true);
+        localStorage.setItem('owfn-welcome-seen', 'true');
+      }, 1000); // Small delay to let the page settle
+    }
+  }, [setWelcomeModalOpen]);
 
   if (isMaintenanceActive && !isAdmin) {
     return <Maintenance />;
@@ -91,6 +103,7 @@ const AppContent = () => {
         </Switch>
       </Layout>
       <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setWalletModalOpen(false)} />
+      <WelcomeModal isOpen={isWelcomeModalOpen} onClose={() => setWelcomeModalOpen(false)} />
     </Router>
   );
 };

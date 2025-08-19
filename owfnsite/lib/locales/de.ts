@@ -543,4 +543,13 @@ export const de = {
     contact_social_telegram_group_desc: `Treten Sie unserer Community-Gruppe bei, um zu diskutieren und sich mit anderen Mitgliedern auszutauschen.`,
     contact_social_discord_title: `Discord-Server`,
     contact_social_discord_desc: `Werden Sie Teil unserer aktiven Community für Diskussionen und Unterstützung.`,
+
+    // Welcome Modal
+    welcome_modal_title: 'Sei Teil des Wandels',
+    welcome_modal_subtitle: 'Gestalte die Zukunft mit uns.',
+    welcome_modal_text: 'Willkommen im Weltfamilien-Netzwerk! Du bist nicht nur auf einer Website, sondern am Anfang einer globalen Bewegung. Jede Aktion hier trägt zu einem echten und transparenten Einfluss bei. Erkunde, verbinde dich und hilf uns, eine bessere Welt zu bauen.',
+    welcome_modal_button_presale: 'Am Vorverkauf teilnehmen',
+    welcome_modal_button_whitepaper: 'Whitepaper lesen',
+    welcome_modal_button_impact: 'Unsere Wirkung sehen',
+    welcome_modal_button_explore: 'Website erkunden',
 };
