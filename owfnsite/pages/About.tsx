@@ -1,10 +1,8 @@
 
-
 import React from 'react';
 import { Link } from 'wouter';
 import { HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { owfnImpactCollage } from '../lib/assets.ts';
 
 export default function About() {
     const { t } = useAppContext();
@@ -23,7 +21,7 @@ export default function About() {
                     <div className="absolute -inset-1 bg-gradient-to-r from-accent-400/80 to-accent-600/80 rounded-2xl blur-xl opacity-20 dark:opacity-40 group-hover:opacity-30 dark:group-hover:opacity-50 transition duration-500 animate-pulse-slow"></div>
                     <div className="relative bg-white dark:bg-darkPrimary-800 ring-1 ring-primary-900/5 dark:ring-white/10 rounded-2xl p-2 shadow-3d-lg">
                         <img 
-                            src={owfnImpactCollage} 
+                            src="/owfnimpact.png" 
                             alt={t('about_owfn_collage_alt')} 
                             className="w-full h-auto object-contain rounded-xl" 
                         />
