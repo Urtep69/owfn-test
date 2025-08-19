@@ -73,6 +73,7 @@ export const de = {
     about_impact_education_desc: `Bau und Modernisierung von Schulen und Kindergärten, um zukünftigen Generationen eine qualitativ hochwertige Bildung zu bieten.`,
     about_impact_needs_title: `Grundbedürfnisse`,
     about_impact_needs_desc: `Bereitstellung von Nahrung, Unterkunft und Kleidung für Obdachlose und Bau von würdigen Heimen für ältere Menschen.`,
+    about_owfn_collage_alt: `Eine Collage, die den Einfluss von OWFN darstellt: helfende Hände, Bildung und Gemeinschaftsaufbau.`,
     
     // Roadmap Page
     roadmap_title: `Roadmap zum globalen Einfluss`,

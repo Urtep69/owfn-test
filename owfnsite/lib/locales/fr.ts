@@ -73,6 +73,7 @@ export const fr = {
     about_impact_education_desc: `Construire et moderniser des écoles et des jardins d'enfants pour offrir une éducation de qualité aux générations futures.`,
     about_impact_needs_title: `Besoins de Base`,
     about_impact_needs_desc: `Fournir de la nourriture, un abri et des vêtements aux sans-abri, et construire des logements dignes pour les personnes âgées.`,
+    about_owfn_collage_alt: `Un collage représentant l'impact de l'OWFN : des mains secourables, l'éducation et la construction communautaire.`,
     
     // Roadmap Page
     roadmap_title: `Feuille de Route vers l'Impact Mondial`,

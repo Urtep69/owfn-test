@@ -73,6 +73,7 @@ export const ro = {
     about_impact_education_desc: `Construirea și modernizarea școlilor și grădinițelor pentru a oferi educație de calitate generațiilor viitoare.`,
     about_impact_needs_title: `Nevoi de Bază`,
     about_impact_needs_desc: `Furnizarea de hrană, adăpost și îmbrăcăminte pentru persoanele fără adăpost și construirea de locuințe demne pentru vârstnici.`,
+    about_owfn_collage_alt: `Un colaj ce reprezintă impactul OWFN: mâini de ajutor, educație și construcție comunitară.`,
     
     // Roadmap Page
     roadmap_title: `Foaie de Parcurs către Impact Global`,

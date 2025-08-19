@@ -73,6 +73,7 @@ export const en = {
     about_impact_education_desc: `Building and modernizing schools and kindergartens to provide quality education for future generations.`,
     about_impact_needs_title: `Basic Needs`,
     about_impact_needs_desc: `Providing food, shelter, and clothing for the homeless, and building dignified homes for the elderly.`,
+    about_owfn_collage_alt: `A collage representing OWFN's impact: helping hands, education, and community building.`,
     
     // Roadmap Page
     roadmap_title: `Roadmap to Global Impact`,
@@ -541,7 +542,6 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
-    contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
 
     // Welcome Modal

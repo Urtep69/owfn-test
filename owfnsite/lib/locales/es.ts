@@ -73,6 +73,7 @@ export const es = {
     about_impact_education_desc: `Construyendo y modernizando escuelas y jardines de infancia para proporcionar educación de calidad a las generaciones futuras.`,
     about_impact_needs_title: `Necesidades Básicas`,
     about_impact_needs_desc: `Proporcionando alimentos, refugio y ropa para personas sin hogar, y construyendo viviendas dignas para los ancianos.`,
+    about_owfn_collage_alt: `Un collage que representa el impacto de OWFN: manos que ayudan, educación y construcción de comunidad.`,
     
     // Roadmap Page
     roadmap_title: `Hoja de Ruta hacia el Impacto Global`,
