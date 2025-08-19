@@ -41,12 +41,16 @@ const AppContent = () => {
 
   useEffect(() => {
     // Show the welcome modal only once to new users.
-    const hasSeenWelcome = localStorage.getItem('owfn-welcome-seen');
-    if (!hasSeenWelcome) {
-      setTimeout(() => {
-        setWelcomeModalOpen(true);
-        localStorage.setItem('owfn-welcome-seen', 'true');
-      }, 1000); // Small delay to let the page settle
+    try {
+      const hasSeenWelcome = window.localStorage.getItem('owfn-welcome-seen');
+      if (!hasSeenWelcome) {
+        setTimeout(() => {
+          setWelcomeModalOpen(true);
+          window.localStorage.setItem('owfn-welcome-seen', 'true');
+        }, 1000); // Small delay to let the page settle
+      }
+    } catch (error) {
+        console.warn("Could not access localStorage to check for welcome modal.", error);
     }
   }, [setWelcomeModalOpen]);
 

@@ -469,7 +469,7 @@ export const en = {
     // Coming Soon
     coming_soon_title: `Coming Soon`,
     coming_soon_desc: `This feature is currently under development. We are working hard to bring it to you soon. Thank you for your patience and support.`,
-    
+
     // Admin Presale
     presale_admin_title: `Presale Admin`,
     presale_admin_subtitle: `Monitor transactions and manage the post-presale token airdrop.`,
