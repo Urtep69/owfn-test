@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -142,6 +141,12 @@ export const ro = {
     presale_you_contributed: `Ați contribuit deja cu: {amount} SOL.`,
     presale_you_can_buy: `Puteți contribui cu până la încă {amount} SOL.`,
     presale_bonus_offer: `BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!`,
+    presale_calculator_title: 'Calculator Interactiv',
+    presale_you_invest: 'Investești',
+    presale_you_will_receive: 'Vei primi',
+    presale_base_amount: 'Sumă de Bază',
+    presale_bonus_active: 'Bonus Activ!',
+    presale_total_received: 'Total de Primit',
 
     // Donations Page
     make_donation: `Fă o Donație`,

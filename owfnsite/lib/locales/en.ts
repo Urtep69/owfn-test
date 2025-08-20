@@ -142,6 +142,12 @@ export const en = {
     presale_you_contributed: `You have already contributed: {amount} SOL.`,
     presale_you_can_buy: `You can contribute up to {amount} more SOL.`,
     presale_bonus_offer: `{percentage}% BONUS on purchases of {threshold} SOL or more!`,
+    presale_calculator_title: 'Interactive Calculator',
+    presale_you_invest: 'You Invest',
+    presale_you_will_receive: 'You Will Receive',
+    presale_base_amount: 'Base Amount',
+    presale_bonus_active: 'Bonus Active!',
+    presale_total_received: 'Total To Receive',
 
     // Donations Page
     make_donation: `Make a Donation`,
@@ -279,7 +285,7 @@ export const en = {
     faq_a9: `Your involvement is crucial! Spreading the word about OWFN is incredibly powerful. Talk to your friends, family, and colleagues about our mission. Share our vision on social media, during your travels, or at work. Every conversation, every share, helps raise awareness and brings more people into our global family, amplifying our collective impact. Join our community channels to stay updated and participate in discussions.`,
     faq_q10: `Are there any special instructions for donating USDC or USDT?`,
     faq_a10: `Yes, this is critically important. All USDC and USDT donations must be sent *exclusively* from the Solana blockchain. Do not send from any other network (e.g., Ethereum), as the funds will be lost and will not reach their destination. This information is also clearly displayed on the donations page.`,
-    faq_q11: `What exactly happens after I buy tokens in the presale? Do I need to do anything?`,
+    faq_q11: 'What exactly happens after I buy tokens in the presale? Do I need to do anything?',
     faq_a11: 'No, after you have successfully completed the purchase of OWFN tokens during the presale, no further action is required from you. The tokens are automatically reserved for your wallet address. At the end of the presale period, all tokens will be automatically distributed (airdropped) to the buyers\' wallets.',
     faq_q12: 'When and where will I be able to trade (sell/buy) OWFN tokens after the presale?',
     faq_a12: 'According to our Roadmap, after the successful conclusion of the presale, we will proceed with the official listing of the $OWFN token on decentralized exchanges (DEXs) within the Solana ecosystem. The exact date and platforms will be announced on our official channels.',
