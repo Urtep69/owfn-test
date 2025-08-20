@@ -1,6 +1,6 @@
 {
-  "name": "TEST Copy of testare plati mobil - LIVE pe vercel -18-02025- (OWFN)",
-  "description": "Pentru testare tranzactii mobil, inca nu este implementat functionalitate 100% mobil tranzactii dar aceasta este aplicatia care este LIVE pe owfn.org. aceasta este pe LIVE Vercel dar acum fac test",
+  "name": "testare plati mobil - LIVE pe vercel -18-02025- (OWFN)",
+  "description": "Pentru testare tranzactii mobil, inca nu este implementat functionalitate 100% mobil tranzactii dar aceasta este aplicatia care este LIVE pe owfn.org",
   "requestFramePermissions": [],
   "prompt": ""
 }

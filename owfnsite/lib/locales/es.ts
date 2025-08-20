@@ -73,7 +73,6 @@ export const es = {
     about_impact_education_desc: `Construyendo y modernizando escuelas y jardines de infancia para proporcionar educación de calidad a las generaciones futuras.`,
     about_impact_needs_title: `Necesidades Básicas`,
     about_impact_needs_desc: `Proporcionando alimentos, refugio y ropa para personas sin hogar, y construyendo viviendas dignas para los ancianos.`,
-    about_owfn_collage_alt: `Un collage que representa el impacto de OWFN: manos que ayudan, educación y construcción de comunidad.`,
     
     // Roadmap Page
     roadmap_title: `Hoja de Ruta hacia el Impacto Global`,
@@ -544,13 +543,4 @@ export const es = {
     contact_social_telegram_group_desc: `Únase a nuestro grupo comunitario para discutir y participar con otros miembros.`,
     contact_social_discord_title: `Servidor de Discord`,
     contact_social_discord_desc: `Forme parte de nuestra comunidad activa para discusiones y soporte.`,
-
-    // Welcome Modal
-    welcome_modal_title: 'Sé Parte del Cambio',
-    welcome_modal_subtitle: 'Construye el Futuro con Nosotros.',
-    welcome_modal_text: '¡Bienvenido a la Red Familiar Mundial! No estás solo en un sitio, sino al comienzo de un movimiento global. Cada acción aquí contribuye a un impacto real y transparente. Explora, conéctate y ayúdanos a construir un mundo mejor.',
-    welcome_modal_button_presale: 'Únete a la Preventa',
-    welcome_modal_button_whitepaper: 'Leer el Whitepaper',
-    welcome_modal_button_impact: 'Ver Nuestro Impacto',
-    welcome_modal_button_explore: 'Explorar el Sitio',
 };

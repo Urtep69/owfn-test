@@ -73,7 +73,6 @@ export const en = {
     about_impact_education_desc: `Building and modernizing schools and kindergartens to provide quality education for future generations.`,
     about_impact_needs_title: `Basic Needs`,
     about_impact_needs_desc: `Providing food, shelter, and clothing for the homeless, and building dignified homes for the elderly.`,
-    about_owfn_collage_alt: `A collage representing OWFN's impact: helping hands, education, and community building.`,
     
     // Roadmap Page
     roadmap_title: `Roadmap to Global Impact`,
@@ -280,7 +279,7 @@ export const en = {
     faq_a9: `Your involvement is crucial! Spreading the word about OWFN is incredibly powerful. Talk to your friends, family, and colleagues about our mission. Share our vision on social media, during your travels, or at work. Every conversation, every share, helps raise awareness and brings more people into our global family, amplifying our collective impact. Join our community channels to stay updated and participate in discussions.`,
     faq_q10: `Are there any special instructions for donating USDC or USDT?`,
     faq_a10: `Yes, this is critically important. All USDC and USDT donations must be sent *exclusively* from the Solana blockchain. Do not send from any other network (e.g., Ethereum), as the funds will be lost and will not reach their destination. This information is also clearly displayed on the donations page.`,
-    faq_q11: 'What exactly happens after I buy tokens in the presale? Do I need to do anything?',
+    faq_q11: `What exactly happens after I buy tokens in the presale? Do I need to do anything?`,
     faq_a11: 'No, after you have successfully completed the purchase of OWFN tokens during the presale, no further action is required from you. The tokens are automatically reserved for your wallet address. At the end of the presale period, all tokens will be automatically distributed (airdropped) to the buyers\' wallets.',
     faq_q12: 'When and where will I be able to trade (sell/buy) OWFN tokens after the presale?',
     faq_a12: 'According to our Roadmap, after the successful conclusion of the presale, we will proceed with the official listing of the $OWFN token on decentralized exchanges (DEXs) within the Solana ecosystem. The exact date and platforms will be announced on our official channels.',
@@ -470,7 +469,7 @@ export const en = {
     // Coming Soon
     coming_soon_title: `Coming Soon`,
     coming_soon_desc: `This feature is currently under development. We are working hard to bring it to you soon. Thank you for your patience and support.`,
-
+    
     // Admin Presale
     presale_admin_title: `Presale Admin`,
     presale_admin_subtitle: `Monitor transactions and manage the post-presale token airdrop.`,
@@ -542,14 +541,6 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
+    contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
-
-    // Welcome Modal
-    welcome_modal_title: 'Be Part of the Change',
-    welcome_modal_subtitle: 'Build the Future with Us.',
-    welcome_modal_text: 'Welcome to the World Family Network! You are not just on a site, but at the beginning of a global movement. Every action here contributes to a real and transparent impact. Explore, connect, and help us build a better world.',
-    welcome_modal_button_presale: 'Join the Presale',
-    welcome_modal_button_whitepaper: 'Read the Whitepaper',
-    welcome_modal_button_impact: 'See Our Impact',
-    welcome_modal_button_explore: 'Explore the Site',
 };

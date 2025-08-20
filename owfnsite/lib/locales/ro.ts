@@ -73,7 +73,6 @@ export const ro = {
     about_impact_education_desc: `Construirea și modernizarea școlilor și grădinițelor pentru a oferi educație de calitate generațiilor viitoare.`,
     about_impact_needs_title: `Nevoi de Bază`,
     about_impact_needs_desc: `Furnizarea de hrană, adăpost și îmbrăcăminte pentru persoanele fără adăpost și construirea de locuințe demne pentru vârstnici.`,
-    about_owfn_collage_alt: `Un colaj ce reprezintă impactul OWFN: mâini de ajutor, educație și construcție comunitară.`,
     
     // Roadmap Page
     roadmap_title: `Foaie de Parcurs către Impact Global`,
@@ -544,13 +543,4 @@ export const ro = {
     contact_social_telegram_group_desc: `Alăturați-vă grupului nostru comunitar pentru a discuta și interacționa cu alți membri.`,
     contact_social_discord_title: `Server Discord`,
     contact_social_discord_desc: `Deveniți parte a comunității noastre active pentru discuții și suport.`,
-
-    // Welcome Modal
-    welcome_modal_title: 'Fii Parte din Schimbare',
-    welcome_modal_subtitle: 'Construiește Viitorul cu Noi.',
-    welcome_modal_text: 'Bun venit în Rețeaua Familială Mondială! Nu ești doar pe un site, ci la începutul unei mișcări globale. Fiecare acțiune aici contribuie la un impact real și transparent. Explorează, conectează-te și ajută-ne să construim o lume mai bună.',
-    welcome_modal_button_presale: 'Participă la Prevânzare',
-    welcome_modal_button_whitepaper: 'Citește Whitepaper',
-    welcome_modal_button_impact: 'Vezi Impactul Nostru',
-    welcome_modal_button_explore: 'Explorează Site-ul',
 };

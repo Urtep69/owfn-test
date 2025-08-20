@@ -90,7 +90,6 @@
             animation: {
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
               'slide-in': 'slideIn 0.5s ease-out forwards',
-              'pulse-slow': 'pulseSlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               fadeInUp: {
@@ -100,10 +99,6 @@
               slideIn: {
                 '0%': { transform: 'translateX(100%)' },
                 '100%': { transform: 'translateX(0)' },
-              },
-              pulseSlow: {
-                '0%, 100%': { opacity: '0.2' },
-                '50%': { opacity: '0.4' },
               },
             },
           },
