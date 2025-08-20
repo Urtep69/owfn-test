@@ -201,6 +201,7 @@ export const en = {
     badge_diverse_donor: `Diverse Donor`,
     badge_diverse_donor_desc: `Awarded for donating to projects in 3 different categories.`,
     asset: `Asset`,
+    balance: `Balance`,
     value_usd: `Value (USD)`,
 
     // Impact Portal
@@ -385,7 +386,7 @@ export const en = {
     my_staked_balance: `My Staked Balance`,
     stake: `Stake`,
     unstake: `Unstake`,
-    balance: `Balance`,
+    
     stake_owfn: `Stake OWFN`,
     unstake_owfn: `Unstake OWFN`,
     my_rewards: `My Rewards`,
@@ -547,6 +548,5 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
-    contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
 };

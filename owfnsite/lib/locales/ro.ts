@@ -200,6 +200,7 @@ export const ro = {
     badge_diverse_donor: `Donator Divers`,
     badge_diverse_donor_desc: `Acordat pentru donații la proiecte din 3 categorii diferite.`,
     asset: `Activ`,
+    balance: `Sold`,
     value_usd: `Valoare (USD)`,
 
     // Impact Portal
@@ -384,7 +385,7 @@ export const ro = {
     my_staked_balance: `Soldul Meu Depus`,
     stake: `Depune`,
     unstake: `Retrage`,
-    balance: `Sold`,
+    
     stake_owfn: `Depune OWFN`,
     unstake_owfn: `Retrage OWFN`,
     my_rewards: `Recompensele Mele`,
