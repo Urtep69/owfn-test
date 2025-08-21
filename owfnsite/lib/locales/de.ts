@@ -110,7 +110,6 @@ export const de = {
     presale_sold_progress: `Verkauft {progress}%`,
     presale_buy_info: `Kaufen (Min: {min} SOL, Max: {max} SOL)`,
     buy: `Kaufen`,
-    owfn_base_amount: `OWFN-Grundbetrag`,
     presale_buying_owfn: `Kaufe {amount} $OWFN`,
     presale_estimate_tooltip: `Dies ist eine Schätzung. Der endgültige Betrag kann abweichen.`,
     presale_whitelist_finished: `Whitelist-Verkauf beendet:`,
