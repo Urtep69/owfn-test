@@ -38,11 +38,11 @@ export interface UseSolanaReturn {
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
 
-const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
-    [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon, null),
-    'So11111111111111111111111111111111111111112': React.createElement(SolIcon, null),
-    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon, null),
-    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
+const KNOWN_TOKEN_COMPONENTS: { [mint: string]: React.FC<{ className?: string }> } = {
+    [OWFN_MINT_ADDRESS]: OwfnIcon,
+    'So11111111111111111111111111111111111111112': SolIcon,
+    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': UsdcIcon,
+    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': UsdtIcon,
 };
 
 const assetCache = new Map<string, { data: { tokens: Token[], nfts: UserNFT[] }, timestamp: number }>();
@@ -107,7 +107,7 @@ export const useSolana = (): UseSolanaReturn => {
                 mintAddress: 'So11111111111111111111111111111111111111112',
                 balance: balance,
                 decimals: 9, name: 'Solana', symbol: 'SOL',
-                logo: React.createElement(SolIcon, null),
+                logo: React.createElement(SolIcon),
                 pricePerToken: pricePerSol,
                 usdValue: result.nativeBalance.total_price || (balance * pricePerSol),
             });
@@ -131,15 +131,18 @@ export const useSolana = (): UseSolanaReturn => {
             }
         });
         
-        const initialSplTokens = fungibleAssets.map((asset: any): Token => ({
-            mintAddress: asset.id,
-            balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
-            decimals: asset.token_info.decimals,
-            name: asset.content?.metadata?.name || 'Unknown Token',
-            symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
-            logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
-            usdValue: 0, pricePerToken: 0,
-        }));
+        const initialSplTokens = fungibleAssets.map((asset: any): Token => {
+            const IconComponent = KNOWN_TOKEN_COMPONENTS[asset.id];
+            return {
+                mintAddress: asset.id,
+                balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
+                decimals: asset.token_info.decimals,
+                name: asset.content?.metadata?.name || 'Unknown Token',
+                symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
+                logo: IconComponent ? React.createElement(IconComponent) : React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
+                usdValue: 0, pricePerToken: 0,
+            };
+        });
         allTokens.push(...initialSplTokens);
 
         if (splMintsToPrice.length > 0) {
