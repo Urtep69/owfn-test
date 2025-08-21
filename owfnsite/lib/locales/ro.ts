@@ -110,6 +110,7 @@ export const ro = {
     presale_sold_progress: `Vândut {progress}%`,
     presale_buy_info: `Cumpără (Min: {min} SOL, Max: {max} SOL)`,
     buy: `Cumpără`,
+    owfn_base_amount: `Sumă de Bază OWFN`,
     presale_buying_owfn: `Cumperi {amount} $OWFN`,
     presale_estimate_tooltip: `Aceasta este o estimare. Suma finală poate varia.`,
     presale_whitelist_finished: `Vânzarea Whitelist s-a Încheiat:`,

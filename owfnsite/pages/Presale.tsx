@@ -429,10 +429,10 @@ export default function Presale() {
     }
   };
 
-  const { owfnAmount, bonusApplied } = useMemo(() => {
+  const calculation = useMemo(() => {
     const numAmount = parseFloat(solAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
-        return { owfnAmount: 0, bonusApplied: false };
+        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
     }
 
     try {
@@ -440,7 +440,6 @@ export default function Presale() {
         const owfnDecimals = BigInt(TOKEN_DETAILS.decimals);
         const owfnDecimalsMultiplier = 10n ** owfnDecimals;
 
-        // Convert SOL string to lamports BigInt to avoid floating point issues
         const parts = solAmount.split('.');
         const integerPart = BigInt(parts[0] || '0');
         const fractionalPart = (parts[1] || '').slice(0, 9).padEnd(9, '0');
@@ -449,22 +448,28 @@ export default function Presale() {
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
         const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * LAMPORTS_PER_SOL_BIGINT;
         
-        let totalOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
-
+        const baseOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
+        let bonusOwfnSmallestUnit = 0n;
         let isBonus = false;
+
         if (lamports >= bonusThresholdLamports) {
-            const bonusAmount = (totalOwfnSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
-            totalOwfnSmallestUnit += bonusAmount;
+            bonusOwfnSmallestUnit = (baseOwfnSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
             isBonus = true;
         }
 
-        const finalOwfnAmount = Number(totalOwfnSmallestUnit) / Number(owfnDecimalsMultiplier);
-        
-        return { owfnAmount: finalOwfnAmount, bonusApplied: isBonus };
+        const totalOwfnSmallestUnit = baseOwfnSmallestUnit + bonusOwfnSmallestUnit;
 
+        const toDisplayAmount = (amountInSmallestUnit: bigint) => Number(amountInSmallestUnit) / Number(owfnDecimalsMultiplier);
+        
+        return {
+            base: toDisplayAmount(baseOwfnSmallestUnit),
+            bonus: toDisplayAmount(bonusOwfnSmallestUnit),
+            total: toDisplayAmount(totalOwfnSmallestUnit),
+            bonusApplied: isBonus,
+        };
     } catch (e) {
         console.error("Error calculating OWFN amount:", e);
-        return { owfnAmount: 0, bonusApplied: false };
+        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
     }
   }, [solAmount]);
 
@@ -488,7 +493,7 @@ export default function Presale() {
         if (result.success && result.signature) {
             alert(t('presale_purchase_success_alert', { 
                 amount: numSolAmount.toFixed(2), 
-                owfnAmount: owfnAmount.toLocaleString() 
+                owfnAmount: calculation.total.toLocaleString() 
             }));
             const newTx: PresaleTransaction = {
                 id: result.signature,
@@ -647,18 +652,13 @@ export default function Presale() {
 
                 {/* Right Column: Buy & Feed */}
                 <div className="lg:col-span-2 space-y-6 flex flex-col">
-                     {/* Buy Section */}
-                    <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6">
-                        <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center mb-4">
-                            <p className="font-bold text-accent-700 dark:text-darkAccent-200 flex items-center justify-center gap-2">
-                                <Gift size={18} /> {t('presale_bonus_offer', { threshold: PRESALE_DETAILS.bonusThreshold, percentage: PRESALE_DETAILS.bonusPercentage })}
-                            </p>
-                        </div>
-                        <p className="text-sm text-primary-700 dark:text-darkPrimary-300 mb-2 text-center">
+                    {/* Buy Section */}
+                    <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6 space-y-4">
+                        <p className="text-sm text-primary-700 dark:text-darkPrimary-300 text-center">
                             {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
                         {solana.connected && (
-                            <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 mb-3 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
+                            <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
                                 {isCheckingContribution ? (
                                     <div className="flex items-center justify-center gap-2">
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -673,35 +673,62 @@ export default function Presale() {
                                 )}
                             </div>
                         )}
-                        <div className="flex gap-2">
-                            <div className="flex-grow relative">
-                                <input 
-                                    id="buy-amount"
-                                    type="number"
-                                    value={solAmount}
-                                    onChange={handleAmountChange}
-                                    onBlur={handleBlur}
-                                    className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
-                                    placeholder="0.00"
-                                    disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
-                                />
+                        
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                                <SolIcon className="w-6 h-6" />
                             </div>
-                            <button 
-                                onClick={handleBuy}
-                                className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                                disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
-                            >
-                                {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
-                            </button>
+                            <input
+                                id="buy-amount"
+                                type="number"
+                                value={solAmount}
+                                onChange={handleAmountChange}
+                                onBlur={handleBlur}
+                                className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 text-right focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
+                                placeholder="0.00"
+                                disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
+                            />
                         </div>
-                        {error && <p className="text-red-500 dark:text-red-400 text-sm mt-2 text-center">{error}</p>}
-                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400 mt-2 text-center flex items-center justify-center">
-                            {t('presale_buying_owfn', { amount: isNaN(owfnAmount) ? '0.00' : owfnAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) })}
-                            {bonusApplied && <span className="ml-1.5 text-xs font-bold text-green-500 dark:text-green-400">(+10% Bonus!)</span>}
-                            <span className="ml-1.5 cursor-pointer" title={t('presale_estimate_tooltip')}>
-                                <Info size={14} />
-                            </span>
-                        </p>
+
+                        {error && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
+                        
+                        <div className="bg-primary-100 dark:bg-darkPrimary-800/50 p-4 rounded-lg space-y-3">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-primary-600 dark:text-darkPrimary-400">{t('owfn_base_amount')}</span>
+                                <span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                            </div>
+                            
+                            {calculation.bonusApplied && (
+                                <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
+                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> Bonus ({PRESALE_DETAILS.bonusPercentage}%)</span>
+                                    <span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                                </div>
+                            )}
+
+                            <div className="border-t border-primary-200/80 dark:border-darkPrimary-700/80 my-2"></div>
+                            
+                            <div className="flex justify-between items-center text-lg">
+                                <span className="font-bold text-primary-800 dark:text-darkPrimary-200">{t('you_receive')}</span>
+                                <div className="flex items-center gap-2">
+                                    <OwfnIcon className="w-6 h-6"/>
+                                    <span className="font-mono font-bold text-2xl text-accent-600 dark:text-darkAccent-400">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={handleBuy}
+                            className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                            disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
+                        >
+                            {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
+                        </button>
+
+                         <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center">
+                            <p className="font-bold text-accent-700 dark:text-darkAccent-200 flex items-center justify-center gap-2">
+                                <Gift size={18} /> {t('presale_bonus_offer', { threshold: PRESALE_DETAILS.bonusThreshold, percentage: PRESALE_DETAILS.bonusPercentage })}
+                            </p>
+                        </div>
                     </div>
                     {/* Live Feed */}
                     <div className="flex-grow">
