@@ -117,11 +117,11 @@ export const useSolana = (): UseSolanaReturn => {
         const fungibleAssets: any[] = [];
 
         result.items.forEach((asset: any) => {
-            if ((asset.interface === 'FungibleAsset' || asset.interface === 'FungibleToken') && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
+            if (asset.fungible && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
                 fungibleAssets.push(asset);
                 splMintsToPrice.push(asset.id);
-            } else if (asset.interface === 'V1_NFT' && !asset.compression?.compressed) {
-                allNfts.push({
+            } else if (!asset.fungible && !asset.compression?.compressed) {
+                 allNfts.push({
                     id: asset.id,
                     name: asset.content?.metadata?.name || 'Unknown NFT',
                     imageUrl: asset.content?.links?.image,
