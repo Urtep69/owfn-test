@@ -52,7 +52,7 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, signMessage, disconnect } = useWallet();
+  const { publicKey, connected, signMessage, disconnect, signTransaction } = useWallet();
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userTokens, setUserTokens] = useState<Token[]>([]);
@@ -282,9 +282,10 @@ export const useSolana = (): UseSolanaReturn => {
  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
     if (!connected || !publicKey || !isAuthenticated) return { success: false, messageKey: 'connect_wallet_first' };
     
-    // The wallet adapter doesn't export the signTransaction type properly, so we have to cast it.
-    const walletSignTransaction = (useWallet() as any).signTransaction;
-    if (!walletSignTransaction) return { success: false, messageKey: 'transaction_failed_alert' };
+    if (!signTransaction) {
+        console.error("Wallet does not support signing transactions.");
+        return { success: false, messageKey: 'transaction_failed_alert' };
+    }
 
     setLoading(true);
     try {
@@ -311,7 +312,7 @@ export const useSolana = (): UseSolanaReturn => {
         const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
         const messageV0 = new TransactionMessage({ payerKey: publicKey, recentBlockhash: blockhash, instructions }).compileToV0Message();
         const transaction = new VersionedTransaction(messageV0);
-        const signedTransaction = await walletSignTransaction(transaction);
+        const signedTransaction = await signTransaction(transaction);
         const signature = await connection.sendTransaction(signedTransaction, { skipPreflight: false });
         await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature }, 'finalized');
 
@@ -329,7 +330,7 @@ export const useSolana = (): UseSolanaReturn => {
             });
         }
     }
-  }, [connected, publicKey, connection, isAuthenticated, userTokens, address, getWalletAssets]);
+  }, [connected, publicKey, connection, isAuthenticated, userTokens, address, getWalletAssets, signTransaction]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
