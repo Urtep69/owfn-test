@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 
 const calculateTimeLeft = (endDate: Date) => {
@@ -24,9 +25,9 @@ interface CountdownTimerProps {
 }
 
 const TimeUnit = ({ value, label }: { value: number; label: string }) => (
-    <div className="flex flex-col items-center justify-center bg-primary-200/50 dark:bg-darkPrimary-700/50 rounded-lg p-4 w-24 h-24 shadow-inner-3d">
-        <span className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{String(value).padStart(2, '0')}</span>
-        <span className="text-sm uppercase text-primary-500 dark:text-darkPrimary-400">{label}</span>
+    <div className="flex flex-col items-center justify-center bg-primary-100 dark:bg-darkPrimary-800 rounded-lg p-4 w-24 h-24 border-2 border-primary-900 dark:border-primary-200">
+        <span className="text-4xl font-bold text-accent-600 dark:text-darkAccent-500">{String(value).padStart(2, '0')}</span>
+        <span className="text-sm uppercase text-primary-600 dark:text-primary-400">{label}</span>
     </div>
 );
 

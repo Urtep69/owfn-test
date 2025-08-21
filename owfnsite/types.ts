@@ -4,7 +4,7 @@ export interface Token {
   name: string;
   symbol: string;
   mintAddress: string;
-  logo: string | React.ComponentType<{ className?: string }>;
+  logo: string | React.ReactNode;
   balance: number;
   usdValue: number;
   decimals: number;
@@ -147,19 +147,4 @@ export interface PresaleTransaction {
   solAmount: number;
   owfnAmount: number;
   time: Date;
-}
-
-export interface UserNFT {
-  id: string; // mint address
-  name: string;
-  imageUrl?: string;
-  collectionName?: string;
-  description?: string;
-}
-
-export interface ParsedTransaction {
-  signature: string;
-  timestamp: number;
-  description: string;
-  type: string;
 }

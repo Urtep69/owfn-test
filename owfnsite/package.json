@@ -5,7 +5,7 @@
   "type": "module",
   "description": "A global network united by the vision to build a better world through technology and humanity.",
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && cp index.html dist/ && copyfiles -u 1 \"public/**/*\" dist && esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.ts=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"' --external:tweetnacl"
+    "build": "rm -rf dist && mkdir -p dist && cp index.html dist/ && copyfiles -u 1 \"public/**/*\" dist && esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.ts=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"'"
   },
   "author": "OWFN",
   "license": "UNLICENSED",
@@ -22,7 +22,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.12.7",
-    "wouter": "^3.3.0"
+    "wouter": "^3.2.0"
   },
   "devDependencies": {
     "esbuild": "^0.23.0",
