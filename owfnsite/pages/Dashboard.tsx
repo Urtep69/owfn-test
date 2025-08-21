@@ -3,7 +3,7 @@ import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import type { Wallet, Token } from '../types.ts';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
+import { TokenIcon } from '../components/TokenIcon.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 
 const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'> }) => {
@@ -58,7 +58,7 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                                 <a className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors cursor-pointer">
                                     {/* Asset Info */}
                                     <div className="flex items-center space-x-3">
-                                        <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">{token.logo}</div>
+                                        <TokenIcon token={token} className="w-8 h-8 flex-shrink-0" />
                                         <div>
                                             <p className="font-semibold">{token.symbol}</p>
                                             <p className="text-xs text-primary-500 dark:text-darkPrimary-500">

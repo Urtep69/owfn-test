@@ -4,7 +4,7 @@ export interface Token {
   name: string;
   symbol: string;
   mintAddress: string;
-  logo: string | React.ReactNode;
+  logo: string | React.ComponentType<{ className?: string }>;
   balance: number;
   usdValue: number;
   decimals: number;

@@ -3,9 +3,10 @@ import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, DollarSign, HandHeart, Vote, Gem, Loader2, Image as ImageIcon, History, Layers, ShieldCheck } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { ImpactBadge, UserNFT, ParsedTransaction } from '../types.ts';
+import type { ImpactBadge, UserNFT, ParsedTransaction, Token } from '../types.ts';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
+import { TokenIcon } from '../components/TokenIcon.tsx';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -200,7 +201,13 @@ export default function Profile() {
                                                 {userTokens.map(token => (
                                                     <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
                                                         <a className="grid grid-cols-2 gap-4 items-center p-2 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50">
-                                                            <div className="flex items-center space-x-3"><div className="w-8 h-8">{token.logo}</div><div><p className="font-bold">{token.symbol}</p><p className="text-xs text-primary-500">@ ${token.pricePerToken.toPrecision(3)}</p></div></div>
+                                                            <div className="flex items-center space-x-3">
+                                                                <TokenIcon token={token} className="w-8 h-8" />
+                                                                <div>
+                                                                    <p className="font-bold">{token.symbol}</p>
+                                                                    <p className="text-xs text-primary-500">@ ${token.pricePerToken.toPrecision(3)}</p>
+                                                                </div>
+                                                            </div>
                                                             <div className="text-right"><p className="font-mono font-semibold">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p><p className="text-xs text-primary-500">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p></div>
                                                         </a>
                                                     </Link>

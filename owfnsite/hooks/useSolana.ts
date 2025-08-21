@@ -107,7 +107,7 @@ export const useSolana = (): UseSolanaReturn => {
                 mintAddress: 'So11111111111111111111111111111111111111112',
                 balance: balance,
                 decimals: 9, name: 'Solana', symbol: 'SOL',
-                logo: React.createElement(SolIcon),
+                logo: SolIcon,
                 pricePerToken: pricePerSol,
                 usdValue: result.nativeBalance.total_price || (balance * pricePerSol),
             });
@@ -139,7 +139,7 @@ export const useSolana = (): UseSolanaReturn => {
                 decimals: asset.token_info.decimals,
                 name: asset.content?.metadata?.name || 'Unknown Token',
                 symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
-                logo: IconComponent ? React.createElement(IconComponent) : React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
+                logo: IconComponent || asset.content?.links?.image,
                 usdValue: 0, pricePerToken: 0,
             };
         });
