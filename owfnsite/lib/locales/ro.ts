@@ -1,3 +1,4 @@
+
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -109,6 +110,7 @@ export const ro = {
     presale_sold_progress: `Vândut {progress}%`,
     presale_buy_info: `Cumpără (Min: {min} SOL, Max: {max} SOL)`,
     buy: `Cumpără`,
+    owfn_base_amount: `Sumă de Bază OWFN`,
     presale_buying_owfn: `Cumperi {amount} $OWFN`,
     presale_estimate_tooltip: `Aceasta este o estimare. Suma finală poate varia.`,
     presale_whitelist_finished: `Vânzarea Whitelist s-a Încheiat:`,
@@ -141,12 +143,6 @@ export const ro = {
     presale_you_contributed: `Ați contribuit deja cu: {amount} SOL.`,
     presale_you_can_buy: `Puteți contribui cu până la încă {amount} SOL.`,
     presale_bonus_offer: `BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!`,
-    presale_calculator_title: 'Calculator Interactiv',
-    presale_you_invest: 'Investești',
-    presale_you_will_receive: 'Vei primi',
-    presale_base_amount: 'Sumă de Bază',
-    presale_bonus_active: 'Bonus Activ!',
-    presale_total_received: 'Total de Primit',
 
     // Donations Page
     make_donation: `Fă o Donație`,
@@ -200,7 +196,6 @@ export const ro = {
     badge_diverse_donor: `Donator Divers`,
     badge_diverse_donor_desc: `Acordat pentru donații la proiecte din 3 categorii diferite.`,
     asset: `Activ`,
-    balance: `Sold`,
     value_usd: `Valoare (USD)`,
 
     // Impact Portal
@@ -385,7 +380,7 @@ export const ro = {
     my_staked_balance: `Soldul Meu Depus`,
     stake: `Depune`,
     unstake: `Retrage`,
-    
+    balance: `Sold`,
     stake_owfn: `Depune OWFN`,
     unstake_owfn: `Retrage OWFN`,
     my_rewards: `Recompensele Mele`,

@@ -110,6 +110,7 @@ export const en = {
     presale_sold_progress: `Sold {progress}%`,
     presale_buy_info: `Buy (Min: {min} SOL, Max: {max} SOL)`,
     buy: `Buy`,
+    owfn_base_amount: `OWFN Base Amount`,
     presale_buying_owfn: `You're buying {amount} $OWFN`,
     presale_estimate_tooltip: `This is an estimate. Final amount may vary.`,
     presale_whitelist_finished: `Whitelist Sale Finished:`,
@@ -142,12 +143,6 @@ export const en = {
     presale_you_contributed: `You have already contributed: {amount} SOL.`,
     presale_you_can_buy: `You can contribute up to {amount} more SOL.`,
     presale_bonus_offer: `{percentage}% BONUS on purchases of {threshold} SOL or more!`,
-    presale_calculator_title: 'Interactive Calculator',
-    presale_you_invest: 'You Invest',
-    presale_you_will_receive: 'You Will Receive',
-    presale_base_amount: 'Base Amount',
-    presale_bonus_active: 'Bonus Active!',
-    presale_total_received: 'Total To Receive',
 
     // Donations Page
     make_donation: `Make a Donation`,
@@ -201,7 +196,6 @@ export const en = {
     badge_diverse_donor: `Diverse Donor`,
     badge_diverse_donor_desc: `Awarded for donating to projects in 3 different categories.`,
     asset: `Asset`,
-    balance: `Balance`,
     value_usd: `Value (USD)`,
 
     // Impact Portal
@@ -386,7 +380,7 @@ export const en = {
     my_staked_balance: `My Staked Balance`,
     stake: `Stake`,
     unstake: `Unstake`,
-    
+    balance: `Balance`,
     stake_owfn: `Stake OWFN`,
     unstake_owfn: `Unstake OWFN`,
     my_rewards: `My Rewards`,
@@ -548,5 +542,6 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
+    contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
 };
