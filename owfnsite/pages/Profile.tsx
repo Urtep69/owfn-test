@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Wallet, DollarSign, HandHeart, Vote, Gem, Loader2, Image as ImageIcon, History, Layers } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Gem, Loader2, Image as ImageIcon, History, Layers, ShieldCheck } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { ImpactBadge, UserNFT, ParsedTransaction } from '../types.ts';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
@@ -89,8 +89,9 @@ const TransactionRow = ({ tx }: { tx: ParsedTransaction }) => {
 
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, userNfts, userTransactions, solDomain, loading, loadingAdditionalData, userStats } = solana;
+    const { connected, isAuthenticated, address, userTokens, userNfts, userTransactions, solDomain, loading, loadingAdditionalData, userStats, signIn } = solana;
     const [activeTab, setActiveTab] = useState<'portfolio' | 'nfts' | 'history'>('portfolio');
+    const [isSigningIn, setIsSigningIn] = useState(false);
 
     const totalUsdValue = useMemo(() => userTokens.reduce((sum, token) => sum + token.usdValue, 0), [userTokens]);
 
@@ -103,6 +104,12 @@ export default function Profile() {
                 color: PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]
             }));
     }, [userTokens]);
+
+    const handleSignIn = async () => {
+        setIsSigningIn(true);
+        await signIn();
+        setIsSigningIn(false);
+    }
 
     if (!connected) {
         return (
@@ -119,6 +126,24 @@ export default function Profile() {
                 </button>
             </div>
         );
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
+                <ShieldCheck className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
+                <h1 className="text-2xl font-bold mb-2">Verify Wallet Ownership</h1>
+                <p className="text-primary-600 dark:text-darkPrimary-400 mb-6 max-w-md mx-auto">To access your profile, please sign a message to prove you own this wallet. This is a free and safe action that will not trigger a transaction or cost any gas fees.</p>
+                <button
+                    onClick={handleSignIn}
+                    disabled={isSigningIn}
+                    className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50 flex items-center justify-center mx-auto"
+                >
+                    {isSigningIn && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
+                    {isSigningIn ? 'Waiting for signature...' : 'Verify with Signature'}
+                </button>
+            </div>
+        )
     }
     
     return (

@@ -2,19 +2,21 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
+import nacl from 'tweetnacl';
 import type { Token, UserNFT, ParsedTransaction } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, HELIUS_API_KEY } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 export interface UseSolanaReturn {
   connected: boolean;
+  isAuthenticated: boolean;
   address: string | null;
   userTokens: Token[];
   userNfts: UserNFT[];
   userTransactions: ParsedTransaction[];
   solDomain: string | null;
-  loading: boolean; // For initial token/NFT load
-  loadingAdditionalData: boolean; // For transactions/domain
+  loading: boolean;
+  loadingAdditionalData: boolean;
   userStats: {
     totalDonated: number;
     projectsSupported: number;
@@ -25,7 +27,8 @@ export interface UseSolanaReturn {
   stakedBalance: number;
   earnedRewards: number;
   connection: Connection;
-  disconnectWallet: () => Promise<void>;
+  signIn: () => Promise<boolean>;
+  signOut: () => Promise<void>;
   getWalletAssets: (walletAddress: string) => Promise<{ tokens: Token[], nfts: UserNFT[] }>;
   sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
   stakeTokens: (amount: number) => Promise<any>;
@@ -49,8 +52,9 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
+  const { publicKey, connected, signMessage, disconnect } = useWallet();
   
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [userNfts, setUserNfts] = useState<UserNFT[]>([]);
   const [userTransactions, setUserTransactions] = useState<ParsedTransaction[]>([]);
@@ -83,7 +87,7 @@ export const useSolana = (): UseSolanaReturn => {
                     displayOptions: {
                         showFungible: true,
                         showNativeBalance: true,
-                        showNonFungible: true, // Fetch NFTs as well
+                        showNonFungible: true,
                     },
                 },
             }),
@@ -96,7 +100,6 @@ export const useSolana = (): UseSolanaReturn => {
         const allTokens: Token[] = [];
         const allNfts: UserNFT[] = [];
 
-        // Process native SOL balance
         if (result.nativeBalance?.lamports > 0) {
             const pricePerSol = result.nativeBalance.price_per_sol || 0;
             const balance = result.nativeBalance.lamports / LAMPORTS_PER_SOL;
@@ -114,7 +117,7 @@ export const useSolana = (): UseSolanaReturn => {
         const fungibleAssets: any[] = [];
 
         result.items.forEach((asset: any) => {
-            if (asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
+            if ((asset.interface === 'FungibleAsset' || asset.interface === 'FungibleToken') && asset.token_info?.balance > 0 && !asset.compression?.compressed) {
                 fungibleAssets.push(asset);
                 splMintsToPrice.push(asset.id);
             } else if (asset.interface === 'V1_NFT' && !asset.compression?.compressed) {
@@ -139,7 +142,6 @@ export const useSolana = (): UseSolanaReturn => {
         }));
         allTokens.push(...initialSplTokens);
 
-        // Fetch prices for all SPL tokens in one call
         if (splMintsToPrice.length > 0) {
             try {
                 const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${splMintsToPrice.join(',')}`);
@@ -171,6 +173,39 @@ export const useSolana = (): UseSolanaReturn => {
         setLoading(false);
     }
   }, [connection]);
+
+  const signIn = useCallback(async (): Promise<boolean> => {
+    if (!publicKey || !signMessage) {
+        console.error("Wallet not connected or signMessage not available");
+        return false;
+    }
+    try {
+        const message = new TextEncoder().encode("Sign this message to authenticate with OWFN.\nThis is a free action and will not trigger a transaction.");
+        const signature = await signMessage(message);
+        const verified = nacl.sign.detached.verify(message, signature, publicKey.toBuffer());
+        
+        if (verified) {
+            setIsAuthenticated(true);
+            return true;
+        } else {
+            console.error("Signature verification failed.");
+            setIsAuthenticated(false);
+            return false;
+        }
+    } catch (error) {
+        console.error("Sign in error:", error);
+        setIsAuthenticated(false);
+        return false;
+    }
+  }, [publicKey, signMessage]);
+
+  const signOut = useCallback(async () => {
+    setIsAuthenticated(false);
+    assetCache.clear();
+    transactionCache.clear();
+    domainCache.clear();
+    await disconnect();
+  }, [disconnect]);
 
   const fetchUserTransactions = useCallback(async (walletAddress: string): Promise<ParsedTransaction[]> => {
     const cached = transactionCache.get(walletAddress);
@@ -216,7 +251,7 @@ export const useSolana = (): UseSolanaReturn => {
   }, []);
 
   useEffect(() => {
-    if (connected && address) {
+    if (connected && address && isAuthenticated) {
         setLoading(true);
         setLoadingAdditionalData(true);
 
@@ -234,18 +269,23 @@ export const useSolana = (): UseSolanaReturn => {
         }).finally(() => setLoadingAdditionalData(false));
 
     } else {
+      if (!connected) {
+          setIsAuthenticated(false);
+      }
       setUserTokens([]);
       setUserNfts([]);
       setUserTransactions([]);
       setSolDomain(null);
-      assetCache.clear();
-      transactionCache.clear();
-      domainCache.clear();
     }
-  }, [connected, address, getWalletAssets, fetchUserTransactions, fetchSolDomain]);
+  }, [connected, address, isAuthenticated, getWalletAssets, fetchUserTransactions, fetchSolDomain]);
 
  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
-    if (!connected || !publicKey || !signTransaction) return { success: false, messageKey: 'connect_wallet_first' };
+    if (!connected || !publicKey || !isAuthenticated) return { success: false, messageKey: 'connect_wallet_first' };
+    
+    // The wallet adapter doesn't export the signTransaction type properly, so we have to cast it.
+    const walletSignTransaction = (useWallet() as any).signTransaction;
+    if (!walletSignTransaction) return { success: false, messageKey: 'transaction_failed_alert' };
+
     setLoading(true);
     try {
         const toPublicKey = new PublicKey(to);
@@ -271,7 +311,7 @@ export const useSolana = (): UseSolanaReturn => {
         const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
         const messageV0 = new TransactionMessage({ payerKey: publicKey, recentBlockhash: blockhash, instructions }).compileToV0Message();
         const transaction = new VersionedTransaction(messageV0);
-        const signedTransaction = await signTransaction(transaction);
+        const signedTransaction = await walletSignTransaction(transaction);
         const signature = await connection.sendTransaction(signedTransaction, { skipPreflight: false });
         await connection.confirmTransaction({ blockhash, lastValidBlockHeight, signature }, 'finalized');
 
@@ -282,14 +322,14 @@ export const useSolana = (): UseSolanaReturn => {
         return { success: false, messageKey: 'transaction_failed_alert' };
     } finally {
         setLoading(false);
-        if (connected && address) {
+        if (connected && address && isAuthenticated) {
             getWalletAssets(address).then(({ tokens, nfts }) => {
                 setUserTokens(tokens);
                 setUserNfts(nfts);
             });
         }
     }
-  }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletAssets]);
+  }, [connected, publicKey, connection, isAuthenticated, userTokens, address, getWalletAssets]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
@@ -299,6 +339,7 @@ export const useSolana = (): UseSolanaReturn => {
 
   return {
     connected,
+    isAuthenticated,
     address,
     userTokens,
     userNfts,
@@ -310,8 +351,9 @@ export const useSolana = (): UseSolanaReturn => {
     userStats: { totalDonated: 0, projectsSupported: 0, votesCast: 0, donations: [], votedProposalIds: [] },
     stakedBalance: 0,
     earnedRewards: 0,
-    disconnectWallet: disconnect,
-    getWalletAssets: getWalletAssets,
+    signIn,
+    signOut,
+    getWalletAssets,
     sendTransaction,
     stakeTokens: notImplemented,
     unstakeTokens: notImplemented,

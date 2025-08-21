@@ -11,8 +11,8 @@ interface HeaderProps {
 }
 
 const ConnectButton = () => {
-    const { t, setWalletModalOpen } = useAppContext();
-    const { connected, publicKey, disconnect } = useWallet();
+    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { connected, publicKey } = useWallet();
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
 
@@ -28,7 +28,7 @@ const ConnectButton = () => {
                     <span className="font-semibold text-sm font-mono">{truncateAddress(publicKey.toBase58())}</span>
                 </button>
                  <button
-                    onClick={() => disconnect()}
+                    onClick={() => solana.signOut()}
                     className="p-2 text-primary-600 dark:text-darkPrimary-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-r-lg transition-colors"
                     aria-label={t('disconnect_wallet')}
                 >

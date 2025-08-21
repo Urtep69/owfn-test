@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
-import { useSolana } from '../hooks/useSolana.ts';
+import { useSolana, UseSolanaReturn } from '../hooks/useSolana.ts';
 import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
@@ -13,7 +13,7 @@ interface AppContextType {
   setLang: (langCode: string) => void;
   currentLanguage: Language;
   supportedLanguages: Language[];
-  solana: ReturnType<typeof useSolana>;
+  solana: UseSolanaReturn;
   socialCases: SocialCase[];
   addSocialCase: (newCase: SocialCase) => void;
   vestingSchedules: VestingSchedule[];
