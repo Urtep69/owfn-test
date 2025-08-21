@@ -675,20 +675,24 @@ export default function Presale() {
                         )}
                         
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                               <SolIcon className="w-6 h-6" />
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                                <SolIcon className="w-6 h-6" />
                             </div>
-                            <input 
+                            <input
                                 id="buy-amount"
                                 type="number"
                                 value={solAmount}
                                 onChange={handleAmountChange}
                                 onBlur={handleBlur}
-                                className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 pl-11 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
+                                className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-16 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
                                 placeholder="0.00"
                                 disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
                             />
-                            <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-lg font-semibold text-primary-500 dark:text-darkPrimary-400">SOL</span>
+                            <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none">
+                                <div className="h-full flex items-center bg-primary-200 dark:bg-darkPrimary-700/50 border-l border-primary-300 dark:border-darkPrimary-600 px-4 rounded-r-lg">
+                                    <span className="font-semibold text-lg text-primary-700 dark:text-darkPrimary-300">SOL</span>
+                                </div>
+                            </div>
                         </div>
 
                         {error && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
@@ -696,13 +700,13 @@ export default function Presale() {
                         <div className="bg-primary-100 dark:bg-darkPrimary-800/50 p-4 rounded-lg space-y-3">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-primary-600 dark:text-darkPrimary-400">{t('owfn_base_amount')}</span>
-                                <span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                                <span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
                             </div>
                             
                             {calculation.bonusApplied && (
                                 <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
                                     <span className="font-bold flex items-center gap-2"><Gift size={16}/> Bonus ({PRESALE_DETAILS.bonusPercentage}%)</span>
-                                    <span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                                    <span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
                                 </div>
                             )}
 
@@ -712,7 +716,7 @@ export default function Presale() {
                                 <span className="font-bold text-primary-800 dark:text-darkPrimary-200">{t('you_receive')}</span>
                                 <div className="flex items-center gap-2">
                                     <OwfnIcon className="w-6 h-6"/>
-                                    <span className="font-mono font-bold text-2xl text-accent-600 dark:text-darkAccent-400">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                                    <span className="font-mono font-bold text-2xl text-accent-600 dark:text-darkAccent-400">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
                                 </div>
                             </div>
                         </div>
