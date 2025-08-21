@@ -148,3 +148,18 @@ export interface PresaleTransaction {
   owfnAmount: number;
   time: Date;
 }
+
+export interface UserNFT {
+  id: string; // mint address
+  name: string;
+  imageUrl?: string;
+  collectionName?: string;
+  description?: string;
+}
+
+export interface ParsedTransaction {
+  signature: string;
+  timestamp: number;
+  description: string;
+  type: string;
+}
