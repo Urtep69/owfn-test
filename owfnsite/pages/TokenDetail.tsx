@@ -35,15 +35,15 @@ const formatTimeAgo = (timestamp?: number): string => {
 };
 
 const StatCard = ({ title, value, change, icon }: { title: string, value: string, change?: number, icon: React.ReactNode }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
+    <div className="bg-surface-1 p-4 rounded-xl border border-border-color">
         <div className="flex items-center space-x-3">
-            <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">{icon}</div>
+            <div className="bg-surface-2 text-accent rounded-lg p-3">{icon}</div>
             <div>
-                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+                <p className="text-sm text-text-secondary">{title}</p>
                 <div className="flex items-baseline gap-2">
-                    <p className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">{value}</p>
+                    <p className="text-2xl font-bold text-text-primary">{value}</p>
                     {change !== undefined && (
-                        <p className={`text-sm font-bold ${change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        <p className={`text-sm font-bold ${change >= 0 ? 'text-success' : 'text-danger'}`}>
                             {change >= 0 ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
                         </p>
                     )}
@@ -54,21 +54,21 @@ const StatCard = ({ title, value, change, icon }: { title: string, value: string
 );
 
 const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-primary-800 dark:text-darkPrimary-200">{icon}{title}</h3>
+    <div className="glassmorphism p-6 rounded-lg">
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-text-primary">{icon}{title}</h3>
         <div className="space-y-3">{children}</div>
     </div>
 );
 
 const InfoRow = ({ label, children }: { label: string, children: React.ReactNode }) => (
-    <div className="flex justify-between items-center py-2 border-b border-primary-200/50 dark:border-darkPrimary-700/50 last:border-b-0">
-        <span className="text-sm text-primary-600 dark:text-darkPrimary-400">{label}</span>
-        <div className="text-sm font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
+    <div className="flex justify-between items-center py-2 border-b border-border-color/50 last:border-b-0">
+        <span className="text-sm text-text-secondary">{label}</span>
+        <div className="text-sm font-semibold text-text-primary text-right break-all">{children}</div>
     </div>
 );
 
 const LinkButton = ({ href, icon, text }: { href: string, icon: React.ReactNode, text: string }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="flex-grow flex items-center justify-center gap-2 bg-primary-100 dark:bg-darkPrimary-700 hover:bg-primary-200 dark:hover:bg-darkPrimary-600 text-primary-700 dark:text-darkPrimary-200 font-semibold py-2 px-3 rounded-md transition-colors">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="flex-grow flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-3 text-text-primary font-semibold py-2 px-3 rounded-md transition-colors border border-border-color">
         {icon}{text}
     </a>
 );
@@ -92,7 +92,7 @@ export default function TokenDetail() {
     
     const AuthorityRow = ({ label, address }: { label: string, address?: string | null }) => (
         <InfoRow label={label}>
-            {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold">{t('revoked')}</span>}
+            {address ? <AddressDisplay address={address} /> : <span className="text-success font-bold">{t('revoked')}</span>}
         </InfoRow>
     );
 
@@ -133,15 +133,15 @@ export default function TokenDetail() {
     };
 
     if (loading) {
-        return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>;
+        return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-accent"/></div>;
     }
 
     if (error || !token) {
         return (
             <div className="text-center py-10">
                 <h2 className="text-2xl font-bold">{t('token_not_found')}</h2>
-                {error && <p className="text-red-400 mt-2">{error}</p>}
-                <Link to={fromPath} className="text-accent-500 hover:underline mt-4 inline-flex items-center gap-2">
+                {error && <p className="text-danger mt-2">{error}</p>}
+                <Link to={fromPath} className="text-accent hover:underline mt-4 inline-flex items-center gap-2">
                     <ArrowLeft size={16} /> {backLinkText}
                 </Link>
             </div>
@@ -152,7 +152,7 @@ export default function TokenDetail() {
 
     return (
         <div className="space-y-8 animate-fade-in-up">
-            <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
+            <Link to={fromPath} className="inline-flex items-center gap-2 text-accent hover:underline">
                 <ArrowLeft size={16} /> {backLinkText}
             </Link>
 
@@ -160,10 +160,10 @@ export default function TokenDetail() {
                 <GenericTokenIcon uri={token.logo as string} className="w-16 h-16 flex-shrink-0" />
                 <div className="flex-grow">
                     <h1 className="text-3xl font-bold">{token.name}</h1>
-                    <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
+                    <p className="text-text-secondary font-semibold text-lg">${token.symbol}</p>
                 </div>
                 {isMarketDataAvailable && token.mintAddress && (
-                    <a href={`https://jup.ag/swap/SOL-${token.mintAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors flex items-center gap-2">
+                    <a href={`https://jup.ag/swap/SOL-${token.mintAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2">
                         {t('swap')} <ExternalLink size={16} />
                     </a>
                 )}
@@ -198,8 +198,8 @@ export default function TokenDetail() {
                             </InfoCard>
                         </>
                     ) : (
-                        <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner-3d">
-                            <p className="text-primary-600 dark:text-darkPrimary-400">Live market data is not available for this token. It may not be listed on a decentralized exchange yet.</p>
+                        <div className="text-center p-12 glassmorphism rounded-lg">
+                            <p className="text-text-secondary">Live market data is not available for this token. It may not be listed on a decentralized exchange yet.</p>
                         </div>
                     )}
                 </div>
@@ -207,7 +207,7 @@ export default function TokenDetail() {
                 <div className="lg:col-span-1 space-y-8">
                     {token.description && (
                         <InfoCard title={t('token_description_title')} icon={<FileText />}>
-                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{token.description}</p>
+                            <p className="text-sm text-text-secondary leading-relaxed">{token.description}</p>
                         </InfoCard>
                     )}
                     
