@@ -155,3 +155,14 @@ export interface PresaleTransaction {
   owfnAmount: number;
   time: Date;
 }
+
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            'spline-viewer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+                url: string;
+                'events-target'?: string;
+            };
+        }
+    }
+}

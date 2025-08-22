@@ -3,8 +3,8 @@ import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import type { Wallet, Token } from '../types.ts';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import { Loader2 } from 'lucide-react';
 
 const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'> }) => {
     const { t, solana } = useAppContext();
@@ -14,14 +14,22 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
 
     useEffect(() => {
         const fetchBalances = async () => {
+            if (!solana.fetchWalletAssets) return;
             setLoading(true);
-            const { tokens } = await solana.fetchWalletAssets(walletInfo.address);
-            setBalances(tokens);
-            setTotalValue(tokens.reduce((sum, token) => sum + token.usdValue, 0));
-            setLoading(false);
+            try {
+                const { tokens } = await solana.fetchWalletAssets(walletInfo.address);
+                setBalances(tokens);
+                setTotalValue(tokens.reduce((sum, token) => sum + token.usdValue, 0));
+            } catch (error) {
+                console.error(`Failed to fetch assets for ${walletInfo.name}:`, error);
+                setBalances([]);
+                setTotalValue(0);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchBalances();
-    }, [walletInfo.address, solana.fetchWalletAssets]);
+    }, [walletInfo.address, solana.fetchWalletAssets, walletInfo.name]);
 
     return (
         <div className="glassmorphism p-6 rounded-lg">
@@ -30,18 +38,12 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                 <AddressDisplay address={walletInfo.address} />
             </div>
             {loading ? (
-                <div className="space-y-3 animate-pulse">
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div className="h-12 bg-surface-2 rounded"></div>
-                        <div className="h-12 bg-surface-2 rounded"></div>
-                    </div>
-                    <div className="h-8 bg-surface-2 rounded w-full"></div>
-                    <div className="h-8 bg-surface-2 rounded w-full"></div>
-                    <div className="h-8 bg-surface-2 rounded w-full"></div>
+                 <div className="flex justify-center items-center h-48">
+                    <Loader2 className="w-8 h-8 animate-spin text-accent-light" />
                 </div>
             ) : (
                 <>
-                    <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-surface-2 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-surface-dark rounded-lg">
                         <div>
                             <p className="text-sm text-text-secondary">{t('token_types')}</p>
                             <p className="text-2xl font-bold">{balances.length}</p>
@@ -55,7 +57,7 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                     <div className="space-y-1 max-h-60 overflow-y-auto pr-2">
                         {balances.length > 0 ? balances.map(token => (
                              <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/dashboard`}>
-                                <a className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md hover:bg-surface-2 transition-colors cursor-pointer">
+                                <a className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md hover:bg-surface-light transition-colors cursor-pointer">
                                     {/* Asset Info */}
                                     <div className="flex items-center space-x-3">
                                         <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">{token.logo}</div>
@@ -99,7 +101,7 @@ export default function Dashboard() {
     return (
         <div className="animate-fade-in-up space-y-8">
             <div className="text-center">
-                <h1 className="text-4xl font-display font-bold text-accent">{t('wallet_monitor')}</h1>
+                <h1 className="text-4xl font-display font-bold text-accent-light">{t('wallet_monitor')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-text-secondary">
                     {t('wallet_monitor_desc')}
                 </p>

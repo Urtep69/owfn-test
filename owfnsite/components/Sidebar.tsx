@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
@@ -19,8 +20,8 @@ const NavItem = ({ to, icon, label, isOpen, onClick }: { to: string, icon: React
     const [isActive] = useRoute(to);
     const navLinkClasses = `flex items-center py-3 px-4 my-1 rounded-lg transition-colors duration-200 ${
         isActive 
-            ? 'bg-accent/10 text-accent font-semibold' 
-            : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
+            ? 'bg-accent-light/10 text-accent-light font-semibold' 
+            : 'text-text-secondary hover:bg-surface-light hover:text-text-primary'
         }`;
 
     return (

@@ -15,7 +15,7 @@ const socialLinks = [
 export const Footer = () => {
   const { t } = useAppContext();
   return (
-    <footer className="bg-surface-1 shadow-inner border-t border-border-color">
+    <footer className="bg-surface-dark shadow-inner border-t border-border-color">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex justify-between items-center">
           <p className="text-sm text-text-secondary">
@@ -28,7 +28,7 @@ export const Footer = () => {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-secondary hover:text-accent transition-colors"
+                className="text-text-secondary hover:text-accent-light transition-colors"
               >
                 <span className="sr-only">{link.name}</span>
                 {link.icon}

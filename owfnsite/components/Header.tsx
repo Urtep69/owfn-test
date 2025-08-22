@@ -17,7 +17,7 @@ const ConnectButton = () => {
 
     if (isAuthenticated && address) {
         return (
-             <div className="flex items-center space-x-2 bg-surface-2 rounded-lg">
+             <div className="flex items-center space-x-2 bg-surface-light rounded-lg">
                 <div
                     className="flex items-center space-x-2 pl-3 pr-2 py-2 text-text-primary"
                 >
@@ -26,7 +26,7 @@ const ConnectButton = () => {
                 </div>
                  <button
                     onClick={() => disconnectWallet()}
-                    className="p-2 text-text-secondary hover:text-danger hover:bg-surface-3 rounded-r-lg transition-colors"
+                    className="p-2 text-text-secondary hover:text-danger hover:bg-surface-dark rounded-r-lg transition-colors"
                     aria-label={t('disconnect_wallet')}
                 >
                     <LogOut size={18} />
@@ -51,7 +51,7 @@ const ConnectButton = () => {
     return (
         <button
             onClick={() => setWalletModalOpen(true)}
-            className="bg-accent text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors"
+            className="bg-accent-light text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors"
         >
             {t('connect_wallet')}
         </button>
@@ -61,13 +61,13 @@ const ConnectButton = () => {
 
 export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
   return (
-    <header className="glassmorphism sticky top-0 z-40 shadow-sm">
+    <header className="glassmorphism sticky top-0 z-40">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
              <button
               onClick={toggleSidebar}
-              className="p-2 rounded-md text-text-secondary hover:bg-surface-2 focus:outline-none"
+              className="p-2 rounded-md text-text-secondary hover:bg-surface-light focus:outline-none"
               aria-label="Toggle sidebar"
             >
               {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
