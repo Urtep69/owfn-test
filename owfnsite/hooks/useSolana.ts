@@ -269,26 +269,29 @@ export const useSolana = (): UseSolanaReturn => {
         
         await signMessage(message);
         setIsAuthenticated(true);
-        if(publicKey) {
-            fetchWalletDetails(publicKey.toBase58());
-        }
     } catch (error) {
-        console.error("Sign in failed:", error);
-        await disconnect();
+        console.warn("User declined signature or an error occurred:", error);
         setIsAuthenticated(false);
     } finally {
         setIsAuthenticating(false);
     }
-}, [publicKey, walletConnected, signMessage, fetchWalletDetails, disconnect]);
+}, [publicKey, walletConnected, signMessage]);
 
+  // Effect to fetch public wallet data when the address is available
+  useEffect(() => {
+    if (address) {
+        fetchWalletDetails(address);
+    }
+  }, [address, fetchWalletDetails]);
 
+  // Effect to handle the authentication (sign-in) flow
   useEffect(() => {
     if (walletConnected && !isAuthenticated && !isAuthenticating) {
         signIn();
     }
     
     if (!walletConnected) {
-        // Reset state on disconnect
+        // Reset all state on disconnect
         setIsAuthenticated(false);
         setIsAuthenticating(false);
         setUserTokens([]);

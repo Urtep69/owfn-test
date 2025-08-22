@@ -23,7 +23,7 @@ const ConnectButton = () => {
         );
     }
     
-    if (solana.connected && solana.address) {
+    if (solana.address) {
         return (
              <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
                 <button

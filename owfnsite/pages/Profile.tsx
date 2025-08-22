@@ -77,7 +77,7 @@ export default function Profile() {
         );
     }
 
-    if (!connected) {
+    if (!address) {
         return (
             <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
                 <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
