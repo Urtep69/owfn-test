@@ -24,7 +24,7 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
     }, [walletInfo.address, solana.getWalletBalances]);
 
     return (
-        <div className="bg-primary-50 dark:bg-darkPrimary-800 p-6 rounded-lg shadow-neo-brutal dark:shadow-dark-neo-brutal border-2 border-primary-900 dark:border-primary-100">
+        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
             <h3 className="text-xl font-bold mb-1">{walletInfo.name}</h3>
             <div className="mb-4">
                 <AddressDisplay address={walletInfo.address} />
@@ -41,13 +41,13 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                 </div>
             ) : (
                 <>
-                    <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-primary-100 dark:bg-darkPrimary-900 rounded-lg border-2 border-primary-900 dark:border-primary-200">
+                    <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
                         <div>
-                            <p className="text-sm text-primary-600 dark:text-primary-400">{t('token_types')}</p>
+                            <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('token_types')}</p>
                             <p className="text-2xl font-bold">{balances.length}</p>
                         </div>
                         <div className="text-right">
-                             <p className="text-sm text-primary-600 dark:text-primary-400">{t('total_value')}</p>
+                             <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('total_value')}</p>
                             <p className="text-2xl font-bold text-green-600 dark:text-green-400">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                         </div>
                     </div>
@@ -55,13 +55,13 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                     <div className="space-y-1 max-h-60 overflow-y-auto pr-2">
                         {balances.length > 0 ? balances.map(token => (
                              <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/dashboard`}>
-                                <a className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors cursor-pointer">
+                                <a className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors cursor-pointer">
                                     {/* Asset Info */}
                                     <div className="flex items-center space-x-3">
                                         <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">{token.logo}</div>
                                         <div>
                                             <p className="font-semibold">{token.symbol}</p>
-                                            <p className="text-xs text-primary-500">
+                                            <p className="text-xs text-primary-500 dark:text-darkPrimary-500">
                                                 @ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}
                                             </p>
                                         </div>
@@ -69,12 +69,12 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                                     {/* Balance & Value */}
                                     <div className="text-right">
                                         <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p>
-                                        <p className="text-xs text-primary-500">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                        <p className="text-xs text-primary-500 dark:text-darkPrimary-400">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                     </div>
                                 </a>
                             </Link>
                         )) : (
-                             <div className="text-center py-8 text-primary-500 dark:text-primary-400">
+                             <div className="text-center py-8 text-primary-500 dark:text-darkPrimary-400">
                                 <p>{t('profile_no_tokens')}</p>
                             </div>
                         )}
@@ -99,8 +99,8 @@ export default function Dashboard() {
     return (
         <div className="animate-fade-in-up space-y-8">
             <div className="text-center">
-                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-500">{t('wallet_monitor')}</h1>
-                <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-primary-400">
+                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('wallet_monitor')}</h1>
+                <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">
                     {t('wallet_monitor_desc')}
                 </p>
             </div>

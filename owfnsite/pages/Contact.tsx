@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Link } from 'wouter';
@@ -7,7 +8,7 @@ import { DiscordIcon } from '../components/IconComponents.tsx';
 import { PROJECT_LINKS, ADMIN_WALLET_ADDRESS } from '../constants.ts';
 
 const ContactCard = ({ icon, title, email, description }: { icon: React.ReactNode, title: string, email: string, description: string }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform">
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform golden-border">
         <div className="flex items-center space-x-4 mb-4">
             <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-primary-100 dark:bg-darkPrimary-700 rounded-full text-accent-500 dark:text-darkAccent-400">
                 {icon}
@@ -26,7 +27,7 @@ const SocialLinkCard = ({ icon, title, description, href }: { icon: React.ReactN
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="block bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform text-center"
+        className="block bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform text-center golden-border"
     >
         <div className="flex items-center justify-center w-16 h-16 mb-4 bg-primary-100 dark:bg-darkPrimary-700 rounded-full text-accent-500 dark:text-darkAccent-400 mx-auto">
             {icon}
@@ -131,7 +132,7 @@ export default function Contact() {
             </section>
 
             {isAdmin && (
-                <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d-lg">
+                <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d-lg golden-border">
                     <h2 className="text-3xl font-bold text-center mb-8">{t('contact_form_title')}</h2>
                     {status === 'success' ? (
                         <div className="text-center p-8 bg-green-500/10 dark:bg-green-500/20 rounded-lg animate-fade-in-up">
@@ -164,7 +165,7 @@ export default function Contact() {
                                 <p className="text-red-500 text-sm text-center">{t('contact_error_message')}</p>
                             )}
                             <div>
-                                <button type="submit" disabled={status === 'loading'} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-accent-950 bg-accent-400 hover:bg-accent-500 dark:text-darkPrimary-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <button type="submit" disabled={status === 'loading'} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-accent-950 bg-accent-400 hover:bg-accent-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 disabled:opacity-50 disabled:cursor-not-allowed btn-golden">
                                     {status === 'loading' ? <><Loader2 className="animate-spin mr-2" /> {t('contact_sending')}</> : t('contact_send_message')}
                                 </button>
                             </div>
@@ -191,7 +192,7 @@ export default function Contact() {
                         <p className="text-primary-700 dark:text-darkPrimary-300 mt-1">{t('contact_faq_desc')}</p>
                      </div>
                 </div>
-                <Link to="/faq" className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-full text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-transform transform hover:scale-105 shadow-lg flex-shrink-0">
+                <Link to="/faq" className="bg-accent-400 text-accent-950 font-bold py-3 px-8 rounded-full text-lg hover:bg-accent-500 transition-transform transform hover:scale-105 shadow-lg flex-shrink-0 btn-golden">
                     {t('contact_faq_button')}
                 </Link>
             </section>
