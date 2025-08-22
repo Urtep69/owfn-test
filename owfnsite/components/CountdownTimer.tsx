@@ -24,8 +24,8 @@ interface CountdownTimerProps {
 }
 
 const TimeUnit = ({ value, label }: { value: number; label: string }) => (
-    <div className="flex flex-col items-center justify-center bg-surface-2 rounded-lg p-4 w-24 h-24 shadow-card">
-        <span className="text-4xl font-bold text-accent">{String(value).padStart(2, '0')}</span>
+    <div className="flex flex-col items-center justify-center bg-surface-light rounded-lg p-4 w-24 h-24 shadow-lg">
+        <span className="text-4xl font-bold text-accent-light">{String(value).padStart(2, '0')}</span>
         <span className="text-sm uppercase text-text-secondary">{label}</span>
     </div>
 );

@@ -20,21 +20,32 @@ export const DualProgressBar: React.FC<DualProgressBarProps> = ({
   formatter = (value) => value.toLocaleString(),
 }) => {
   const total = value1 + value2;
-  const percentage1 = total > 0 ? (value1 / total) * 100 : 50;
+  const percent1 = total > 0 ? (value1 / total) * 100 : 0;
+  const percent2 = total > 0 ? 100 - percent1 : 0;
+
+  if (total === 0) {
+      return (
+        <div>
+          <div className="flex justify-between mb-1 text-sm font-medium text-text-secondary">
+            <span>{label1}: {formatter(value1)} (0%)</span>
+            <span>{label2}: {formatter(value2)} (0%)</span>
+          </div>
+          <div className="w-full bg-surface-light rounded-full h-4 flex overflow-hidden border border-border-color">
+            <div className="bg-surface-dark h-full" style={{ width: '100%' }}></div>
+          </div>
+        </div>
+      );
+  }
 
   return (
-    <div className="w-full my-2">
-      <div className="flex justify-between items-center mb-1 text-sm font-bold text-text-primary">
-        <span className="text-success">{label1}</span>
-        <span className="text-danger">{label2}</span>
+    <div>
+      <div className="flex justify-between mb-1 text-sm font-medium">
+        <span className="font-bold text-success">{label1}: {formatter(value1)} ({percent1.toFixed(1)}%)</span>
+        <span className="font-bold text-danger">{label2}: {formatter(value2)} ({percent2.toFixed(1)}%)</span>
       </div>
-      <div className="flex w-full h-2.5 rounded-full overflow-hidden bg-surface-2">
-        <div className={color1} style={{ width: `${percentage1}%` }}></div>
-        <div className={color2} style={{ width: `${100 - percentage1}%` }}></div>
-      </div>
-      <div className="flex justify-between items-center mt-1 text-base font-semibold text-text-primary font-mono">
-        <span>{formatter(value1)}</span>
-        <span>{formatter(value2)}</span>
+      <div className="w-full bg-surface-light rounded-full h-4 flex overflow-hidden border border-border-color">
+        <div className={`${color1} h-full transition-all duration-500`} style={{ width: `${percent1}%` }}></div>
+        <div className={`${color2} h-full transition-all duration-500`} style={{ width: `${percent2}%` }}></div>
       </div>
     </div>
   );

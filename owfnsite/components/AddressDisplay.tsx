@@ -38,10 +38,10 @@ export const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, type = 
   return (
     <div className={`flex items-center space-x-2 text-sm text-text-secondary ${className}`}>
       <span className="font-mono">{truncateAddress(address)}</span>
-      <button onClick={copyToClipboard} className="hover:text-text-primary transition-colors" aria-label="Copy address">
+      <button onClick={copyToClipboard} className="hover:text-accent-light transition-colors" aria-label="Copy address">
         {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
       </button>
-      <a href={solscanUrl} target="_blank" rel="noopener noreferrer" className="hover:text-text-primary transition-colors" aria-label="View on Solscan">
+      <a href={solscanUrl} target="_blank" rel="noopener noreferrer" className="hover:text-accent-light transition-colors" aria-label="View on Solscan">
         <ExternalLink className="w-4 h-4" />
       </a>
     </div>

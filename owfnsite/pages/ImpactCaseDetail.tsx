@@ -74,7 +74,7 @@ export default function ImpactCaseDetail() {
         return (
             <div className="text-center py-10 animate-fade-in-up">
                 <h2 className="text-2xl font-bold">{t('case_not_found')}</h2>
-                <Link to="/impact" className="text-accent hover:underline mt-4 inline-block">{t('back_to_all_cases')}</Link>
+                <Link to="/impact" className="text-accent-light hover:underline mt-4 inline-block">{t('back_to_all_cases')}</Link>
             </div>
         );
     }
@@ -114,20 +114,20 @@ export default function ImpactCaseDetail() {
 
     return (
         <div className="animate-fade-in-up space-y-8">
-            <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent hover:underline">
+            <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-light hover:underline">
                 <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
             </Link>
             <div className="glassmorphism rounded-lg overflow-hidden">
                 <img src={socialCase.imageUrl} alt={title} className="w-full h-64 md:h-96 object-cover" />
                 <div className="p-6 md:p-10">
-                    <span className="text-lg font-semibold text-accent mb-2 inline-block">{t(`category_${socialCase.category.toLowerCase().replace(' ', '_')}`, { defaultValue: socialCase.category })}</span>
+                    <span className="text-lg font-semibold text-accent-light mb-2 inline-block">{t(`category_${socialCase.category.toLowerCase().replace(' ', '_')}`, { defaultValue: socialCase.category })}</span>
                     <h1 className="text-3xl md:text-5xl font-bold mb-6">{title}</h1>
                     <p className="text-lg text-text-secondary leading-relaxed mb-8">{description}</p>
                     
                     <div className="mb-8">
                         <ProgressBar progress={progress} />
                         <div className="flex justify-between text-lg font-semibold mt-2">
-                            <span><span className="font-bold text-accent">${socialCase.donated.toLocaleString()}</span> {t('funded')}</span>
+                            <span><span className="font-bold text-accent-light">${socialCase.donated.toLocaleString()}</span> {t('funded')}</span>
                             <span><span className="font-normal text-text-secondary">{t('goal')}:</span> ${socialCase.goal.toLocaleString()}</span>
                         </div>
                     </div>
@@ -176,7 +176,7 @@ export default function ImpactCaseDetail() {
                                             <button
                                                 key={token.symbol}
                                                 onClick={() => setSelectedToken(token.symbol)}
-                                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-accent bg-accent/10' : 'border-border-color bg-surface-2'}`}
+                                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-accent-light bg-accent-light/10' : 'border-border-color bg-surface-light'}`}
                                             >
                                                 <div className="w-8 h-8 mb-2">{token.icon}</div>
                                                 <span className="font-semibold">{token.symbol}</span>
@@ -193,7 +193,7 @@ export default function ImpactCaseDetail() {
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
                                         placeholder="0.0"
-                                        className="w-full p-3 bg-surface-2 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent focus:outline-none border border-border-color"
+                                        className="w-full p-3 bg-surface-light rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent-light focus:outline-none border border-border-color"
                                     />
                                     <div className="flex flex-wrap gap-2 mt-3">
                                         {percentages.map(p => (
@@ -201,7 +201,7 @@ export default function ImpactCaseDetail() {
                                                 key={p}
                                                 onClick={() => handlePercentageClick(p)}
                                                 disabled={!solana.connected || !currentUserToken || currentUserToken.balance <= 0}
-                                                className="flex-grow text-xs bg-surface-2 hover:bg-surface-3 py-1 px-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-border-color"
+                                                className="flex-grow text-xs bg-surface-light hover:bg-surface-dark py-1 px-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-border-color"
                                             >
                                                 {p === 100 ? 'MAX' : `${p}%`}
                                             </button>
@@ -218,7 +218,7 @@ export default function ImpactCaseDetail() {
                                                 </p>
                                             </div>
                                         ) : (
-                                            <div className="text-center py-3 px-4 bg-surface-2 border border-border-color rounded-lg">
+                                            <div className="text-center py-3 px-4 bg-surface-light border border-border-color rounded-lg">
                                                 <div className="flex items-center justify-center space-x-2 text-text-secondary">
                                                     {React.cloneElement(tokens.find(t => t.symbol === selectedToken)!.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                                                     <p className="font-semibold">
@@ -231,7 +231,7 @@ export default function ImpactCaseDetail() {
                                 )}
 
                                 {parseFloat(amount) > 0 && (
-                                    <div className="p-4 bg-surface-2 rounded-lg text-center animate-fade-in-up border border-border-color" style={{animationDuration: '300ms'}}>
+                                    <div className="p-4 bg-surface-light rounded-lg text-center animate-fade-in-up border border-border-color" style={{animationDuration: '300ms'}}>
                                         <p className="text-2xl font-bold text-text-primary">
                                             {parseFloat(amount).toLocaleString(undefined, {maximumFractionDigits: 4})} {selectedToken}
                                         </p>
@@ -241,7 +241,7 @@ export default function ImpactCaseDetail() {
                                     </div>
                                 )}
 
-                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50">
+                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-accent-light text-accent-foreground font-bold py-3 rounded-lg text-xl hover:bg-accent-hover transition-opacity disabled:opacity-50">
                                     {solana.loading ? t('processing') : (solana.connected ? t('donate') : t('connect_wallet'))}
                                 </button>
                             </div>
@@ -249,11 +249,11 @@ export default function ImpactCaseDetail() {
                         <div className="glassmorphism p-6 rounded-lg">
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Milestone /> {t('funding_milestones')}</h3>
                              <div className="relative pl-4">
-                                <div className="absolute top-0 left-4 h-full w-0.5 bg-surface-3"></div>
-                                <div className="absolute top-0 left-4 h-full w-0.5 bg-accent transition-all duration-500" style={{ height: `${progress}%` }}></div>
+                                <div className="absolute top-0 left-4 h-full w-0.5 bg-surface-dark"></div>
+                                <div className="absolute top-0 left-4 h-full w-0.5 bg-accent-light transition-all duration-500" style={{ height: `${progress}%` }}></div>
                                 {milestones.map(milestone => (
                                     <div key={milestone.percentage} className="flex items-start mb-4 relative">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center -ml-8 flex-shrink-0 z-10 ${progress >= milestone.percentage ? 'bg-accent' : 'bg-surface-3'}`}>
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center -ml-8 flex-shrink-0 z-10 ${progress >= milestone.percentage ? 'bg-accent-light' : 'bg-surface-dark'}`}>
                                             <CheckCircle size={16} className="text-white"/>
                                         </div>
                                         <div className="ml-4">

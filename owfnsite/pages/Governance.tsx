@@ -74,7 +74,7 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
             <div className="text-xs text-text-secondary">Proposed by: <AddressDisplay address={proposal.proposer} /></div>
             
             <div className="space-y-2">
-                <div className="w-full bg-surface-2 rounded-full h-4 flex overflow-hidden">
+                <div className="w-full bg-surface-dark rounded-full h-4 flex overflow-hidden">
                     <div className="bg-success h-full" style={{ width: `${forPercentage}%` }}></div>
                     <div className="bg-danger h-full" style={{ width: `${againstPercentage}%` }}></div>
                 </div>
@@ -89,7 +89,7 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
                     <div className="text-sm text-text-secondary">{t('ends_in')}: <Countdown endDate={proposal.endDate} /></div>
                     {address && (
                         hasVoted ? (
-                             <div className="flex items-center gap-2 text-accent font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
+                             <div className="flex items-center gap-2 text-accent-light font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
                         ) : (
                             <div className="flex gap-2">
                                 <button onClick={() => handleVote('for')} disabled={loading} className="bg-success text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 disabled:opacity-50"><ThumbsUp size={16}/></button>
@@ -137,13 +137,13 @@ export default function Governance() {
         <div className="animate-fade-in-up space-y-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="text-center md:text-left">
-                    <h1 className="text-4xl font-display font-bold text-accent">{t('governance_title')}</h1>
+                    <h1 className="text-4xl font-display font-bold text-accent-light">{t('governance_title')}</h1>
                     <p className="mt-2 text-lg text-text-secondary">{t('governance_subtitle')}</p>
                 </div>
                 {solana.connected && (
                     <button 
                         onClick={() => setCreateModalOpen(true)}
-                        className="flex items-center gap-2 bg-accent text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors"
+                        className="flex items-center gap-2 bg-accent-light text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors"
                     >
                         <PlusCircle size={20} /> {t('create_proposal')}
                     </button>
@@ -188,7 +188,7 @@ export default function Governance() {
                                     value={newTitle}
                                     onChange={e => setNewTitle(e.target.value)}
                                     required
-                                    className="w-full p-2 bg-surface-2 rounded-md border border-border-color focus:ring-2 focus:ring-accent"
+                                    className="w-full p-2 bg-surface-light rounded-md border border-border-color focus:ring-2 focus:ring-accent-light"
                                 />
                             </div>
                             <div>
@@ -199,13 +199,13 @@ export default function Governance() {
                                     onChange={e => setNewDescription(e.target.value)}
                                     required
                                     rows={5}
-                                    className="w-full p-2 bg-surface-2 rounded-md border border-border-color focus:ring-2 focus:ring-accent"
+                                    className="w-full p-2 bg-surface-light rounded-md border border-border-color focus:ring-2 focus:ring-accent-light"
                                 ></textarea>
                             </div>
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-accent text-accent-foreground py-3 rounded-lg font-bold hover:bg-accent-hover disabled:opacity-50"
+                                className="w-full bg-accent-light text-accent-foreground py-3 rounded-lg font-bold hover:bg-accent-hover disabled:opacity-50"
                             >
                                 {isSubmitting ? t('processing') : t('submit_proposal')}
                             </button>

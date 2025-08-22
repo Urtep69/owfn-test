@@ -35,9 +35,9 @@ const formatTimeAgo = (timestamp?: number): string => {
 };
 
 const StatCard = ({ title, value, change, icon }: { title: string, value: string, change?: number, icon: React.ReactNode }) => (
-    <div className="bg-surface-1 p-4 rounded-xl border border-border-color">
+    <div className="bg-surface-dark p-4 rounded-xl border border-border-color">
         <div className="flex items-center space-x-3">
-            <div className="bg-surface-2 text-accent rounded-lg p-3">{icon}</div>
+            <div className="bg-surface-light text-accent-light rounded-lg p-3">{icon}</div>
             <div>
                 <p className="text-sm text-text-secondary">{title}</p>
                 <div className="flex items-baseline gap-2">
@@ -68,7 +68,7 @@ const InfoRow = ({ label, children }: { label: string, children: React.ReactNode
 );
 
 const LinkButton = ({ href, icon, text }: { href: string, icon: React.ReactNode, text: string }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="flex-grow flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-3 text-text-primary font-semibold py-2 px-3 rounded-md transition-colors border border-border-color">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="flex-grow flex items-center justify-center gap-2 bg-surface-light hover:bg-surface-dark text-text-primary font-semibold py-2 px-3 rounded-md transition-colors border border-border-color">
         {icon}{text}
     </a>
 );
@@ -133,7 +133,7 @@ export default function TokenDetail() {
     };
 
     if (loading) {
-        return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-accent"/></div>;
+        return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-accent-light"/></div>;
     }
 
     if (error || !token) {
@@ -141,7 +141,7 @@ export default function TokenDetail() {
             <div className="text-center py-10">
                 <h2 className="text-2xl font-bold">{t('token_not_found')}</h2>
                 {error && <p className="text-danger mt-2">{error}</p>}
-                <Link to={fromPath} className="text-accent hover:underline mt-4 inline-flex items-center gap-2">
+                <Link to={fromPath} className="text-accent-light hover:underline mt-4 inline-flex items-center gap-2">
                     <ArrowLeft size={16} /> {backLinkText}
                 </Link>
             </div>
@@ -152,7 +152,7 @@ export default function TokenDetail() {
 
     return (
         <div className="space-y-8 animate-fade-in-up">
-            <Link to={fromPath} className="inline-flex items-center gap-2 text-accent hover:underline">
+            <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-light hover:underline">
                 <ArrowLeft size={16} /> {backLinkText}
             </Link>
 
@@ -163,7 +163,7 @@ export default function TokenDetail() {
                     <p className="text-text-secondary font-semibold text-lg">${token.symbol}</p>
                 </div>
                 {isMarketDataAvailable && token.mintAddress && (
-                    <a href={`https://jup.ag/swap/SOL-${token.mintAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2">
+                    <a href={`https://jup.ag/swap/SOL-${token.mintAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent-light text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-2">
                         {t('swap')} <ExternalLink size={16} />
                     </a>
                 )}

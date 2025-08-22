@@ -51,7 +51,7 @@ const renderMessageContent = (text: string) => {
             const path = pageNameToPath[pageName];
             if (path) {
                 result.push(
-                    <Link key={match.index} href={path} className="text-accent font-bold underline hover:opacity-80">
+                    <Link key={match.index} href={path} className="text-accent-light font-bold underline hover:opacity-80">
                         {pageName}
                     </Link>
                 );
@@ -64,7 +64,7 @@ const renderMessageContent = (text: string) => {
             const icon = socialIconMap[platformName];
             if (url && platformName) {
                  result.push(
-                    <a key={match.index} href={url} target="_blank" rel="noopener noreferrer" className="text-accent font-bold underline hover:opacity-80 inline-flex items-center gap-1.5">
+                    <a key={match.index} href={url} target="_blank" rel="noopener noreferrer" className="text-accent-light font-bold underline hover:opacity-80 inline-flex items-center gap-1.5">
                         {icon} {platformName}
                     </a>
                 );
@@ -201,7 +201,7 @@ export const Chatbot = () => {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-5 right-5 bg-accent text-accent-foreground p-4 rounded-full shadow-glow-md hover:bg-accent-hover transition-transform transform hover:scale-110"
+                className="fixed bottom-5 right-5 bg-accent-light text-accent-foreground p-4 rounded-full shadow-glow-accent hover:bg-accent-hover transition-transform transform hover:scale-110"
                 aria-label="Open Chatbot"
             >
                 <MessageCircle size={28} />
@@ -210,12 +210,12 @@ export const Chatbot = () => {
     }
 
     const containerClasses = isMaximized
-        ? "fixed inset-0 flex flex-col bg-surface-1 z-50 animate-fade-in-up"
-        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-surface-1 rounded-lg shadow-glow-lg animate-slide-in z-50 border border-border-color";
+        ? "fixed inset-0 flex flex-col bg-background z-50 animate-fade-in-up"
+        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-surface-dark rounded-lg shadow-glow-lg animate-slide-in z-50 border border-border-color";
 
     return (
         <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
-            <header className="flex items-center justify-between p-4 bg-accent text-accent-foreground rounded-t-lg">
+            <header className="flex items-center justify-between p-4 bg-accent-light text-accent-foreground rounded-t-lg">
                 <div className="flex items-center space-x-2">
                     <OwfnIcon className="w-6 h-6" />
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
@@ -240,20 +240,20 @@ export const Chatbot = () => {
                                             {formatTimestamp(msg.timestamp)}
                                         </p>
                                     )}
-                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent text-accent-foreground rounded-br-none' : 'bg-surface-2 text-text-primary rounded-bl-none'}`}>
+                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-light text-accent-foreground rounded-br-none' : 'bg-surface-light text-text-primary rounded-bl-none'}`}>
                                        <div className="text-sm whitespace-pre-wrap">
                                            {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
                                        </div>
                                     </div>
                                 </div>
-                                {msg.role === 'user' && <User className="w-6 h-6 text-accent flex-shrink-0 mt-1" />}
+                                {msg.role === 'user' && <User className="w-6 h-6 text-accent-light flex-shrink-0 mt-1" />}
                             </div>
                         </div>
                     ))}
                     {isLoading && (
                          <div className="flex items-start gap-3 justify-start">
                             <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />
-                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-surface-2 text-text-primary rounded-bl-none">
+                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-surface-light text-text-primary rounded-bl-none">
                                 <div className="flex items-center space-x-2 text-sm text-text-secondary">
                                     <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
                                     <span>{loadingText}</span>
@@ -270,13 +270,13 @@ export const Chatbot = () => {
                         ref={inputRef}
                         type="text" value={input} onChange={(e) => setInput(e.target.value)}
                         onKeyPress={handleKeyPress} placeholder={t('chatbot_placeholder')}
-                        className="w-full p-3 pr-20 bg-surface-2 rounded-lg focus:ring-2 focus:ring-accent focus:outline-none"
+                        className="w-full p-3 pr-20 bg-surface-light rounded-lg focus:ring-2 focus:ring-accent-light focus:outline-none"
                         disabled={isLoading}
                     />
                     <button
                         onClick={handleSend}
                         disabled={isLoading || input.trim() === ''}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent text-accent-foreground p-2 rounded-md hover:bg-accent-hover disabled:bg-surface-3 disabled:cursor-not-allowed"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-light text-accent-foreground p-2 rounded-md hover:bg-accent-hover disabled:bg-surface-dark disabled:cursor-not-allowed"
                         aria-label="Send message"
                     >
                        {isLoading ? <div className="w-5 h-5 border-2 border-accent-foreground border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }

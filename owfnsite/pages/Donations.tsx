@@ -93,7 +93,7 @@ export default function Donations() {
     return (
         <div className="animate-fade-in-up space-y-12">
             <div className="text-center">
-                <h1 className="text-4xl font-display font-bold text-accent">{t('make_donation')}</h1>
+                <h1 className="text-4xl font-display font-bold text-accent-light">{t('make_donation')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-text-secondary">
                     {t('donation_desc')}
                 </p>
@@ -105,7 +105,7 @@ export default function Donations() {
                     <p className="text-text-secondary leading-relaxed">{t('donation_message_p1')}</p>
                     <p className="text-text-secondary leading-relaxed">
                         {t('donation_message_p2_part1')}
-                        <span className="font-bold text-accent">
+                        <span className="font-bold text-accent-light">
                             {t('donation_message_p2_project_name')}
                         </span>
                         {t('donation_message_p2_part2')}
@@ -125,7 +125,7 @@ export default function Donations() {
             <div className="glassmorphism p-8 rounded-lg max-w-2xl mx-auto">
                 <h2 className="text-2xl font-bold mb-6 text-center">{t('donations_form_title')}</h2>
 
-                <div className="bg-surface-2 p-3 rounded-lg text-sm text-text-secondary mb-6 flex items-start gap-2 border border-border-color">
+                <div className="bg-surface-light p-3 rounded-lg text-sm text-text-secondary mb-6 flex items-start gap-2 border border-border-color">
                     <Info size={18} className="flex-shrink-0 mt-0.5 text-text-secondary" />
                     <span>{t('donation_fee_info')}</span>
                 </div>
@@ -138,7 +138,7 @@ export default function Donations() {
                                 <button
                                     key={token.symbol}
                                     onClick={() => setSelectedToken(token.symbol)}
-                                    className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-accent bg-accent/10' : 'border-border-color bg-surface-2'}`}
+                                    className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-accent-light bg-accent-light/10' : 'border-border-color bg-surface-light'}`}
                                 >
                                     <div className="w-8 h-8 mb-2">{token.icon}</div>
                                     <span className="font-semibold">{token.symbol}</span>
@@ -154,7 +154,7 @@ export default function Donations() {
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder="0.0"
-                            className="w-full p-3 bg-surface-2 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent focus:outline-none border border-border-color"
+                            className="w-full p-3 bg-surface-light rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent-light focus:outline-none border border-border-color"
                         />
                          <div className="flex flex-wrap gap-2 mt-3">
                             {percentages.map(p => (
@@ -162,7 +162,7 @@ export default function Donations() {
                                     key={p}
                                     onClick={() => handlePercentageClick(p)}
                                     disabled={!solana.connected || !currentUserToken || currentUserToken.balance <= 0}
-                                    className="flex-grow text-xs bg-surface-2 hover:bg-surface-3 py-1 px-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-border-color"
+                                    className="flex-grow text-xs bg-surface-light hover:bg-surface-dark py-1 px-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-border-color"
                                 >
                                     {p === 100 ? 'MAX' : `${p}%`}
                                 </button>
@@ -179,7 +179,7 @@ export default function Donations() {
                                     </p>
                                 </div>
                             ) : (
-                                <div className="text-center py-3 px-4 bg-surface-2 border border-border-color rounded-lg">
+                                <div className="text-center py-3 px-4 bg-surface-light border border-border-color rounded-lg">
                                     <div className="flex items-center justify-center space-x-2 text-text-secondary">
                                         {React.cloneElement(tokens.find(t => t.symbol === selectedToken)!.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                                         <p className="font-semibold">
@@ -192,7 +192,7 @@ export default function Donations() {
                     )}
 
                      {parseFloat(amount) > 0 && (
-                        <div className="p-4 bg-surface-2 rounded-lg text-center animate-fade-in-up border border-border-color" style={{animationDuration: '300ms'}}>
+                        <div className="p-4 bg-surface-light rounded-lg text-center animate-fade-in-up border border-border-color" style={{animationDuration: '300ms'}}>
                             <p className="text-2xl font-bold text-text-primary">
                                 {parseFloat(amount).toLocaleString(undefined, {maximumFractionDigits: 4})} {selectedToken}
                             </p>
@@ -201,7 +201,7 @@ export default function Donations() {
                             </p>
                         </div>
                     )}
-                     <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-accent to-accent-hover text-accent-foreground font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                     <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-accent-light to-accent-hover text-accent-foreground font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                          {solana.loading ? t('processing') : (solana.connected ? t('donate') : t('connect_wallet'))}
                     </button>
                 </div>

@@ -59,7 +59,7 @@ export default function FAQ() {
         { qKey: 'faq_q15', aKey: 'faq_a15', category: 'technical' },
         { qKey: 'faq_q16', aKey: 'faq_a16', category: 'technical' },
         { qKey: 'faq_q17', aKey: 'faq_a17', category: 'mission' },
-        { qKey: 'faq_q18', aKey: 'faq_a18', category: 'mission' },
+        { qKey: 'faq_q18', aKey: 'faq_a18', 'category': 'mission' },
         { qKey: 'faq_q20', aKey: 'faq_a20', category: 'security' },
     ], []);
 
@@ -86,8 +86,8 @@ export default function FAQ() {
     return (
         <div className="animate-fade-in-up max-w-4xl mx-auto space-y-8">
             <div className="text-center">
-                <HelpCircle className="mx-auto w-16 h-16 text-accent mb-4" />
-                <h1 className="text-4xl font-display font-bold text-accent">{t('faq_title')}</h1>
+                <HelpCircle className="mx-auto w-16 h-16 text-accent-light mb-4" />
+                <h1 className="text-4xl font-display font-bold text-accent-light">{t('faq_title')}</h1>
                 <p className="mt-4 text-lg text-text-secondary">
                     {t('faq_subtitle')}
                 </p>
@@ -102,7 +102,7 @@ export default function FAQ() {
                         aria-label={t('faq_search_aria_label')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-surface-1 border-2 border-border-color rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent focus:outline-none transition-colors"
+                        className="w-full pl-10 pr-4 py-3 bg-surface-light border-2 border-border-color rounded-lg focus:ring-2 focus:ring-accent-light focus:border-transparent focus:outline-none transition-colors"
                     />
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -112,8 +112,8 @@ export default function FAQ() {
                             onClick={() => setActiveCategory(cat.key)}
                             className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-200 ${
                                 activeCategory === cat.key
-                                    ? 'bg-accent text-accent-foreground'
-                                    : 'bg-surface-2 text-text-secondary hover:bg-surface-3'
+                                    ? 'bg-accent-light text-accent-foreground'
+                                    : 'bg-surface-light text-text-secondary hover:bg-surface-dark'
                             }`}
                         >
                             {t(cat.nameKey)}

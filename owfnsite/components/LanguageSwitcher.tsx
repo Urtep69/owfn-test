@@ -28,7 +28,7 @@ export const LanguageSwitcher = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(prev => !prev)}
-                className="flex items-center space-x-2 p-2 rounded-lg text-text-primary hover:bg-surface-2 transition-colors"
+                className="flex items-center space-x-2 p-2 rounded-lg text-text-primary hover:bg-surface-light transition-colors"
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 aria-label="Change language"
@@ -39,7 +39,7 @@ export const LanguageSwitcher = () => {
             </button>
             {isOpen && (
                 <div 
-                    className="absolute right-0 mt-2 w-48 bg-surface-1 border border-border-color rounded-md shadow-lg py-1 z-20 animate-fade-in-up" 
+                    className="absolute right-0 mt-2 w-48 bg-surface-dark border border-border-color rounded-md shadow-lg py-1 z-20 animate-fade-in-up" 
                     style={{ animationDuration: '200ms' }}
                     role="menu"
                 >
@@ -47,7 +47,7 @@ export const LanguageSwitcher = () => {
                         <button
                             key={lang.code}
                             onClick={() => handleSelectLanguage(lang.code)}
-                            className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-surface-2 flex items-center space-x-3"
+                            className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-surface-light flex items-center space-x-3"
                             role="menuitem"
                         >
                             <span className="text-xl" aria-hidden="true">{lang.flag}</span>

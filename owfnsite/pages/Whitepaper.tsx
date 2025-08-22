@@ -9,7 +9,7 @@ import { CheckCircle, Users, BarChart2, Map as MapIcon, Star, Link as LinkIcon, 
 const Section = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
     <section className="glassmorphism p-8 rounded-xl mb-12">
         <div className="flex items-center mb-6">
-            <div className="bg-surface-2 text-accent rounded-full p-3 mr-4">
+            <div className="bg-surface-light text-accent-light rounded-full p-3 mr-4">
                 {icon}
             </div>
             <h2 className="text-3xl font-bold text-text-primary">{title}</h2>
@@ -33,8 +33,8 @@ export default function Whitepaper() {
     return (
         <div className="animate-fade-in-up">
             <header className="text-center mb-16">
-                <FileText className="mx-auto w-20 h-20 text-accent mb-4" />
-                <h1 className="text-5xl font-display font-extrabold text-accent">{t('whitepaper_title')}</h1>
+                <FileText className="mx-auto w-20 h-20 text-accent-light mb-4" />
+                <h1 className="text-5xl font-display font-extrabold text-accent-light">{t('whitepaper_title')}</h1>
                 <p className="mt-4 text-xl text-text-secondary max-w-3xl mx-auto">
                     {t('whitepaper_subtitle')}
                 </p>
@@ -95,8 +95,8 @@ export default function Whitepaper() {
                 <div className="relative border-l-2 border-border-color ml-4 pl-8 space-y-8">
                     {ROADMAP_DATA.map((phase) => (
                         <div key={phase.quarter} className="relative">
-                             <div className="absolute -left-[42px] top-1 w-6 h-6 bg-accent rounded-full border-4 border-background"></div>
-                            <p className="font-semibold text-accent">{phase.quarter}</p>
+                             <div className="absolute -left-[42px] top-1 w-6 h-6 bg-accent-light rounded-full border-4 border-background"></div>
+                            <p className="font-semibold text-accent-light">{phase.quarter}</p>
                             <h4 className="font-bold text-xl">{t(`${phase.key_prefix}_title`)}</h4>
                             <p>{t(`${phase.key_prefix}_description`)}</p>
                         </div>
@@ -117,10 +117,10 @@ export default function Whitepaper() {
             <Section title={t('whitepaper_community_title')} icon={<LinkIcon />}>
                 <p className="mb-4">{t('whitepaper_community_desc')}</p>
                 <div className="flex flex-wrap gap-x-6 gap-y-2">
-                    <a href={PROJECT_LINKS.website} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-semibold">Website</a>
-                    <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-semibold">X.com (Twitter)</a>
-                    <a href={PROJECT_LINKS.telegramGroup} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-semibold">Telegram Group</a>
-                    <a href={PROJECT_LINKS.discord} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-semibold">Discord</a>
+                    <a href={PROJECT_LINKS.website} target="_blank" rel="noopener noreferrer" className="text-accent-light hover:underline font-semibold">Website</a>
+                    <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer" className="text-accent-light hover:underline font-semibold">X.com (Twitter)</a>
+                    <a href={PROJECT_LINKS.telegramGroup} target="_blank" rel="noopener noreferrer" className="text-accent-light hover:underline font-semibold">Telegram Group</a>
+                    <a href={PROJECT_LINKS.discord} target="_blank" rel="noopener noreferrer" className="text-accent-light hover:underline font-semibold">Discord</a>
                 </div>
             </Section>
         </div>

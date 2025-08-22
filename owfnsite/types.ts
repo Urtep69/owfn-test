@@ -1,4 +1,13 @@
-
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            'spline-viewer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+                url: string;
+                'events-target'?: string;
+            };
+        }
+    }
+}
 
 export interface Token {
   name: string;
@@ -154,15 +163,4 @@ export interface PresaleTransaction {
   solAmount: number;
   owfnAmount: number;
   time: Date;
-}
-
-declare global {
-    namespace JSX {
-        interface IntrinsicElements {
-            'spline-viewer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-                url: string;
-                'events-target'?: string;
-            };
-        }
-    }
 }

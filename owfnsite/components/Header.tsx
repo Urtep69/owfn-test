@@ -40,7 +40,7 @@ const ConnectButton = () => {
             <button
                 onClick={() => setSignInModalOpen(true)}
                 disabled={isAuthLoading}
-                className="bg-warning text-black font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition-colors flex items-center gap-2"
+                className="bg-warning text-background font-bold py-2 px-4 rounded-lg hover:bg-yellow-300 transition-colors flex items-center gap-2"
             >
                 <ShieldCheck size={18} />
                 {isAuthLoading ? t('processing') : 'Verify Wallet'}

@@ -182,10 +182,10 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
             <div className="flex-grow overflow-y-auto space-y-1 pr-1 -mr-2 mt-2">
                 {loading ? (
                      <div className="flex justify-center items-center h-full">
-                        <Loader2 className="w-6 h-6 animate-spin text-accent" />
+                        <Loader2 className="w-6 h-6 animate-spin text-accent-light" />
                     </div>
                 ) : transactions.length > 0 ? transactions.map((tx) => (
-                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 10000 ? 'bg-accent/10' : ''}`}>
+                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 10000 ? 'bg-accent-light/10' : ''}`}>
                         <div className="col-span-2 flex items-center gap-2">
                            <AddressDisplay address={tx.address} className="text-xs" />
                         </div>
@@ -206,7 +206,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
 const AccordionSection = ({ title, children, isOpen: defaultIsOpen = false }: { title: string, children: React.ReactNode, isOpen?: boolean }) => {
   const [isOpen, setIsOpen] = useState(defaultIsOpen);
   return (
-    <div className="bg-surface-2/50 border border-border-color rounded-lg">
+    <div className="bg-surface-light/50 border border-border-color rounded-lg">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center p-4"
@@ -522,7 +522,7 @@ export default function Presale() {
   return (
         <div className="animate-fade-in-up">
             <div className="mb-4">
-                <Link to="/" className="text-text-secondary hover:text-accent transition-colors">
+                <Link to="/" className="text-text-secondary hover:text-accent-light transition-colors">
                     <ArrowLeft size={24} />
                 </Link>
             </div>
@@ -531,15 +531,15 @@ export default function Presale() {
                 
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <img src={OWFN_LOGO_URL} alt="Token Logo" className="w-20 h-20 rounded-full border-2 border-accent"/>
+                    <img src={OWFN_LOGO_URL} alt="Token Logo" className="w-20 h-20 rounded-full border-2 border-accent-light"/>
                     <div className="flex-grow">
                         <h1 className="text-2xl font-bold text-text-primary">{t('presale_join_title')}</h1>
                         <h2 className="text-lg text-text-secondary">{t('presale_header_subtitle')}</h2>
                     </div>
                     <div className="flex items-center gap-3 text-text-secondary">
-                        <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-surface-2 transition-colors"><Twitter size={20}/></a>
-                        <a href={PROJECT_LINKS.telegramGroup} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-surface-2 transition-colors"><Send size={20}/></a>
-                        <a href={PROJECT_LINKS.website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-surface-2 transition-colors"><Globe size={20}/></a>
+                        <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-surface-light transition-colors"><Twitter size={20}/></a>
+                        <a href={PROJECT_LINKS.telegramGroup} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-surface-light transition-colors"><Send size={20}/></a>
+                        <a href={PROJECT_LINKS.website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-surface-light transition-colors"><Globe size={20}/></a>
                     </div>
                 </div>
 
@@ -554,8 +554,8 @@ export default function Presale() {
                             <div className="text-text-primary text-sm mb-1">
                                 <span>{t('presale_sold_progress', { progress: saleProgress.toFixed(2) })}</span>
                             </div>
-                            <div className="w-full bg-surface-2 rounded-full h-2.5">
-                                <div className="bg-accent h-2.5 rounded-full" style={{width: `${saleProgress}%`}}></div>
+                            <div className="w-full bg-surface-dark rounded-full h-2.5">
+                                <div className="bg-accent-light h-2.5 rounded-full" style={{width: `${saleProgress}%`}}></div>
                             </div>
                             <div className="flex justify-between mt-1 text-sm text-text-secondary">
                                 <span>{soldSOL.toFixed(2)} SOL</span>
@@ -629,7 +629,7 @@ export default function Presale() {
                                             <span className="text-sm text-text-secondary">{alloc.name} ({alloc.percentage}%)</span>
                                         </div>
                                     ))}
-                                    <Link to="/tokenomics" className="text-accent hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
+                                    <Link to="/tokenomics" className="text-accent-light hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
                                 </div>
                             </AccordionSection>
                             <AccordionSection title={t('roadmap_title')}>
@@ -640,7 +640,7 @@ export default function Presale() {
                                             <p className="text-sm text-text-secondary">{t(`${phase.key_prefix}_description`)}</p>
                                         </div>
                                     ))}
-                                    <Link to="/roadmap" className="text-accent hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
+                                    <Link to="/roadmap" className="text-accent-light hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
                                 </div>
                             </AccordionSection>
                             <AccordionSection title={t('presale_dyor_nfa_title')}>
@@ -657,7 +657,7 @@ export default function Presale() {
                                 {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                             </p>
                             {solana.connected && (
-                                <div className="text-center text-xs text-text-secondary p-2 bg-surface-2 rounded-md">
+                                <div className="text-center text-xs text-text-secondary p-2 bg-surface-dark rounded-md">
                                     {isCheckingContribution ? (
                                         <div className="flex items-center justify-center gap-2">
                                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -683,7 +683,7 @@ export default function Presale() {
                                     value={solAmount}
                                     onChange={handleAmountChange}
                                     onBlur={handleBlur}
-                                    className={`w-full bg-surface-2 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-text-primary text-right focus:ring-2 focus:border-accent placeholder-text-secondary/50 ${error ? 'border-danger focus:ring-danger' : 'border-border-color focus:ring-accent'}`}
+                                    className={`w-full bg-surface-light border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-text-primary text-right focus:ring-2 focus:border-accent-light placeholder-text-secondary/50 ${error ? 'border-danger focus:ring-danger' : 'border-border-color focus:ring-accent-light'}`}
                                     placeholder="0.00"
                                     disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
                                 />
@@ -691,7 +691,7 @@ export default function Presale() {
 
                             {error && <p className="text-danger text-sm -mt-2 text-center">{error}</p>}
                             
-                            <div className="bg-surface-2 p-4 rounded-lg space-y-3">
+                            <div className="bg-surface-dark p-4 rounded-lg space-y-3">
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-text-secondary">{t('owfn_base_amount')}</span>
                                     <span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
@@ -710,21 +710,21 @@ export default function Presale() {
                                     <span className="font-bold text-text-primary">{t('you_receive')}</span>
                                     <div className="flex items-center gap-2">
                                         <OwfnIcon className="w-6 h-6"/>
-                                        <span className="font-mono font-bold text-2xl text-accent">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                                        <span className="font-mono font-bold text-2xl text-accent-light">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <button 
                                 onClick={handleBuy}
-                                className="w-full bg-accent text-accent-foreground font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                                className="w-full bg-accent-light text-accent-foreground font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                                 disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
                             >
                                 {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
                             </button>
 
-                             <div className="bg-accent/10 border border-accent/30 p-3 rounded-lg text-center">
-                                <p className="font-bold text-accent flex items-center justify-center gap-2">
+                             <div className="bg-accent-light/10 border border-accent-light/30 p-3 rounded-lg text-center">
+                                <p className="font-bold text-accent-light flex items-center justify-center gap-2">
                                     <Gift size={18} /> {t('presale_bonus_offer', { threshold: PRESALE_DETAILS.bonusThreshold, percentage: PRESALE_DETAILS.bonusPercentage })}
                                 </p>
                             </div>

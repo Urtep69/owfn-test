@@ -16,9 +16,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress, label }) => 
         <span className="text-base font-medium text-text-primary">{label}</span>
         <span className="text-sm font-medium text-text-primary">{clampedProgress.toFixed(2)}%</span>
       </div>}
-      <div className="w-full bg-surface-2 rounded-full h-4">
+      <div className="w-full bg-surface-light rounded-full h-4">
         <div
-          className="bg-gradient-to-r from-accent to-accent-hover h-4 rounded-full transition-all duration-500 ease-out"
+          className="bg-gradient-to-r from-accent-light to-accent-hover h-4 rounded-full transition-all duration-500 ease-out"
           style={{ width: `${clampedProgress}%` }}
         ></div>
       </div>

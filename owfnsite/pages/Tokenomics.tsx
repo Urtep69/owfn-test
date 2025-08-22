@@ -17,7 +17,7 @@ export default function Tokenomics() {
     return (
         <div className="animate-fade-in-up">
             <div className="text-center mb-12">
-                <h1 className="text-4xl font-display font-bold text-accent">{t('tokenomics_title')}</h1>
+                <h1 className="text-4xl font-display font-bold text-accent-light">{t('tokenomics_title')}</h1>
                 <p className="mt-4 text-lg text-text-secondary">
                     {t('tokenomics_subtitle')}
                 </p>

@@ -8,8 +8,8 @@ export default function Partnerships() {
     return (
         <div className="animate-fade-in-up text-center py-8 max-w-4xl mx-auto space-y-12">
             <div>
-                <Handshake className="mx-auto w-24 h-24 text-accent mb-6" />
-                <h1 className="text-4xl font-display font-bold text-accent">{t('partnerships_title')}</h1>
+                <Handshake className="mx-auto w-24 h-24 text-accent-light mb-6" />
+                <h1 className="text-4xl font-display font-bold text-accent-light">{t('partnerships_title')}</h1>
             </div>
 
             <div className="glassmorphism p-8 rounded-lg text-left">
@@ -46,12 +46,12 @@ export default function Partnerships() {
                 </div>
             </div>
 
-            <div className="bg-accent/10 border-l-4 border-accent p-6 rounded-md text-left">
-                 <h2 className="text-2xl font-bold text-accent mb-2">{t('partnerships_invitation_title')}</h2>
+            <div className="bg-accent-light/10 border-l-4 border-accent-light p-6 rounded-md text-left">
+                 <h2 className="text-2xl font-bold text-accent-light mb-2">{t('partnerships_invitation_title')}</h2>
                  <p className="text-lg text-text-primary">
                     {t('partnerships_invitation_desc')}
                 </p>
-                <p className="mt-4 font-semibold text-accent">
+                <p className="mt-4 font-semibold text-accent-light">
                     partnerships@owfn.org
                 </p>
             </div>

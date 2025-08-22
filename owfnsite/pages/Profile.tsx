@@ -14,8 +14,8 @@ const MOCK_BADGES: ImpactBadge[] = [
 ];
 
 const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => (
-    <div className="bg-surface-2 p-4 rounded-lg flex items-center space-x-4 border border-border-color">
-        <div className="text-accent">{icon}</div>
+    <div className="bg-surface-light p-4 rounded-lg flex items-center space-x-4 border border-border-color">
+        <div className="text-accent-light">{icon}</div>
         <div>
             <p className="text-sm text-text-secondary">{title}</p>
             <p className="text-xl font-bold">{value}</p>
@@ -39,13 +39,13 @@ export default function Profile() {
     if (!connected) {
         return (
             <div className="text-center p-12 glassmorphism rounded-lg animate-fade-in-up">
-                <Wallet className="mx-auto w-16 h-16 text-accent mb-4" />
+                <Wallet className="mx-auto w-16 h-16 text-accent-light mb-4" />
                 <h1 className="text-2xl font-bold mb-2">{t('my_profile')}</h1>
                 <p className="text-text-secondary mb-6">{t('profile_connect_prompt')}</p>
                 <button
                     onClick={() => setWalletModalOpen(true)}
                     disabled={loading}
-                    className="bg-accent hover:bg-accent-hover text-accent-foreground font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
+                    className="bg-accent-light hover:bg-accent-hover text-accent-foreground font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
                 >
                     {loading ? t('connecting') : t('connect_wallet')}
                 </button>
@@ -56,7 +56,7 @@ export default function Profile() {
     return (
         <div className="animate-fade-in-up space-y-8">
             <div>
-                <h1 className="text-4xl font-display font-bold text-accent">{t('impact_dashboard_title')}</h1>
+                <h1 className="text-4xl font-display font-bold text-accent-light">{t('impact_dashboard_title')}</h1>
                 <div className="flex items-center space-x-2 mt-2">
                     <span className="text-sm text-text-secondary">{t('connected_as')}:</span>
                     {address && <AddressDisplay address={address} />}
@@ -65,7 +65,7 @@ export default function Profile() {
 
             <div className="glassmorphism p-6 rounded-lg">
                 <h2 className="text-2xl font-bold mb-4">{t('my_tokens')}</h2>
-                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-surface-2 rounded-lg border border-border-color">
+                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-surface-dark rounded-lg border border-border-color">
                     <div>
                         <p className="text-sm text-text-secondary">{t('token_types')}</p>
                         <p className="text-2xl font-bold">{loading ? '-' : userTokens.length}</p>
@@ -94,7 +94,7 @@ export default function Profile() {
                         {/* Token List */}
                         {userTokens.map(token => (
                            <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
-                                <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-surface-2 transition-colors duration-200 cursor-pointer">
+                                <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-surface-light transition-colors duration-200 cursor-pointer">
                                     {/* Column 1: Asset Info */}
                                     <div className="flex items-center space-x-4">
                                         <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
@@ -153,13 +153,13 @@ export default function Profile() {
                          <div className="flex flex-wrap gap-4">
                             {MOCK_BADGES.map(badge => (
                                  <div key={badge.id} className="group relative flex flex-col items-center text-center w-24">
-                                    <div className="bg-surface-2 rounded-full p-4 text-accent group-hover:scale-110 transition-transform">
+                                    <div className="bg-surface-light rounded-full p-4 text-accent-light group-hover:scale-110 transition-transform">
                                         {React.cloneElement(badge.icon as React.ReactElement<{ size: number }>, { size: 32 })}
                                     </div>
                                     <p className="text-sm font-semibold mt-2">{t(badge.titleKey)}</p>
-                                    <div className="absolute bottom-full mb-2 w-48 bg-surface-3 text-text-primary text-xs rounded py-1 px-2 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                    <div className="absolute bottom-full mb-2 w-48 bg-surface-dark text-text-primary text-xs rounded py-1 px-2 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                         {t(badge.descriptionKey)}
-                                        <svg className="absolute text-surface-3 h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon className="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+                                        <svg className="absolute text-surface-dark h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon className="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
                                     </div>
                                 </div>
                             ))}

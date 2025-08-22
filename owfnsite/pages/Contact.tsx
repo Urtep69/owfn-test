@@ -6,14 +6,14 @@ import { DiscordIcon } from '../components/IconComponents.tsx';
 import { PROJECT_LINKS, ADMIN_WALLET_ADDRESS } from '../constants.ts';
 
 const ContactCard = ({ icon, title, email, description }: { icon: React.ReactNode, title: string, email: string, description: string }) => (
-    <div className="glassmorphism p-6 rounded-xl hover:shadow-glow-md hover:scale-105 transition-all duration-300 transform">
+    <div className="glassmorphism p-6 rounded-xl hover:shadow-glow-accent hover:scale-105 transition-all duration-300 transform">
         <div className="flex items-center space-x-4 mb-4">
-            <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-surface-2 rounded-full text-accent">
+            <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-surface-light rounded-full text-accent-light">
                 {icon}
             </div>
             <div>
                 <h3 className="text-xl font-bold text-text-primary">{title}</h3>
-                 <a href={`mailto:${email}`} className="text-accent hover:underline break-all">{email}</a>
+                 <a href={`mailto:${email}`} className="text-accent-light hover:underline break-all">{email}</a>
             </div>
         </div>
         <p className="text-text-secondary">{description}</p>
@@ -25,9 +25,9 @@ const SocialLinkCard = ({ icon, title, description, href }: { icon: React.ReactN
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="block glassmorphism p-6 rounded-xl hover:shadow-glow-md hover:scale-105 transition-all duration-300 transform text-center"
+        className="block glassmorphism p-6 rounded-xl hover:shadow-glow-accent hover:scale-105 transition-all duration-300 transform text-center"
     >
-        <div className="flex items-center justify-center w-16 h-16 mb-4 bg-surface-2 rounded-full text-accent mx-auto">
+        <div className="flex items-center justify-center w-16 h-16 mb-4 bg-surface-light rounded-full text-accent-light mx-auto">
             {icon}
         </div>
         <h3 className="text-xl font-bold text-text-primary mb-2">{title}</h3>
@@ -93,7 +93,7 @@ export default function Contact() {
     return (
         <div className="animate-fade-in-up space-y-12">
             <div className="text-center">
-                <h1 className="text-4xl font-display font-bold text-accent">{t('contact_title')}</h1>
+                <h1 className="text-4xl font-display font-bold text-accent-light">{t('contact_title')}</h1>
                 <p className="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
                     {t('contact_subtitle')}
                 </p>
@@ -143,27 +143,27 @@ export default function Contact() {
                             <p className="text-sm text-text-secondary -mb-2">{t('contact_required_fields')}</p>
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium text-text-secondary">{t('contact_form_name')} <span className="text-danger">*</span></label>
-                                <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-surface-2 border border-border-color rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent" />
+                                <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-surface-light border border-border-color rounded-md shadow-sm focus:outline-none focus:ring-accent-light focus:border-accent-light" />
                             </div>
                             <div>
                                 <label htmlFor="email" className="block text-sm font-medium text-text-secondary">{t('contact_form_email')} <span className="text-danger">*</span></label>
-                                <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-surface-2 border border-border-color rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent" />
+                                <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-surface-light border border-border-color rounded-md shadow-sm focus:outline-none focus:ring-accent-light focus:border-accent-light" />
                             </div>
                              <div>
                                 <label htmlFor="reason" className="block text-sm font-medium text-text-secondary">{t('contact_form_reason')} <span className="text-danger">*</span></label>
-                                <select id="reason" value={reason} onChange={e => setReason(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-surface-2 border border-border-color rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent">
+                                <select id="reason" value={reason} onChange={e => setReason(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-surface-light border border-border-color rounded-md shadow-sm focus:outline-none focus:ring-accent-light focus:border-accent-light">
                                     {reasonOptions.map(opt => <option key={opt.key} value={opt.key}>{t(opt.labelKey)}</option>)}
                                 </select>
                             </div>
                             <div>
                                 <label htmlFor="message" className="block text-sm font-medium text-text-secondary">{t('contact_form_message')} <span className="text-danger">*</span></label>
-                                <textarea id="message" value={message} onChange={e => setMessage(e.target.value)} required rows={5} className="mt-1 block w-full px-3 py-2 bg-surface-2 border border-border-color rounded-md shadow-sm focus:outline-none focus:ring-accent focus:border-accent"></textarea>
+                                <textarea id="message" value={message} onChange={e => setMessage(e.target.value)} required rows={5} className="mt-1 block w-full px-3 py-2 bg-surface-light border border-border-color rounded-md shadow-sm focus:outline-none focus:ring-accent-light focus:border-accent-light"></textarea>
                             </div>
                             {status === 'error' && (
                                 <p className="text-danger text-sm text-center">{t('contact_error_message')}</p>
                             )}
                             <div>
-                                <button type="submit" disabled={status === 'loading'} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-accent-foreground bg-accent hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed">
+                                <button type="submit" disabled={status === 'loading'} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-accent-foreground bg-accent-light hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light disabled:opacity-50 disabled:cursor-not-allowed">
                                     {status === 'loading' ? <><Loader2 className="animate-spin mr-2" /> {t('contact_sending')}</> : t('contact_send_message')}
                                 </button>
                             </div>
@@ -173,7 +173,7 @@ export default function Contact() {
             )}
             
             <section>
-                <div className="bg-surface-2 p-6 rounded-lg shadow-md flex items-start gap-4 border border-border-color">
+                <div className="bg-surface-light p-6 rounded-lg shadow-md flex items-start gap-4 border border-border-color">
                     <Info className="w-8 h-8 text-text-secondary flex-shrink-0 mt-1" />
                     <div>
                         <h3 className="font-bold text-lg text-text-primary">{t('contact_disclaimer_title')}</h3>
@@ -182,15 +182,15 @@ export default function Contact() {
                 </div>
             </section>
 
-            <section className="bg-accent/10 p-8 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6">
+            <section className="bg-accent-light/10 p-8 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
-                     <HelpCircle className="w-12 h-12 text-accent flex-shrink-0" />
+                     <HelpCircle className="w-12 h-12 text-accent-light flex-shrink-0" />
                      <div>
                         <h2 className="text-2xl font-bold">{t('contact_faq_title')}</h2>
                         <p className="text-text-primary mt-1">{t('contact_faq_desc')}</p>
                      </div>
                 </div>
-                <Link to="/faq" className="bg-accent text-accent-foreground font-bold py-3 px-8 rounded-full text-lg hover:bg-accent-hover transition-transform transform hover:scale-105 shadow-lg flex-shrink-0">
+                <Link to="/faq" className="bg-accent-light text-accent-foreground font-bold py-3 px-8 rounded-full text-lg hover:bg-accent-hover transition-transform transform hover:scale-105 shadow-lg flex-shrink-0">
                     {t('contact_faq_button')}
                 </Link>
             </section>

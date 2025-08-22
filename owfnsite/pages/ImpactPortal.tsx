@@ -73,21 +73,21 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
 
     return (
         <div className="glassmorphism p-8 rounded-lg mt-12">
-            <h2 className="text-3xl font-bold mb-6 text-accent">{t('create_new_case')}</h2>
+            <h2 className="text-3xl font-bold mb-6 text-accent-light">{t('create_new_case')}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-                <input type="text" placeholder={t('case_title')} value={title} onChange={e => setTitle(e.target.value)} required className="w-full p-2 bg-surface-2 rounded-md border border-border-color focus:ring-2 focus:ring-accent" />
-                <textarea placeholder={t('case_description')} value={description} onChange={e => setDescription(e.target.value)} required className="w-full p-2 bg-surface-2 rounded-md h-32 border border-border-color focus:ring-2 focus:ring-accent"></textarea>
-                <textarea placeholder={t('case_details')} value={details} onChange={e => setDetails(e.target.value)} required className="w-full p-2 bg-surface-2 rounded-md h-24 border border-border-color focus:ring-2 focus:ring-accent"></textarea>
-                <input type="text" placeholder={t('image_url')} value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="w-full p-2 bg-surface-2 rounded-md border border-border-color focus:ring-2 focus:ring-accent" />
+                <input type="text" placeholder={t('case_title')} value={title} onChange={e => setTitle(e.target.value)} required className="w-full p-2 bg-surface-light rounded-md border border-border-color focus:ring-2 focus:ring-accent-light" />
+                <textarea placeholder={t('case_description')} value={description} onChange={e => setDescription(e.target.value)} required className="w-full p-2 bg-surface-light rounded-md h-32 border border-border-color focus:ring-2 focus:ring-accent-light"></textarea>
+                <textarea placeholder={t('case_details')} value={details} onChange={e => setDetails(e.target.value)} required className="w-full p-2 bg-surface-light rounded-md h-24 border border-border-color focus:ring-2 focus:ring-accent-light"></textarea>
+                <input type="text" placeholder={t('image_url')} value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="w-full p-2 bg-surface-light rounded-md border border-border-color focus:ring-2 focus:ring-accent-light" />
                 <div className="grid grid-cols-2 gap-4">
-                    <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-2 bg-surface-2 rounded-md border border-border-color focus:ring-2 focus:ring-accent">
+                    <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-2 bg-surface-light rounded-md border border-border-color focus:ring-2 focus:ring-accent-light">
                         <option value="Health">{t('category_health')}</option>
                         <option value="Education">{t('category_education')}</option>
                         <option value="Basic Needs">{t('category_basic_needs')}</option>
                     </select>
-                    <input type="number" placeholder={t('funding_goal_usd')} value={goal} onChange={e => setGoal(e.target.value)} required className="w-full p-2 bg-surface-2 rounded-md border border-border-color focus:ring-2 focus:ring-accent" min="1" />
+                    <input type="number" placeholder={t('funding_goal_usd')} value={goal} onChange={e => setGoal(e.target.value)} required className="w-full p-2 bg-surface-light rounded-md border border-border-color focus:ring-2 focus:ring-accent-light" min="1" />
                 </div>
-                <button type="submit" disabled={isTranslating} className="w-full bg-accent text-accent-foreground py-3 rounded-lg font-bold hover:bg-accent-hover disabled:bg-surface-3 transition-colors">
+                <button type="submit" disabled={isTranslating} className="w-full bg-accent-light text-accent-foreground py-3 rounded-lg font-bold hover:bg-accent-hover disabled:bg-surface-dark transition-colors">
                     {isTranslating ? t('admin_saving_case') : t('save_case')}
                 </button>
             </form>
@@ -103,21 +103,21 @@ export default function ImpactPortal() {
     const categories = [
         { 
             name: 'Health',
-            icon: <HeartHandshake className="mx-auto text-accent w-12 h-12 mb-4" />,
+            icon: <HeartHandshake className="mx-auto text-accent-light w-12 h-12 mb-4" />,
             titleKey: 'about_impact_health_title',
             descKey: 'about_impact_health_desc',
             casesCount: socialCases.filter(c => c.category === 'Health').length
         },
         { 
             name: 'Education',
-            icon: <BookOpen className="mx-auto text-accent w-12 h-12 mb-4" />,
+            icon: <BookOpen className="mx-auto text-accent-light w-12 h-12 mb-4" />,
             titleKey: 'about_impact_education_title',
             descKey: 'about_impact_education_desc',
             casesCount: socialCases.filter(c => c.category === 'Education').length
         },
         { 
             name: 'Basic Needs',
-            icon: <HomeIcon className="mx-auto text-accent w-12 h-12 mb-4" />,
+            icon: <HomeIcon className="mx-auto text-accent-light w-12 h-12 mb-4" />,
             titleKey: 'about_impact_needs_title',
             descKey: 'about_impact_needs_desc',
             casesCount: socialCases.filter(c => c.category === 'Basic Needs').length
@@ -127,7 +127,7 @@ export default function ImpactPortal() {
     return (
         <div className="animate-fade-in-up space-y-8">
             <div className="text-center">
-                <h1 className="text-4xl font-display font-bold text-accent">{t('about_impact_areas_title')}</h1>
+                <h1 className="text-4xl font-display font-bold text-accent-light">{t('about_impact_areas_title')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-text-secondary">
                     {t('social_cases_desc')}
                 </p>
@@ -139,7 +139,7 @@ export default function ImpactPortal() {
                         key={category.name}
                         href={`/impact/category/${category.name.toLowerCase().replace(' ', '-')}`}
                     >
-                       <a className="block text-center p-8 glassmorphism rounded-lg hover:shadow-glow-md hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent">
+                       <a className="block text-center p-8 glassmorphism rounded-lg hover:shadow-glow-accent hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent-light">
                             {category.icon}
                             <h2 className="text-2xl font-bold">{t(category.titleKey)}</h2>
                             <p className="text-text-secondary mt-2">{t(category.descKey)}</p>

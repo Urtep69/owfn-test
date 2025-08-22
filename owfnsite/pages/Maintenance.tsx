@@ -27,7 +27,7 @@ export default function Maintenance() {
                 <p className="text-lg text-text-secondary leading-relaxed mb-8">
                     {t('maintenance_message')}
                 </p>
-                <div className="bg-surface-2 p-4 rounded-lg">
+                <div className="bg-surface-dark p-4 rounded-lg">
                      <p className="text-md font-semibold text-text-primary">
                         {t('maintenance_stay_tuned')}
                     </p>
@@ -38,7 +38,7 @@ export default function Maintenance() {
                                 href={link.href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-text-secondary hover:text-accent transition-transform transform hover:scale-110"
+                                className="text-text-secondary hover:text-accent-light transition-transform transform hover:scale-110"
                                 aria-label={link.name}
                             >
                                 {link.icon}
@@ -50,7 +50,7 @@ export default function Maintenance() {
              <div className="absolute bottom-4">
                 <button
                     onClick={() => setWalletModalOpen(true)}
-                    className="text-sm text-text-secondary hover:text-accent transition-colors"
+                    className="text-sm text-text-secondary hover:text-accent-light transition-colors"
                 >
                     {t('admin_login')}
                 </button>

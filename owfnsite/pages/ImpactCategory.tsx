@@ -6,17 +6,17 @@ import { ArrowLeft, HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
 
 const categoryDetails: { [key: string]: { icon: React.ReactNode, titleKey: string, descKey: string } } = {
     'Health': {
-        icon: <HeartHandshake className="w-12 h-12 text-accent" />,
+        icon: <HeartHandshake className="w-12 h-12 text-accent-light" />,
         titleKey: 'about_impact_health_title',
         descKey: 'about_impact_health_desc'
     },
     'Education': {
-        icon: <BookOpen className="w-12 h-12 text-accent" />,
+        icon: <BookOpen className="w-12 h-12 text-accent-light" />,
         titleKey: 'about_impact_education_title',
         descKey: 'about_impact_education_desc'
     },
     'Basic Needs': {
-        icon: <HomeIcon className="w-12 h-12 text-accent" />,
+        icon: <HomeIcon className="w-12 h-12 text-accent-light" />,
         titleKey: 'about_impact_needs_title',
         descKey: 'about_impact_needs_desc'
     }
@@ -38,19 +38,19 @@ export default function ImpactCategory() {
         return (
             <div className="text-center py-10 animate-fade-in-up">
                 <h2 className="text-2xl font-bold">Category Not Found</h2>
-                <Link to="/impact" className="text-accent hover:underline mt-4 inline-block">{t('back_to_all_cases')}</Link>
+                <Link to="/impact" className="text-accent-light hover:underline mt-4 inline-block">{t('back_to_all_cases')}</Link>
             </div>
         );
     }
 
     return (
         <div className="animate-fade-in-up space-y-8">
-            <Link to="/impact" className="inline-flex items-center gap-2 text-accent hover:underline">
+            <Link to="/impact" className="inline-flex items-center gap-2 text-accent-light hover:underline">
                 <ArrowLeft size={16} /> {t('back_to_all_cases')}
             </Link>
             <div className="text-center p-8 glassmorphism rounded-lg">
                 {details.icon}
-                <h1 className="text-4xl font-display font-bold text-accent mt-4">{t(details.titleKey)}</h1>
+                <h1 className="text-4xl font-display font-bold text-accent-light mt-4">{t(details.titleKey)}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-text-secondary">
                     {t(details.descKey)}
                 </p>
