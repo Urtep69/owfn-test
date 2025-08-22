@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -40,6 +39,8 @@ export const en = {
     connect_wallet_first: `Please connect your wallet first.`,
     yes: `Yes`,
     no: `No`,
+    authenticating: 'Authenticating...',
+    auth_prompt: 'Please sign the message in your wallet to continue.',
 
     // Time Units
     time_days: `Days`,
@@ -197,6 +198,12 @@ export const en = {
     badge_diverse_donor_desc: `Awarded for donating to projects in 3 different categories.`,
     asset: `Asset`,
     value_usd: `Value (USD)`,
+    activity_tab: `Activity`,
+    profile_loading_data: `Loading your Web3 profile...`,
+    profile_no_nfts: 'No NFTs found in this wallet.',
+    profile_no_activity: 'No recent activity.',
+    portfolio_allocation: 'Portfolio Allocation',
+    coming_soon_impact_tracking: 'Impact tracking features are coming soon!',
 
     // Impact Portal
     social_cases: `Social Cases`,
@@ -542,6 +549,5 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
-    contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
 };

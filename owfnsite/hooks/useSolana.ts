@@ -8,13 +8,14 @@ import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../comp
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
 export interface UseSolanaReturn {
-  connected: boolean;
+  connected: boolean; // This now means wallet connected AND user authenticated
   address: string | null;
   userTokens: Token[];
   nfts: Nft[];
   transactions: HumanizedTransaction[];
   solDomain: string | null;
   loading: boolean;
+  isAuthenticating: boolean;
   userStats: {
     totalDonated: number;
     projectsSupported: number;
@@ -47,7 +48,10 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
+  const { publicKey, connected: walletConnected, sendTransaction: walletSendTransaction, signTransaction, signMessage, disconnect } = useWallet();
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [nfts, setNfts] = useState<Nft[]>([]);
   const [transactions, setTransactions] = useState<HumanizedTransaction[]>([]);
@@ -82,9 +86,21 @@ export const useSolana = (): UseSolanaReturn => {
             }),
         });
         
-        if (!response.ok) throw new Error('Failed to fetch assets from Helius');
-        const { result } = await response.json();
-        if (!result) return [];
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Helius API Error:", response.status, errorText);
+            throw new Error(`Failed to fetch assets from Helius. Status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.error) {
+            console.error("Helius RPC Error:", data.error);
+            throw new Error(`Helius RPC Error: ${data.error.message}`);
+        }
+        const { result } = data;
+        if (!result) {
+            console.warn("Helius API returned no result for address:", walletAddress);
+            return [];
+        }
        
         const allTokens: Token[] = [];
         if (result.nativeBalance && result.nativeBalance.lamports > 0) {
@@ -238,20 +254,53 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [getWalletBalances]);
 
+  const signIn = useCallback(async () => {
+    if (!walletConnected || !publicKey || !signMessage) {
+        return;
+    }
+    setIsAuthenticating(true);
+    try {
+        const message = new TextEncoder().encode(
+            `Welcome to Official World Family Network (OWFN)!\n\n` +
+            `Click "Sign" to authenticate your wallet and access your profile.\n\n` +
+            `This request will not trigger a blockchain transaction or cost any fees.\n\n` +
+            `Timestamp: ${new Date().toISOString()}`
+        );
+        
+        await signMessage(message);
+        setIsAuthenticated(true);
+        if(publicKey) {
+            fetchWalletDetails(publicKey.toBase58());
+        }
+    } catch (error) {
+        console.error("Sign in failed:", error);
+        await disconnect();
+        setIsAuthenticated(false);
+    } finally {
+        setIsAuthenticating(false);
+    }
+}, [publicKey, walletConnected, signMessage, fetchWalletDetails, disconnect]);
+
+
   useEffect(() => {
-    if (connected && address) {
-        fetchWalletDetails(address);
-    } else {
+    if (walletConnected && !isAuthenticated && !isAuthenticating) {
+        signIn();
+    }
+    
+    if (!walletConnected) {
+        // Reset state on disconnect
+        setIsAuthenticated(false);
+        setIsAuthenticating(false);
         setUserTokens([]);
         setNfts([]);
         setTransactions([]);
         setSolDomain(null);
         balanceCache.clear();
     }
-  }, [connected, address, fetchWalletDetails]);
+  }, [walletConnected, isAuthenticated, isAuthenticating, signIn]);
 
  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
-    if (!connected || !publicKey || !signTransaction) {
+    if (!walletConnected || !isAuthenticated || !publicKey || !signTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
     setLoading(true);
@@ -345,7 +394,7 @@ export const useSolana = (): UseSolanaReturn => {
         setLoading(false);
         return { success: false, messageKey: 'transaction_failed_alert' };
     }
-  }, [connected, publicKey, connection, signTransaction, userTokens, address, fetchWalletDetails, getWalletBalances]);
+  }, [walletConnected, isAuthenticated, publicKey, connection, signTransaction, userTokens, address, fetchWalletDetails]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
@@ -354,13 +403,14 @@ export const useSolana = (): UseSolanaReturn => {
   }
 
   return {
-    connected,
+    connected: walletConnected && isAuthenticated,
     address,
     userTokens,
     nfts,
     transactions,
     solDomain,
     loading,
+    isAuthenticating,
     connection,
     userStats: { 
         totalDonated: 0,

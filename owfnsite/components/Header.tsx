@@ -1,6 +1,5 @@
 import React from 'react';
-import { Menu, X, LogOut, Wallet } from 'lucide-react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { Menu, X, LogOut, Wallet, Loader2 } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 import { ThemeSwitcher } from './ThemeSwitcher.tsx';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -11,12 +10,20 @@ interface HeaderProps {
 }
 
 const ConnectButton = () => {
-    const { t, setWalletModalOpen } = useAppContext();
-    const { connected, publicKey, disconnect } = useWallet();
+    const { t, setWalletModalOpen, solana } = useAppContext();
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
 
-    if (connected && publicKey) {
+    if (solana.isAuthenticating) {
+        return (
+            <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg px-3 py-2">
+                <Loader2 size={18} className="animate-spin text-primary-700 dark:text-darkPrimary-200"/>
+                <span className="font-semibold text-sm text-primary-700 dark:text-darkPrimary-200">{t('authenticating')}</span>
+            </div>
+        );
+    }
+    
+    if (solana.connected && solana.address) {
         return (
              <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
                 <button
@@ -25,10 +32,10 @@ const ConnectButton = () => {
                     aria-label={t('change_wallet')}
                 >
                     <Wallet size={18} />
-                    <span className="font-semibold text-sm font-mono">{truncateAddress(publicKey.toBase58())}</span>
+                    <span className="font-semibold text-sm font-mono">{truncateAddress(solana.address)}</span>
                 </button>
                  <button
-                    onClick={() => disconnect()}
+                    onClick={solana.disconnectWallet}
                     className="p-2 text-primary-600 dark:text-darkPrimary-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-r-lg transition-colors"
                     aria-label={t('disconnect_wallet')}
                 >

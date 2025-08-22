@@ -59,13 +59,23 @@ const TransactionRow = ({ tx }: { tx: HumanizedTransaction }) => {
 
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, nfts, transactions, solDomain, loading } = solana;
+    const { connected, address, userTokens, nfts, transactions, solDomain, loading, isAuthenticating } = solana;
     const [activeTab, setActiveTab] = useState<'tokens' | 'nfts' | 'activity'>('tokens');
 
     const totalUsdValue = useMemo(() => {
         if (!userTokens || userTokens.length === 0) return 0;
         return userTokens.reduce((sum, token) => sum + token.usdValue, 0);
     }, [userTokens]);
+
+    if (isAuthenticating) {
+        return (
+            <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
+                <Loader2 className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4 animate-spin" />
+                <h1 className="text-2xl font-bold mb-2">{t('authenticating')}</h1>
+                <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('auth_prompt')}</p>
+            </div>
+        );
+    }
 
     if (!connected) {
         return (
@@ -88,7 +98,7 @@ export default function Profile() {
             <header className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d space-y-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-accent-600 dark:text-darkAccent-400">{solDomain ? `${solDomain}.sol` : t('impact_dashboard_title')}</h1>
+                        <h1 className="text-3xl font-bold text-accent-600 dark:text-darkAccent-400">{solDomain ? `${solDomain}` : t('impact_dashboard_title')}</h1>
                         {address && <AddressDisplay address={address} />}
                     </div>
                     {loading ? (
@@ -109,7 +119,7 @@ export default function Profile() {
                              {[
                                 { id: 'tokens', label: t('my_tokens'), icon: <Layers size={18} /> },
                                 { id: 'nfts', label: 'NFTs', icon: <ImageIcon size={18} /> },
-                                { id: 'activity', label: 'Activity', icon: <Activity size={18} /> },
+                                { id: 'activity', label: t('activity_tab'), icon: <Activity size={18} /> },
                             ].map(tab => (
                                 <button
                                     key={tab.id}
@@ -127,7 +137,7 @@ export default function Profile() {
                     {loading ? (
                         <div className="text-center py-20 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
                             <Loader2 className="w-8 h-8 animate-spin" />
-                            <span className="text-lg">Loading your Web3 profile...</span>
+                            <span className="text-lg">{t('profile_loading_data')}</span>
                         </div>
                     ) : (
                         <div>
@@ -160,14 +170,14 @@ export default function Profile() {
                                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                         {nfts.map(nft => <NftCard key={nft.id} nft={nft}/>)}
                                     </div>
-                                ) : <p className="text-center py-10">No NFTs found in this wallet.</p>
+                                ) : <p className="text-center py-10">{t('profile_no_nfts')}</p>
                             )}
                              {activeTab === 'activity' && (
                                 transactions.length > 0 ? (
                                     <div className="space-y-1">
                                         {transactions.map(tx => <TransactionRow key={tx.signature} tx={tx}/>)}
                                     </div>
-                                ) : <p className="text-center py-10">No recent activity.</p>
+                                ) : <p className="text-center py-10">{t('profile_no_activity')}</p>
                             )}
                         </div>
                     )}
@@ -175,7 +185,7 @@ export default function Profile() {
 
                 <aside className="lg:col-span-1 space-y-8">
                      <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h3 className="text-lg font-bold mb-2">Portfolio Allocation</h3>
+                        <h3 className="text-lg font-bold mb-2">{t('portfolio_allocation')}</h3>
                          {loading ? (
                              <div className="h-64 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
                          ) : (
@@ -186,7 +196,7 @@ export default function Profile() {
                         <h3 className="text-lg font-bold mb-4">{t('my_impact_stats')}</h3>
                         <div className="space-y-3">
                              <div className="flex items-center gap-3"><DollarSign className="w-5 h-5 text-accent-500 dark:text-darkAccent-400"/><span>{t('total_donated')}: $0.00</span></div>
-                             <p className="text-xs text-center text-primary-500 dark:text-darkPrimary-400 p-2 bg-primary-100 dark:bg-darkPrimary-700/50 rounded-md">Impact tracking features are coming soon!</p>
+                             <p className="text-xs text-center text-primary-500 dark:text-darkPrimary-400 p-2 bg-primary-100 dark:bg-darkPrimary-700/50 rounded-md">{t('coming_soon_impact_tracking')}</p>
                         </div>
                     </div>
                 </aside>
