@@ -7,8 +7,8 @@ import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from './constants.ts';
+import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
 import { WalletConnectModal } from './components/WalletConnectModal.tsx';
-import { SignInModal } from './components/SignInModal.tsx';
 
 import Home from './pages/Home.tsx';
 import Presale from './pages/Presale.tsx';
@@ -34,19 +34,9 @@ import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana, isWalletModalOpen, setWalletModalOpen, isSignInModalOpen, setSignInModalOpen } = useAppContext();
-  const { connected, isAuthenticated, address } = solana;
-  const isAdmin = isAuthenticated && address === ADMIN_WALLET_ADDRESS;
-
-  useEffect(() => {
-      if (connected && !isAuthenticated) {
-          setSignInModalOpen(true);
-      }
-      if (!connected) {
-          setSignInModalOpen(false);
-      }
-  }, [connected, isAuthenticated, setSignInModalOpen]);
-
+  const { isMaintenanceActive, solana, isWalletModalOpen, setWalletModalOpen } = useAppContext();
+  const { connected, address } = solana;
+  const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
 
   if (isMaintenanceActive && !isAdmin) {
     return <Maintenance />;
@@ -61,11 +51,27 @@ const AppContent = () => {
           <Route path="/whitepaper"><Whitepaper /></Route>
           <Route path="/tokenomics"><Tokenomics /></Route>
           <Route path="/roadmap"><Roadmap /></Route>
-          <Route path="/staking"><Staking /></Route>
-          <Route path="/vesting"><Vesting /></Route>
-          <Route path="/airdrop"><Airdrop /></Route>
+          <Route path="/staking">
+            <ComingSoonWrapper>
+              <Staking />
+            </ComingSoonWrapper>
+          </Route>
+          <Route path="/vesting">
+            <ComingSoonWrapper>
+              <Vesting />
+            </ComingSoonWrapper>
+          </Route>
+          <Route path="/airdrop">
+            <ComingSoonWrapper>
+              <Airdrop />
+            </ComingSoonWrapper>
+          </Route>
           <Route path="/donations"><Donations /></Route>
-          <Route path="/dashboard/token/:mint"><TokenDetail /></Route>
+          <Route path="/dashboard/token/:mint">
+            <ComingSoonWrapper>
+              <TokenDetail />
+            </ComingSoonWrapper>
+          </Route>
           <Route path="/dashboard"><Dashboard /></Route>
           <Route path="/profile"><Profile /></Route>
           <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
@@ -74,14 +80,17 @@ const AppContent = () => {
           <Route path="/partnerships"><Partnerships /></Route>
           <Route path="/faq"><FAQ /></Route>
           <Route path="/contact"><Contact /></Route>
-          <Route path="/governance"><Governance /></Route>
+          <Route path="/governance">
+            <ComingSoonWrapper>
+              <Governance />
+            </ComingSoonWrapper>
+          </Route>
           {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
           <Route path="/maintenance"><Maintenance /></Route>
           <Route path="/"><Home /></Route>
         </Switch>
       </Layout>
       <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setWalletModalOpen(false)} />
-      <SignInModal isOpen={isSignInModalOpen} onClose={() => setSignInModalOpen(false)} />
     </Router>
   );
 };

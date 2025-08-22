@@ -1,16 +1,3 @@
-import React from 'react';
-
-// Add Spline Viewer to global JSX definitions to prevent TypeScript errors
-declare global {
-    namespace JSX {
-        interface IntrinsicElements {
-            'spline-viewer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-                url: string;
-                'events-target'?: string;
-            };
-        }
-    }
-}
 
 export interface Token {
   name: string;
@@ -21,13 +8,6 @@ export interface Token {
   usdValue: number;
   decimals: number;
   pricePerToken: number;
-}
-
-export interface Nft {
-  id: string;
-  name: string;
-  imageUrl: string;
-  collectionName?: string;
 }
 
 export interface Wallet {
@@ -75,7 +55,7 @@ export interface ChatMessage {
 }
 
 export interface TokenExtensionState {
-  [key:string]: any;
+  [key: string]: any;
 }
 
 export interface TokenExtension {
@@ -166,4 +146,21 @@ export interface PresaleTransaction {
   solAmount: number;
   owfnAmount: number;
   time: Date;
+}
+
+export interface Nft {
+  id: string; // mint address
+  name: string;
+  imageUrl?: string;
+  collectionName?: string;
+  solscanUrl: string;
+}
+
+export interface HumanizedTransaction {
+  signature: string;
+  timestamp: Date;
+  type: 'send' | 'receive' | 'swap' | 'unknown' | 'airdrop';
+  description: string;
+  solscanUrl: string;
+  status: 'success' | 'failed';
 }

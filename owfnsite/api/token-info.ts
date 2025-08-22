@@ -8,11 +8,7 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Mint address is required." });
     }
 
-    const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
-    if (!HELIUS_API_KEY) {
-        console.error("CRITICAL: HELIUS_API_KEY environment variable is not set.");
-        return res.status(500).json({ error: "Server configuration error." });
-    }
+    const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
 
     try {
         // Step 1: Fetch asset data from Helius for on-chain details and metadata
@@ -50,8 +46,9 @@ export default async function handler(req: any, res: any) {
 
         let totalSupply = 0;
         try {
+            // Defensive parsing for potentially very large numbers
             totalSupply = parseFloat(tokenInfo.supply) / Math.pow(10, decimals);
-        } catch { /* Fails gracefully */ }
+        } catch { /* Fails gracefully, remains 0 */ }
         
         const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
         const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
@@ -60,7 +57,7 @@ export default async function handler(req: any, res: any) {
         if (tokenStandard === 'Token-2022' && Array.isArray(splTokenInfo.token_extensions)) {
             tokenExtensions = splTokenInfo.token_extensions.map((ext: any) => ({
                 extension: ext?.extension || 'unknown',
-                state: ext?.state || {},
+                state: { ...(ext?.state || {}), mintDecimals: decimals },
             }));
         }
         
@@ -88,12 +85,13 @@ export default async function handler(req: any, res: any) {
             if (dexResponse.ok) {
                 const dexData = await dexResponse.json();
                 if (dexData.pairs && dexData.pairs.length > 0) {
+                    // Find the most liquid pair
                     const primaryPair = dexData.pairs.reduce((prev: any, current: any) => 
                         (prev.liquidity?.usd ?? 0) > (current.liquidity?.usd ?? 0) ? prev : current
                     );
 
                     responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
-                    responseData.marketCap = primaryPair.marketCap ?? 0;
+                    responseData.marketCap = primaryPair.marketCap ?? 0; // Use marketCap directly if available
                     responseData.fdv = primaryPair.fdv ?? 0;
                     responseData.volume24h = primaryPair.volume?.h24 || 0;
                     responseData.price24hChange = primaryPair.priceChange?.h24 || 0;
@@ -111,6 +109,7 @@ export default async function handler(req: any, res: any) {
             }
         } catch (dexError) {
             console.warn(`Could not fetch market data for ${mintAddress} from DexScreener:`, dexError);
+            // Gracefully continue without market data, the frontend will handle this
         }
 
         return res.status(200).json(responseData);

@@ -2,19 +2,18 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
-import type { Token, Nft } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS, HELIUS_API_KEY, HELIUS_API_BASE_URL } from '../constants.ts';
+import type { Token, Nft, HumanizedTransaction } from '../types.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS, HELIUS_API_KEY } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
-import bs58 from 'bs58';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
 export interface UseSolanaReturn {
   connected: boolean;
-  isAuthenticated: boolean;
-  isAuthLoading: boolean;
   address: string | null;
   userTokens: Token[];
-  userNFTs: Nft[];
+  nfts: Nft[];
+  transactions: HumanizedTransaction[];
+  solDomain: string | null;
   loading: boolean;
   userStats: {
     totalDonated: number;
@@ -27,9 +26,8 @@ export interface UseSolanaReturn {
   earnedRewards: number;
   connection: Connection;
   disconnectWallet: () => Promise<void>;
-  fetchWalletAssets: (walletAddress: string) => Promise<{ tokens: Token[], nfts: Nft[] }>;
+  getWalletBalances: (walletAddress: string) => Promise<Token[]>;
   sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
-  signIn: () => Promise<boolean>;
   stakeTokens: (amount: number) => Promise<any>;
   unstakeTokens: (amount: number) => Promise<any>;
   claimRewards: () => Promise<any>;
@@ -44,156 +42,216 @@ const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
     'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
 };
 
-const assetCache = new Map<string, { data: { tokens: Token[], nfts: Nft[] }, timestamp: number }>();
+const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, signMessage, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
-  
+  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
-  const [userNFTs, setUserNFTs] = useState<Nft[]>([]);
+  const [nfts, setNfts] = useState<Nft[]>([]);
+  const [transactions, setTransactions] = useState<HumanizedTransaction[]>([]);
+  const [solDomain, setSolDomain] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
 
-  const disconnectWallet = useCallback(async () => {
-      setIsAuthenticated(false);
-      sessionStorage.removeItem('owfn-auth-token');
-      await disconnect();
-  }, [disconnect]);
-
-  useEffect(() => {
-    // On address change (connect/disconnect), reset auth status
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('owfn-auth-token');
-    // Attempt to re-validate session if a public key exists
-    if (publicKey) {
-        const token = sessionStorage.getItem('owfn-auth-token');
-        if (token === publicKey.toBase58()) {
-            setIsAuthenticated(true);
-        }
-    }
-  }, [publicKey]);
-
-  const fetchWalletAssets = useCallback(async (walletAddress: string): Promise<{ tokens: Token[], nfts: Nft[] }> => {
-    const cached = assetCache.get(walletAddress);
+  const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
+    const cached = balanceCache.get(walletAddress);
     if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
         return cached.data;
     }
       
-    setLoading(true);
     try {
-        const balancesUrl = `${HELIUS_API_BASE_URL}/v0/addresses/${walletAddress}/balances?api-key=${HELIUS_API_KEY}`;
-        const response = await fetch(balancesUrl);
-
-        if (!response.ok) {
-            throw new Error(`Helius API call failed: ${response.status} ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        const allTokens: Token[] = [];
-
-        // Process native SOL balance
-        if (data.nativeBalance) {
-            const balance = data.nativeBalance / LAMPORTS_PER_SOL;
-            if (balance > 0) {
-                 allTokens.push({
-                    mintAddress: 'So11111111111111111111111111111111111111112',
-                    balance: balance,
-                    decimals: 9,
-                    name: 'Solana',
-                    symbol: 'SOL',
-                    logo: React.createElement(SolIcon, null),
-                    pricePerToken: 0, // Will be fetched later
-                    usdValue: 0,
-                });
-            }
-        }
-
-        // Process SPL tokens
-        if (data.tokens && data.tokens.length > 0) {
-            const splTokens = data.tokens
-                .filter((asset: any) => asset.amount > 0)
-                .map((asset: any): Token => ({
-                    mintAddress: asset.mint,
-                    balance: asset.amount / Math.pow(10, asset.decimals),
-                    decimals: asset.decimals,
-                    name: asset.tokenMetadata?.name || 'Unknown Token',
-                    symbol: asset.tokenMetadata?.symbol || `${asset.mint.slice(0, 4)}..`,
-                    logo: KNOWN_TOKEN_ICONS[asset.mint] || React.createElement(GenericTokenIcon, { uri: asset.tokenMetadata?.logo }),
-                    usdValue: 0,
-                    pricePerToken: 0,
-                }));
-            allTokens.push(...splTokens);
-        }
+        const response = await fetch(HELIUS_RPC_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 'my-id',
+                method: 'getAssetsByOwner',
+                params: {
+                    ownerAddress: walletAddress,
+                    page: 1,
+                    limit: 1000,
+                    displayOptions: {
+                        showFungible: true,
+                        showNativeBalance: true,
+                    },
+                },
+            }),
+        });
         
-        // Fetch prices in batches from Jupiter
-        const mints = allTokens.map(t => t.mintAddress);
-        if (mints.length > 0) {
+        if (!response.ok) throw new Error('Failed to fetch assets from Helius');
+        const { result } = await response.json();
+        if (!result) return [];
+       
+        const allTokens: Token[] = [];
+        if (result.nativeBalance && result.nativeBalance.lamports > 0) {
+            const pricePerSol = result.nativeBalance.price_per_sol || 0;
+            const balance = result.nativeBalance.lamports / LAMPORTS_PER_SOL;
+            const solToken: Token = {
+                mintAddress: 'So11111111111111111111111111111111111111112',
+                balance: balance,
+                decimals: 9,
+                name: 'Solana',
+                symbol: 'SOL',
+                logo: React.createElement(SolIcon, null),
+                pricePerToken: pricePerSol,
+                usdValue: result.nativeBalance.total_price || (balance * pricePerSol),
+            };
+            allTokens.push(solToken);
+        }
+
+        const splTokens: Token[] = (result.items || [])
+            .filter((asset: any) => asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed)
+            .map((asset: any): Token => ({
+                mintAddress: asset.id,
+                balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
+                decimals: asset.token_info.decimals,
+                name: asset.content?.metadata?.name || 'Unknown Token',
+                symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
+                logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
+                usdValue: 0,
+                pricePerToken: 0,
+            }));
+
+        allTokens.push(...splTokens);
+        if (allTokens.length === 0) return [];
+        
+        const splMintsToFetch = splTokens.map(t => t.mintAddress).join(',');
+
+        if (splMintsToFetch) {
             try {
-                const priceDataMap = new Map<string, any>();
-                const CHUNK_SIZE = 100;
-                
-                for (let i = 0; i < mints.length; i += CHUNK_SIZE) {
-                    const chunk = mints.slice(i, i + CHUNK_SIZE).join(',');
-                    if (chunk) {
-                        const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${chunk}`);
-                        if (priceRes.ok) {
-                            const priceResult = await priceRes.json();
-                            if (priceResult.data) {
-                                for (const mint in priceResult.data) {
-                                    priceDataMap.set(mint, priceResult.data[mint]);
-                                }
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${splMintsToFetch}`);
+                if (priceRes.ok) {
+                    const priceData = await priceRes.json();
+                    if (priceData.data) {
+                         allTokens.forEach(token => {
+                            if (token.mintAddress === 'So11111111111111111111111111111111111111112') return;
+                            const priceInfo = priceData.data[token.mintAddress];
+                            if (priceInfo && priceInfo.price) {
+                                token.pricePerToken = priceInfo.price;
+                                token.usdValue = token.balance * priceInfo.price;
                             }
-                        }
+                        });
                     }
                 }
-
-                allTokens.forEach(token => {
-                    const priceData = priceDataMap.get(token.mintAddress);
-                    if (priceData && priceData.price) {
-                        const price = priceData.price;
-                        token.pricePerToken = price;
-                        token.usdValue = token.balance * price;
-                    }
-                });
-
             } catch (priceError) {
-                console.warn(`Could not fetch token prices for ${walletAddress}:`, priceError);
+                console.error("Could not fetch token prices:", priceError);
             }
         }
         
         const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
-        const assets = { tokens: sortedTokens, nfts: [] }; // NFTs are not included in this endpoint
-        assetCache.set(walletAddress, { data: assets, timestamp: Date.now() });
-        return assets;
+        balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
+        return sortedTokens;
 
     } catch (error) {
-        console.error(`Error fetching wallet assets for ${walletAddress}:`, error);
-        return { tokens: [], nfts: [] };
+        console.error("Error fetching wallet balances:", error);
+        return [];
+    }
+  }, [connection]);
+  
+  const fetchWalletDetails = useCallback(async (walletAddress: string) => {
+    setLoading(true);
+    try {
+        const tokensPromise = getWalletBalances(walletAddress);
+
+        const nftsPromise = (async () => {
+            const response = await fetch(HELIUS_RPC_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 'my-id',
+                    method: 'getAssetsByOwner',
+                    params: { ownerAddress: walletAddress, page: 1, limit: 100, displayOptions: { showFungible: false, showNonFungible: true } },
+                }),
+            });
+            if (!response.ok) return [];
+            const { result } = await response.json();
+            return (result.items || [])
+                .filter((asset: any) => asset.interface === 'V1_NFT' && !asset.compression?.compressed)
+                .map((asset: any): Nft => ({
+                    id: asset.id,
+                    name: asset.content?.metadata?.name || 'Unnamed NFT',
+                    imageUrl: asset.content?.links?.image,
+                    collectionName: asset.grouping?.find(g => g.group_key === 'collection')?.group_value,
+                    solscanUrl: `https://solscan.io/token/${asset.id}`
+                }));
+        })();
+        
+        const txsPromise = (async () => {
+            const url = `https://api.helius.xyz/v0/addresses/${walletAddress}/transactions?api-key=${HELIUS_API_KEY}&limit=25`;
+            const response = await fetch(url);
+            if (!response.ok) return [];
+            const data = await response.json();
+            return (data || []).map((tx: any): HumanizedTransaction => {
+                let type: HumanizedTransaction['type'] = 'unknown';
+                let description = `Transaction: ${tx.signature.slice(0,10)}...`;
+
+                if (tx.type === 'NATIVE_TRANSFER') {
+                    const isSender = tx.nativeTransfers[0].fromUserAccount === walletAddress;
+                    type = isSender ? 'send' : 'receive';
+                    const amount = (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL).toFixed(4);
+                    description = `${isSender ? 'Sent' : 'Received'} ${amount} SOL ${isSender ? 'to' : 'from'} ${isSender ? tx.nativeTransfers[0].toUserAccount.slice(0,4) : tx.nativeTransfers[0].fromUserAccount.slice(0,4)}...`;
+                }
+
+                return {
+                    signature: tx.signature,
+                    timestamp: new Date(tx.timestamp * 1000),
+                    type,
+                    description,
+                    status: tx.error ? 'failed' : 'success',
+                    solscanUrl: `https://solscan.io/tx/${tx.signature}`
+                };
+            });
+        })();
+
+        const domainPromise = (async () => {
+             const response = await fetch(HELIUS_RPC_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 'my-id',
+                    method: 'getNamesForAddress',
+                    params: [walletAddress],
+                }),
+            });
+            if (!response.ok) return null;
+            const { result } = await response.json();
+            return result?.names?.[0] || null;
+        })();
+
+        const [tokensResult, nftsResult, txsResult, domainResult] = await Promise.all([tokensPromise, nftsPromise, txsPromise, domainPromise]);
+
+        setUserTokens(tokensResult);
+        setNfts(nftsResult);
+        setTransactions(txsResult);
+        setSolDomain(domainResult);
+
+    } catch (error) {
+        console.error("Error fetching wallet details:", error);
     } finally {
         setLoading(false);
     }
-  }, [connection]);
+  }, [getWalletBalances]);
 
   useEffect(() => {
     if (connected && address) {
-      fetchWalletAssets(address).then(({tokens, nfts}) => {
-          setUserTokens(tokens);
-          setUserNFTs(nfts);
-      });
+        fetchWalletDetails(address);
     } else {
-      setUserTokens([]);
-      setUserNFTs([]);
-      assetCache.clear();
+        setUserTokens([]);
+        setNfts([]);
+        setTransactions([]);
+        setSolDomain(null);
+        balanceCache.clear();
     }
-  }, [connected, address, fetchWalletAssets]);
+  }, [connected, address, fetchWalletDetails]);
 
  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
-    if (!isAuthenticated || !publicKey || !signTransaction) {
+    if (!connected || !publicKey || !signTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
     setLoading(true);
@@ -205,49 +263,80 @@ export const useSolana = (): UseSolanaReturn => {
         if (tokenSymbol === 'SOL') {
             instructions.push(
                 SystemProgram.transfer({
-                    fromPubkey: publicKey, toPubkey: toPublicKey,
+                    fromPubkey: publicKey,
+                    toPubkey: toPublicKey,
                     lamports: Math.round(amount * LAMPORTS_PER_SOL),
                 })
             );
         } else {
             const mintAddress = KNOWN_TOKEN_MINT_ADDRESSES[tokenSymbol];
-            if (!mintAddress) throw new Error(`Unknown token: ${tokenSymbol}`);
+            if (!mintAddress) throw new Error(`Unknown token symbol: ${tokenSymbol}`);
+
             const mintPublicKey = new PublicKey(mintAddress);
             const tokenInfo = userTokens.find(t => t.symbol === tokenSymbol);
-            if (!tokenInfo) throw new Error(`Token ${tokenSymbol} not found.`);
+            if (!tokenInfo) throw new Error(`Token ${tokenSymbol} not found in user's wallet.`);
             
+            const decimals = tokenInfo.decimals;
+            const transferAmount = BigInt(Math.round(amount * Math.pow(10, decimals)));
+
             const fromTokenAccount = await getAssociatedTokenAddress(mintPublicKey, publicKey);
             const toTokenAccount = await getAssociatedTokenAddress(mintPublicKey, toPublicKey);
             
             try {
-                await getAccount(connection, toTokenAccount);
-            } catch (e) {
-                instructions.push(
-                    createAssociatedTokenAccountInstruction(publicKey, toTokenAccount, toPublicKey, mintPublicKey)
-                );
+                await getAccount(connection, toTokenAccount, 'confirmed');
+            } catch (error) {
+                if (error instanceof Error && (error.name === 'TokenAccountNotFoundError' || error.message.includes('not found'))) {
+                    instructions.push(
+                        createAssociatedTokenAccountInstruction(
+                            publicKey,
+                            toTokenAccount,
+                            toPublicKey,
+                            mintPublicKey
+                        )
+                    );
+                } else {
+                    throw error;
+                }
             }
+            
             instructions.push(
-                createTransferInstruction(fromTokenAccount, toTokenAccount, publicKey, BigInt(Math.round(amount * Math.pow(10, tokenInfo.decimals))))
+                createTransferInstruction(
+                    fromTokenAccount,
+                    toTokenAccount,
+                    publicKey,
+                    transferAmount
+                )
             );
         }
 
         const latestBlockHash = await connection.getLatestBlockhash('finalized');
-        const messageV0 = new TransactionMessage({
-            payerKey: publicKey, recentBlockhash: latestBlockHash.blockhash, instructions,
-        }).compileToV0Message();
-        const transaction = new VersionedTransaction(messageV0);
-        const signedTransaction = await signTransaction(transaction);
-        const signature = await connection.sendTransaction(signedTransaction);
-        await connection.confirmTransaction({ signature, ...latestBlockHash }, 'finalized');
         
-        console.log(`Transaction successful: ${signature}`);
+        const messageV0 = new TransactionMessage({
+            payerKey: publicKey,
+            recentBlockhash: latestBlockHash.blockhash,
+            instructions,
+        }).compileToV0Message();
+
+        const transaction = new VersionedTransaction(messageV0);
+
+        const signedTransaction = await signTransaction(transaction);
+
+        const signature = await connection.sendTransaction(signedTransaction, {
+            skipPreflight: false,
+            preflightCommitment: 'finalized',
+        });
+        
+        await connection.confirmTransaction({
+            blockhash: latestBlockHash.blockhash,
+            lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+            signature: signature
+        }, 'finalized');
+
+        console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
         if (address) {
-            assetCache.delete(address);
-            fetchWalletAssets(address).then(({tokens, nfts}) => {
-                setUserTokens(tokens);
-                setUserNFTs(nfts);
-            });
+            balanceCache.delete(address);
+            fetchWalletDetails(address);
         }
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
@@ -256,40 +345,8 @@ export const useSolana = (): UseSolanaReturn => {
         setLoading(false);
         return { success: false, messageKey: 'transaction_failed_alert' };
     }
-  }, [isAuthenticated, publicKey, connection, signTransaction, userTokens, address, fetchWalletAssets]);
+  }, [connected, publicKey, connection, signTransaction, userTokens, address, fetchWalletDetails, getWalletBalances]);
   
-  const signIn = useCallback(async (): Promise<boolean> => {
-      if (!publicKey || !signMessage) {
-          console.error("Wallet not connected or does not support signMessage");
-          return false;
-      }
-      setIsAuthLoading(true);
-      try {
-          const message = new TextEncoder().encode(`Sign this message to authenticate with OWFN.\n\nTimestamp: ${new Date().toISOString()}`);
-          const signature = await signMessage(message);
-          // In a real app, you'd send the signature and public key to a backend for verification.
-          // Here, we just verify the signature locally for demonstration.
-          // This is NOT secure for production authentication but demonstrates the flow.
-          // For a real app, use a proper SIWS library or backend verification.
-          
-          // MOCK VERIFICATION
-          if (signature) {
-             setIsAuthenticated(true);
-             sessionStorage.setItem('owfn-auth-token', publicKey.toBase58());
-             console.log("Authentication successful (mocked)");
-             return true;
-          }
-          throw new Error("Signature failed");
-      } catch (error) {
-          console.error("Sign-in failed:", error);
-          setIsAuthenticated(false);
-          sessionStorage.removeItem('owfn-auth-token');
-          return false;
-      } finally {
-          setIsAuthLoading(false);
-      }
-  }, [publicKey, signMessage]);
-
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
       alert("This feature is coming soon and requires on-chain programs to be deployed.");
@@ -298,23 +355,25 @@ export const useSolana = (): UseSolanaReturn => {
 
   return {
     connected,
-    isAuthenticated,
-    isAuthLoading,
     address,
     userTokens,
-    userNFTs,
+    nfts,
+    transactions,
+    solDomain,
     loading,
     connection,
     userStats: { 
-        totalDonated: 0, projectsSupported: 0, votesCast: 0,
-        donations: [], votedProposalIds: []
+        totalDonated: 0,
+        projectsSupported: 0,
+        votesCast: 0,
+        donations: [],
+        votedProposalIds: []
     },
     stakedBalance: 0,
     earnedRewards: 0,
-    disconnectWallet,
-    fetchWalletAssets,
+    disconnectWallet: disconnect,
+    getWalletBalances,
     sendTransaction,
-    signIn,
     stakeTokens: notImplemented,
     unstakeTokens: notImplemented,
     claimRewards: notImplemented,

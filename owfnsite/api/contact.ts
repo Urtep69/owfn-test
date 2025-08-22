@@ -16,6 +16,7 @@ export default async function handler(req: any, res: any) {
     try {
         const { name, email, reason, message } = req.body;
 
+        // Basic validation
         if (!name || !email || !reason || !message || !name.trim() || !email.trim() || !message.trim()) {
             return res.status(400).json({ success: false, error: 'All fields are required.' });
         }
