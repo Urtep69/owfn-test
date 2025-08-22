@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/assets/owfn.png" />
@@ -29,7 +29,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
-        darkMode: 'class', // Although we are using a light theme, we keep this for potential future toggles.
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
@@ -37,30 +37,30 @@
               display: ['Orbitron', 'sans-serif'],
             },
             colors: {
-              'background': '#F7F9FC',      // Very light, cool gray
-              'surface': '#FFFFFF',         // Pure white for primary content areas
-              'surface-dark': '#F0F3F8',     // Slightly darker surface for depth
-              'surface-light': '#FFFFFF',    // Kept for consistency, same as surface
-              'border-color': '#E1E8F0',     // Soft, light gray border
-              'text-primary': '#111827',     // Dark gray for primary text, high contrast
-              'text-secondary': '#6B7280',    // Muted gray for secondary text
-              'accent': '#00F5A0',           // Vibrant Teal/Turquoise
-              'accent-light': '#00D9F5',     // Vibrant Electric Blue
-              'accent-hover': '#00C4E0',     // Lighter hover for accent
-              'accent-foreground': '#FFFFFF', // Text on accent buttons
-              'success': '#10B981',          // Green for success
-              'danger': '#EF4444',           // Red for errors
-              'warning': '#F59E0B'           // Amber for warnings
+              'background': '#0D1117',      // Deep, dark blue/charcoal
+              'surface': '#161B22',         // Slightly lighter dark surface
+              'surface-dark': '#010409',     // Even darker for depth
+              'surface-light': '#1C2128',    // Lighter surface for subtle contrast
+              'border-color': '#30363d',     // Muted gray border for dark theme
+              'text-primary': '#c9d1d9',     // Off-white for primary text
+              'text-secondary': '#8b949e',    // Gray for secondary text
+              'accent': '#EAB308',           // Vibrant Gold/Yellow
+              'accent-light': '#FFD700',     // Lighter Gold for hover/gradients
+              'accent-hover': '#F0B90B',     // Richer Gold for hover
+              'accent-foreground': '#0D1117', // Dark text on accent buttons
+              'success': '#238636',          // Green for success
+              'danger': '#DA3633',           // Red for errors
+              'warning': '#E3B341'           // Amber for warnings
             },
             boxShadow: {
-              'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
-              'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.07)',
-              'glow-accent': '0 0 20px 0 rgba(0, 217, 245, 0.3)',
+              'card': '0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.15)',
+              'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.25)',
+              'glow-accent': '0 0 20px 0 rgba(234, 179, 8, 0.4)',
+              'glow-lg': '0 0 35px -5px rgba(234, 179, 8, 0.25)',
             },
             animation: {
               'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards',
               'slide-in': 'slideIn 0.5s ease-out forwards',
-              'aurora': 'aurora 60s linear infinite',
             },
             keyframes: {
               fadeInUp: {
@@ -71,60 +71,47 @@
                 '0%': { transform: 'translateX(100%)' },
                 '100%': { transform: 'translateX(0)' },
               },
-              aurora: {
-                '0%': { background-position: '0% 50%' },
-                '50%': { background-position: '100% 50%' },
-                '100%': { background-position: '0% 50%' },
-              },
             },
           },
         },
       };
     </script>
     <style>
-      .glassmorphism {
-        background: rgba(255, 255, 255, 0.6); /* white with alpha for light theme */
+      .glassmorphism-dark {
+        background: rgba(22, 27, 34, 0.6); /* surface with alpha */
         backdrop-filter: blur(16px) saturate(180%);
         -webkit-backdrop-filter: blur(16px) saturate(180%);
-        border: 1px solid rgba(225, 232, 240, 0.5); /* border-color with alpha */
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        border: 1px solid rgba(48, 54, 61, 0.5); /* border-color with alpha */
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
       }
       .font-display {
         font-family: 'Orbitron', sans-serif;
       }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #F7F9FC;
-        color: #111827;
-      }
-      .aurora-background {
-        background: radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 0.1) 0px, transparent 50%), 
-                    radial-gradient(at 97% 21%, hsla(160, 100%, 75%, 0.1) 0px, transparent 50%), 
-                    radial-gradient(at 52% 99%, hsla(180, 100%, 75%, 0.1) 0px, transparent 50%),
-                    radial-gradient(at 10% 29%, hsla(210, 96%, 66%, 0.1) 0px, transparent 50%),
-                    radial-gradient(at 97% 96%, hsla(170, 100%, 75%, 0.1) 0px, transparent 50%),
-                    radial-gradient(at 33% 50%, hsla(200, 98%, 62%, 0.1) 0px, transparent 50%),
-                    radial-gradient(at 79% 53%, hsla(190, 100%, 75%, 0.1) 0px, transparent 50%);
+        background-color: #0D1117;
+        color: #c9d1d9;
       }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.1.1",
-    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
-    "react/": "https://esm.sh/react@^19.1.1/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.13.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.539.0",
-    "@solana/wallet-adapter-react": "https://esm.sh/@solana/wallet-adapter-react@^0.15.39",
-    "@solana/wallet-adapter-react-ui": "https://esm.sh/@solana/wallet-adapter-react-ui@^0.9.39",
-    "@solana/web3.js": "https://esm.sh/@solana/web3.js@^1.98.4",
-    "@solana/spl-token": "https://esm.sh/@solana/spl-token@^0.4.13",
-    "recharts": "https://esm.sh/recharts@^3.1.2",
-    "wouter": "https://esm.sh/wouter@^3.7.1",
-    "@solana/wallet-adapter-base": "https://esm.sh/@solana/wallet-adapter-base@^0.9.27",
-    "@solana/wallet-adapter-solflare": "https://esm.sh/@solana/wallet-adapter-solflare@^0.6.32",
-    "@solana/wallet-adapter-phantom": "https://esm.sh/@solana/wallet-adapter-phantom@^0.9.28",
-    "bs58": "https://esm.sh/bs58@^5.0.0"
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "@google/genai": "https://esm.sh/@google/genai@1.13.0",
+    "lucide-react": "https://esm.sh/lucide-react@0.395.0?deps=react@18.3.1",
+    "@solana/wallet-adapter-react": "https://esm.sh/@solana/wallet-adapter-react@0.15.35?deps=react@18.3.1",
+    "@solana/wallet-adapter-react-ui": "https://esm.sh/@solana/wallet-adapter-react-ui@0.9.35?deps=react@18.3.1,react-dom@18.3.1",
+    "@solana/web3.js": "https://esm.sh/@solana/web3.js@1.98.4",
+    "@solana/spl-token": "https://esm.sh/@solana/spl-token@0.4.13",
+    "recharts": "https://esm.sh/recharts@2.12.7?deps=react@18.3.1,react-dom@18.3.1",
+    "wouter": "https://esm.sh/wouter@3.2.0?deps=react@18.3.1",
+    "@solana/wallet-adapter-base": "https://esm.sh/@solana/wallet-adapter-base@0.9.23",
+    "@solana/wallet-adapter-solflare": "https://esm.sh/@solana/wallet-adapter-solflare@0.6.28?deps=react@18.3.1",
+    "@solana/wallet-adapter-phantom": "https://esm.sh/@solana/wallet-adapter-phantom@0.9.24?deps=react@18.3.1",
+    "bs58": "https://esm.sh/bs58@5.0.0",
+    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
+    "react/": "https://esm.sh/react@18.3.1/"
   }
 }
 </script>

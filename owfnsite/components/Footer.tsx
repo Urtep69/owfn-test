@@ -26,7 +26,7 @@ export const Footer = () => {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-secondary hover:text-accent-light transition-colors"
+                className="text-text-secondary hover:text-accent transition-colors"
                 aria-label={link.name}
               >
                 {link.icon}

@@ -82,7 +82,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     ];
 
     return (
-        <aside className={`fixed top-0 left-0 h-full glassmorphism z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <aside className={`fixed top-0 left-0 h-full glassmorphism-dark z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
              <div className="flex items-center h-24 px-4 flex-shrink-0">
                 <Link to="/" onClick={handleLinkClick} className={`flex items-center space-x-3`}>
                     <OwfnIcon className="h-9 w-9" />

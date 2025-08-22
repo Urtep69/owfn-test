@@ -1,4 +1,5 @@
 
+
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -14,7 +15,7 @@ const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge3', titleKey: 'badge_diverse_donor', descriptionKey: 'badge_diverse_donor_desc', icon: <Gem /> },
 ];
 
-const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => (
+const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string }) => (
     <div className="bg-surface-light p-4 rounded-lg flex items-center space-x-4 border border-border-color">
         <div className="text-accent-light">{icon}</div>
         <div>
@@ -133,8 +134,8 @@ export default function Profile() {
                     <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
                     <div className="grid md:grid-cols-3 gap-4">
                         <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
-                        <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
-                        <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
+                        <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={String(userStats.projectsSupported)} />
+                        <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={String(userStats.votesCast)} />
                     </div>
                 </div>
             </ComingSoonWrapper>

@@ -1,3 +1,16 @@
+import React from 'react';
+
+// Add Spline Viewer to global JSX definitions to prevent TypeScript errors
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            'spline-viewer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+                url: string;
+                'events-target'?: string;
+            };
+        }
+    }
+}
 
 export interface Token {
   name: string;

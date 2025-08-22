@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -39,7 +37,7 @@ export const LanguageSwitcher = () => {
             </button>
             {isOpen && (
                 <div 
-                    className="absolute right-0 mt-2 w-48 bg-surface-dark border border-border-color rounded-md shadow-lg py-1 z-20 animate-fade-in-up" 
+                    className="absolute right-0 mt-2 w-48 glassmorphism-dark bg-surface/80 rounded-md shadow-lg py-1 z-20 animate-fade-in-up" 
                     style={{ animationDuration: '200ms' }}
                     role="menu"
                 >

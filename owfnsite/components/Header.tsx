@@ -1,7 +1,6 @@
 import React from 'react';
 import { Menu, X, LogOut, Wallet, ShieldCheck } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
-import { ThemeSwitcher } from './ThemeSwitcher.tsx';
 import { useAppContext } from '../contexts/AppContext.tsx';
 
 interface HeaderProps {
@@ -53,7 +52,7 @@ const ConnectButton = () => {
     return (
         <button
             onClick={() => setWalletModalOpen(true)}
-            className={`${baseButtonClasses} text-white bg-gradient-to-r from-accent to-accent-light shadow-lg hover:shadow-glow-accent`}
+            className={`${baseButtonClasses} text-accent-foreground bg-gradient-to-r from-accent to-accent-light shadow-lg hover:shadow-glow-accent`}
         >
             {t('connect_wallet')}
         </button>
@@ -63,13 +62,13 @@ const ConnectButton = () => {
 
 export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
   return (
-    <header className="glassmorphism sticky top-4 mx-auto max-w-[calc(100%-2rem)] md:max-w-[calc(100%-4rem)] rounded-xl z-40">
+    <header className="glassmorphism-dark sticky top-4 mx-auto max-w-[calc(100%-2rem)] md:max-w-[calc(100%-4rem)] rounded-xl z-40">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
              <button
               onClick={toggleSidebar}
-              className="p-2 rounded-md text-text-secondary hover:bg-surface-dark focus:outline-none"
+              className="p-2 rounded-md text-text-secondary hover:bg-surface-light focus:outline-none"
               aria-label="Toggle sidebar"
             >
               {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -77,7 +76,6 @@ export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
           </div>
           
           <div className="flex items-center space-x-2">
-            <ThemeSwitcher />
             <LanguageSwitcher />
             <ConnectButton />
           </div>

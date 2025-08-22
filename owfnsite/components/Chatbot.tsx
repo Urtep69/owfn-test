@@ -130,7 +130,7 @@ export const Chatbot = () => {
 
     const containerClasses = isMaximized
         ? "fixed inset-0 flex flex-col bg-background z-50 animate-fade-in-up"
-        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-surface/80 backdrop-blur-lg rounded-2xl shadow-card-hover animate-slide-in z-50 border border-border-color";
+        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col glassmorphism-dark bg-surface/80 rounded-2xl shadow-card-hover animate-slide-in z-50";
 
     return (
         <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>

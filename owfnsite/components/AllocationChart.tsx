@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { TOKEN_ALLOCATIONS } from '../constants.ts';
@@ -7,7 +5,7 @@ import { TOKEN_ALLOCATIONS } from '../constants.ts';
 const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="glassmorphism p-2 border border-border-color rounded-lg shadow-lg text-text-primary">
+        <div className="glassmorphism-dark p-2 border border-border-color rounded-lg shadow-lg text-text-primary">
           <p className="font-bold">{`${payload[0].name}`}</p>
           <p className="text-sm">{`Amount: ${payload[0].value.toLocaleString()} OWFN`}</p>
           <p className="text-sm">{`Percentage: ${payload[0].payload.percentage}%`}</p>
@@ -38,7 +36,7 @@ export const AllocationChart = () => {
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
-          <Legend wrapperStyle={{ color: 'var(--recharts-legend-text-color, #8B949E)' }} />
+          <Legend wrapperStyle={{ color: '#8b949e' }} />
         </PieChart>
       </ResponsiveContainer>
     </div>

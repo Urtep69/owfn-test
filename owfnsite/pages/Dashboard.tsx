@@ -14,10 +14,9 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
 
     useEffect(() => {
         const fetchBalances = async () => {
-            if (!solana.fetchWalletAssets) return;
             setLoading(true);
             try {
-                // Correctly use fetchWalletAssets which is available in the hook
+                // BUG FIX: Correctly call the fetchWalletAssets function from the useSolana hook
                 const fetchedAssets = await solana.fetchWalletAssets(walletInfo.address);
                 setAssets(fetchedAssets);
                 const value = fetchedAssets.tokens.reduce((sum, token) => sum + token.usdValue, 0);
@@ -34,14 +33,14 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
     }, [walletInfo.address, solana.fetchWalletAssets, walletInfo.name]);
 
     return (
-        <div className="glassmorphism p-6 rounded-2xl shadow-card hover:shadow-card-hover transition-shadow duration-300 flex flex-col">
+        <div className="glassmorphism-dark p-6 rounded-2xl shadow-card hover:shadow-card-hover transition-shadow duration-300 flex flex-col">
             <h3 className="text-xl font-bold mb-1 text-text-primary font-display">{walletInfo.name}</h3>
             <div className="mb-4">
                 <AddressDisplay address={walletInfo.address} />
             </div>
             {loading ? (
                  <div className="flex justify-center items-center h-48">
-                    <Loader2 className="w-8 h-8 animate-spin text-accent-light" />
+                    <Loader2 className="w-8 h-8 animate-spin text-accent" />
                 </div>
             ) : (
                 <>

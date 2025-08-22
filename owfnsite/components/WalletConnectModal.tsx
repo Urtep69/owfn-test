@@ -38,7 +38,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
             aria-modal="true"
         >
             <div 
-                className="glassmorphism w-full max-w-sm m-auto animate-fade-in-up rounded-2xl border border-border-color"
+                className="glassmorphism-dark w-full max-w-sm m-auto animate-fade-in-up rounded-2xl border border-border-color"
                 style={{ animationDuration: '300ms' }}
                 onClick={e => e.stopPropagation()}
             >

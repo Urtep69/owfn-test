@@ -32,7 +32,7 @@ interface AggregatedContributor {
     totalOwfn: bigint; // Use BigInt for precision
 }
 
-const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
+const StatCard = ({ title, value, icon }: { title: string, value: string, icon: React.ReactNode }) => (
     <div className="glassmorphism p-6 rounded-lg flex items-center space-x-4">
         <div className="bg-surface-light text-accent-light rounded-full p-3">
             {icon}
@@ -323,8 +323,8 @@ export default function AdminPresale() {
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <StatCard title={t('total_sol_raised')} value={stats.sol.toFixed(4)} icon={<SolIcon className="w-6 h-6"/>} />
-                        <StatCard title={t('total_transactions')} value={stats.count} icon={<FileText />} />
-                        <StatCard title={t('unique_contributors')} value={stats.contributors} icon={<User />} />
+                        <StatCard title={t('total_transactions')} value={String(stats.count)} icon={<FileText />} />
+                        <StatCard title={t('unique_contributors')} value={String(stats.contributors)} icon={<User />} />
                         <StatCard title={t('total_owfn_to_distribute')} value={totalOwfnToDistribute.toLocaleString(undefined, { maximumFractionDigits: 0 })} icon={<PieChart />} />
                     </div>
 
