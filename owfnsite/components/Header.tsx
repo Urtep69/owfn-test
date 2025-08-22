@@ -14,10 +14,12 @@ const ConnectButton = () => {
     const { connected, isAuthenticated, address, disconnectWallet, isAuthLoading } = solana;
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
+    
+    const baseButtonClasses = "font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105";
 
     if (isAuthenticated && address) {
         return (
-             <div className="flex items-center space-x-2 bg-surface-light rounded-lg">
+             <div className="flex items-center space-x-2 bg-surface rounded-lg border border-border-color shadow-card">
                 <div
                     className="flex items-center space-x-2 pl-3 pr-2 py-2 text-text-primary"
                 >
@@ -40,7 +42,7 @@ const ConnectButton = () => {
             <button
                 onClick={() => setSignInModalOpen(true)}
                 disabled={isAuthLoading}
-                className="bg-warning text-background font-bold py-2 px-4 rounded-lg hover:bg-yellow-300 transition-colors flex items-center gap-2"
+                className={`${baseButtonClasses} bg-warning text-white flex items-center gap-2 shadow-md hover:shadow-lg`}
             >
                 <ShieldCheck size={18} />
                 {isAuthLoading ? t('processing') : 'Verify Wallet'}
@@ -51,7 +53,7 @@ const ConnectButton = () => {
     return (
         <button
             onClick={() => setWalletModalOpen(true)}
-            className="bg-accent-light text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors"
+            className={`${baseButtonClasses} text-white bg-gradient-to-r from-accent to-accent-light shadow-lg hover:shadow-glow-accent`}
         >
             {t('connect_wallet')}
         </button>
@@ -61,13 +63,13 @@ const ConnectButton = () => {
 
 export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
   return (
-    <header className="glassmorphism sticky top-0 z-40">
+    <header className="glassmorphism sticky top-4 mx-auto max-w-[calc(100%-2rem)] md:max-w-[calc(100%-4rem)] rounded-xl z-40">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
              <button
               onClick={toggleSidebar}
-              className="p-2 rounded-md text-text-secondary hover:bg-surface-light focus:outline-none"
+              className="p-2 rounded-md text-text-secondary hover:bg-surface-dark focus:outline-none"
               aria-label="Toggle sidebar"
             >
               {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

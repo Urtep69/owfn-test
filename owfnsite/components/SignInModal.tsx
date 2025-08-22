@@ -16,7 +16,6 @@ export const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose }) => 
         if (success) {
             onClose();
         } else {
-            // Optionally show an error message within the modal
             alert("Signature failed or was rejected. Please try again.");
         }
     };
@@ -31,7 +30,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose }) => 
             aria-modal="true"
         >
             <div 
-                className="bg-surface-1 rounded-2xl shadow-glow-md w-full max-w-sm m-auto animate-fade-in-up border border-border-color"
+                className="glassmorphism w-full max-w-sm m-auto animate-fade-in-up rounded-2xl border border-border-color"
                 style={{ animationDuration: '300ms' }}
                 onClick={e => e.stopPropagation()}
             >
@@ -40,7 +39,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose }) => 
                         <ShieldCheck className="text-accent" />
                         Verify Wallet Ownership
                     </h2>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-surface-2">
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-surface-dark">
                         <X size={20} className="text-text-secondary" />
                     </button>
                 </header>
@@ -49,11 +48,11 @@ export const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose }) => 
                     <p className="text-text-secondary">
                         To access your full profile and advanced features, please sign a message to prove you own this wallet.
                     </p>
-                    <div className="bg-surface-2 p-3 rounded-lg text-sm text-text-secondary border border-border-color">
+                    <div className="bg-surface-dark p-3 rounded-lg text-sm text-text-secondary border border-border-color">
                         <p className="font-mono break-all">{address}</p>
                     </div>
 
-                    <div className="text-xs text-text-secondary flex items-start gap-2 text-left p-3 bg-surface-2 rounded-lg">
+                    <div className="text-xs text-text-secondary flex items-start gap-2 text-left p-3 bg-surface-dark rounded-lg">
                         <Info size={28} className="flex-shrink-0 mt-0.5" />
                         <span>This is a gas-free action and does not grant any permissions to move your funds. It's simply a cryptographic proof of ownership.</span>
                     </div>
@@ -61,7 +60,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose }) => 
                     <button 
                         onClick={handleSignIn}
                         disabled={isAuthLoading}
-                        className="w-full bg-accent text-accent-foreground font-bold py-3 px-4 rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
+                        className="w-full bg-gradient-to-r from-accent to-accent-light text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
                         {isAuthLoading ? 'Waiting for signature...' : 'Sign and Verify'}
                     </button>

@@ -44,7 +44,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
             >
                 <header className="flex items-center justify-between p-4 border-b border-border-color">
                     <h2 className="text-lg font-bold text-text-primary">{t('connect_wallet')}</h2>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-surface-2 transition-colors">
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-surface-dark transition-colors">
                         <X size={20} className="text-text-secondary" />
                     </button>
                 </header>
@@ -55,7 +55,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                             <button
                                 key={wallet.adapter.name}
                                 onClick={() => handleWalletSelect(wallet.adapter.name as WalletName)}
-                                className="w-full flex items-center space-x-4 p-3 rounded-lg bg-surface-2 hover:bg-surface-3 transition-colors"
+                                className="w-full flex items-center space-x-4 p-3 rounded-lg bg-surface-dark hover:bg-border-color/50 transition-colors"
                             >
                                  <img src={wallet.adapter.icon} alt={wallet.adapter.name} className="w-8 h-8 rounded-full"/>
                                  <span className="font-semibold text-text-primary">{wallet.adapter.name}</span>
@@ -64,7 +64,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                      </div>
                 </div>
 
-                 <footer className="p-4 text-center text-xs text-text-secondary bg-surface-1/50 border-t border-border-color rounded-b-2xl">
+                 <footer className="p-4 text-center text-xs text-text-secondary bg-surface-dark/50 border-t border-border-color rounded-b-2xl">
                     <p>By connecting, you agree to our Terms of Service.</p>
                 </footer>
             </div>

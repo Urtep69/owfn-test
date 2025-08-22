@@ -3,16 +3,15 @@ import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, TrendingUp, Gift, Database, HeartHandshake } from 'lucide-react';
 import { OwfnIcon } from '../components/IconComponents.tsx';
 
-const StatCard = ({ icon, title, value, subtext }: { icon: React.ReactNode, title: string, value: string, subtext?: string }) => (
-    <div className="glassmorphism p-6 rounded-xl">
+const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string }) => (
+    <div className="glassmorphism p-6 rounded-xl shadow-card">
         <div className="flex items-center space-x-4">
-            <div className="bg-surface-2 text-accent rounded-lg p-3">
+            <div className="bg-gradient-to-br from-accent/10 to-accent-light/10 text-accent-light rounded-lg p-3">
                 {icon}
             </div>
             <div>
                 <p className="text-sm text-text-secondary">{title}</p>
-                <p className="text-2xl font-bold text-text-primary">{value}</p>
-                 {subtext && <p className="text-xs text-text-secondary">{subtext}</p>}
+                <p className="text-2xl font-bold font-display text-text-primary">{value}</p>
             </div>
         </div>
     </div>
@@ -22,13 +21,13 @@ const ConnectWalletPrompt = () => {
     const { t, solana, setWalletModalOpen } = useAppContext();
     return (
         <div className="text-center p-12 glassmorphism rounded-lg">
-            <Wallet className="mx-auto w-16 h-16 text-accent mb-4" />
+            <Wallet className="mx-auto w-16 h-16 text-accent-light mb-4" />
             <h2 className="text-2xl font-bold mb-2">{t('staking_connect_title')}</h2>
             <p className="text-text-secondary mb-6">{t('staking_connect_prompt')}</p>
             <button
                 onClick={() => setWalletModalOpen(true)}
                 disabled={solana.loading}
-                className="bg-accent hover:bg-accent-hover text-accent-foreground font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
+                className="text-white bg-gradient-to-r from-accent to-accent-light font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-lg hover:shadow-glow-accent disabled:opacity-50"
             >
                 {solana.loading ? t('connecting') : t('connect_wallet')}
             </button>
@@ -60,24 +59,20 @@ const StakingInterface = () => {
         }
         
         if (result.success) {
-            alert(t(result.messageKey, result.params));
+            alert(t(result.messageKey, { amount: numAmount }));
             setAmount('');
-        } else {
-            // Error is handled inside the hook for now
         }
     };
     
     const handleClaim = async () => {
         const result = await solana.claimRewards();
          if (result.success) {
-            alert(t(result.messageKey, result.params));
-        } else {
-            // Error is handled inside the hook for now
+            alert(t(result.messageKey, { amount: solana.earnedRewards }));
         }
     }
 
     const setPercentage = (percentage: number) => {
-        setAmount(((balance * percentage) / 100).toString());
+        setAmount(parseFloat(((balance * percentage) / 100).toFixed(6)).toString());
     }
 
     return (
@@ -85,8 +80,8 @@ const StakingInterface = () => {
          <div className="grid md:grid-cols-2 gap-8">
             <div className="glassmorphism p-8 rounded-lg">
                 <div className="flex border-b border-border-color mb-6">
-                    <button onClick={() => setActiveTab('stake')} className={`py-2 px-4 font-semibold ${activeTab === 'stake' ? 'border-b-2 border-accent text-accent' : 'text-text-secondary'}`}>{t('stake')}</button>
-                    <button onClick={() => setActiveTab('unstake')} className={`py-2 px-4 font-semibold ${activeTab === 'unstake' ? 'border-b-2 border-accent text-accent' : 'text-text-secondary'}`}>{t('unstake')}</button>
+                    <button onClick={() => setActiveTab('stake')} className={`py-2 px-4 font-semibold transition-colors ${activeTab === 'stake' ? 'border-b-2 border-accent text-accent' : 'text-text-secondary'}`}>{t('stake')}</button>
+                    <button onClick={() => setActiveTab('unstake')} className={`py-2 px-4 font-semibold transition-colors ${activeTab === 'unstake' ? 'border-b-2 border-accent text-accent' : 'text-text-secondary'}`}>{t('unstake')}</button>
                 </div>
                 <div>
                     <div className="flex justify-between items-center mb-2">
@@ -100,16 +95,16 @@ const StakingInterface = () => {
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder="0.0"
-                            className="w-full p-3 bg-surface-2 border border-border-color rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent focus:outline-none pr-16"
+                            className="w-full p-3 bg-surface-dark border border-border-color rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent focus:outline-none pr-16"
                         />
                         <OwfnIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8"/>
                     </div>
                      <div className="flex justify-between mt-2 space-x-2">
                         {[25, 50, 75, 100].map(p => (
-                            <button key={p} onClick={() => setPercentage(p)} className="flex-1 text-xs bg-surface-2 hover:bg-surface-3 py-1 rounded-md transition-colors border border-border-color">{p === 100 ? 'MAX' : `${p}%`}</button>
+                            <button key={p} onClick={() => setPercentage(p)} className="flex-1 text-xs bg-surface-dark hover:bg-surface-dark/80 py-1 rounded-md transition-colors border border-border-color">{p === 100 ? 'MAX' : `${p}%`}</button>
                         ))}
                     </div>
-                    <button onClick={handleAction} disabled={solana.loading} className="mt-6 w-full bg-accent text-accent-foreground font-bold py-3 rounded-lg text-lg hover:bg-accent-hover transition-colors disabled:opacity-50">
+                    <button onClick={handleAction} disabled={solana.loading || parseFloat(amount) <= 0} className="mt-6 w-full bg-gradient-to-r from-accent to-accent-light text-white font-bold py-3 rounded-lg text-lg hover:opacity-90 transition-opacity disabled:opacity-50">
                         {solana.loading ? t('processing') : (activeTab === 'stake' ? t('stake_owfn') : t('unstake_owfn'))}
                     </button>
                 </div>
@@ -117,17 +112,17 @@ const StakingInterface = () => {
              <div className="glassmorphism p-8 rounded-lg flex flex-col justify-center items-center text-center">
                  <Gift size={48} className="text-accent mb-4" />
                  <h3 className="text-xl font-bold">{t('my_rewards')}</h3>
-                 <p className="text-4xl font-bold my-2 text-accent">{solana.earnedRewards.toLocaleString(undefined, {minimumFractionDigits: 4, maximumFractionDigits: 4})}</p>
-                 <button onClick={handleClaim} disabled={solana.loading || solana.earnedRewards <= 0} className="mt-4 w-full max-w-xs bg-accent text-accent-foreground font-bold py-3 rounded-lg text-lg hover:bg-accent-hover transition-colors disabled:opacity-50">
+                 <p className="text-4xl font-bold my-2 text-accent-light font-display">{solana.earnedRewards.toLocaleString(undefined, {minimumFractionDigits: 4, maximumFractionDigits: 4})}</p>
+                 <button onClick={handleClaim} disabled={solana.loading || solana.earnedRewards <= 0} className="mt-4 w-full max-w-xs bg-gradient-to-r from-accent to-accent-light text-white font-bold py-3 rounded-lg text-lg hover:opacity-90 transition-opacity disabled:opacity-50">
                     {solana.loading ? t('processing') : t('claim_rewards')}
                  </button>
             </div>
         </div>
          <div className="mt-8 glassmorphism p-8 rounded-lg">
-            <div className="flex items-center gap-4 mb-4">
-                <HeartHandshake className="w-10 h-10 text-rose-500"/>
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+                <HeartHandshake className="w-10 h-10 text-rose-500 flex-shrink-0"/>
                 <div>
-                    <h3 className="text-2xl font-bold">{t('impact_staking_title')}</h3>
+                    <h3 className="text-2xl font-bold font-display">{t('impact_staking_title')}</h3>
                     <p className="text-text-secondary">{t('impact_staking_desc')}</p>
                 </div>
             </div>
@@ -139,9 +134,9 @@ const StakingInterface = () => {
                     step="1"
                     value={impactStakingPercentage}
                     onChange={(e) => setImpactStakingPercentage(Number(e.target.value))}
-                    className="w-full h-2 bg-surface-3 rounded-lg appearance-none cursor-pointer accent-accent"
+                    className="w-full h-2 bg-surface-dark rounded-lg appearance-none cursor-pointer accent-accent"
                 />
-                <span className="font-bold text-xl text-accent w-20 text-center">{impactStakingPercentage}%</span>
+                <span className="font-bold text-xl text-accent-light w-20 text-center font-display">{impactStakingPercentage}%</span>
             </div>
             <p className="text-sm text-center mt-2 text-text-secondary">
                 {t('donate_rewards_percentage', { percentage: impactStakingPercentage })}
@@ -153,18 +148,17 @@ const StakingInterface = () => {
 
 export default function Staking() {
     const { t, solana } = useAppContext();
-    const MOCK_STAKING_INFO = { totalStaked: 0, apy: 0 }; // Placeholder
 
     return (
         <div className="animate-fade-in-up space-y-8">
             <div className="text-center">
-                <h1 className="text-4xl font-display font-bold text-accent">{t('staking_title')}</h1>
+                <h1 className="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-light">{t('staking_title')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-text-secondary">
                     {t('staking_subtitle')}
                 </p>
             </div>
 
-            {solana.connected ? (
+            {solana.isAuthenticated ? (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <StatCard icon={<Database size={24} />} title={t('total_staked')} value={`-- OWFN`} />

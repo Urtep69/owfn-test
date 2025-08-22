@@ -14,7 +14,7 @@ const ConnectWalletPrompt = () => {
             <button
                 onClick={() => setWalletModalOpen(true)}
                 disabled={solana.loading}
-                className="bg-accent-light hover:bg-accent-hover text-accent-foreground font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
+                className="text-white bg-gradient-to-r from-accent to-accent-light font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105 shadow-lg hover:shadow-glow-accent disabled:opacity-50"
             >
                 {solana.loading ? t('connecting') : t('connect_wallet')}
             </button>
@@ -51,7 +51,7 @@ const EligibilityChecker = () => {
             {isChecking && (
                 <>
                     <Loader2 className="mx-auto w-16 h-16 text-accent-light mb-4 animate-spin" />
-                    <h2 className="text-2xl font-bold mb-2">{t('airdrop_checking')}</h2>
+                    <h2 className="text-2xl font-bold mb-2 font-display">{t('airdrop_checking')}</h2>
                     <p className="text-text-secondary">{t('airdrop_subtitle')}</p>
                 </>
             )}
@@ -59,7 +59,7 @@ const EligibilityChecker = () => {
             {!isChecking && eligibilityStatus === 'eligible' && (
                 <div className="animate-fade-in-up">
                     <CheckCircle className="mx-auto w-16 h-16 text-success mb-4" />
-                    <h2 className="text-2xl font-bold text-success mb-2">{t('airdrop_congratulations')}</h2>
+                    <h2 className="text-2xl font-bold text-success mb-2 font-display">{t('airdrop_congratulations')}</h2>
                     <p className="text-text-primary text-lg">
                         {t('airdrop_eligible_message', { amount: MOCK_AIRDROP_AMOUNT.toLocaleString() })}
                     </p>
@@ -68,7 +68,7 @@ const EligibilityChecker = () => {
              {!isChecking && eligibilityStatus === 'not_eligible' && (
                 <div className="animate-fade-in-up">
                     <XCircle className="mx-auto w-16 h-16 text-danger mb-4" />
-                    <h2 className="text-2xl font-bold text-danger mb-2">{t('airdrop_not_eligible')}</h2>
+                    <h2 className="text-2xl font-bold text-danger mb-2 font-display">{t('airdrop_not_eligible')}</h2>
                     <p className="text-text-secondary">
                         {t('airdrop_not_eligible_message')}
                     </p>
@@ -84,7 +84,7 @@ export default function Airdrop() {
     return (
         <div className="animate-fade-in-up space-y-8">
             <div className="text-center">
-                <h1 className="text-4xl font-display font-bold text-accent-light">{t('airdrop_title')}</h1>
+                <h1 className="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-light">{t('airdrop_title')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-text-secondary">
                     {t('airdrop_subtitle')}
                 </p>
@@ -93,10 +93,15 @@ export default function Airdrop() {
             {!solana.connected ? <ConnectWalletPrompt /> : <EligibilityChecker />}
 
             <div className="max-w-2xl mx-auto mt-12 p-6 glassmorphism rounded-lg">
-                <h3 className="text-xl font-bold mb-2">{t('airdrop_info_box_title')}</h3>
-                <p className="text-text-secondary">
-                    {t('airdrop_info_box_desc')}
-                </p>
+                 <div className="flex items-center gap-4">
+                    <Gift className="w-8 h-8 text-accent flex-shrink-0" />
+                    <div>
+                        <h3 className="text-xl font-bold mb-2 font-display">{t('airdrop_info_box_title')}</h3>
+                        <p className="text-text-secondary">
+                            {t('airdrop_info_box_desc')}
+                        </p>
+                    </div>
+                 </div>
             </div>
         </div>
     );

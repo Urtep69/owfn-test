@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
@@ -18,16 +16,14 @@ interface SidebarProps {
 
 const NavItem = ({ to, icon, label, isOpen, onClick }: { to: string, icon: React.ReactNode, label: string, isOpen: boolean, onClick: () => void }) => {
     const [isActive] = useRoute(to);
-    const navLinkClasses = `flex items-center py-3 px-4 my-1 rounded-lg transition-colors duration-200 ${
-        isActive 
-            ? 'bg-accent-light/10 text-accent-light font-semibold' 
-            : 'text-text-secondary hover:bg-surface-light hover:text-text-primary'
-        }`;
+    const activeClasses = 'bg-gradient-to-r from-accent/10 to-accent-light/10 text-accent font-semibold border-l-4 border-accent';
+    const inactiveClasses = 'text-text-secondary hover:bg-surface-dark hover:text-text-primary';
+    const navLinkClasses = `flex items-center py-3 px-4 my-1 rounded-r-lg transition-all duration-200 ${isActive ? activeClasses : inactiveClasses}`;
 
     return (
         <Link to={to} className={navLinkClasses} onClick={onClick}>
             {icon}
-            <span className={`ml-4 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>{label}</span>
+            <span className={`ml-4 whitespace-nowrap transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>{label}</span>
         </Link>
     );
 };
@@ -87,14 +83,14 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
 
     return (
         <aside className={`fixed top-0 left-0 h-full glassmorphism z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-             <div className="flex items-center justify-between h-16 px-4 border-b border-border-color flex-shrink-0">
-                <Link to="/" onClick={handleLinkClick} className={`flex items-center space-x-3 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
+             <div className="flex items-center h-24 px-4 flex-shrink-0">
+                <Link to="/" onClick={handleLinkClick} className={`flex items-center space-x-3`}>
                     <OwfnIcon className="h-9 w-9" />
-                    <span className={`font-bold text-xl text-text-primary ${isOpen ? 'inline' : 'hidden'}`}>OWFN</span>
+                    <span className={`font-display font-bold text-xl text-text-primary whitespace-nowrap transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>OWFN</span>
                 </Link>
              </div>
 
-            <nav className="flex-1 overflow-y-auto px-2 py-4">
+            <nav className="flex-1 overflow-y-auto overflow-x-hidden">
                 {navGroups.map(group => (
                     <NavGroup key={group.title} title={group.title} isOpen={isOpen}>
                         {group.links.map(link => (
@@ -115,7 +111,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 )}
             </nav>
             
-            <div className="px-2 py-4 border-t border-border-color flex-shrink-0">
+            <div className="py-4 border-t border-border-color flex-shrink-0">
                  <NavItem to="/profile" icon={<User size={20} />} label={t('profile')} isOpen={isOpen} onClick={handleLinkClick} />
             </div>
         </aside>

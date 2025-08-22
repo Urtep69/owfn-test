@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { Header } from './Header.tsx';
 import { Footer } from './Footer.tsx';
@@ -10,8 +8,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-sans">
-      <div className="flex">
+    <div className="min-h-screen bg-background text-text-primary font-sans relative">
+      {/* Aurora Background Effect */}
+      <div className="absolute inset-0 z-0 aurora-background opacity-50"></div>
+      
+      <div className="relative z-10 flex">
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} />
         <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
           <Header toggleSidebar={() => setSidebarOpen(prev => !prev)} isSidebarOpen={isSidebarOpen} />

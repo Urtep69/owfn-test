@@ -8,40 +8,34 @@ const Countdown = ({ endDate }: { endDate: Date }) => {
     const { t } = useAppContext();
     const calculateTimeLeft = () => {
         const difference = +endDate - +new Date();
-        let timeLeft: {d: number, h: number, m: number} | {} = {};
-
-        if (difference > 0) {
-            timeLeft = {
-                d: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                h: Math.floor((difference / (1000 * 60 * 60)) % 24),
-                m: Math.floor((difference / 1000 / 60) % 60),
-            };
-        }
-        return timeLeft;
+        if (difference <= 0) return {};
+        return {
+            d: Math.floor(difference / (1000 * 60 * 60 * 24)),
+            h: Math.floor((difference / (1000 * 60 * 60)) % 24),
+            m: Math.floor((difference / 1000 / 60) % 60),
+        };
     };
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
     React.useEffect(() => {
-        const timer = setTimeout(() => {
-            setTimeLeft(calculateTimeLeft());
-        }, 60000); // update every minute
-        return () => clearTimeout(timer);
-    });
+        const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 60000);
+        return () => clearInterval(timer);
+    }, [endDate]);
 
     const timerComponents = Object.entries(timeLeft)
+        .filter(([, value]) => value > 0)
         .map(([interval, value]) => `${value}${interval}`);
 
-    return <span>{timerComponents.length > 0 ? timerComponents.join(' ') : 'Ended'}</span>;
+    return <span>{timerComponents.length > 0 ? timerComponents.join(' ') : t('ends_in')}</span>;
 };
 
 const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
     const { t, solana, voteOnProposal: contextVote, currentLanguage } = useAppContext();
-    const { address, userStats, loading, voteOnProposal: hookVote } = solana;
+    const { isAuthenticated, userStats, loading, voteOnProposal: hookVote } = solana;
     
     const totalVotes = proposal.votesFor + proposal.votesAgainst;
     const forPercentage = totalVotes > 0 ? (proposal.votesFor / totalVotes) * 100 : 0;
-    const againstPercentage = totalVotes > 0 ? (proposal.votesAgainst / totalVotes) * 100 : 0;
     
     const hasVoted = userStats.votedProposalIds.includes(proposal.id);
 
@@ -49,15 +43,15 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
         const result = await hookVote(proposal.id, vote);
         if (result.success) {
             contextVote(proposal.id, vote);
-            alert(t(result.messageKey));
+            alert(t('vote_success_alert'));
         }
     }
 
     const getStatusChip = () => {
         switch(proposal.status) {
-            case 'active': return <div className="bg-blue-500/20 text-blue-400 text-xs font-bold px-2 py-1 rounded-full">{t('status_active')}</div>;
-            case 'passed': return <div className="bg-green-500/20 text-green-400 text-xs font-bold px-2 py-1 rounded-full">{t('status_passed')}</div>;
-            case 'failed': return <div className="bg-red-500/20 text-red-400 text-xs font-bold px-2 py-1 rounded-full">{t('status_failed')}</div>;
+            case 'active': return <div className="bg-blue-500/20 text-blue-500 text-xs font-bold px-2 py-1 rounded-full">{t('status_active')}</div>;
+            case 'passed': return <div className="bg-success/20 text-success text-xs font-bold px-2 py-1 rounded-full">{t('status_passed')}</div>;
+            case 'failed': return <div className="bg-danger/20 text-danger text-xs font-bold px-2 py-1 rounded-full">{t('status_failed')}</div>;
         }
     }
 
@@ -65,31 +59,30 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
     const description = proposal.description[currentLanguage.code] || proposal.description['en'];
 
     return (
-        <div className="glassmorphism p-6 rounded-lg space-y-4">
+        <div className="glassmorphism p-6 rounded-lg space-y-4 flex flex-col">
             <div className="flex justify-between items-start">
-                <h3 className="text-xl font-bold">{title}</h3>
+                <h3 className="text-xl font-bold font-display">{title}</h3>
                 {getStatusChip()}
             </div>
-            <p className="text-text-secondary text-sm">{description}</p>
+            <p className="text-text-secondary text-sm flex-grow">{description}</p>
             <div className="text-xs text-text-secondary">Proposed by: <AddressDisplay address={proposal.proposer} /></div>
             
             <div className="space-y-2">
-                <div className="w-full bg-surface-dark rounded-full h-4 flex overflow-hidden">
-                    <div className="bg-success h-full" style={{ width: `${forPercentage}%` }}></div>
-                    <div className="bg-danger h-full" style={{ width: `${againstPercentage}%` }}></div>
+                <div className="w-full bg-danger/20 rounded-full h-4 flex overflow-hidden">
+                    <div className="bg-success h-full transition-all duration-500" style={{ width: `${forPercentage}%` }}></div>
                 </div>
                 <div className="flex justify-between text-sm font-semibold">
-                    <span className="text-success">{t('votes_for')}: {forPercentage.toFixed(2)}%</span>
-                    <span className="text-danger">{t('votes_against')}: {againstPercentage.toFixed(2)}%</span>
+                    <span className="text-success">{t('votes_for')}: {forPercentage.toFixed(1)}%</span>
+                    <span className="text-danger">{t('votes_against')}: {(100 - forPercentage).toFixed(1)}%</span>
                 </div>
             </div>
             
             {proposal.status === 'active' && (
                 <div className="flex justify-between items-center border-t border-border-color pt-4">
-                    <div className="text-sm text-text-secondary">{t('ends_in')}: <Countdown endDate={proposal.endDate} /></div>
-                    {address && (
+                    <div className="text-sm text-text-secondary font-mono">{t('ends_in')}: <Countdown endDate={proposal.endDate} /></div>
+                    {isAuthenticated && (
                         hasVoted ? (
-                             <div className="flex items-center gap-2 text-accent-light font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
+                             <div className="flex items-center gap-2 text-accent font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
                         ) : (
                             <div className="flex gap-2">
                                 <button onClick={() => handleVote('for')} disabled={loading} className="bg-success text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 disabled:opacity-50"><ThumbsUp size={16}/></button>
@@ -110,7 +103,12 @@ export default function Governance() {
     const activeProposals = useMemo(() => proposals.filter(p => p.status === 'active'), [proposals]);
     const pastProposals = useMemo(() => proposals.filter(p => p.status !== 'active'), [proposals]);
     
-    // Create Proposal Form State
+    // Add mock proposals if none exist for demonstration
+    if (proposals.length === 0) {
+        proposals.push({ id: 'prop1', title: { en: 'Increase Marketing Budget for Q1 2026' }, description: { en: 'Allocate an additional 5% of the treasury to marketing efforts to expand our reach in the Asian market.' }, proposer: '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy', status: 'active', votesFor: 12500000, votesAgainst: 3400000, endDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) });
+        proposals.push({ id: 'prop2', title: { en: 'Fund Educational Program in West Africa' }, description: { en: 'Partner with a local NGO to build three new schools.' }, proposer: '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy', status: 'passed', votesFor: 25000000, votesAgainst: 1200000, endDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000) });
+    }
+    
     const [newTitle, setNewTitle] = useState('');
     const [newDescription, setNewDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -122,91 +120,57 @@ export default function Governance() {
         const endDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000); // 14 days from now
         try {
             await addProposal({ title: newTitle, description: newDescription, endDate });
-            setNewTitle('');
-            setNewDescription('');
-            setCreateModalOpen(false);
-        } catch (error) {
-            console.error("Failed to create proposal:", error);
-            // Optionally show an error to the user
-        } finally {
-            setIsSubmitting(false);
-        }
+            setNewTitle(''); setNewDescription(''); setCreateModalOpen(false);
+        } finally { setIsSubmitting(false); }
     };
 
     return (
         <div className="animate-fade-in-up space-y-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="text-center md:text-left">
-                    <h1 className="text-4xl font-display font-bold text-accent-light">{t('governance_title')}</h1>
+                    <h1 className="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-light">{t('governance_title')}</h1>
                     <p className="mt-2 text-lg text-text-secondary">{t('governance_subtitle')}</p>
                 </div>
-                {solana.connected && (
-                    <button 
-                        onClick={() => setCreateModalOpen(true)}
-                        className="flex items-center gap-2 bg-accent-light text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors"
-                    >
+                {solana.isAuthenticated && (
+                    <button onClick={() => setCreateModalOpen(true)} className="flex items-center gap-2 bg-gradient-to-r from-accent to-accent-light text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">
                         <PlusCircle size={20} /> {t('create_proposal')}
                     </button>
                 )}
             </div>
 
             <div>
-                <h2 className="text-2xl font-bold mb-4">{t('active_proposals')}</h2>
+                <h2 className="text-2xl font-bold mb-4 font-display">{t('active_proposals')}</h2>
                 {activeProposals.length > 0 ? (
                     <div className="grid md:grid-cols-2 gap-6">
                         {activeProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
                     </div>
-                ) : (
-                    <p className="text-text-secondary">{t('no_active_proposals')}</p> 
-                )}
+                ) : ( <p className="text-text-secondary p-8 text-center glassmorphism rounded-lg">{t('no_active_proposals')}</p> )}
             </div>
 
             <div>
-                <h2 className="text-2xl font-bold mb-4">{t('past_proposals')}</h2>
+                <h2 className="text-2xl font-bold mb-4 font-display">{t('past_proposals')}</h2>
                 {pastProposals.length > 0 ? (
                     <div className="grid md:grid-cols-2 gap-6">
                         {pastProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
                     </div>
-                ) : (
-                    <p className="text-text-secondary">{t('no_past_proposals')}</p>
-                )}
+                ) : ( <p className="text-text-secondary p-8 text-center glassmorphism rounded-lg">{t('no_past_proposals')}</p> )}
             </div>
 
             {isCreateModalOpen && (
                 <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
                     <div className="glassmorphism rounded-lg p-8 w-full max-w-2xl relative animate-fade-in-up" style={{ animationDuration: '300ms' }}>
-                        <button onClick={() => setCreateModalOpen(false)} className="absolute top-4 right-4 text-text-secondary hover:text-text-primary">
-                            <X size={24} />
-                        </button>
-                        <h2 className="text-2xl font-bold mb-6">{t('create_proposal')}</h2>
+                        <button onClick={() => setCreateModalOpen(false)} className="absolute top-4 right-4 text-text-secondary hover:text-text-primary"><X size={24} /></button>
+                        <h2 className="text-2xl font-bold mb-6 font-display">{t('create_proposal')}</h2>
                         <form onSubmit={handleCreateProposal} className="space-y-4">
                             <div>
                                 <label htmlFor="prop-title" className="block text-sm font-medium mb-1">{t('proposal_title')}</label>
-                                <input
-                                    id="prop-title"
-                                    type="text"
-                                    value={newTitle}
-                                    onChange={e => setNewTitle(e.target.value)}
-                                    required
-                                    className="w-full p-2 bg-surface-light rounded-md border border-border-color focus:ring-2 focus:ring-accent-light"
-                                />
+                                <input id="prop-title" type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} required className="w-full p-2 bg-surface-dark rounded-md border border-border-color focus:ring-2 focus:ring-accent" />
                             </div>
                             <div>
                                 <label htmlFor="prop-desc" className="block text-sm font-medium mb-1">{t('proposal_description')}</label>
-                                <textarea
-                                    id="prop-desc"
-                                    value={newDescription}
-                                    onChange={e => setNewDescription(e.target.value)}
-                                    required
-                                    rows={5}
-                                    className="w-full p-2 bg-surface-light rounded-md border border-border-color focus:ring-2 focus:ring-accent-light"
-                                ></textarea>
+                                <textarea id="prop-desc" value={newDescription} onChange={e => setNewDescription(e.target.value)} required rows={5} className="w-full p-2 bg-surface-dark rounded-md border border-border-color focus:ring-2 focus:ring-accent"></textarea>
                             </div>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="w-full bg-accent-light text-accent-foreground py-3 rounded-lg font-bold hover:bg-accent-hover disabled:opacity-50"
-                            >
+                            <button type="submit" disabled={isSubmitting} className="w-full bg-gradient-to-r from-accent to-accent-light text-white py-3 rounded-lg font-bold hover:opacity-90 disabled:opacity-50">
                                 {isSubmitting ? t('processing') : t('submit_proposal')}
                             </button>
                         </form>

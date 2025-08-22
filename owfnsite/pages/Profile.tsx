@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -139,7 +140,7 @@ export default function Profile() {
             </ComingSoonWrapper>
 
             <div className="grid lg:grid-cols-2 gap-8">
-                <ComingSoonWrapper showMessage={false}>
+                <ComingSoonWrapper>
                     <div className="glassmorphism p-6 rounded-lg">
                         <h2 className="text-2xl font-bold mb-4">{t('impact_trophies_nfts')}</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -147,7 +148,7 @@ export default function Profile() {
                         </div>
                     </div>
                 </ComingSoonWrapper>
-                 <ComingSoonWrapper showMessage={false}>
+                 <ComingSoonWrapper>
                     <div className="glassmorphism p-6 rounded-lg">
                         <h2 className="text-2xl font-bold mb-4">{t('impact_badges')}</h2>
                          <div className="flex flex-wrap gap-4">

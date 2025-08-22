@@ -29,7 +29,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
-        darkMode: 'class',
+        darkMode: 'class', // Although we are using a light theme, we keep this for potential future toggles.
         theme: {
           extend: {
             fontFamily: {
@@ -37,37 +37,44 @@
               display: ['Orbitron', 'sans-serif'],
             },
             colors: {
-              'background': '#0A0F1F',      // Rich, deep navy blue
-              'surface-dark': '#111827',     // Darker surface for depth
-              'surface-light': '#1E293B',    // Lighter surface for cards, inputs
-              'border-color': '#334155',     // Softer border
-              'text-primary': '#E0E6F1',     // Soft off-white for readability
-              'text-secondary': '#94A3B8',    // Muted secondary text
-              'accent-light': '#4A8FFF',     // Vibrant electric blue for primary actions
-              'accent-hover': '#6EA3FF',     // Lighter hover for accent
-              'accent-glow': 'rgba(74, 143, 255, 0.2)', // Glow color for shadows
+              'background': '#F7F9FC',      // Very light, cool gray
+              'surface': '#FFFFFF',         // Pure white for primary content areas
+              'surface-dark': '#F0F3F8',     // Slightly darker surface for depth
+              'surface-light': '#FFFFFF',    // Kept for consistency, same as surface
+              'border-color': '#E1E8F0',     // Soft, light gray border
+              'text-primary': '#111827',     // Dark gray for primary text, high contrast
+              'text-secondary': '#6B7280',    // Muted gray for secondary text
+              'accent': '#00F5A0',           // Vibrant Teal/Turquoise
+              'accent-light': '#00D9F5',     // Vibrant Electric Blue
+              'accent-hover': '#00C4E0',     // Lighter hover for accent
               'accent-foreground': '#FFFFFF', // Text on accent buttons
-              'success': '#34D399',          // Bright green for success
-              'danger': '#F87171',           // Softer red for errors
-              'warning': '#FBBF24'           // Amber for warnings
+              'success': '#10B981',          // Green for success
+              'danger': '#EF4444',           // Red for errors
+              'warning': '#F59E0B'           // Amber for warnings
             },
             boxShadow: {
-              'glow-accent': '0 0 16px 0 rgba(74, 143, 255, 0.3)',
-              'glow-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 20px rgba(74, 143, 255, 0.1)',
-              'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)'
+              'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
+              'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.07)',
+              'glow-accent': '0 0 20px 0 rgba(0, 217, 245, 0.3)',
             },
             animation: {
-              'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+              'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards',
               'slide-in': 'slideIn 0.5s ease-out forwards',
+              'aurora': 'aurora 60s linear infinite',
             },
             keyframes: {
               fadeInUp: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
+                '0%': { opacity: '0', transform: 'translateY(30px) scale(0.98)' },
+                '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
               },
               slideIn: {
                 '0%': { transform: 'translateX(100%)' },
                 '100%': { transform: 'translateX(0)' },
+              },
+              aurora: {
+                '0%': { background-position: '0% 50%' },
+                '50%': { background-position: '100% 50%' },
+                '100%': { background-position: '0% 50%' },
               },
             },
           },
@@ -76,19 +83,28 @@
     </script>
     <style>
       .glassmorphism {
-        background: rgba(30, 41, 59, 0.6); /* surface-light with alpha */
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(51, 65, 85, 0.5); /* border-color with alpha */
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        background: rgba(255, 255, 255, 0.6); /* white with alpha for light theme */
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid rgba(225, 232, 240, 0.5); /* border-color with alpha */
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
       }
       .font-display {
         font-family: 'Orbitron', sans-serif;
       }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #0A0F1F;
-        color: #E0E6F1;
+        background-color: #F7F9FC;
+        color: #111827;
+      }
+      .aurora-background {
+        background: radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 0.1) 0px, transparent 50%), 
+                    radial-gradient(at 97% 21%, hsla(160, 100%, 75%, 0.1) 0px, transparent 50%), 
+                    radial-gradient(at 52% 99%, hsla(180, 100%, 75%, 0.1) 0px, transparent 50%),
+                    radial-gradient(at 10% 29%, hsla(210, 96%, 66%, 0.1) 0px, transparent 50%),
+                    radial-gradient(at 97% 96%, hsla(170, 100%, 75%, 0.1) 0px, transparent 50%),
+                    radial-gradient(at 33% 50%, hsla(200, 98%, 62%, 0.1) 0px, transparent 50%),
+                    radial-gradient(at 79% 53%, hsla(190, 100%, 75%, 0.1) 0px, transparent 50%);
       }
     </style>
 <script type="importmap">
