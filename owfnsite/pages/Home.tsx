@@ -1,8 +1,8 @@
+import '../types.ts';
 import React from 'react';
 import { Link } from 'wouter';
 import { Target, Users, Zap, ArrowRight } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import '../types.ts';
 
 const FeatureCard = ({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) => (
     <div className="glassmorphism-dark p-8 rounded-2xl shadow-card hover:shadow-card-hover hover:-translate-y-2 transition-all duration-300 transform">

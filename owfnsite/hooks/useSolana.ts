@@ -3,7 +3,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
 import type { Token, Nft } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS, HELIUS_API_KEY, HELIUS_API_BASE_URL } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 import bs58 from 'bs58';
 
@@ -86,96 +86,93 @@ export const useSolana = (): UseSolanaReturn => {
       
     setLoading(true);
     try {
-        const response = await fetch(HELIUS_RPC_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 'my-id',
-                method: 'getAssetsByOwner',
-                params: {
-                    ownerAddress: walletAddress,
-                    page: 1,
-                    limit: 1000,
-                    displayOptions: {
-                        showFungible: true,
-                        showNativeBalance: true,
-                        showNonFungible: true,
-                    },
-                },
-            }),
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch assets from Helius');
+        const balancesUrl = `${HELIUS_API_BASE_URL}/v0/addresses/${walletAddress}/balances?api-key=${HELIUS_API_KEY}`;
+        const response = await fetch(balancesUrl);
 
-        const { result } = await response.json();
-        
-        if (!result || !result.items) return { tokens: [], nfts: [] };
-       
+        if (!response.ok) {
+            throw new Error(`Helius API call failed: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
         const allTokens: Token[] = [];
 
         // Process native SOL balance
-        if (result.nativeBalance && result.nativeBalance.lamports > 0) {
-            const pricePerSol = result.nativeBalance.price_per_sol || 0;
-            const balance = result.nativeBalance.lamports / LAMPORTS_PER_SOL;
-            allTokens.push({
-                mintAddress: 'So11111111111111111111111111111111111111112',
-                balance: balance, decimals: 9, name: 'Solana', symbol: 'SOL',
-                logo: React.createElement(SolIcon, null),
-                pricePerToken: pricePerSol,
-                usdValue: result.nativeBalance.total_price || (balance * pricePerSol),
-            });
+        if (data.nativeBalance) {
+            const balance = data.nativeBalance / LAMPORTS_PER_SOL;
+            if (balance > 0) {
+                 allTokens.push({
+                    mintAddress: 'So11111111111111111111111111111111111111112',
+                    balance: balance,
+                    decimals: 9,
+                    name: 'Solana',
+                    symbol: 'SOL',
+                    logo: React.createElement(SolIcon, null),
+                    pricePerToken: 0, // Will be fetched later
+                    usdValue: 0,
+                });
+            }
+        }
+
+        // Process SPL tokens
+        if (data.tokens && data.tokens.length > 0) {
+            const splTokens = data.tokens
+                .filter((asset: any) => asset.amount > 0)
+                .map((asset: any): Token => ({
+                    mintAddress: asset.mint,
+                    balance: asset.amount / Math.pow(10, asset.decimals),
+                    decimals: asset.decimals,
+                    name: asset.tokenMetadata?.name || 'Unknown Token',
+                    symbol: asset.tokenMetadata?.symbol || `${asset.mint.slice(0, 4)}..`,
+                    logo: KNOWN_TOKEN_ICONS[asset.mint] || React.createElement(GenericTokenIcon, { uri: asset.tokenMetadata?.logo }),
+                    usdValue: 0,
+                    pricePerToken: 0,
+                }));
+            allTokens.push(...splTokens);
         }
         
-        const splTokens = result.items
-            .filter((asset: any) => asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed)
-            .map((asset: any): Token => ({
-                mintAddress: asset.id,
-                balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
-                decimals: asset.token_info.decimals,
-                name: asset.content?.metadata?.name || 'Unknown Token',
-                symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
-                logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
-                usdValue: 0, pricePerToken: 0,
-            }));
-        allTokens.push(...splTokens);
-        
-        const nfts: Nft[] = result.items
-            .filter((asset: any) => asset.interface === 'V1_NFT' && !asset.compression?.compressed)
-            .map((asset: any): Nft => ({
-                id: asset.id,
-                name: asset.content?.metadata?.name || 'Unknown NFT',
-                imageUrl: asset.content?.links?.image,
-                collectionName: asset.grouping?.[0]?.group_value || 'N/A'
-            }));
-
-        const splMintsToFetch = splTokens.map(t => t.mintAddress).join(',');
-        if (splMintsToFetch) {
+        // Fetch prices in batches from Jupiter
+        const mints = allTokens.map(t => t.mintAddress);
+        if (mints.length > 0) {
             try {
-                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${splMintsToFetch}`);
-                if (!priceRes.ok) throw new Error(`Jupiter API failed`);
-                const priceData = await priceRes.json();
-                if (priceData.data) {
-                     allTokens.forEach(token => {
-                        if (priceData.data[token.mintAddress]) {
-                            const price = priceData.data[token.mintAddress].price;
-                            token.pricePerToken = price;
-                            token.usdValue = token.balance * price;
+                const priceDataMap = new Map<string, any>();
+                const CHUNK_SIZE = 100;
+                
+                for (let i = 0; i < mints.length; i += CHUNK_SIZE) {
+                    const chunk = mints.slice(i, i + CHUNK_SIZE).join(',');
+                    if (chunk) {
+                        const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${chunk}`);
+                        if (priceRes.ok) {
+                            const priceResult = await priceRes.json();
+                            if (priceResult.data) {
+                                for (const mint in priceResult.data) {
+                                    priceDataMap.set(mint, priceResult.data[mint]);
+                                }
+                            }
                         }
-                    });
+                    }
                 }
+
+                allTokens.forEach(token => {
+                    const priceData = priceDataMap.get(token.mintAddress);
+                    if (priceData && priceData.price) {
+                        const price = priceData.price;
+                        token.pricePerToken = price;
+                        token.usdValue = token.balance * price;
+                    }
+                });
+
             } catch (priceError) {
-                console.warn("Could not fetch token prices:", priceError);
+                console.warn(`Could not fetch token prices for ${walletAddress}:`, priceError);
             }
         }
         
         const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
-        const assets = { tokens: sortedTokens, nfts };
+        const assets = { tokens: sortedTokens, nfts: [] }; // NFTs are not included in this endpoint
         assetCache.set(walletAddress, { data: assets, timestamp: Date.now() });
         return assets;
 
     } catch (error) {
-        console.error("Error fetching wallet assets:", error);
+        console.error(`Error fetching wallet assets for ${walletAddress}:`, error);
         return { tokens: [], nfts: [] };
     } finally {
         setLoading(false);

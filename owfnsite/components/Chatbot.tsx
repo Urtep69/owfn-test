@@ -122,7 +122,7 @@ export const Chatbot = () => {
     
     if (!isOpen) {
         return (
-            <button onClick={() => setIsOpen(true)} className="fixed bottom-5 right-5 bg-gradient-to-r from-accent to-accent-light text-accent-foreground p-4 rounded-full shadow-lg hover:shadow-glow-accent transition-transform transform hover:scale-110" aria-label="Open Chatbot">
+            <button onClick={() => setIsOpen(true)} className="fixed bottom-5 right-5 bg-gradient-to-r from-accent to-accent-light text-accent-foreground p-4 rounded-full shadow-lg hover:shadow-glow-accent transition-transform transform hover:scale-110 z-50" aria-label="Open Chatbot">
                 <MessageCircle size={28} />
             </button>
         );
