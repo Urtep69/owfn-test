@@ -9,6 +9,7 @@ import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
 import { WalletConnectModal } from './components/WalletConnectModal.tsx';
+import { SignInModal } from './components/SignInModal.tsx';
 
 import Home from './pages/Home.tsx';
 import Presale from './pages/Presale.tsx';
@@ -34,9 +35,20 @@ import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana, isWalletModalOpen, setWalletModalOpen } = useAppContext();
-  const { connected, address } = solana;
-  const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
+  const { isMaintenanceActive, solana, isWalletModalOpen, setWalletModalOpen, isSignInModalOpen, setSignInModalOpen } = useAppContext();
+  const { connected, isAuthenticated, address } = solana;
+  const isAdmin = isAuthenticated && address === ADMIN_WALLET_ADDRESS;
+
+  useEffect(() => {
+      if (connected && !isAuthenticated) {
+          // Automatically prompt for sign-in after connecting
+          setSignInModalOpen(true);
+      }
+      if (!connected) {
+          setSignInModalOpen(false);
+      }
+  }, [connected, isAuthenticated, setSignInModalOpen]);
+
 
   if (isMaintenanceActive && !isAdmin) {
     return <Maintenance />;
@@ -68,9 +80,7 @@ const AppContent = () => {
           </Route>
           <Route path="/donations"><Donations /></Route>
           <Route path="/dashboard/token/:mint">
-            <ComingSoonWrapper>
               <TokenDetail />
-            </ComingSoonWrapper>
           </Route>
           <Route path="/dashboard"><Dashboard /></Route>
           <Route path="/profile"><Profile /></Route>
@@ -91,6 +101,7 @@ const AppContent = () => {
         </Switch>
       </Layout>
       <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setWalletModalOpen(false)} />
+      <SignInModal isOpen={isSignInModalOpen} onClose={() => setSignInModalOpen(false)} />
     </Router>
   );
 };

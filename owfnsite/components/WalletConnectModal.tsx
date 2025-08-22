@@ -48,7 +48,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
             aria-modal="true"
         >
             <div 
-                className="bg-white dark:bg-darkPrimary-800 rounded-2xl shadow-3d-lg w-full max-w-md m-auto animate-fade-in-up golden-border"
+                className="bg-white dark:bg-darkPrimary-800 rounded-2xl shadow-3d-lg w-full max-w-md m-auto animate-fade-in-up"
                 style={{ animationDuration: '300ms' }}
                 onClick={e => e.stopPropagation()}
             >

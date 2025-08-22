@@ -21,8 +21,8 @@ export default function Maintenance() {
                 <ThemeSwitcher />
                 <LanguageSwitcher />
             </div>
-            <div className="bg-white dark:bg-darkPrimary-800 p-8 sm:p-12 rounded-2xl shadow-2xl max-w-2xl w-full golden-border">
-                <Wrench className="mx-auto w-20 h-20 text-accent-500 dark:text-darkAccent-400 mb-6 animate-pulse" />
+            <div className="bg-white dark:bg-darkPrimary-800 p-8 sm:p-12 rounded-2xl shadow-2xl max-w-2xl w-full">
+                <Wrench className="mx-auto w-20 h-20 text-primary-500 dark:text-darkPrimary-500 mb-6 animate-pulse" />
                 <h1 className="text-4xl sm:text-5xl font-extrabold text-primary-700 dark:text-darkPrimary-300 mb-4">{t('maintenance_heading')}</h1>
                 <p className="text-lg text-primary-600 dark:text-darkPrimary-300 leading-relaxed mb-8">
                     {t('maintenance_message')}

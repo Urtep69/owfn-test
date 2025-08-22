@@ -14,7 +14,7 @@ export default function Partnerships() {
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-300">{t('partnerships_title')}</h1>
             </div>
 
-            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d text-left golden-border">
+            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d text-left">
                 <h2 className="text-2xl font-bold text-primary-800 dark:text-darkPrimary-200 mb-4">{t('partnerships_focus_title')}</h2>
                 <p className="text-lg text-primary-600 dark:text-darkPrimary-400 leading-relaxed">
                     {t('partnerships_focus_desc')}
@@ -24,7 +24,7 @@ export default function Partnerships() {
                 </p>
             </div>
 
-            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d text-left golden-border">
+            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d text-left">
                  <h2 className="text-2xl font-bold text-primary-800 dark:text-darkPrimary-200 mb-4">{t('partnerships_vision_title')}</h2>
                 <p className="text-lg text-primary-600 dark:text-darkPrimary-400 leading-relaxed">
                     {t('partnerships_vision_desc')}

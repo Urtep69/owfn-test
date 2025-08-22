@@ -1,20 +1,11 @@
 
+
 import { useState, useEffect, useCallback } from 'react';
 import type { Theme } from '../types.ts';
 
 export const useTheme = (): [Theme, () => void] => {
   const [theme, setTheme] = useState<Theme>(() => {
-    try {
-      if (typeof window !== 'undefined') {
-        const savedTheme = window.localStorage.getItem('owfn-theme') as Theme;
-        if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
-          return savedTheme;
-        }
-      }
-    } catch (e) {
-      console.warn("Could not read theme from localStorage", e);
-    }
-    // Default to dark theme as requested
+    // Force dark theme as the new default
     return 'dark';
   });
 
@@ -26,8 +17,9 @@ export const useTheme = (): [Theme, () => void] => {
       root.classList.add('dark');
     }
   }, [theme]);
-
-  const toggleTheme = useCallback(() => {
+  
+   const toggleTheme = useCallback(() => {
+    // This functionality is preserved but the default is now dark.
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     try {
@@ -36,6 +28,7 @@ export const useTheme = (): [Theme, () => void] => {
       console.warn("Could not save theme to localStorage", error);
     }
   }, [theme]);
+
 
   return [theme, toggleTheme];
 };

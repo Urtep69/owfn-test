@@ -11,6 +11,13 @@ export interface Token {
   pricePerToken: number;
 }
 
+export interface Nft {
+  id: string;
+  name: string;
+  imageUrl: string;
+  collectionName?: string;
+}
+
 export interface Wallet {
   name: string;
   address: string;
@@ -56,7 +63,7 @@ export interface ChatMessage {
 }
 
 export interface TokenExtensionState {
-  [key: string]: any;
+  [key:string]: any;
 }
 
 export interface TokenExtension {

@@ -26,7 +26,7 @@ export default function Tokenomics() {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-12 items-start">
-                <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d golden-border">
+                <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
                     <h2 className="text-2xl font-bold mb-6">{t('tokenomics_details_title')}</h2>
                     <div className="space-y-2">
                         <DetailItem 
@@ -47,7 +47,7 @@ export default function Tokenomics() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d golden-border">
+                <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
                     <h2 className="text-2xl font-bold mb-6">{t('tokenomics_allocation_title')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {TOKEN_ALLOCATIONS.map(alloc => (
@@ -60,7 +60,7 @@ export default function Tokenomics() {
                 </div>
             </div>
 
-            <div className="mt-12 bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d golden-border">
+            <div className="mt-12 bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
                 <h2 className="text-2xl font-bold mb-6 text-center">{t('tokenomics_chart_title')}</h2>
                 <AllocationChart />
             </div>

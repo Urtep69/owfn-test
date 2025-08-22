@@ -117,7 +117,7 @@ export default function ImpactCaseDetail() {
             <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
                 <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
             </Link>
-            <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden golden-border">
+            <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden">
                 <img src={socialCase.imageUrl} alt={title} className="w-full h-64 md:h-96 object-cover" />
                 <div className="p-6 md:p-10">
                     <span className="text-lg font-semibold text-accent-600 dark:text-darkAccent-500 mb-2 inline-block">{t(`category_${socialCase.category.toLowerCase().replace(' ', '_')}`, { defaultValue: socialCase.category })}</span>
@@ -136,7 +136,7 @@ export default function ImpactCaseDetail() {
 
             <div className="grid lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-3 space-y-8">
-                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
+                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                         <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Newspaper /> {t('live_updates')}</h3>
                         <div className="space-y-4">
                             {mockUpdates.map(update => (
@@ -150,7 +150,7 @@ export default function ImpactCaseDetail() {
                     </div>
 
                      {details && (
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                             <h3 className="text-2xl font-bold mb-4">{t('case_details_title')}</h3>
                             <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed whitespace-pre-wrap">{details}</p>
                         </div>
@@ -159,7 +159,7 @@ export default function ImpactCaseDetail() {
 
                 <div className="lg:col-span-2">
                     <div className="lg:sticky top-24 space-y-8">
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
                                 <Heart className="text-red-500" />
                                 <span>{t('support_this_cause')}</span>
@@ -176,7 +176,7 @@ export default function ImpactCaseDetail() {
                                             <button
                                                 key={token.symbol}
                                                 onClick={() => setSelectedToken(token.symbol)}
-                                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-accent-500 dark:border-darkAccent-600 bg-accent-100/50 dark:bg-darkAccent-900/50' : 'border-primary-200 dark:border-darkPrimary-600'}`}
+                                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-accent-500 bg-accent-100/50 dark:bg-darkAccent-900/50' : 'border-primary-200 dark:border-darkPrimary-600'}`}
                                             >
                                                 <div className="w-8 h-8 mb-2">{token.icon}</div>
                                                 <span className="font-semibold">{token.symbol}</span>
@@ -241,12 +241,12 @@ export default function ImpactCaseDetail() {
                                     </div>
                                 )}
 
-                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 btn-golden">
+                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50">
                                     {solana.loading ? t('processing') : (solana.connected ? t('donate') : t('connect_wallet'))}
                                 </button>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Milestone /> {t('funding_milestones')}</h3>
                              <div className="relative pl-4">
                                 <div className="absolute top-0 left-4 h-full w-0.5 bg-primary-200 dark:bg-darkPrimary-700"></div>

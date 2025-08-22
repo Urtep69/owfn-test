@@ -65,7 +65,7 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
     const description = proposal.description[currentLanguage.code] || proposal.description['en'];
 
     return (
-        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d space-y-4 golden-border">
+        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d space-y-4">
             <div className="flex justify-between items-start">
                 <h3 className="text-xl font-bold">{title}</h3>
                 {getStatusChip()}
@@ -143,7 +143,7 @@ export default function Governance() {
                 {solana.connected && (
                     <button 
                         onClick={() => setCreateModalOpen(true)}
-                        className="flex items-center gap-2 bg-accent-400 text-accent-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 transition-colors btn-golden"
+                        className="flex items-center gap-2 bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors"
                     >
                         <PlusCircle size={20} /> {t('create_proposal')}
                     </button>
@@ -174,7 +174,7 @@ export default function Governance() {
 
             {isCreateModalOpen && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-xl p-8 w-full max-w-2xl relative animate-fade-in-up golden-border" style={{ animationDuration: '300ms' }}>
+                    <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-xl p-8 w-full max-w-2xl relative animate-fade-in-up" style={{ animationDuration: '300ms' }}>
                         <button onClick={() => setCreateModalOpen(false)} className="absolute top-4 right-4 text-primary-500 hover:text-primary-800 dark:text-darkPrimary-400 dark:hover:text-darkPrimary-100">
                             <X size={24} />
                         </button>
@@ -205,7 +205,7 @@ export default function Governance() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-accent-400 text-accent-950 py-3 rounded-lg font-bold hover:bg-accent-500 disabled:opacity-50 btn-golden"
+                                className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 py-3 rounded-lg font-bold hover:bg-accent-500 dark:hover:bg-darkAccent-600 disabled:opacity-50"
                             >
                                 {isSubmitting ? t('processing') : t('submit_proposal')}
                             </button>

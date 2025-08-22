@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, Nft } from '../types.ts';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 
@@ -24,6 +24,8 @@ interface AppContextType {
   isMaintenanceActive: boolean;
   isWalletModalOpen: boolean;
   setWalletModalOpen: (isOpen: boolean) => void;
+  isSignInModalOpen: boolean;
+  setSignInModalOpen: (isOpen: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -33,6 +35,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
   const solana = useSolana();
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
+  const [isSignInModalOpen, setSignInModalOpen] = useState(false);
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
@@ -121,6 +124,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isMaintenanceActive,
     isWalletModalOpen,
     setWalletModalOpen,
+    isSignInModalOpen,
+    setSignInModalOpen,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

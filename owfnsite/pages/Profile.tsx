@@ -38,14 +38,14 @@ export default function Profile() {
 
     if (!connected) {
         return (
-            <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up golden-border">
+            <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
                 <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
                 <h1 className="text-2xl font-bold mb-2">{t('my_profile')}</h1>
                 <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_connect_prompt')}</p>
                 <button
                     onClick={() => setWalletModalOpen(true)}
                     disabled={loading}
-                    className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50 btn-golden"
+                    className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
                 >
                     {loading ? t('connecting') : t('connect_wallet')}
                 </button>
@@ -63,7 +63,7 @@ export default function Profile() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
+            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                 <h2 className="text-2xl font-bold mb-4">{t('my_tokens')}</h2>
                 <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
                     <div>
@@ -128,7 +128,7 @@ export default function Profile() {
             </div>
             
             <ComingSoonWrapper>
-                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
+                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                     <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
                     <div className="grid md:grid-cols-3 gap-4">
                         <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
@@ -140,7 +140,7 @@ export default function Profile() {
 
             <div className="grid lg:grid-cols-2 gap-8">
                 <ComingSoonWrapper showMessage={false}>
-                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                         <h2 className="text-2xl font-bold mb-4">{t('impact_trophies_nfts')}</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                            {/* Live NFT data would be populated here */}
@@ -148,7 +148,7 @@ export default function Profile() {
                     </div>
                 </ComingSoonWrapper>
                  <ComingSoonWrapper showMessage={false}>
-                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                         <h2 className="text-2xl font-bold mb-4">{t('impact_badges')}</h2>
                          <div className="flex flex-wrap gap-4">
                             {MOCK_BADGES.map(badge => (

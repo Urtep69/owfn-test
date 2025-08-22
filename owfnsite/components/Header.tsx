@@ -1,6 +1,5 @@
 import React from 'react';
-import { Menu, X, LogOut, Wallet } from 'lucide-react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { Menu, X, LogOut, Wallet, ShieldCheck } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 import { ThemeSwitcher } from './ThemeSwitcher.tsx';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -11,25 +10,23 @@ interface HeaderProps {
 }
 
 const ConnectButton = () => {
-    const { t, setWalletModalOpen } = useAppContext();
-    const { connected, publicKey, disconnect } = useWallet();
+    const { t, setWalletModalOpen, solana, setSignInModalOpen } = useAppContext();
+    const { connected, isAuthenticated, address, disconnectWallet, isAuthLoading } = solana;
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
 
-    if (connected && publicKey) {
+    if (isAuthenticated && address) {
         return (
-             <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
-                <button
-                    onClick={() => setWalletModalOpen(true)}
-                    className="flex items-center space-x-2 pl-3 pr-2 py-2 text-primary-700 dark:text-darkPrimary-200 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-l-lg transition-colors"
-                    aria-label={t('change_wallet')}
+             <div className="flex items-center space-x-2 bg-surface-2 rounded-lg">
+                <div
+                    className="flex items-center space-x-2 pl-3 pr-2 py-2 text-text-primary"
                 >
-                    <Wallet size={18} />
-                    <span className="font-semibold text-sm font-mono">{truncateAddress(publicKey.toBase58())}</span>
-                </button>
+                    <Wallet size={18} className="text-success" />
+                    <span className="font-semibold text-sm font-mono">{truncateAddress(address)}</span>
+                </div>
                  <button
-                    onClick={() => disconnect()}
-                    className="p-2 text-primary-600 dark:text-darkPrimary-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-r-lg transition-colors"
+                    onClick={() => disconnectWallet()}
+                    className="p-2 text-text-secondary hover:text-danger hover:bg-surface-3 rounded-r-lg transition-colors"
                     aria-label={t('disconnect_wallet')}
                 >
                     <LogOut size={18} />
@@ -38,10 +35,23 @@ const ConnectButton = () => {
         );
     }
 
+    if (connected && !isAuthenticated) {
+         return (
+            <button
+                onClick={() => setSignInModalOpen(true)}
+                disabled={isAuthLoading}
+                className="bg-warning text-black font-bold py-2 px-4 rounded-lg hover:bg-yellow-400 transition-colors flex items-center gap-2"
+            >
+                <ShieldCheck size={18} />
+                {isAuthLoading ? t('processing') : 'Verify Wallet'}
+            </button>
+        );
+    }
+    
     return (
         <button
             onClick={() => setWalletModalOpen(true)}
-            className="bg-accent-400 text-accent-950 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors btn-golden"
+            className="bg-accent text-accent-foreground font-bold py-2 px-4 rounded-lg hover:bg-accent-hover transition-colors"
         >
             {t('connect_wallet')}
         </button>
@@ -51,13 +61,13 @@ const ConnectButton = () => {
 
 export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
   return (
-    <header className="bg-primary-100/80 dark:bg-darkPrimary-900/80 backdrop-blur-sm sticky top-0 z-40 shadow-sm">
+    <header className="glassmorphism sticky top-0 z-40 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
              <button
               onClick={toggleSidebar}
-              className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none"
+              className="p-2 rounded-md text-text-secondary hover:bg-surface-2 focus:outline-none"
               aria-label="Toggle sidebar"
             >
               {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

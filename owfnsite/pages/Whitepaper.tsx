@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, ROADMAP_DATA, PROJECT_LINKS } from '../constants.ts';
@@ -9,7 +8,7 @@ import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { CheckCircle, Users, BarChart2, Map as MapIcon, Star, Link as LinkIcon, FileText } from 'lucide-react';
 
 const Section = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
-    <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-xl shadow-3d-lg mb-12 golden-border">
+    <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-xl shadow-3d-lg mb-12">
         <div className="flex items-center mb-6">
             <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-full p-3 mr-4">
                 {icon}
@@ -94,10 +93,10 @@ export default function Whitepaper() {
             </Section>
 
             <Section title={t('roadmap_title')} icon={<MapIcon />}>
-                <div className="relative border-l-2 border-primary-200 dark:border-darkAccent-700/50 ml-4 pl-8 space-y-8">
+                <div className="relative border-l-2 border-primary-200 dark:border-darkPrimary-700 ml-4 pl-8 space-y-8">
                     {ROADMAP_DATA.map((phase) => (
                         <div key={phase.quarter} className="relative">
-                             <div className="absolute -left-[42px] top-1 w-6 h-6 bg-darkAccent-500 rounded-full border-4 border-white dark:border-darkPrimary-800"></div>
+                             <div className="absolute -left-[42px] top-1 w-6 h-6 bg-accent-400 dark:bg-darkAccent-500 rounded-full border-4 border-white dark:border-darkPrimary-800"></div>
                             <p className="font-semibold text-accent-500 dark:text-darkAccent-400">{phase.quarter}</p>
                             <h4 className="font-bold text-xl">{t(`${phase.key_prefix}_title`)}</h4>
                             <p>{t(`${phase.key_prefix}_description`)}</p>

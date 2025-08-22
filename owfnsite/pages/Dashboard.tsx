@@ -15,16 +15,16 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
     useEffect(() => {
         const fetchBalances = async () => {
             setLoading(true);
-            const fetchedBalances = await solana.getWalletBalances(walletInfo.address);
-            setBalances(fetchedBalances);
-            setTotalValue(fetchedBalances.reduce((sum, token) => sum + token.usdValue, 0));
+            const { tokens } = await solana.fetchWalletAssets(walletInfo.address);
+            setBalances(tokens);
+            setTotalValue(tokens.reduce((sum, token) => sum + token.usdValue, 0));
             setLoading(false);
         };
         fetchBalances();
-    }, [walletInfo.address, solana.getWalletBalances]);
+    }, [walletInfo.address, solana.fetchWalletAssets]);
 
     return (
-        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d golden-border">
+        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
             <h3 className="text-xl font-bold mb-1">{walletInfo.name}</h3>
             <div className="mb-4">
                 <AddressDisplay address={walletInfo.address} />

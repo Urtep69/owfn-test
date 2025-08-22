@@ -124,7 +124,7 @@ export default function FAQ() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d golden-border">
+            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
                 {filteredFaqData.length > 0 ? (
                     filteredFaqData.map((item, index) => (
                         <FaqItem
