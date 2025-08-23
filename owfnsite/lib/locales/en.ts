@@ -541,6 +541,6 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
-    contact_social_discord_title: `Discord`,
+    contact_social_discord_title: 'Discord Server',
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
 };

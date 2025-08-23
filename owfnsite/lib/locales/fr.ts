@@ -65,7 +65,7 @@ export const fr = {
     about_mission_title: `Notre Mission`,
     about_mission_desc: `L'Official World Family Network (OWFN) a pour mission de construire un réseau mondial qui apporte un soutien réel et 100% transparent à l'humanité. Nous aidons les gens partout, à tout moment, avec des besoins essentiels en exploitant la puissance de la technologie blockchain. Notre objectif est de créer un système d'aide décentralisé, efficace, responsable et accessible à tous. Nous pensons qu'en connectant directement les gens aux causes, nous pouvons éliminer les inefficacités et nous assurer que l'aide parvienne à ceux qui en ont le plus besoin.`,
     about_vision_title: `Notre Vision`,
-    about_vision_desc: `Nous envisageons un monde où les frontières ne limitent pas la compassion et le soutien. Un monde où la technologie nous unit pour résoudre des problèmes mondiaux critiques comme la pauvreté, le manque d'accès aux soins de santé et les disparités éducatives. L'OWFN vise à être plus qu'un simple projet ; c'est un mouvement. Une force vive pour le bien, construite et entretenue par une communauté mondiale d'individus qui croient en un avenir meilleur et plus équitable pour tous. Cette vision ne peut être réalisée que par une action collective et le soutien indéfectible de notre communauté.`,
+    about_vision_desc: `Nous envisageons un monde où les frontières ne limitent pas la compassion et le soutien. Un monde où la technologie nous unit pour résoudre des problèmes mondiaux critiques comme la pauvreté, le manque d'accès aux soins de santé et les disparités éducatives. L'OWFN vise à être plus qu'un simple projet ; c'est un mouvement. Une force vive pour le bien, construite et entretenue par une communauté mondiale d'individus qui croient en un avenir meilleur et plus équitable pour tous. Cette vision ne puede être réalisée que par une action collective et le soutien indéfectible de notre communauté.`,
     about_impact_areas_title: `Domaines d'Impact`,
     about_impact_health_title: `Santé`,
     about_impact_health_desc: `Couvrir les frais de chirurgie, moderniser les hôpitaux et fournir un accès aux soins médicaux essentiels.`,
@@ -468,7 +468,7 @@ export const fr = {
 
     // Coming Soon
     coming_soon_title: `Bientôt Disponible`,
-    coming_soon_desc: `Cette fonctionnalité est actuellement en cours de développement. Nous travaillons dur pour vous la proposer bientôt. Merci pour votre patience et votre soutien.`,
+    coming_soon_desc: `Cette fonctionnalité est currently en cours de développement. Nous travaillons dur pour vous la proposer bientôt. Merci pour votre patience et votre soutien.`,
     
     // Admin Presale
     presale_admin_title: `Admin Prévente`,
@@ -541,6 +541,6 @@ export const fr = {
     contact_social_telegram_channel_desc: `Abonnez-vous pour les annonces importantes et les nouvelles officielles.`,
     contact_social_telegram_group_title: `Groupe Telegram`,
     contact_social_telegram_group_desc: `Rejoignez notre groupe communautaire pour discuter et échanger avec d'autres membres.`,
-    contact_social_discord_title: `Discord`,
+    contact_social_discord_title: `Serveur Discord`,
     contact_social_discord_desc: `Devenez membre de notre communauté active pour des discussions et du soutien.`,
 };

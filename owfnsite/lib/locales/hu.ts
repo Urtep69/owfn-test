@@ -540,6 +540,6 @@ export const hu = {
     contact_social_telegram_channel_desc: `Iratkozzon fel a fontos bejelentésekért és hivatalos hírekért.`,
     contact_social_telegram_group_title: `Telegram Csoport`,
     contact_social_telegram_group_desc: `Csatlakozzon közösségi csoportunkhoz, hogy megvitassa és kapcsolatba lépjen más tagokkal.`,
-    contact_social_discord_title: `Discord`,
+    contact_social_discord_title: `Discord szerver`,
     contact_social_discord_desc: `Legyen része aktív közösségünknek a megbeszélésekért és támogatásért.`,
 };

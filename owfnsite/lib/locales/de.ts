@@ -542,6 +542,6 @@ export const de = {
     contact_social_telegram_channel_desc: `Abonnieren Sie für wichtige Ankündigungen und offizielle Nachrichten.`,
     contact_social_telegram_group_title: `Telegram-Gruppe`,
     contact_social_telegram_group_desc: `Treten Sie unserer Community-Gruppe bei, um zu diskutieren und sich mit anderen Mitgliedern auszutauschen.`,
-    contact_social_discord_title: `Discord`,
+    contact_social_discord_title: `Discord-Server`,
     contact_social_discord_desc: `Werden Sie Teil unserer aktiven Community für Diskussionen und Unterstützung.`,
 };
