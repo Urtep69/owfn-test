@@ -169,12 +169,12 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
 
 
     return (
-        <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 h-full flex flex-col">
+        <div className="bg-primary-50 dark:bg-darkPrimary-800 border-2 border-primary-900 dark:border-primary-100 rounded-lg p-4 h-full flex flex-col">
             <div className="flex items-center gap-2 mb-4">
                 <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
-                <h3 className="text-primary-900 dark:text-darkPrimary-100 font-bold">{t('live_presale_feed')}</h3>
+                <h3 className="text-primary-900 dark:text-primary-100 font-bold">{t('live_presale_feed')}</h3>
             </div>
-            <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 dark:text-darkPrimary-400 pb-2 border-b border-primary-200 dark:border-darkPrimary-700 font-semibold">
+            <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 dark:text-primary-400 pb-2 border-b-2 border-primary-900 dark:border-primary-100 font-semibold">
                 <span className="col-span-2">{t('wallet')}</span>
                 <span className="text-right">{t('sol_spent')}</span>
                 <span className="text-right">{t('owfn_received')}</span>
@@ -182,10 +182,10 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
             <div className="flex-grow overflow-y-auto space-y-1 pr-1 -mr-2 mt-2">
                 {loading ? (
                      <div className="flex justify-center items-center h-full">
-                        <Loader2 className="w-6 h-6 animate-spin text-accent-500 dark:text-darkAccent-500" />
+                        <Loader2 className="w-6 h-6 animate-spin text-accent-500" />
                     </div>
                 ) : transactions.length > 0 ? transactions.map((tx) => (
-                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 10000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
+                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 10000 ? 'bg-accent-100 dark:bg-darkAccent-950' : ''}`}>
                         <div className="col-span-2 flex items-center gap-2">
                            <AddressDisplay address={tx.address} className="text-xs" />
                         </div>
@@ -206,16 +206,16 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
 const AccordionSection = ({ title, children, isOpen: defaultIsOpen = false }: { title: string, children: React.ReactNode, isOpen?: boolean }) => {
   const [isOpen, setIsOpen] = useState(defaultIsOpen);
   return (
-    <div className="border border-accent-400/20 dark:border-darkAccent-500/20 bg-primary-100/30 dark:bg-darkPrimary-800/30 rounded-lg">
+    <div className="border-2 border-primary-900 dark:border-primary-100 bg-primary-100 dark:bg-darkPrimary-800 rounded-lg">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center p-4"
       >
-        <h3 className="font-bold text-md text-primary-900 dark:text-darkPrimary-100">{title}</h3>
-        <ChevronDown className={`w-5 h-5 text-primary-500 dark:text-darkPrimary-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <h3 className="font-bold text-md text-primary-900 dark:text-primary-100">{title}</h3>
+        <ChevronDown className={`w-5 h-5 text-primary-700 dark:text-primary-300 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       {isOpen && (
-        <div className="px-4 pb-4 text-primary-600 dark:text-darkPrimary-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
+        <div className="px-4 pb-4 text-primary-700 dark:text-primary-300 animate-fade-in-up" style={{animationDuration: '300ms'}}>
           {children}
         </div>
       )}
@@ -224,9 +224,9 @@ const AccordionSection = ({ title, children, isOpen: defaultIsOpen = false }: { 
 };
 
 const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNode }) => (
-  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50">
-    <span className="text-primary-500 dark:text-darkPrimary-400 mb-1 sm:mb-0">{label}</span>
-    <div className="font-semibold text-primary-800 dark:text-darkPrimary-100 text-left sm:text-right break-all w-full sm:w-auto">{value}</div>
+  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-300 dark:border-darkPrimary-700">
+    <span className="text-primary-600 dark:text-primary-400 mb-1 sm:mb-0">{label}</span>
+    <div className="font-semibold text-primary-800 dark:text-primary-100 text-left sm:text-right break-all w-full sm:w-auto">{value}</div>
   </div>
 );
 
@@ -389,36 +389,88 @@ export default function Presale() {
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^\d*\.?\d*$/.test(value)) { // Allow only numbers and a single dot
-        setSolAmount(value);
-    }
-  };
+    setSolAmount(value);
 
-  useEffect(() => {
-    const numValue = parseFloat(solAmount);
-    if (isNaN(numValue)) {
+    if (value === '' || isNaN(parseFloat(value))) {
         setError('');
         return;
     }
+
+    const numValue = parseFloat(value);
     if ((numValue > 0 && numValue < PRESALE_DETAILS.minBuy) || numValue > maxAllowedBuy) {
         setError(t('presale_amount_error', { min: PRESALE_DETAILS.minBuy.toFixed(2), max: maxAllowedBuy.toFixed(6) }));
     } else {
         setError('');
     }
-  }, [solAmount, maxAllowedBuy, t]);
+  };
+  
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || isNaN(parseFloat(value))) {
+        return;
+    }
 
-  const { owfnAmount, bonusAmount, totalOwfnAmount } = useMemo(() => {
+    const numValue = parseFloat(value);
+    let correctedValue = value;
+
+    if (numValue > 0 && numValue < PRESALE_DETAILS.minBuy) {
+        correctedValue = String(PRESALE_DETAILS.minBuy);
+    } else if (numValue > maxAllowedBuy) {
+        correctedValue = maxAllowedBuy.toFixed(6);
+    }
+    
+    if (correctedValue !== value) {
+        setSolAmount(correctedValue);
+    }
+    
+    const correctedNum = parseFloat(correctedValue);
+    if (correctedNum >= PRESALE_DETAILS.minBuy && correctedNum <= maxAllowedBuy) {
+        setError('');
+    }
+  };
+
+  const calculation = useMemo(() => {
     const numAmount = parseFloat(solAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
-        return { owfnAmount: 0, bonusAmount: 0, totalOwfnAmount: 0 };
+        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
     }
 
-    const baseOwfn = numAmount * PRESALE_DETAILS.rate;
-    let bonus = 0;
-    if (numAmount >= PRESALE_DETAILS.bonusThreshold) {
-        bonus = baseOwfn * (PRESALE_DETAILS.bonusPercentage / 100);
+    try {
+        const LAMPORTS_PER_SOL_BIGINT = 1000000000n;
+        const owfnDecimals = BigInt(TOKEN_DETAILS.decimals);
+        const owfnDecimalsMultiplier = 10n ** owfnDecimals;
+
+        const parts = solAmount.split('.');
+        const integerPart = BigInt(parts[0] || '0');
+        const fractionalPart = (parts[1] || '').slice(0, 9).padEnd(9, '0');
+        const lamports = integerPart * LAMPORTS_PER_SOL_BIGINT + BigInt(fractionalPart);
+
+        const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
+        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * LAMPORTS_PER_SOL_BIGINT;
+        
+        const baseOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
+        let bonusOwfnSmallestUnit = 0n;
+        let isBonus = false;
+
+        if (lamports >= bonusThresholdLamports) {
+            bonusOwfnSmallestUnit = (baseOwfnSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
+            isBonus = true;
+        }
+
+        const totalOwfnSmallestUnit = baseOwfnSmallestUnit + bonusOwfnSmallestUnit;
+
+        const toDisplayAmount = (amountInSmallestUnit: bigint) => Number(amountInSmallestUnit) / Number(owfnDecimalsMultiplier);
+        
+        return {
+            base: toDisplayAmount(baseOwfnSmallestUnit),
+            bonus: toDisplayAmount(bonusOwfnSmallestUnit),
+            total: toDisplayAmount(totalOwfnSmallestUnit),
+            bonusApplied: isBonus,
+        };
+    } catch (e) {
+        console.error("Error calculating OWFN amount:", e);
+        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
     }
-    return { owfnAmount: baseOwfn, bonusAmount: bonus, totalOwfnAmount: baseOwfn + bonus };
   }, [solAmount]);
 
 
@@ -441,7 +493,7 @@ export default function Presale() {
         if (result.success && result.signature) {
             alert(t('presale_purchase_success_alert', { 
                 amount: numSolAmount.toFixed(2), 
-                owfnAmount: totalOwfnAmount.toLocaleString() 
+                owfnAmount: calculation.total.toLocaleString() 
             }));
             const newTx: PresaleTransaction = {
                 id: result.signature,
@@ -468,24 +520,24 @@ export default function Presale() {
   const saleStartDate = PRESALE_DETAILS.startDate;
 
   return (
-    <div className="bg-primary-50 dark:bg-darkPrimary-950 text-primary-700 dark:text-darkPrimary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
+    <div className="bg-primary-100 dark:bg-darkPrimary-950 text-primary-700 dark:text-primary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
       <div className="w-full max-w-screen-2xl">
         <div className="mb-4">
-            <Link to="/" className="text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400 transition-colors">
+            <Link to="/" className="text-primary-600 dark:text-primary-400 hover:text-accent-500 transition-colors">
                 <ArrowLeft size={24} />
             </Link>
         </div>
         
-        <div className="bg-primary-100 dark:bg-darkPrimary-900 rounded-xl p-6 md:p-10 border border-primary-200 dark:border-darkPrimary-700/50 shadow-3d-lg">
+        <div className="bg-primary-50 dark:bg-darkPrimary-800 rounded-xl p-6 md:p-10 border-2 border-primary-900 dark:border-primary-100 shadow-neo-brutal dark:shadow-dark-neo-brutal">
             
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <img src={OWFN_LOGO_URL} alt="Token Logo" className="w-20 h-20 rounded-full border-2 border-accent-400 dark:border-darkAccent-400"/>
+                <img src={OWFN_LOGO_URL} alt="Token Logo" className="w-20 h-20 rounded-full border-2 border-primary-900 dark:border-primary-100"/>
                 <div className="flex-grow">
-                    <h1 className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">{t('presale_join_title')}</h1>
-                    <h2 className="text-lg text-primary-700 dark:text-darkPrimary-300">{t('presale_header_subtitle')}</h2>
+                    <h1 className="text-2xl font-bold text-primary-900 dark:text-primary-100">{t('presale_join_title')}</h1>
+                    <h2 className="text-lg text-primary-700 dark:text-primary-300">{t('presale_header_subtitle')}</h2>
                 </div>
-                <div className="flex items-center gap-3 text-primary-500 dark:text-darkPrimary-400">
+                <div className="flex items-center gap-3 text-primary-700 dark:text-primary-300">
                     <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"><Twitter size={20}/></a>
                     <a href={PROJECT_LINKS.telegramGroup} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"><Send size={20}/></a>
                     <a href={PROJECT_LINKS.website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"><Globe size={20}/></a>
@@ -493,20 +545,20 @@ export default function Presale() {
             </div>
 
             {/* Description */}
-            <p className="text-primary-600 dark:text-darkPrimary-400 text-sm leading-relaxed mt-4">{t('about_mission_desc')}</p>
+            <p className="text-primary-700 dark:text-primary-400 text-sm leading-relaxed mt-4">{t('about_mission_desc')}</p>
             
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-6">
                 {/* Left Column: Info */}
                 <div className="lg:col-span-3 space-y-6">
                     {/* Progress Bar */}
                     <div className="w-full">
-                        <div className="text-primary-800 dark:text-darkPrimary-100 text-sm mb-1">
+                        <div className="text-primary-800 dark:text-primary-100 text-sm mb-1">
                             <span>{t('presale_sold_progress', { progress: saleProgress.toFixed(2) })}</span>
                         </div>
-                        <div className="w-full bg-accent-200/70 dark:bg-darkAccent-900/70 rounded-full h-2.5">
-                            <div className="bg-accent-400 dark:bg-darkAccent-400 h-2.5 rounded-full" style={{width: `${saleProgress}%`}}></div>
+                        <div className="w-full bg-primary-300 dark:bg-darkPrimary-700 rounded-full h-2.5 border-2 border-primary-900 dark:border-primary-100">
+                            <div className="bg-accent-500 h-full rounded-full" style={{width: `${saleProgress}%`}}></div>
                         </div>
-                        <div className="flex justify-between mt-1 text-sm text-primary-700 dark:text-darkPrimary-300">
+                        <div className="flex justify-between mt-1 text-sm text-primary-700 dark:text-primary-300">
                             <span>{soldSOL.toFixed(2)} SOL</span>
                             <span>{PRESALE_DETAILS.hardCap.toFixed(2)} SOL</span>
                         </div>
@@ -514,18 +566,18 @@ export default function Presale() {
 
                     {/* Timers */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 text-center">
-                            <p className="text-primary-500 dark:text-darkPrimary-400 text-sm">{t('presale_whitelist_finished')}</p>
-                            <p className="text-primary-800 dark:text-darkPrimary-100 text-2xl font-mono font-bold">--:--:--:--</p>
+                        <div className="bg-primary-50 dark:bg-darkPrimary-800 border-2 border-primary-900 dark:border-primary-100 rounded-lg p-4 text-center">
+                            <p className="text-primary-600 dark:text-primary-400 text-sm">{t('presale_whitelist_finished')}</p>
+                            <p className="text-primary-800 dark:text-primary-100 text-2xl font-mono font-bold">--:--:--:--</p>
                         </div>
-                        <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 text-center">
-                            <p className="text-primary-500 dark:text-darkPrimary-400 text-sm">
+                        <div className="bg-primary-50 dark:bg-darkPrimary-800 border-2 border-primary-900 dark:border-primary-100 rounded-lg p-4 text-center">
+                            <p className="text-primary-600 dark:text-primary-400 text-sm">
                                 {presaleStatus === 'pending' && t('presale_sale_starts_in')}
                                 {presaleStatus === 'active' && t('presale_public_ending_in')}
                                 {presaleStatus === 'ended' && endReason === 'hardcap' && t('presale_ended_hardcap')}
                                 {presaleStatus === 'ended' && endReason !== 'hardcap' && t('presale_sale_ended')}
                             </p>
-                            <p className="text-primary-800 dark:text-darkPrimary-100 text-2xl font-mono font-bold">
+                            <p className="text-primary-800 dark:text-primary-100 text-2xl font-mono font-bold">
                                 {presaleStatus !== 'ended' ? 
                                     `${String(timeLeft.days).padStart(2, '0')}:${String(timeLeft.hours).padStart(2, '0')}:${String(timeLeft.minutes).padStart(2, '0')}:${String(timeLeft.seconds).padStart(2, '0')}`
                                     : '--:--:--:--'
@@ -562,8 +614,8 @@ export default function Presale() {
                                 <ProjectInfoRow label={t('presale_softcap_label')} value={`${PRESALE_DETAILS.softCap} SOL`} />
                                 <ProjectInfoRow label={t('presale_hardcap_label')} value={`${PRESALE_DETAILS.hardCap} SOL`} />
                                 <ProjectInfoRow label={t('token_decimals')} value={TOKEN_DETAILS.decimals} />
-                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50">
-                                    <span className="text-primary-500 dark:text-darkPrimary-400 mb-1 sm:mb-0">{t('presale_token_address_label')}</span>
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-300 dark:border-darkPrimary-700">
+                                    <span className="text-primary-600 dark:text-primary-400 mb-1 sm:mb-0">{t('presale_token_address_label')}</span>
                                     <AddressDisplay address={OWFN_MINT_ADDRESS} type="token" />
                                 </div>
                                 <ProjectInfoRow label={t('presale_start_time_label')} value={formatSaleDate(saleStartDate)} />
@@ -575,21 +627,21 @@ export default function Presale() {
                                 {TOKEN_ALLOCATIONS.map(alloc => (
                                     <div key={alloc.name} className="flex items-center space-x-3">
                                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: alloc.color }}></div>
-                                        <span className="text-sm text-primary-700 dark:text-darkPrimary-300">{alloc.name} ({alloc.percentage}%)</span>
+                                        <span className="text-sm text-primary-700 dark:text-primary-300">{alloc.name} ({alloc.percentage}%)</span>
                                     </div>
                                 ))}
-                                <Link to="/tokenomics" className="text-accent-600 dark:text-darkAccent-400 hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
+                                <Link to="/tokenomics" className="text-accent-600 dark:text-darkAccent-500 hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
                             </div>
                         </AccordionSection>
                         <AccordionSection title={t('roadmap_title')}>
                             <div className="space-y-3">
                                 {ROADMAP_DATA.map(phase => (
                                     <div key={phase.key_prefix}>
-                                        <h4 className="font-bold text-primary-800 dark:text-darkPrimary-100">{t(`${phase.key_prefix}_title`)} ({phase.quarter})</h4>
-                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t(`${phase.key_prefix}_description`)}</p>
+                                        <h4 className="font-bold text-primary-800 dark:text-primary-100">{t(`${phase.key_prefix}_title`)} ({phase.quarter})</h4>
+                                        <p className="text-sm text-primary-600 dark:text-primary-400">{t(`${phase.key_prefix}_description`)}</p>
                                     </div>
                                 ))}
-                                <Link to="/roadmap" className="text-accent-600 dark:text-darkAccent-400 hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
+                                <Link to="/roadmap" className="text-accent-600 dark:text-darkAccent-500 hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
                             </div>
                         </AccordionSection>
                         <AccordionSection title={t('presale_dyor_nfa_title')}>
@@ -600,72 +652,83 @@ export default function Presale() {
 
                 {/* Right Column: Buy & Feed */}
                 <div className="lg:col-span-2 space-y-6 flex flex-col">
-                     {/* Buy Section */}
-                    <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6">
-                        <h3 className="font-bold text-lg text-center mb-4">{t('presale_calculator_title')}</h3>
-                        
+                    {/* Buy Section */}
+                    <div className="bg-primary-50 dark:bg-darkPrimary-800 border-2 border-primary-900 dark:border-primary-100 rounded-lg p-6 space-y-4">
+                        <p className="text-sm text-primary-700 dark:text-primary-300 text-center">
+                            {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
+                        </p>
                         {solana.connected && (
-                            <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 mb-4 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
+                            <div className="text-center text-xs text-primary-700 dark:text-primary-300 p-2 bg-primary-200 dark:bg-darkPrimary-900 rounded-md">
                                 {isCheckingContribution ? (
-                                    <div className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /><span>Checking...</span></div>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>Checking your contribution...</span>
+                                    </div>
                                 ) : (
                                     <>
-                                        <span>{t('presale_you_contributed', { amount: userContribution.toFixed(6) })}</span><br/>
+                                        <span>{t('presale_you_contributed', { amount: userContribution.toFixed(6) })}</span>
+                                        <br/>
                                         <span className="font-semibold">{t('presale_you_can_buy', { amount: maxAllowedBuy.toFixed(6) })}</span>
                                     </>
                                 )}
                             </div>
                         )}
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="text-sm font-medium">{t('presale_you_invest')}</label>
-                                <div className="relative mt-1">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><SolIcon className="w-6 h-6" /></div>
-                                    <input 
-                                        type="text"
-                                        value={solAmount}
-                                        onChange={handleAmountChange}
-                                        className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 pl-12 text-2xl font-mono font-bold text-right text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
-                                        placeholder="0.0"
-                                        disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
-                                    />
-                                </div>
-                                {error && <p className="text-red-500 dark:text-red-400 text-xs mt-1 text-center">{error}</p>}
+                        
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                                <SolIcon className="w-6 h-6" />
                             </div>
+                            <input
+                                id="buy-amount"
+                                type="number"
+                                value={solAmount}
+                                onChange={handleAmountChange}
+                                onBlur={handleBlur}
+                                className={`w-full bg-primary-200 dark:bg-darkPrimary-900 border-2 rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-primary-100 text-right focus:ring-2 placeholder-primary-500 dark:placeholder-primary-400 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-900 dark:border-primary-200 focus:ring-accent-500'}`}
+                                placeholder="0.00"
+                                disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
+                            />
+                        </div>
 
-                            <div>
-                                 <label className="text-sm font-medium">{t('presale_you_will_receive')}</label>
-                                 <div className="mt-1 p-4 bg-primary-100 dark:bg-darkPrimary-800 rounded-lg space-y-2 text-right">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-primary-600 dark:text-darkPrimary-400">{t('presale_base_amount')}</span>
-                                        <span className="font-mono font-semibold">{owfnAmount.toLocaleString(undefined, {maximumFractionDigits: 0})} OWFN</span>
-                                    </div>
-                                    {bonusAmount > 0 && (
-                                        <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400 animate-fade-in-up">
-                                            <span className="font-bold flex items-center gap-1.5"><Gift size={14}/> {t('presale_bonus_active')}</span>
-                                            <span className="font-mono font-semibold">+{bonusAmount.toLocaleString(undefined, {maximumFractionDigits: 0})} OWFN</span>
-                                        </div>
-                                    )}
-                                    <div className="border-t border-primary-200 dark:border-darkPrimary-700 my-2"></div>
-                                    <div className="flex justify-between items-center text-lg">
-                                        <span className="font-bold">{t('presale_total_received')}</span>
-                                        <span className="font-mono font-bold text-accent-600 dark:text-darkAccent-400 flex items-center gap-2">
-                                            <OwfnIcon className="w-5 h-5"/>
-                                            {totalOwfnAmount.toLocaleString(undefined, {maximumFractionDigits: 0})}
-                                        </span>
-                                    </div>
-                                 </div>
+                        {error && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
+                        
+                        <div className="bg-primary-100 dark:bg-darkPrimary-900 p-4 rounded-lg space-y-3 border-2 border-primary-900 dark:border-primary-200">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-primary-600 dark:text-primary-400">{t('owfn_base_amount')}</span>
+                                <span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                            </div>
+                            
+                            {calculation.bonusApplied && (
+                                <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
+                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> Bonus ({PRESALE_DETAILS.bonusPercentage}%)</span>
+                                    <span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                                </div>
+                            )}
+
+                            <div className="border-t-2 border-primary-900 dark:border-primary-200 my-2"></div>
+                            
+                            <div className="flex justify-between items-center text-lg">
+                                <span className="font-bold text-primary-800 dark:text-primary-200">{t('you_receive')}</span>
+                                <div className="flex items-center gap-2">
+                                    <OwfnIcon className="w-6 h-6"/>
+                                    <span className="font-mono font-bold text-2xl text-accent-600 dark:text-darkAccent-500">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                                </div>
                             </div>
                         </div>
 
                         <button 
                             onClick={handleBuy}
-                            className="w-full mt-6 bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-transform transform hover:scale-105 shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            className="w-full bg-accent-500 text-white font-bold py-3 px-8 rounded-lg border-2 border-primary-900 dark:border-primary-100 shadow-neo-brutal dark:shadow-dark-neo-brutal hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 active:shadow-none transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                             disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
                         >
                             {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
                         </button>
+
+                         <div className="bg-accent-100 dark:bg-darkAccent-950 border-2 border-primary-900 dark:border-primary-100 p-3 rounded-lg text-center">
+                            <p className="font-bold text-accent-700 dark:text-darkAccent-300 flex items-center justify-center gap-2">
+                                <Gift size={18} /> {t('presale_bonus_offer', { threshold: PRESALE_DETAILS.bonusThreshold, percentage: PRESALE_DETAILS.bonusPercentage })}
+                            </p>
+                        </div>
                     </div>
                     {/* Live Feed */}
                     <div className="flex-grow">
