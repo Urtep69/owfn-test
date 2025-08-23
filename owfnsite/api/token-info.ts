@@ -1,4 +1,5 @@
 import type { TokenDetails, Trade, LiquidityPool, Socials } from '../types.ts';
+import { BIRDEYE_API_BASE_URL, BIRDEYE_API_KEY } from '../constants.ts';
 
 const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
 const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
@@ -141,8 +142,43 @@ async function fetchTokenDetails(mintAddress: string): Promise<Partial<TokenDeta
         marketData.dexScreenerUrl = primaryPair.url;
     }
     
-    // Step 3: Combine and return
-    return { ...onChainData, ...marketData };
+    // Step 3: Fetch aggregated data from Birdeye
+    let birdeyeData: Partial<TokenDetails> = {};
+    try {
+        const birdeyeUrl = `${BIRDEYE_API_BASE_URL}/defi/token_overview?address=${mintAddress}`;
+        const birdeyeResponse = await fetch(birdeyeUrl, {
+            headers: { 'X-API-KEY': BIRDEYE_API_KEY }
+        });
+        if (birdeyeResponse.ok) {
+            const { data } = await birdeyeResponse.json();
+            if (data) {
+                birdeyeData.holders = data.holders;
+                // Birdeye uses 'mc' for market cap, which is more accurate than FDV if available. Overwrite fdv.
+                if (data.mc) {
+                    birdeyeData.fdv = data.mc; 
+                }
+                // Birdeye provides circulating supply for some tokens
+                if (data.supply && typeof data.supply.circulating === 'number') {
+                    birdeyeData.circulatingSupply = data.supply.circulating;
+                }
+                
+                // Merge social links from Birdeye, giving them precedence as they are often more accurate
+                if (data.extensions) {
+                    if (data.extensions.website) onChainData.socials!.website = data.extensions.website;
+                    if (data.extensions.twitter) onChainData.socials!.twitter = data.extensions.twitter;
+                    if (data.extensions.telegram) onChainData.socials!.telegram = data.extensions.telegram;
+                    if (data.extensions.discord) onChainData.socials!.discord = data.extensions.discord;
+                }
+            }
+        } else {
+            console.warn(`Birdeye API failed with status ${birdeyeResponse.status}`);
+        }
+    } catch (err) {
+        console.warn("Failed to fetch data from Birdeye:", err);
+    }
+    
+    // Step 4: Combine and return, giving precedence to more specific/accurate sources
+    return { ...onChainData, ...marketData, ...birdeyeData };
 }
 
 async function fetchTokenTrades(pairAddress: string): Promise<Trade[]> {

@@ -197,12 +197,12 @@ export default function TokenDetail() {
             <div className="grid lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
                 {/* Left Column */}
                 <div className="lg:col-span-1 space-y-4">
-                    <InfoCard title="Market Stats">
-                        <InfoRow label="Market Cap" tooltip="Fully Diluted Valuation">${formatLargeNumber(token.fdv)}</InfoRow>
-                        <InfoRow label="Liquidity">${formatLargeNumber(token.liquidity?.usd)}</InfoRow>
-                        <InfoRow label="24h Volume">${formatLargeNumber(token.volume?.h24)}</InfoRow>
-                        <InfoRow label="Holders">N/A</InfoRow>
-                        <InfoRow label="Circ. Supply">N/A</InfoRow>
+                    <InfoCard title={t('market_stats')}>
+                        <InfoRow label={t('market_cap')} tooltip="Market Capitalization">${formatLargeNumber(token.fdv)}</InfoRow>
+                        <InfoRow label={t('liquidity')}>${formatLargeNumber(token.liquidity?.usd)}</InfoRow>
+                        <InfoRow label={t('volume_24h')}>${formatLargeNumber(token.volume?.h24)}</InfoRow>
+                        <InfoRow label={t('holders')}>{formatLargeNumber(token.holders)}</InfoRow>
+                        <InfoRow label={t('circulating_supply')}>{formatLargeNumber(token.circulatingSupply)}</InfoRow>
                     </InfoCard>
                      <InfoCard title="Pool Info">
                         <InfoRow label={`Pooled ${token.quoteToken?.symbol}`}>{formatLargeNumber(token.liquidity?.quote)}</InfoRow>
