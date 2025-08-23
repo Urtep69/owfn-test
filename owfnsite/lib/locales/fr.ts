@@ -109,6 +109,7 @@ export const fr = {
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Vendu {progress}%`,
     presale_buy_info: `Acheter (Min: {min} SOL, Max: {max} SOL)`,
+    presale_buy_info_max_only: `Acheter (Max: {max} SOL)`,
     buy: `Acheter`,
     owfn_base_amount: `Montant de Base OWFN`,
     presale_buying_owfn: `Achat de {amount} $OWFN`,
@@ -134,6 +135,7 @@ export const fr = {
     presale_dyor_nfa_desc: `Faites vos propres recherches. Ceci n'est pas un conseil financier.`,
     presale_footer_copyright: `© {year} Official World Family Network | Tous droits réservés.`,
     presale_amount_error: `Le montant doit être compris entre {min} et {max} SOL.`,
+    presale_amount_error_max_only: `Le montant doit être supérieur à 0 et jusqu'à {max} SOL.`,
     live_presale_feed: `Flux de Prévente en Direct`,
     wallet: `Portefeuille`,
     sol_spent: `SOL Dépensé`,
@@ -428,7 +430,7 @@ export const fr = {
     airdrop_congratulations: `Félicitations !`,
     airdrop_eligible_message: `Votre portefeuille est éligible ! Vous recevrez {amount} jetons OWFN lors de la prochaine distribution.`,
     airdrop_not_eligible: `Non Éligible`,
-    airdrop_not_eligible_message: `Désolé, cette adresse de portefeuille n'est pas éligible pour l'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !`,
+    airdrop_not_eligible_message: `Désolé, cette adresse de portefeuille n'est pas éligible for the current airdrop. Restez actif dans notre communauté pour de futures opportunités !`,
     airdrop_info_box_title: `À propos de cet Airdrop`,
     airdrop_info_box_desc: `Cet airdrop est conçu pour récompenser les premiers supporters et les membres actifs de la communauté. L'éligibilité est basée sur des facteurs tels que la participation à la prévente et l'engagement dans les événements communautaires.`,
 
@@ -450,7 +452,7 @@ export const fr = {
     status_passed: `Adoptée`,
     status_failed: `Rejetée`,
     you_voted: `Vous avez voté`,
-    no_active_proposals: `Il n'y a actuellement aucune proposition active.`,
+    no_active_proposals: `Il n'y a currently aucune proposition active.`,
     no_past_proposals: `Il n'y a aucune proposition passée à afficher.`,
     no_active_cases_in_category: `Il n'y a actuellement aucun cas actif dans cette catégorie.`,
 
