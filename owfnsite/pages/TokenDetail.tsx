@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { Loader2, ArrowLeft, Database, Shield, Code, TrendingUp, DollarSign, BarChart2, Repeat, Droplets, Clock, ArrowRightLeft, FileText, Link as LinkIcon, Globe, Twitter, Send, ExternalLink } from 'lucide-react';
@@ -147,7 +148,7 @@ export default function TokenDetail() {
         );
     }
     
-    const isMarketDataAvailable = (token.marketCap ?? 0) > 0;
+    const isMarketDataAvailable = (token.fdv ?? 0) > 0;
 
     return (
         <div className="space-y-8 animate-fade-in-up">
@@ -169,9 +170,9 @@ export default function TokenDetail() {
             </header>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <StatCard title={t('pricePerToken', {defaultValue: 'Price'})} value={isMarketDataAvailable ? `$${token.pricePerToken?.toPrecision(4)}` : 'N/A'} change={token.price24hChange} icon={<DollarSign />} />
-                <StatCard title={t('market_cap')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.marketCap)}` : 'N/A'} icon={<BarChart2 />} />
-                <StatCard title={t('volume_24h')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.volume24h)}` : 'N/A'} icon={<Repeat />} />
+                <StatCard title={t('pricePerToken', {defaultValue: 'Price'})} value={isMarketDataAvailable ? `$${token.pricePerToken?.toPrecision(4)}` : 'N/A'} change={token.priceChange?.h24} icon={<DollarSign />} />
+                <StatCard title={t('market_cap')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.fdv)}` : 'N/A'} icon={<BarChart2 />} />
+                <StatCard title={t('volume_24h')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.volume?.h24)}` : 'N/A'} icon={<Repeat />} />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8 items-start">
@@ -180,7 +181,7 @@ export default function TokenDetail() {
                         <>
                             <InfoCard title={t('market_stats')} icon={<TrendingUp />}>
                                 <InfoRow label={t('fully_diluted_valuation')}>{`$${formatLargeNumber(token.fdv)}`}</InfoRow>
-                                <InfoRow label={t('liquidity')}>{`$${formatLargeNumber(token.liquidity)}`}</InfoRow>
+                                <InfoRow label={t('liquidity')}>{`$${formatLargeNumber(token.liquidity?.usd)}`}</InfoRow>
                                 <InfoRow label={t('holders')}>N/A</InfoRow>
                                 <InfoRow label={t('circulating_supply')}>N/A</InfoRow>
                             </InfoCard>
