@@ -51,27 +51,11 @@ const AppContent = () => {
           <Route path="/whitepaper"><Whitepaper /></Route>
           <Route path="/tokenomics"><Tokenomics /></Route>
           <Route path="/roadmap"><Roadmap /></Route>
-          <Route path="/staking">
-            <ComingSoonWrapper>
-              <Staking />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/vesting">
-            <ComingSoonWrapper>
-              <Vesting />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/airdrop">
-            <ComingSoonWrapper>
-              <Airdrop />
-            </ComingSoonWrapper>
-          </Route>
+          <Route path="/staking"><Staking /></Route>
+          <Route path="/vesting"><Vesting /></Route>
+          <Route path="/airdrop"><Airdrop /></Route>
           <Route path="/donations"><Donations /></Route>
-          <Route path="/dashboard/token/:mint">
-            <ComingSoonWrapper>
-              <TokenDetail />
-            </ComingSoonWrapper>
-          </Route>
+          <Route path="/dashboard/token/:mint"><TokenDetail /></Route>
           <Route path="/dashboard"><Dashboard /></Route>
           <Route path="/profile"><Profile /></Route>
           <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
@@ -80,11 +64,7 @@ const AppContent = () => {
           <Route path="/partnerships"><Partnerships /></Route>
           <Route path="/faq"><FAQ /></Route>
           <Route path="/contact"><Contact /></Route>
-          <Route path="/governance">
-            <ComingSoonWrapper>
-              <Governance />
-            </ComingSoonWrapper>
-          </Route>
+          <Route path="/governance"><Governance /></Route>
           {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
           <Route path="/maintenance"><Maintenance /></Route>
           <Route path="/"><Home /></Route>

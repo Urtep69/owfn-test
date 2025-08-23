@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Twitter, Send } from 'lucide-react';
 import { PROJECT_LINKS } from '../constants.ts';
@@ -14,7 +13,7 @@ const socialLinks = [
 export const Footer = () => {
   const { t } = useAppContext();
   return (
-    <footer className="bg-primary-200 dark:bg-darkPrimary-800 shadow-inner">
+    <footer className="bg-primary-100/80 dark:bg-darkPrimary-900/50 backdrop-blur-sm border-t border-primary-200 dark:border-darkPrimary-700">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex justify-between items-center">
           <p className="text-sm text-primary-600 dark:text-darkPrimary-400">
@@ -27,7 +26,7 @@ export const Footer = () => {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400 transition-colors"
+                className="text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-accent-400 transition-colors"
               >
                 <span className="sr-only">{link.name}</span>
                 {link.icon}

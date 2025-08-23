@@ -65,7 +65,7 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
     const description = proposal.description[currentLanguage.code] || proposal.description['en'];
 
     return (
-        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d space-y-4">
+        <div className="glass-card p-6 space-y-4">
             <div className="flex justify-between items-start">
                 <h3 className="text-xl font-bold">{title}</h3>
                 {getStatusChip()}
@@ -85,11 +85,11 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
             </div>
             
             {proposal.status === 'active' && (
-                <div className="flex justify-between items-center border-t border-primary-200 dark:border-darkPrimary-700 pt-4">
+                <div className="flex justify-between items-center border-t border-primary-200/50 dark:border-darkPrimary-700/50 pt-4">
                     <div className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('ends_in')}: <Countdown endDate={proposal.endDate} /></div>
                     {address && (
                         hasVoted ? (
-                             <div className="flex items-center gap-2 text-accent-600 dark:text-darkAccent-500 font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
+                             <div className="flex items-center gap-2 text-accent-500 font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
                         ) : (
                             <div className="flex gap-2">
                                 <button onClick={() => handleVote('for')} disabled={loading} className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 disabled:opacity-50"><ThumbsUp size={16}/></button>
@@ -134,16 +134,16 @@ export default function Governance() {
     };
 
     return (
-        <div className="animate-fade-in-up space-y-8">
+        <div className="animate-fade-in-up space-y-12">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="text-center md:text-left">
-                    <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('governance_title')}</h1>
+                    <h1 className="text-4xl font-bold text-primary-900 dark:text-darkPrimary-100">{t('governance_title')}</h1>
                     <p className="mt-2 text-lg text-primary-600 dark:text-darkPrimary-400">{t('governance_subtitle')}</p>
                 </div>
                 {solana.connected && (
                     <button 
                         onClick={() => setCreateModalOpen(true)}
-                        className="flex items-center gap-2 bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors"
+                        className="flex items-center gap-2 bg-accent-500 text-white font-bold py-2 px-4 rounded-full neo-button border-accent-900/50 dark:border-accent-200/50"
                     >
                         <PlusCircle size={20} /> {t('create_proposal')}
                     </button>
@@ -157,7 +157,9 @@ export default function Governance() {
                         {activeProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
                     </div>
                 ) : (
-                    <p className="text-primary-600 dark:text-darkPrimary-400">{t('no_active_proposals')}</p> 
+                    <div className="text-center p-12 glass-card">
+                        <p className="text-primary-600 dark:text-darkPrimary-400">{t('no_active_proposals')}</p> 
+                    </div>
                 )}
             </div>
 
@@ -168,13 +170,15 @@ export default function Governance() {
                         {pastProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
                     </div>
                 ) : (
-                    <p className="text-primary-600 dark:text-darkPrimary-400">{t('no_past_proposals')}</p>
+                     <div className="text-center p-12 glass-card">
+                        <p className="text-primary-600 dark:text-darkPrimary-400">{t('no_past_proposals')}</p>
+                     </div>
                 )}
             </div>
 
             {isCreateModalOpen && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-xl p-8 w-full max-w-2xl relative animate-fade-in-up" style={{ animationDuration: '300ms' }}>
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                    <div className="bg-primary-50 dark:bg-darkPrimary-900 rounded-lg shadow-xl p-8 w-full max-w-2xl relative animate-fade-in-up" style={{ animationDuration: '300ms' }}>
                         <button onClick={() => setCreateModalOpen(false)} className="absolute top-4 right-4 text-primary-500 hover:text-primary-800 dark:text-darkPrimary-400 dark:hover:text-darkPrimary-100">
                             <X size={24} />
                         </button>
@@ -188,7 +192,7 @@ export default function Governance() {
                                     value={newTitle}
                                     onChange={e => setNewTitle(e.target.value)}
                                     required
-                                    className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md"
+                                    className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-800 border border-primary-200 dark:border-darkPrimary-700 rounded-md focus:ring-accent-500 focus:border-accent-500"
                                 />
                             </div>
                             <div>
@@ -199,13 +203,13 @@ export default function Governance() {
                                     onChange={e => setNewDescription(e.target.value)}
                                     required
                                     rows={5}
-                                    className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md"
+                                    className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-800 border border-primary-200 dark:border-darkPrimary-700 rounded-md focus:ring-accent-500 focus:border-accent-500"
                                 ></textarea>
                             </div>
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 py-3 rounded-lg font-bold hover:bg-accent-500 dark:hover:bg-darkAccent-600 disabled:opacity-50"
+                                className="w-full bg-accent-500 text-white py-3 rounded-lg font-bold hover:bg-accent-600 disabled:opacity-50"
                             >
                                 {isSubmitting ? t('processing') : t('submit_proposal')}
                             </button>
