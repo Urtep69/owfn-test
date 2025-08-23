@@ -65,9 +65,24 @@ export interface TokenExtension {
     state: TokenExtensionState;
 }
 
+export interface LiquidityPool {
+    dexId?: string;
+    pairAddress?: string;
+    liquidity?: number;
+    baseToken?: { symbol?: string; address?: string };
+    quoteToken?: { symbol?: string; address?: string };
+    url?: string;
+}
+
+export interface Socials {
+    website?: string;
+    twitter?: string;
+    telegram?: string;
+    discord?: string;
+}
+
 export interface TokenDetails extends Token {
     description?: string;
-    links?: Record<string, string>;
     
     // On-chain technical details
     creatorAddress?: string;
@@ -77,22 +92,23 @@ export interface TokenDetails extends Token {
     tokenStandard?: 'SPL Token' | 'Token-2022';
     tokenExtensions?: TokenExtension[];
     totalSupply: number;
+    socials?: Socials;
 
     // Market Data from DexScreener/Birdeye
     chainId?: string;
     pairAddress?: string;
     liquidity?: { usd: number; base: number; quote: number };
+    liquidityPools?: LiquidityPool[];
     volume?: { h24: number; h6: number; h1: number };
     priceChange?: { m5: number; h1: number; h6: number; h24: number };
     fdv?: number; // Fully Diluted Valuation
     holders?: number; // Holder count is hard to get reliably, will be optional
     circulatingSupply?: number; // Will be optional
-    volatility?: number; // Placeholder, hard to calculate
     baseToken?: { symbol: string; address: string; };
     quoteToken?: { symbol: string; address: string; };
     poolCreatedAt?: number; // Timestamp
     txns?: {
-        h24: { buys: number, sells: number };
+        h24: { buys: number, sells: number, buysVolume: number, sellsVolume: number };
     };
     dexId?: string;
     dexScreenerUrl?: string;

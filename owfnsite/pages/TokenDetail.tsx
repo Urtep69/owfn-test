@@ -1,67 +1,14 @@
-
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'wouter';
-import { Loader2, ArrowLeft, Database, Shield, TrendingUp, Repeat, Droplets, Info, BarChart2, Star, Share2, Globe, Twitter, Send, ExternalLink, HelpCircle, Check, X } from 'lucide-react';
+import { Loader2, ArrowLeft, Star, Share2, Globe, Twitter, Send, ExternalLink, HelpCircle, Check, X, ChevronDown } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { TokenDetails, Trade } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import { GenericTokenIcon } from '../components/IconComponents.tsx';
-import { DiscordIcon } from '../components/IconComponents.tsx';
-import { DualProgressBar } from '../components/DualProgressBar.tsx';
-import { SolIcon, OwfnIcon } from '../components/IconComponents.tsx';
+import { GenericTokenIcon, DiscordIcon, SolIcon } from '../components/IconComponents.tsx';
 
-// --- Helper Functions & Components ---
-const formatPrice = (price?: number) => {
-    if (price === undefined || price === null) return 'N/A';
-    if (price < 0.000001) return `$0.0...${price.toExponential(2).split('e-')[1]}`;
-    if (price < 1) return `$${price.toPrecision(4)}`;
-    return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
-
-const formatLargeNumber = (num?: number): string => {
-    if (num === undefined || num === null) return 'N/A';
-    if (Math.abs(num) < 1000) return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    if (Math.abs(num) < 1_000_000) return `${(num / 1000).toFixed(2)}K`;
-    if (Math.abs(num) < 1_000_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
-    return `${(num / 1_000_000_000).toFixed(2)}B`;
-};
-
-const formatDate = (timestamp?: number): string => {
-    if (!timestamp) return 'N/A';
-    return new Date(timestamp).toLocaleDateString('en-CA');
-};
-
-const InfoCard = ({ title, children }: { title: string, children: React.ReactNode }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d">
-        <h3 className="text-md font-bold mb-3 text-primary-800 dark:text-darkPrimary-200">{title}</h3>
-        <div className="space-y-2">{children}</div>
-    </div>
-);
-
-const InfoRow = ({ label, children }: { label:string, children:React.ReactNode }) => (
-    <div className="flex justify-between items-center text-sm">
-        <span className="text-primary-600 dark:text-darkPrimary-400">{label}</span>
-        <div className="font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
-    </div>
-);
-
-const AuthorityRow = ({ label, address, t }: { label:string, address?:string|null, t: (key: string) => string }) => (
-    <InfoRow label={label}>
-        {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold flex items-center gap-1"><Check size={14}/> {t('revoked')}</span>}
-    </InfoRow>
-);
-
-const SecurityCheckRow = ({ label, value }: { label: string, value: boolean }) => (
-     <InfoRow label={label}>
-        <div className={`flex items-center gap-1.5 font-bold ${value ? 'text-green-500' : 'text-red-500'}`}>
-            {value ? <Check size={16}/> : <X size={16}/>}
-            <span>{value ? 'Yes' : 'No'}</span>
-        </div>
-    </InfoRow>
-);
-
+// --- Custom Hook for Intervals ---
 const useInterval = (callback: () => void, delay: number | null) => {
-    const savedCallback = React.useRef(callback);
+    const savedCallback = useRef(callback);
     useEffect(() => { savedCallback.current = callback; }, [callback]);
     useEffect(() => {
         if (delay !== null) {
@@ -71,22 +18,84 @@ const useInterval = (callback: () => void, delay: number | null) => {
     }, [delay]);
 };
 
+
+// --- Helper & UI Components (defined inside for single-file update) ---
+
+const formatPrice = (price?: number) => {
+    if (typeof price !== 'number' || isNaN(price)) return '$--';
+    if (price < 0.000001 && price > 0) return `$0.0...${price.toExponential(2).split('e-')[1]}`;
+    if (price < 1) return `$${price.toPrecision(4)}`;
+    return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`;
+};
+
+const formatLargeNumber = (num?: number, prefix = '', suffix = ''): string => {
+    if (typeof num !== 'number' || isNaN(num)) return 'N/A';
+    const absNum = Math.abs(num);
+    let formattedNum;
+    if (absNum < 1000) formattedNum = num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    else if (absNum < 1_000_000) formattedNum = `${(num / 1000).toFixed(2)}K`;
+    else if (absNum < 1_000_000_000) formattedNum = `${(num / 1_000_000).toFixed(2)}M`;
+    else formattedNum = `${(num / 1_000_000_000).toFixed(2)}B`;
+    return `${prefix}${formattedNum}${suffix}`;
+};
+
+const formatDate = (timestamp?: number): string => {
+    if (!timestamp) return 'N/A';
+    return new Date(timestamp).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' });
+};
+
+const InfoCard = ({ title, children, className = '' }: { title: string, children: React.ReactNode, className?: string }) => (
+    <div className={`bg-primary-100 dark:bg-darkPrimary-800 p-4 rounded-lg shadow-md ${className}`}>
+        <h3 className="text-sm font-bold mb-3 text-primary-700 dark:text-darkPrimary-300 uppercase tracking-wider">{title}</h3>
+        <div className="space-y-3">{children}</div>
+    </div>
+);
+
+const InfoRow = ({ label, children, tooltip }: { label:string, children:React.ReactNode, tooltip?: string }) => (
+    <div className="flex justify-between items-center text-sm">
+        <span className="text-primary-600 dark:text-darkPrimary-400 flex items-center gap-1.5">
+            {label}
+            {tooltip && <span title={tooltip}><HelpCircle size={14} className="cursor-help" /></span>}
+        </span>
+        <div className="font-semibold text-primary-900 dark:text-darkPrimary-100 text-right break-all">{children}</div>
+    </div>
+);
+
+const AuthorityStatus = ({ label, address }: { label: string, address?: string | null }) => (
+    <InfoRow label={label}>
+        {address ? (
+            <span className="text-red-500 font-bold flex items-center gap-1.5"><X size={14}/> Active</span>
+        ) : (
+            <span className="text-green-500 font-bold flex items-center gap-1.5"><Check size={14}/> Revoked</span>
+        )}
+    </InfoRow>
+);
+
+const DualProgressBar = ({ value1, value2 }: { value1: number, value2: number }) => {
+  const total = value1 + value2;
+  const percentage1 = total > 0 ? (value1 / total) * 100 : 50;
+
+  return (
+    <div className="flex w-full h-2.5 rounded-full overflow-hidden bg-primary-200 dark:bg-darkPrimary-700">
+      <div className="bg-green-500" style={{ width: `${percentage1}%` }}></div>
+      <div className="bg-red-500" style={{ width: `${100 - percentage1}%` }}></div>
+    </div>
+  );
+};
+
+
 // --- Main Component ---
 export default function TokenDetail() {
-    const { t, theme } = useAppContext();
+    const { t, theme, solana } = useAppContext();
     const params = useParams();
     const mintAddress = params?.['mint'];
     
-    const query = new URLSearchParams(window.location.search);
-    const fromPath = query.get('from') || '/dashboard';
-    const backLinkText = fromPath === '/profile' ? t('back_to_profile') : t('back_to_dashboard');
-
     const [token, setToken] = useState<Partial<TokenDetails> | null>(null);
     const [trades, setTrades] = useState<Trade[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchTokenData = useCallback(async () => {
+    const fetchAllData = useCallback(async () => {
         if (!mintAddress) return;
         try {
             const response = await fetch(`/api/token-info?mint=${mintAddress}`);
@@ -95,6 +104,7 @@ export default function TokenDetail() {
         } catch (err) {
             console.error("Failed to fetch token details:", err);
             setError(err instanceof Error ? err.message : "An unknown error occurred.");
+            setToken(null); // Clear old data on error
         }
     }, [mintAddress]);
     
@@ -109,15 +119,20 @@ export default function TokenDetail() {
 
     useEffect(() => {
         setLoading(true);
-        fetchTokenData().finally(() => setLoading(false));
-    }, [fetchTokenData]);
-
-    useInterval(fetchTokenData, 30000); // Refresh main data every 30s
-    useInterval(fetchTrades, 10000); // Refresh trades every 10s
+        setError(null);
+        setToken(null);
+        setTrades([]);
+        fetchAllData().finally(() => setLoading(false));
+    }, [fetchAllData]);
 
     useEffect(() => {
-        if (token?.pairAddress) fetchTrades(); // Fetch trades once token data is loaded
+        if (token?.pairAddress) {
+            fetchTrades(); // Initial fetch
+        }
     }, [token?.pairAddress, fetchTrades]);
+
+    useInterval(fetchAllData, 60000); // Refresh main data every 60s
+    useInterval(fetchTrades, 10000); // Refresh trades every 10s
 
     if (loading) {
         return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>;
@@ -128,97 +143,103 @@ export default function TokenDetail() {
             <div className="text-center py-10 animate-fade-in-up">
                 <h2 className="text-2xl font-bold">{t('token_not_found')}</h2>
                 {error && <p className="text-red-400 mt-2">{error}</p>}
-                <Link to={fromPath} className="text-accent-500 hover:underline mt-4 inline-flex items-center gap-2">
-                    <ArrowLeft size={16} /> {backLinkText}
+                <Link to="/dashboard" className="text-accent-500 hover:underline mt-4 inline-flex items-center gap-2">
+                    <ArrowLeft size={16} /> {t('back_to_dashboard')}
                 </Link>
             </div>
         );
     }
     
-    const pooledQuoteSymbol = token.quoteToken?.symbol === 'SOL' ? <SolIcon className="w-3 h-3"/> : <span>{token.quoteToken?.symbol}</span>;
-    const pooledBaseSymbol = token.symbol === 'OWFN' ? <OwfnIcon className="w-3 h-3"/> : <span>{token.symbol}</span>;
-    const isFreezable = token.freezeAuthority !== null;
-    const isMintable = token.mintAuthority !== null;
-    
     const priceChange = token.priceChange?.h24 ?? 0;
     const price = token.pricePerToken ?? 0;
-    const quoteTokenPrice = price / (token.liquidity?.usd ?? 1) * (token.liquidity?.quote ?? 0);
+    const quotePrice = token.quoteToken?.symbol === 'SOL' ? price / (solana.userTokens.find(t=>t.symbol==='SOL')?.pricePerToken || 1) : 0;
 
     return (
         <div className="space-y-6 animate-fade-in-up">
-            <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
-                <ArrowLeft size={16} /> {backLinkText}
-            </Link>
-
             {/* Header */}
-            <header className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                <div className="flex items-center gap-3 flex-grow">
+            <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
                     <GenericTokenIcon uri={token.logo as string} className="w-12 h-12 flex-shrink-0" />
                     <div>
-                        <h1 className="text-2xl font-bold">{token.name} / {token.quoteToken?.symbol}</h1>
-                        <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-md">${token.symbol}</p>
+                        <div className="flex items-center gap-2">
+                             <h1 className="text-2xl font-bold">{token.name} / {token.quoteToken?.symbol}</h1>
+                             <div className="flex items-center gap-2">
+                                {token.socials?.website && <a href={token.socials.website} target="_blank" rel="noopener noreferrer"><Globe size={16} /></a>}
+                                {token.socials?.twitter && <a href={token.socials.twitter} target="_blank" rel="noopener noreferrer"><Twitter size={16} /></a>}
+                                {token.socials?.telegram && <a href={token.socials.telegram} target="_blank" rel="noopener noreferrer"><Send size={16} /></a>}
+                                {token.socials?.discord && <a href={token.socials.discord} target="_blank" rel="noopener noreferrer"><DiscordIcon className="w-4 h-4" /></a>}
+                             </div>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                            <span className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-md">${token.symbol}</span>
+                            <AddressDisplay address={token.mintAddress!} type="token" />
+                        </div>
                     </div>
                 </div>
-                 <div className="flex items-center gap-2">
+                 <div className="flex items-center gap-2 self-start md:self-center">
                     <button className="p-2 rounded-md hover:bg-primary-200 dark:hover:bg-darkPrimary-700"><Star size={20}/></button>
                     <button className="p-2 rounded-md hover:bg-primary-200 dark:hover:bg-darkPrimary-700"><Share2 size={20}/></button>
                 </div>
             </header>
 
             {/* Price Info */}
-            <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-4">
+            <div className="bg-primary-50 dark:bg-darkPrimary-800 p-4 rounded-lg shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
                     <p className="text-3xl font-bold">{formatPrice(price)}</p>
-                    <div className={`px-2 py-1 rounded-md text-lg font-bold ${priceChange >= 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                        {priceChange >= 0 ? '▲' : '▼'} {Math.abs(priceChange).toFixed(2)}%
-                    </div>
+                    {quotePrice > 0 && <p className="text-md text-primary-600 dark:text-darkPrimary-400 font-mono flex items-center gap-1.5"><SolIcon className="w-4 h-4"/> {quotePrice.toPrecision(5)}</p>}
                 </div>
-                 <p className="text-lg text-primary-600 dark:text-darkPrimary-400 font-mono">{quoteTokenPrice.toPrecision(4)} {token.quoteToken?.symbol}</p>
+                <div className={`px-3 py-1.5 rounded-md text-lg font-bold ${priceChange >= 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                    {priceChange >= 0 ? '▲' : '▼'} {Math.abs(priceChange).toFixed(2)}% (24h)
+                </div>
             </div>
 
             {/* Main Content */}
-            <div className="grid lg:grid-cols-3 gap-6 items-start">
+            <div className="grid lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
                 {/* Left Column */}
                 <div className="lg:col-span-1 space-y-4">
-                    <InfoCard title={t('market_stats')}>
-                        <InfoRow label={t('market_cap')}>${formatLargeNumber(token.fdv)}</InfoRow>
-                        <InfoRow label={t('liquidity')}>${formatLargeNumber(token.liquidity?.usd)}</InfoRow>
-                        <InfoRow label={t('volume_24h')}>${formatLargeNumber(token.volume?.h24)}</InfoRow>
-                        <InfoRow label={t('holders')}>N/A</InfoRow>
-                        <InfoRow label={t('circulating_supply')}>N/A</InfoRow>
+                    <InfoCard title="Market Stats">
+                        <InfoRow label="Market Cap" tooltip="Fully Diluted Valuation">${formatLargeNumber(token.fdv)}</InfoRow>
+                        <InfoRow label="Liquidity">${formatLargeNumber(token.liquidity?.usd)}</InfoRow>
+                        <InfoRow label="24h Volume">${formatLargeNumber(token.volume?.h24)}</InfoRow>
+                        <InfoRow label="Holders">N/A</InfoRow>
+                        <InfoRow label="Circ. Supply">N/A</InfoRow>
                     </InfoCard>
-                     <InfoCard title={t('pool_info')}>
-                        <InfoRow label={`Pooled ${token.quoteToken?.symbol}`}>{<span className="flex items-center gap-1 justify-end">{pooledQuoteSymbol} {formatLargeNumber(token.liquidity?.quote)}</span>}</InfoRow>
-                        <InfoRow label={`Pooled ${token.symbol}`}>{<span className="flex items-center gap-1 justify-end">{pooledBaseSymbol} {formatLargeNumber(token.liquidity?.base)}</span>}</InfoRow>
-                        <InfoRow label={t('pool_age')}>{formatDate(token.poolCreatedAt)}</InfoRow>
+                     <InfoCard title="Pool Info">
+                        <InfoRow label={`Pooled ${token.quoteToken?.symbol}`}>{formatLargeNumber(token.liquidity?.quote)}</InfoRow>
+                        <InfoRow label={`Pooled ${token.symbol}`}>{formatLargeNumber(token.liquidity?.base)}</InfoRow>
+                        <InfoRow label="Pool Created">{formatDate(token.poolCreatedAt)}</InfoRow>
+                        <InfoRow label="DEX">{token.dexId}</InfoRow>
                     </InfoCard>
-                    <InfoCard title={t('on_chain_security')}>
-                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} t={t} />
-                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} t={t} />
-                         <SecurityCheckRow label={t('is_mintable')} value={isMintable} />
-                         <SecurityCheckRow label={t('is_freezable')} value={isFreezable} />
+                    <InfoCard title="24h Trading Stats">
+                        <DualProgressBar value1={token.txns?.h24.buys || 0} value2={token.txns?.h24.sells || 0}/>
+                        <InfoRow label="Buys / Sells">{token.txns?.h24.buys} / {token.txns?.h24.sells}</InfoRow>
+                        <InfoRow label="Buy / Sell Volume">{formatLargeNumber(token.txns?.h24.buysVolume, '$')} / {formatLargeNumber(token.txns?.h24.sellsVolume, '$')}</InfoRow>
+                    </InfoCard>
+                    <InfoCard title="On-chain Security">
+                         <AuthorityStatus label="Mint Authority" address={token.mintAuthority} />
+                         <AuthorityStatus label="Freeze Authority" address={token.freezeAuthority} />
+                         <AuthorityStatus label="Update Authority" address={token.updateAuthority} />
                     </InfoCard>
                 </div>
 
                 {/* Right Column */}
-                <div className="lg:col-span-2 space-y-4">
+                <div className="lg:col-span-2 xl:col-span-3 space-y-4">
                     <div className="w-full h-[500px] bg-primary-50 dark:bg-darkPrimary-950 rounded-lg">
                        {token.chainId && token.pairAddress && (
                            <iframe 
-                                src={`https://dexscreener.com/${token.chainId}/${token.pairAddress}?embed=1&theme=${theme}`}
+                                src={`https://dexscreener.com/${token.chainId}/${token.pairAddress}?embed=1&theme=${theme}&info=0`}
                                 className="w-full h-full rounded-lg border-0"
                                 allowFullScreen
                            />
                        )}
                     </div>
-                    {/* Trade History */}
-                     <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d">
-                        <h3 className="text-md font-bold mb-3">{t('trading_stats')}</h3>
-                        <div className="overflow-x-auto">
+                     <div className="bg-primary-50 dark:bg-darkPrimary-800 p-4 rounded-lg shadow-md">
+                        <h3 className="text-sm font-bold mb-3 text-primary-700 dark:text-darkPrimary-300 uppercase tracking-wider">Trade History</h3>
+                        <div className="overflow-x-auto max-h-96">
                             <table className="w-full text-xs text-left">
-                                <thead className="text-gray-500 dark:text-gray-400 uppercase bg-primary-100 dark:bg-darkPrimary-700">
+                                <thead className="text-primary-500 dark:text-darkPrimary-400 uppercase bg-primary-100 dark:bg-darkPrimary-900/50 sticky top-0">
                                     <tr>
-                                        <th className="p-2">Date</th>
+                                        <th className="p-2">Time</th>
                                         <th className="p-2">Type</th>
                                         <th className="p-2 text-right">Price USD</th>
                                         <th className="p-2 text-right">Amount ({token.symbol})</th>
@@ -227,13 +248,13 @@ export default function TokenDetail() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {trades.map(trade => (
-                                        <tr key={trade.txHash} className="border-b dark:border-darkPrimary-700 hover:bg-primary-50 dark:hover:bg-darkPrimary-700/50">
+                                    {trades.map((trade, idx) => (
+                                        <tr key={`${trade.txHash}-${idx}`} className="border-b border-primary-200 dark:border-darkPrimary-700 hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50">
                                             <td className="p-2">{new Date(trade.timestamp).toLocaleTimeString()}</td>
                                             <td className={`p-2 font-bold ${trade.type === 'buy' ? 'text-green-500' : 'text-red-500'}`}>{trade.type}</td>
                                             <td className="p-2 text-right font-mono">{formatPrice(trade.priceUsd)}</td>
                                             <td className="p-2 text-right font-mono">{formatLargeNumber(trade.amountBase)}</td>
-                                            <td className="p-2 text-right font-mono">${formatLargeNumber(trade.amountQuote)}</td>
+                                            <td className="p-2 text-right font-mono">{formatLargeNumber(trade.amountQuote, '$')}</td>
                                             <td className="p-2"><AddressDisplay address={trade.maker} /></td>
                                         </tr>
                                     ))}
@@ -245,42 +266,52 @@ export default function TokenDetail() {
             </div>
             
             {/* Bottom Section */}
-            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d space-y-6">
-                <h2 className="text-2xl font-bold">PepeWifPork Live Price and Buy Information</h2>
-                <p className="text-primary-600 dark:text-darkPrimary-400">
-                    The PepeWifPork live price is {formatPrice(price)} USD with a market cap of {formatLargeNumber(token.fdv)} USD, a 24-hour trading volume of {formatLargeNumber(token.volume?.h24)} USD.
-                </p>
+            <div className="bg-primary-50 dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md space-y-6">
+                <h2 className="text-2xl font-bold">{token.name} Live Price and Information</h2>
+                {token.description && <p className="text-primary-600 dark:text-darkPrimary-400">{token.description}</p>}
+                
                 <div className="space-y-4">
-                    <details className="border-b dark:border-darkPrimary-700 pb-2">
-                        <summary className="font-semibold cursor-pointer flex justify-between">How much is 1 PEPEWP? <HelpCircle size={16} className="inline-block"/> </summary>
-                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">The price of 1 PEPEWP is {formatPrice(price)}.</p>
+                    <details className="border-b border-primary-200 dark:border-darkPrimary-700 pb-2">
+                        <summary className="font-semibold cursor-pointer flex justify-between items-center">How much is 1 ${token.symbol}? <ChevronDown className="w-5 h-5"/></summary>
+                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">The price of 1 ${token.symbol} is {formatPrice(price)} USD.</p>
                     </details>
-                     <details className="border-b dark:border-darkPrimary-700 pb-2">
-                        <summary className="font-semibold cursor-pointer flex justify-between">Which is the PEPEWP contract on Solana? <HelpCircle size={16} className="inline-block"/> </summary>
-                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400"><AddressDisplay address={mintAddress!} type="token"/></p>
+                     <details className="border-b border-primary-200 dark:border-darkPrimary-700 pb-2">
+                        <summary className="font-semibold cursor-pointer flex justify-between items-center">What is the ${token.symbol} contract on Solana? <ChevronDown className="w-5 h-5"/></summary>
+                        <div className="mt-2 text-primary-600 dark:text-darkPrimary-400"><AddressDisplay address={mintAddress!} type="token"/></div>
                     </details>
                 </div>
 
-                <h3 className="text-xl font-bold pt-4">How much PEPEWP can I buy with 100 USD?</h3>
-                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-primary-100 dark:bg-darkPrimary-700">
-                            <tr>
-                                <th className="p-2">USD</th>
-                                <th className="p-2 text-right">{token.symbol}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {[1, 5, 10, 25, 50, 100, 500, 1000].map(usd => (
-                                <tr key={usd} className="border-b dark:border-darkPrimary-700">
-                                    <td className="p-2">${usd}</td>
-                                    <td className="p-2 text-right font-mono">{price > 0 ? (usd/price).toLocaleString(undefined, {maximumFractionDigits: 2}) : 'N/A'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="grid md:grid-cols-2 gap-8 items-start">
+                    <div>
+                        <h3 className="text-xl font-bold mb-4">How much ${token.symbol} can I buy?</h3>
+                         <div className="overflow-x-auto rounded-lg border border-primary-200 dark:border-darkPrimary-700">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-primary-100 dark:bg-darkPrimary-900/50">
+                                    <tr>
+                                        <th className="p-3">USD</th>
+                                        <th className="p-3 text-right">{token.symbol}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {[1, 5, 10, 25, 50, 100, 500, 1000].map(usd => (
+                                        <tr key={usd} className="border-t border-primary-200 dark:border-darkPrimary-700">
+                                            <td className="p-3 font-semibold">${usd.toLocaleString()}</td>
+                                            <td className="p-3 text-right font-mono">{price > 0 ? (usd/price).toLocaleString(undefined, {maximumFractionDigits: 2}) : 'N/A'}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold mb-4">How to buy ${token.symbol}?</h3>
+                        <div className="bg-primary-100 dark:bg-darkPrimary-900/50 p-4 rounded-lg space-y-2 text-primary-700 dark:text-darkPrimary-300">
+                           <p>1. Connect your wallet to a DEX like Raydium or Jupiter.</p>
+                           <p>2. Ensure you have SOL in your wallet for the purchase and transaction fees.</p>
+                           <p>3. Swap your SOL for ${token.symbol} using the mint address.</p>
+                        </div>
+                    </div>
                 </div>
-
             </div>
         </div>
     );
