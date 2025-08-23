@@ -350,14 +350,7 @@ export default function AdminPresale() {
                                     {transactions.map(tx => (
                                         <tr key={tx.signature} className="border-b dark:border-darkPrimary-700 hover:bg-primary-50 dark:hover:bg-darkPrimary-700/50">
                                             <td className="px-6 py-4"><AddressDisplay address={tx.from} /></td>
-                                            <td className="px-6 py-4 text-right font-mono flex items-center justify-end gap-2">
-                                                <span>{tx.solAmount.toFixed(4)}</span>
-                                                {tx.solAmount > 0 && tx.solAmount < PRESALE_DETAILS.minBuy && (
-                                                    <span title={`This transaction is below the minimum of ${PRESALE_DETAILS.minBuy} SOL`}>
-                                                        <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                                                    </span>
-                                                )}
-                                            </td>
+                                            <td className="px-6 py-4 text-right font-mono">{tx.solAmount.toFixed(4)}</td>
                                             <td className="px-6 py-4 text-right font-mono">{tx.owfnAmount.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
                                             <td className="px-6 py-4">{new Date(tx.timestamp * 1000).toLocaleString()}</td>
                                             <td className="px-6 py-4"><AddressDisplay address={tx.signature} type="tx"/></td>

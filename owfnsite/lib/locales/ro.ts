@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -105,12 +104,10 @@ export const ro = {
     you_receive: `Primești`,
     min_buy: `Cumpărare minimă`,
     max_buy: `Cumpărare maximă`,
-    invalid_amount: `Suma trebuie să fie între {min} și {max} SOL.`,
     presale_purchase_success_alert: `Cumpărare reușită! Ați contribuit cu {amount} SOL. Tokenurile dumneavoastră de {owfnAmount} OWFN sunt rezervate și vor fi trimise automat prin airdrop în portofelul dumneavoastră la sfârșitul prevânzării.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Vândut {progress}%`,
     presale_buy_info: `Cumpără (Min: {min} SOL, Max: {max} SOL)`,
-    presale_buy_info_max_only: `Cumpără (Max: {max} SOL per portofel)`,
     buy: `Cumpără`,
     presale_buying_owfn: `Cumperi {amount} $OWFN`,
     presale_estimate_tooltip: `Aceasta este o estimare. Suma finală poate varia.`,
@@ -135,8 +132,6 @@ export const ro = {
     presale_dyor_nfa_desc: `Fă-ți Propria Cercetare. Nu este un Sfat Financiar.`,
     presale_footer_copyright: `© {year} Official World Family Network | Toate drepturile rezervate.`,
     presale_amount_error: `Suma trebuie să fie între {min} și {max} SOL.`,
-    presale_max_amount_error: `Suma nu trebuie să depășească {max} SOL.`,
-    presale_min_amount_error: `Suma trebuie să fie de cel puțin {min} SOL.`,
     live_presale_feed: `Feed Live Prevânzare`,
     wallet: `Portofel`,
     sol_spent: `SOL Cheltuit`,
@@ -146,6 +141,12 @@ export const ro = {
     presale_you_contributed: `Ați contribuit deja cu: {amount} SOL.`,
     presale_you_can_buy: `Puteți contribui cu până la încă {amount} SOL.`,
     presale_bonus_offer: `BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!`,
+    presale_calculator_title: 'Calculator Interactiv',
+    presale_you_invest: 'Investești',
+    presale_you_will_receive: 'Vei primi',
+    presale_base_amount: 'Sumă de Bază',
+    presale_bonus_active: 'Bonus Activ!',
+    presale_total_received: 'Total de Primit',
 
     // Donations Page
     make_donation: `Fă o Donație`,
@@ -199,6 +200,7 @@ export const ro = {
     badge_diverse_donor: `Donator Divers`,
     badge_diverse_donor_desc: `Acordat pentru donații la proiecte din 3 categorii diferite.`,
     asset: `Activ`,
+    balance: `Sold`,
     value_usd: `Valoare (USD)`,
 
     // Impact Portal
@@ -373,6 +375,7 @@ export const ro = {
     no_risk_factors_found: `Nu au fost găsiți factori de risc critici, cum ar fi metadate mutabile sau autorități nerevocate.`,
     risk_factors_found: `Riscuri potențiale detectate. Vă rugăm să procedați cu prudență.`,
     swap: `Schimbă`,
+    revoked: `Revocat`,
     
     // Staking & Vesting
     staking_title: `Depune OWFN, Câștigă Recompense`,
@@ -382,7 +385,7 @@ export const ro = {
     my_staked_balance: `Soldul Meu Depus`,
     stake: `Depune`,
     unstake: `Retrage`,
-    balance: `Sold`,
+    
     stake_owfn: `Depune OWFN`,
     unstake_owfn: `Retrage OWFN`,
     my_rewards: `Recompensele Mele`,
@@ -455,7 +458,7 @@ export const ro = {
     no_active_proposals: `Momentan nu există propuneri active.`,
     no_past_proposals: `Nu există propuneri anterioare de afișat.`,
     no_active_cases_in_category: `Nu există cazuri active în această categorie în acest moment.`,
-    
+
     // Maintenance
     maintenance_heading: `Facem lucrurile mai bune!`,
     maintenance_message: `Platforma noastră este în prezent în mentenanță programată pentru a vă îmbunătăți experiența. Apreciem răbdarea și înțelegerea dumneavoastră. Vom reveni online în scurt timp.`,

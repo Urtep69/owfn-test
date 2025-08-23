@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
-import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Expand, Shrink } from 'lucide-react';
+import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -110,13 +110,10 @@ export const Chatbot = () => {
     
     useEffect(() => {
         if (isOpen) {
-            // Use a timeout to ensure focus happens after the slide-in animation starts
-            const timer = setTimeout(() => {
-                inputRef.current?.focus();
-            }, 100);
-            return () => clearTimeout(timer);
+            // A small delay helps ensure the element is visible and animations are settled.
+            setTimeout(() => inputRef.current?.focus(), 100);
         }
-    }, [isOpen]);
+    }, [isOpen, isMaximized]);
 
     // Cleanup interval on component unmount
     useEffect(() => {
@@ -214,7 +211,7 @@ export const Chatbot = () => {
                 loadingIntervalRef.current = null;
             }
             setIsLoading(false);
-            inputRef.current?.focus();
+            setTimeout(() => inputRef.current?.focus(), 0);
         }
     };
 
@@ -236,22 +233,26 @@ export const Chatbot = () => {
         );
     }
 
+    const containerClasses = isMaximized
+        ? "fixed inset-0 flex flex-col bg-white dark:bg-darkPrimary-800 z-50 animate-fade-in-up"
+        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50";
+
     return (
-        <div className={`fixed flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg z-50 transition-all duration-300 ease-in-out ${isMaximized ? 'inset-4' : 'bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] animate-slide-in'}`}>
-            <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg flex-shrink-0">
+        <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
+            <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
                 <div className="flex items-center space-x-2">
                     <OwfnIcon className="w-6 h-6" />
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
-                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-2 rounded-full hover:bg-black/20 transition-colors" aria-label={isMaximized ? "Restore" : "Maximize"}>
-                        {isMaximized ? <Shrink size={18} /> : <Expand size={18} />}
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Minimize Chat">
+                        <Minus size={20} />
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="p-2 rounded-full hover:bg-black/20 transition-colors" aria-label="Minimize">
-                        <Minus size={18} />
+                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={isMaximized ? "Restore Chat" : "Maximize Chat"}>
+                        {isMaximized ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="p-2 rounded-full hover:bg-black/20 transition-colors" aria-label="Close">
-                        <X size={24} />
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Close Chat">
+                        <X size={20} />
                     </button>
                 </div>
             </header>
@@ -291,7 +292,7 @@ export const Chatbot = () => {
                     <div ref={messagesEndRef} />
                 </div>
             </div>
-            <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
+            <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
                 <div className="relative">
                     <input
                         ref={inputRef}

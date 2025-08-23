@@ -1,3 +1,4 @@
+
 export const sr = {
     // Navigation
     home: `Почетна`,
@@ -104,12 +105,10 @@ export const sr = {
     you_receive: `Ви добијате`,
     min_buy: `Мин. куповина`,
     max_buy: `Макс. куповина`,
-    invalid_amount: `Износ мора бити између {min} и {max} SOL.`,
     presale_purchase_success_alert: `Куповина успешна! Допринели сте са {amount} SOL. Ваши {owfnAmount} OWFN токени су резервисани и биће аутоматски аирдроповани на ваш новчаник на крају претпродаје.`,
     presale_header_subtitle: `Званична светска породична мрежа - $OWFN`,
     presale_sold_progress: `Продато {progress}%`,
     presale_buy_info: `Купи (Мин: {min} SOL, Макс: {max} SOL)`,
-    presale_buy_info_max_only: `Купи (Макс: {max} SOL по новчанику)`,
     buy: `Купи`,
     presale_buying_owfn: `Купујете {amount} $OWFN`,
     presale_estimate_tooltip: `Ово је процена. Коначан износ може варирати.`,
@@ -134,7 +133,6 @@ export const sr = {
     presale_dyor_nfa_desc: `Урадите сопствено истраживање. Није финансијски савет.`,
     presale_footer_copyright: `© {year} Званична светска породична мрежа | Сва права задржана.`,
     presale_amount_error: `Износ мора бити између {min} и {max} SOL.`,
-    presale_max_amount_error: `Износ не сме прећи {max} SOL.`,
     live_presale_feed: `Пренос претпродаје уживо`,
     wallet: `Новчаник`,
     sol_spent: `Потрошено SOL`,
@@ -160,8 +158,6 @@ export const sr = {
     select_token: `Изабери токен`,
     amount: `Износ`,
     donations_form_title: `Образац за донације`,
-    donations_stats_title: `Статистика донација уживо (симулирано)`,
-    donated: `Донирано`,
     donation_success_alert: `Донација успешна! Хвала вам на доприносу од {amount} {tokenSymbol}.`,
     donation_no_token_balance: `Не поседујете {symbol}.`,
     
@@ -371,6 +367,7 @@ export const sr = {
     no_risk_factors_found: `Нису пронађени критични фактори ризика као што су променљиви метаподаци или неопозива овлашћења.`,
     risk_factors_found: `Откривени потенцијални ризици. Молимо вас, поступите са опрезом.`,
     swap: `Замена`,
+    revoked: `Опозвано`,
     
     // Staking & Vesting
     staking_title: `Стејкуј OWFN, заради награде`,
@@ -429,7 +426,6 @@ export const sr = {
     airdrop_eligible_message: `Ваш новчаник је подобан! Добићете {amount} OWFN токена у предстојећој дистрибуцији.`,
     airdrop_not_eligible: `Није подобно`,
     airdrop_not_eligible_message: `Жао нам је, ова адреса новчаника није подобна за тренутни аирдроп. Останите активни у нашој заједници за будуће прилике!`,
-    airdrop_info_box_title: `О овом аирдропу`,
     airdrop_info_box_desc: `Овај аирдроп је осмишљен да награди ране присталице и активне чланове заједнице. Подобност се заснива на факторима као што су учешће у претпродаји и ангажовање у догађајима заједнице.`,
 
     // Governance
@@ -542,6 +538,5 @@ export const sr = {
     contact_social_telegram_channel_desc: `Претплатите се на важна обавештења и званичне вести.`,
     contact_social_telegram_group_title: `Телеграм група`,
     contact_social_telegram_group_desc: `Придружите се нашој групи заједнице да бисте дискутовали и комуницирали са другим члановима.`,
-    contact_social_discord_title: `Дискорд сервер`,
     contact_social_discord_desc: `Постаните део наше активне заједнице за дискусије и подршку.`,
 };
