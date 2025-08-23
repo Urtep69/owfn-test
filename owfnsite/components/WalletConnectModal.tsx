@@ -48,26 +48,26 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
             aria-modal="true"
         >
             <div 
-                className="bg-primary-100/90 dark:bg-darkPrimary-900/90 backdrop-blur-lg border-2 border-primary-900 dark:border-primary-200 rounded-2xl shadow-neo-brutal dark:shadow-dark-neo-brutal w-full max-w-md m-auto animate-fade-in-up"
+                className="bg-white dark:bg-darkPrimary-800 rounded-2xl shadow-3d-lg w-full max-w-md m-auto animate-fade-in-up"
                 style={{ animationDuration: '300ms' }}
                 onClick={e => e.stopPropagation()}
             >
-                <header className="flex items-center justify-between p-4 border-b-2 border-primary-900 dark:border-primary-200">
-                    <h2 className="text-lg font-bold text-primary-900 dark:text-primary-100">{t('connect_wallet')}</h2>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-primary-200 dark:hover:bg-darkPrimary-700">
-                        <X size={20} className="text-primary-700 dark:text-primary-300" />
+                <header className="flex items-center justify-between p-4 border-b border-primary-200 dark:border-darkPrimary-700">
+                    <h2 className="text-lg font-bold text-primary-900 dark:text-darkPrimary-100">{t('connect_wallet')}</h2>
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-primary-100 dark:hover:bg-darkPrimary-700">
+                        <X size={20} className="text-primary-500 dark:text-darkPrimary-400" />
                     </button>
                 </header>
                 
                 <div className="p-6 space-y-6">
                     {/* Easy Connect Section */}
                     <div>
-                        <h3 className="text-sm font-semibold text-primary-600 dark:text-primary-400 mb-2">Easy Connect (Recommended)</h3>
+                        <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">Easy Connect (Recommended)</h3>
                          <div className="space-y-2">
                             {socialConnectors.map(connector => (
-                                <button key={connector.name} disabled={connector.comingSoon} className="w-full flex items-center space-x-4 p-3 rounded-lg bg-primary-200 dark:bg-darkPrimary-800 border-2 border-primary-900 dark:border-primary-200 hover:bg-primary-300 dark:hover:bg-darkPrimary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group">
+                                <button key={connector.name} disabled={connector.comingSoon} className="w-full flex items-center space-x-4 p-3 rounded-lg bg-primary-100 dark:bg-darkPrimary-700/50 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group">
                                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">{connector.icon}</div>
-                                    <span className="font-semibold text-primary-800 dark:text-primary-200">{connector.name}</span>
+                                    <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{connector.name}</span>
                                     {connector.comingSoon && <span className="ml-auto text-xs font-bold text-accent-600 dark:text-darkAccent-500 bg-accent-100 dark:bg-darkAccent-900/50 px-2 py-1 rounded-full">{t('coming_soon_title')}</span>}
                                 </button>
                             ))}
@@ -77,22 +77,22 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                      {/* Divider */}
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                            <div className="w-full border-t-2 border-primary-900 dark:border-primary-200"></div>
+                            <div className="w-full border-t border-primary-200 dark:border-darkPrimary-600"></div>
                         </div>
                         <div className="relative flex justify-center">
-                            <span className="bg-primary-100 dark:bg-darkPrimary-900 px-2 text-sm text-primary-600 dark:text-primary-400">OR</span>
+                            <span className="bg-white dark:bg-darkPrimary-800 px-2 text-sm text-primary-500 dark:text-darkPrimary-400">OR</span>
                         </div>
                     </div>
 
                     {/* Traditional Wallet Section */}
                     <div>
-                         <h3 className="text-sm font-semibold text-primary-600 dark:text-primary-400 mb-2">Connect with a Wallet</h3>
+                         <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">Connect with a Wallet</h3>
                          <div className="space-y-2">
                             {wallets.filter(w => w.readyState === 'Installed').map(wallet => (
                                 <button
                                     key={wallet.adapter.name}
                                     onClick={() => handleWalletSelect(wallet.adapter.name as WalletName)}
-                                    className="w-full flex items-center space-x-4 p-3 rounded-lg bg-primary-200 dark:bg-darkPrimary-800 border-2 border-primary-900 dark:border-primary-200 hover:bg-primary-300 dark:hover:bg-darkPrimary-700 transition-colors"
+                                    className="w-full flex items-center space-x-4 p-3 rounded-lg bg-primary-100 dark:bg-darkPrimary-700/50 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"
                                 >
                                      <img src={wallet.adapter.icon} alt={wallet.adapter.name} className="w-8 h-8 rounded-full"/>
                                      <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{wallet.adapter.name}</span>
@@ -102,7 +102,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                     </div>
                 </div>
 
-                 <footer className="p-4 text-center text-xs text-primary-600 dark:text-primary-500 bg-primary-200 dark:bg-darkPrimary-800 border-t-2 border-primary-900 dark:border-primary-200 rounded-b-2xl">
+                 <footer className="p-4 text-center text-xs text-primary-500 dark:text-darkPrimary-500 bg-primary-50 dark:bg-darkPrimary-800/50 border-t border-primary-200 dark:border-darkPrimary-700 rounded-b-2xl">
                     <p>By connecting, you agree to our Terms of Service.</p>
                 </footer>
             </div>

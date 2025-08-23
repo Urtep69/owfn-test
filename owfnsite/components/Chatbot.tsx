@@ -56,7 +56,7 @@ const renderMessageContent = (text: string) => {
             const path = pageNameToPath[pageName];
             if (path) {
                 result.push(
-                    <Link key={match.index} href={path} className="text-accent-600 dark:text-darkAccent-500 font-bold underline hover:opacity-80">
+                    <Link key={match.index} href={path} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
                         {pageName}
                     </Link>
                 );
@@ -69,7 +69,7 @@ const renderMessageContent = (text: string) => {
             const icon = socialIconMap[platformName];
             if (url && platformName) {
                  result.push(
-                    <a key={match.index} href={url} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-500 font-bold underline hover:opacity-80 inline-flex items-center gap-1.5">
+                    <a key={match.index} href={url} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80 inline-flex items-center gap-1.5">
                         {icon} {platformName}
                     </a>
                 );
@@ -225,7 +225,7 @@ export const Chatbot = () => {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-5 right-5 bg-accent-600 text-white p-4 rounded-full shadow-neo-brutal dark:shadow-dark-neo-brutal border-2 border-primary-950 dark:border-primary-100 hover:scale-110 active:scale-105 transition-transform"
+                className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
                 aria-label="Open Chatbot"
             >
                 <MessageCircle size={28} />
@@ -234,12 +234,12 @@ export const Chatbot = () => {
     }
 
     const containerClasses = isMaximized
-        ? "fixed inset-0 flex flex-col bg-primary-100/80 dark:bg-darkPrimary-900/80 backdrop-blur-lg border-2 border-primary-950 dark:border-primary-200 z-50 animate-fade-in-up"
-        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-primary-100/80 dark:bg-darkPrimary-900/80 backdrop-blur-lg rounded-xl border-2 border-primary-950 dark:border-primary-200 shadow-neo-brutal dark:shadow-dark-neo-brutal animate-slide-in z-50";
+        ? "fixed inset-0 flex flex-col bg-white dark:bg-darkPrimary-800 z-50 animate-fade-in-up"
+        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50";
 
     return (
         <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
-            <header className="flex items-center justify-between p-4 bg-accent-500 text-white rounded-t-lg border-b-2 border-primary-950 dark:border-primary-200">
+            <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
                 <div className="flex items-center space-x-2">
                     <OwfnIcon className="w-6 h-6" />
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
@@ -264,25 +264,25 @@ export const Chatbot = () => {
                                 {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
                                 <div className="flex flex-col">
                                     {msg.timestamp && (
-                                        <p className={`text-xs text-primary-500 dark:text-primary-400 mb-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                                        <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mb-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                                             {formatTimestamp(msg.timestamp)}
                                         </p>
                                     )}
-                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-500 text-white rounded-br-none' : 'bg-primary-200 text-primary-900 dark:bg-darkPrimary-700 dark:text-primary-100 rounded-bl-none'}`}>
+                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
                                        <div className="text-sm whitespace-pre-wrap">
                                            {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
                                        </div>
                                     </div>
                                 </div>
-                                {msg.role === 'user' && <User className="w-6 h-6 text-accent-600 dark:text-darkAccent-500 flex-shrink-0 mt-1" />}
+                                {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                             </div>
                         </div>
                     ))}
                     {isLoading && (
                          <div className="flex items-start gap-3 justify-start">
                             <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />
-                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-primary-200 text-primary-900 dark:bg-darkPrimary-700 dark:text-primary-100 rounded-bl-none">
-                                <div className="flex items-center space-x-2 text-sm text-primary-700 dark:text-primary-300">
+                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none">
+                                <div className="flex items-center space-x-2 text-sm text-primary-600 dark:text-darkPrimary-300">
                                     <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
                                     <span>{loadingText}</span>
                                 </div>
@@ -292,7 +292,7 @@ export const Chatbot = () => {
                     <div ref={messagesEndRef} />
                 </div>
             </div>
-            <div className="p-4 border-t-2 border-primary-950 dark:border-primary-200">
+            <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
                 <div className="relative">
                     <input
                         ref={inputRef}
@@ -301,13 +301,13 @@ export const Chatbot = () => {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={handleKeyPress}
                         placeholder={t('chatbot_placeholder')}
-                        className="w-full p-3 pr-20 bg-primary-200 dark:bg-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 focus:outline-none border-2 border-primary-900 dark:border-primary-200"
+                        className="w-full p-3 pr-20 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
                         disabled={isLoading}
                     />
                     <button
                         onClick={handleSend}
                         disabled={isLoading || input.trim() === ''}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 text-white p-2 rounded-md hover:bg-accent-600 disabled:bg-primary-400 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
                         aria-label="Send message"
                     >
                        {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }

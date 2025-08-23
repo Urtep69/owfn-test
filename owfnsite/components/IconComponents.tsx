@@ -7,7 +7,7 @@ export const OwfnIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
     src={owfnLogo} 
     alt="OWFN Logo" 
-    className={`${className} rounded-full border-2 border-primary-900 dark:border-primary-100 object-cover`} 
+    className={`${className} rounded-full border-2 border-accent-600 dark:border-darkAccent-700 object-cover`} 
   />
 );
 
