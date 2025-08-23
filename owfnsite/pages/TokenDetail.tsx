@@ -99,12 +99,24 @@ export default function TokenDetail() {
         if (!mintAddress) return;
         try {
             const response = await fetch(`/api/token-info?mint=${mintAddress}`);
-            if (!response.ok) throw new Error((await response.json()).error || "Failed to fetch token data.");
+            if (!response.ok) {
+                let errorMessage = "Failed to fetch token data from the server.";
+                try {
+                    const errorJson = await response.json();
+                    errorMessage = errorJson.error || `Server responded with status: ${response.status}`;
+                } catch (e) {
+                    const errorText = await response.text().catch(() => "Could not read error response body.");
+                    console.error("Non-JSON error response from API:", errorText);
+                    errorMessage = `An unexpected server error occurred (status ${response.status}). Check server logs for details.`;
+                }
+                throw new Error(errorMessage);
+            }
+            // If response is ok, it should be valid JSON
             setToken(await response.json());
         } catch (err) {
             console.error("Failed to fetch token details:", err);
             setError(err instanceof Error ? err.message : "An unknown error occurred.");
-            setToken(null); // Clear old data on error
+            setToken(null);
         }
     }, [mintAddress]);
     

@@ -148,7 +148,11 @@ async function fetchTokenDetails(mintAddress: string): Promise<Partial<TokenDeta
         try {
             const birdeyeUrl = `${BIRDEYE_API_BASE_URL}/defi/token_overview?address=${mintAddress}`;
             const birdeyeResponse = await fetch(birdeyeUrl, {
-                headers: { 'X-API-KEY': BIRDEYE_API_KEY_SERVER }
+                headers: { 
+                    'X-API-KEY': BIRDEYE_API_KEY_SERVER,
+                    'accept': 'application/json',
+                    'x-chain': 'solana' 
+                }
             });
 
             if (birdeyeResponse.ok) {
