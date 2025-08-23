@@ -1,84 +1,79 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link } from 'wouter';
-import { Loader2, ArrowLeft, Database, Shield, Code, TrendingUp, DollarSign, BarChart2, Repeat, Droplets, Clock, ArrowRightLeft, FileText, Link as LinkIcon, Globe, Twitter, Send, ExternalLink } from 'lucide-react';
+import { Loader2, ArrowLeft, Database, Shield, TrendingUp, Repeat, Droplets, Info, BarChart2, Star, Share2, Globe, Twitter, Send, ExternalLink, HelpCircle, Check, X } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import type { TokenDetails } from '../types.ts';
+import type { TokenDetails, Trade } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
-import { DualProgressBar } from '../components/DualProgressBar.tsx';
 import { DiscordIcon } from '../components/IconComponents.tsx';
+import { DualProgressBar } from '../components/DualProgressBar.tsx';
+import { SolIcon, OwfnIcon } from '../components/IconComponents.tsx';
 
 // --- Helper Functions & Components ---
+const formatPrice = (price?: number) => {
+    if (price === undefined || price === null) return 'N/A';
+    if (price < 0.000001) return `$0.0...${price.toExponential(2).split('e-')[1]}`;
+    if (price < 1) return `$${price.toPrecision(4)}`;
+    return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
 
 const formatLargeNumber = (num?: number): string => {
     if (num === undefined || num === null) return 'N/A';
-    if (num < 1000) return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    if (num < 1_000_000) return `${(num / 1000).toFixed(2)}K`;
-    if (num < 1_000_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
+    if (Math.abs(num) < 1000) return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (Math.abs(num) < 1_000_000) return `${(num / 1000).toFixed(2)}K`;
+    if (Math.abs(num) < 1_000_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
     return `${(num / 1_000_000_000).toFixed(2)}B`;
 };
 
-const formatTimeAgo = (timestamp?: number): string => {
+const formatDate = (timestamp?: number): string => {
     if (!timestamp) return 'N/A';
-    const seconds = Math.floor((new Date().getTime() - timestamp) / 1000);
-    let interval = seconds / 31536000;
-    if (interval > 1) return Math.floor(interval) + " years ago";
-    interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + " months ago";
-    interval = seconds / 86400;
-    if (interval > 1) return Math.floor(interval) + " days ago";
-    interval = seconds / 3600;
-    if (interval > 1) return Math.floor(interval) + " hours ago";
-    interval = seconds / 60;
-    if (interval > 1) return Math.floor(interval) + " minutes ago";
-    return Math.floor(seconds) + " seconds ago";
+    return new Date(timestamp).toLocaleDateString('en-CA');
 };
 
-const StatCard = ({ title, value, change, icon }: { title: string, value: string, change?: number, icon: React.ReactNode }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
-        <div className="flex items-center space-x-3">
-            <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">{icon}</div>
-            <div>
-                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
-                <div className="flex items-baseline gap-2">
-                    <p className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">{value}</p>
-                    {change !== undefined && (
-                        <p className={`text-sm font-bold ${change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                            {change >= 0 ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
-                        </p>
-                    )}
-                </div>
-            </div>
+const InfoCard = ({ title, children }: { title: string, children: React.ReactNode }) => (
+    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d">
+        <h3 className="text-md font-bold mb-3 text-primary-800 dark:text-darkPrimary-200">{title}</h3>
+        <div className="space-y-2">{children}</div>
+    </div>
+);
+
+const InfoRow = ({ label, children }: { label:string, children:React.ReactNode }) => (
+    <div className="flex justify-between items-center text-sm">
+        <span className="text-primary-600 dark:text-darkPrimary-400">{label}</span>
+        <div className="font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
+    </div>
+);
+
+const AuthorityRow = ({ label, address, t }: { label:string, address?:string|null, t: (key: string) => string }) => (
+    <InfoRow label={label}>
+        {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold flex items-center gap-1"><Check size={14}/> {t('revoked')}</span>}
+    </InfoRow>
+);
+
+const SecurityCheckRow = ({ label, value }: { label: string, value: boolean }) => (
+     <InfoRow label={label}>
+        <div className={`flex items-center gap-1.5 font-bold ${value ? 'text-green-500' : 'text-red-500'}`}>
+            {value ? <Check size={16}/> : <X size={16}/>}
+            <span>{value ? 'Yes' : 'No'}</span>
         </div>
-    </div>
+    </InfoRow>
 );
 
-const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-primary-800 dark:text-darkPrimary-200">{icon}{title}</h3>
-        <div className="space-y-3">{children}</div>
-    </div>
-);
-
-const InfoRow = ({ label, children }: { label: string, children: React.ReactNode }) => (
-    <div className="flex justify-between items-center py-2 border-b border-primary-200/50 dark:border-darkPrimary-700/50 last:border-b-0">
-        <span className="text-sm text-primary-600 dark:text-darkPrimary-400">{label}</span>
-        <div className="text-sm font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
-    </div>
-);
-
-const LinkButton = ({ href, icon, text }: { href: string, icon: React.ReactNode, text: string }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="flex-grow flex items-center justify-center gap-2 bg-primary-100 dark:bg-darkPrimary-700 hover:bg-primary-200 dark:hover:bg-darkPrimary-600 text-primary-700 dark:text-darkPrimary-200 font-semibold py-2 px-3 rounded-md transition-colors">
-        {icon}{text}
-    </a>
-);
-
+const useInterval = (callback: () => void, delay: number | null) => {
+    const savedCallback = React.useRef(callback);
+    useEffect(() => { savedCallback.current = callback; }, [callback]);
+    useEffect(() => {
+        if (delay !== null) {
+            const id = setInterval(() => savedCallback.current(), delay);
+            return () => clearInterval(id);
+        }
+    }, [delay]);
+};
 
 // --- Main Component ---
-
 export default function TokenDetail() {
-    const { t } = useAppContext();
+    const { t, theme } = useAppContext();
     const params = useParams();
     const mintAddress = params?.['mint'];
     
@@ -87,50 +82,42 @@ export default function TokenDetail() {
     const backLinkText = fromPath === '/profile' ? t('back_to_profile') : t('back_to_dashboard');
 
     const [token, setToken] = useState<Partial<TokenDetails> | null>(null);
+    const [trades, setTrades] = useState<Trade[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const fetchTokenData = useCallback(async () => {
+        if (!mintAddress) return;
+        try {
+            const response = await fetch(`/api/token-info?mint=${mintAddress}`);
+            if (!response.ok) throw new Error((await response.json()).error || "Failed to fetch token data.");
+            setToken(await response.json());
+        } catch (err) {
+            console.error("Failed to fetch token details:", err);
+            setError(err instanceof Error ? err.message : "An unknown error occurred.");
+        }
+    }, [mintAddress]);
     
-    const AuthorityRow = ({ label, address }: { label: string, address?: string | null }) => (
-        <InfoRow label={label}>
-            {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold">{t('revoked')}</span>}
-        </InfoRow>
-    );
+    const fetchTrades = useCallback(async () => {
+        if (token?.pairAddress) {
+             try {
+                const response = await fetch(`/api/token-info?type=trades&pair=${token.pairAddress}`);
+                if (response.ok) setTrades(await response.json());
+            } catch (err) { console.error("Failed to fetch trades:", err); }
+        }
+    }, [token?.pairAddress]);
 
     useEffect(() => {
-        if (!mintAddress) {
-            setLoading(false);
-            setError('No mint address provided.');
-            return;
-        }
+        setLoading(true);
+        fetchTokenData().finally(() => setLoading(false));
+    }, [fetchTokenData]);
 
-        const fetchTokenData = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await fetch(`/api/token-info?mint=${mintAddress}`);
-                if (!response.ok) {
-                    const errorBody = await response.json().catch(() => ({ error: `Server error: ${response.status}` }));
-                    throw new Error(errorBody.error || "Failed to fetch token data.");
-                }
-                setToken(await response.json());
-            } catch (err) {
-                console.error("Failed to fetch token details:", err);
-                setError(err instanceof Error ? err.message : "An unknown error occurred.");
-            } finally {
-                setLoading(false);
-            }
-        };
+    useInterval(fetchTokenData, 30000); // Refresh main data every 30s
+    useInterval(fetchTrades, 10000); // Refresh trades every 10s
 
-        fetchTokenData();
-    }, [mintAddress]);
-
-    const getLinkIcon = (key: string) => {
-        if (key.includes('twitter')) return <Twitter size={16} />;
-        if (key.includes('telegram')) return <Send size={16} />;
-        if (key.includes('discord')) return <DiscordIcon className="w-4 h-4" />;
-        if (key.includes('website')) return <Globe size={16} />;
-        return <LinkIcon size={16} />;
-    };
+    useEffect(() => {
+        if (token?.pairAddress) fetchTrades(); // Fetch trades once token data is loaded
+    }, [token?.pairAddress, fetchTrades]);
 
     if (loading) {
         return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>;
@@ -138,7 +125,7 @@ export default function TokenDetail() {
 
     if (error || !token) {
         return (
-            <div className="text-center py-10">
+            <div className="text-center py-10 animate-fade-in-up">
                 <h2 className="text-2xl font-bold">{t('token_not_found')}</h2>
                 {error && <p className="text-red-400 mt-2">{error}</p>}
                 <Link to={fromPath} className="text-accent-500 hover:underline mt-4 inline-flex items-center gap-2">
@@ -148,88 +135,152 @@ export default function TokenDetail() {
         );
     }
     
-    const isMarketDataAvailable = (token.fdv ?? 0) > 0;
+    const pooledQuoteSymbol = token.quoteToken?.symbol === 'SOL' ? <SolIcon className="w-3 h-3"/> : <span>{token.quoteToken?.symbol}</span>;
+    const pooledBaseSymbol = token.symbol === 'OWFN' ? <OwfnIcon className="w-3 h-3"/> : <span>{token.symbol}</span>;
+    const isFreezable = token.freezeAuthority !== null;
+    const isMintable = token.mintAuthority !== null;
+    
+    const priceChange = token.priceChange?.h24 ?? 0;
+    const price = token.pricePerToken ?? 0;
+    const quoteTokenPrice = price / (token.liquidity?.usd ?? 1) * (token.liquidity?.quote ?? 0);
 
     return (
-        <div className="space-y-8 animate-fade-in-up">
+        <div className="space-y-6 animate-fade-in-up">
             <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
                 <ArrowLeft size={16} /> {backLinkText}
             </Link>
 
+            {/* Header */}
             <header className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                <GenericTokenIcon uri={token.logo as string} className="w-16 h-16 flex-shrink-0" />
-                <div className="flex-grow">
-                    <h1 className="text-3xl font-bold">{token.name}</h1>
-                    <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
+                <div className="flex items-center gap-3 flex-grow">
+                    <GenericTokenIcon uri={token.logo as string} className="w-12 h-12 flex-shrink-0" />
+                    <div>
+                        <h1 className="text-2xl font-bold">{token.name} / {token.quoteToken?.symbol}</h1>
+                        <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-md">${token.symbol}</p>
+                    </div>
                 </div>
-                {isMarketDataAvailable && token.mintAddress && (
-                    <a href={`https://jup.ag/swap/SOL-${token.mintAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors flex items-center gap-2">
-                        {t('swap')} <ExternalLink size={16} />
-                    </a>
-                )}
+                 <div className="flex items-center gap-2">
+                    <button className="p-2 rounded-md hover:bg-primary-200 dark:hover:bg-darkPrimary-700"><Star size={20}/></button>
+                    <button className="p-2 rounded-md hover:bg-primary-200 dark:hover:bg-darkPrimary-700"><Share2 size={20}/></button>
+                </div>
             </header>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <StatCard title={t('pricePerToken', {defaultValue: 'Price'})} value={isMarketDataAvailable ? `$${token.pricePerToken?.toPrecision(4)}` : 'N/A'} change={token.priceChange?.h24} icon={<DollarSign />} />
-                <StatCard title={t('market_cap')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.fdv)}` : 'N/A'} icon={<BarChart2 />} />
-                <StatCard title={t('volume_24h')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.volume?.h24)}` : 'N/A'} icon={<Repeat />} />
+            {/* Price Info */}
+            <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="flex items-center gap-4">
+                    <p className="text-3xl font-bold">{formatPrice(price)}</p>
+                    <div className={`px-2 py-1 rounded-md text-lg font-bold ${priceChange >= 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                        {priceChange >= 0 ? '▲' : '▼'} {Math.abs(priceChange).toFixed(2)}%
+                    </div>
+                </div>
+                 <p className="text-lg text-primary-600 dark:text-darkPrimary-400 font-mono">{quoteTokenPrice.toPrecision(4)} {token.quoteToken?.symbol}</p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8 items-start">
-                <div className="lg:col-span-2 space-y-8">
-                    {isMarketDataAvailable ? (
-                        <>
-                            <InfoCard title={t('market_stats')} icon={<TrendingUp />}>
-                                <InfoRow label={t('fully_diluted_valuation')}>{`$${formatLargeNumber(token.fdv)}`}</InfoRow>
-                                <InfoRow label={t('liquidity')}>{`$${formatLargeNumber(token.liquidity?.usd)}`}</InfoRow>
-                                <InfoRow label={t('holders')}>N/A</InfoRow>
-                                <InfoRow label={t('circulating_supply')}>N/A</InfoRow>
-                            </InfoCard>
-
-                            <InfoCard title={t('trading_stats')} icon={<ArrowRightLeft />}>
-                                <DualProgressBar value1={token.txns?.h24.buys ?? 0} label1={t('buys')} value2={token.txns?.h24.sells ?? 0} label2={t('sells')} />
-                                <InfoRow label={t('total_transactions_24h')}>{(token.txns?.h24.buys ?? 0) + (token.txns?.h24.sells ?? 0)}</InfoRow>
-                            </InfoCard>
-
-                            <InfoCard title={t('pool_info')} icon={<Droplets />}>
-                                <InfoRow label={t('pair_address')}><AddressDisplay address={token.pairAddress!} type="address" /></InfoRow>
-                                <InfoRow label={t('exchange')}>{token.dexId}</InfoRow>
-                                <InfoRow label={t('pool_age')}>{formatTimeAgo(token.poolCreatedAt)}</InfoRow>
-                            </InfoCard>
-                        </>
-                    ) : (
-                        <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner-3d">
-                            <p className="text-primary-600 dark:text-darkPrimary-400">Live market data is not available for this token. It may not be listed on a decentralized exchange yet.</p>
-                        </div>
-                    )}
-                </div>
-                
-                <div className="lg:col-span-1 space-y-8">
-                    {token.description && (
-                        <InfoCard title={t('token_description_title')} icon={<FileText />}>
-                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{token.description}</p>
-                        </InfoCard>
-                    )}
-                    
-                    {token.links && Object.keys(token.links).length > 0 && (
-                        <InfoCard title="Links" icon={<LinkIcon />}>
-                            <div className="flex flex-wrap gap-2">
-                                {Object.entries(token.links).map(([key, href]) => href && (
-                                    <LinkButton key={key} href={href} icon={getLinkIcon(key)} text={key.charAt(0).toUpperCase() + key.slice(1)} />
-                                ))}
-                            </div>
-                        </InfoCard>
-                    )}
-
-                    <InfoCard title={t('on_chain_security')} icon={<Shield />}>
-                        <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
-                        <InfoRow label="Creator"><AddressDisplay address={token.creatorAddress ?? 'Unknown'} /></InfoRow>
-                        <InfoRow label={t('token_standard')}>{token.tokenStandard}</InfoRow>
-                        <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
-                        <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
-                        <AuthorityRow label="Update Authority" address={token.updateAuthority} />
+            {/* Main Content */}
+            <div className="grid lg:grid-cols-3 gap-6 items-start">
+                {/* Left Column */}
+                <div className="lg:col-span-1 space-y-4">
+                    <InfoCard title={t('market_stats')}>
+                        <InfoRow label={t('market_cap')}>${formatLargeNumber(token.fdv)}</InfoRow>
+                        <InfoRow label={t('liquidity')}>${formatLargeNumber(token.liquidity?.usd)}</InfoRow>
+                        <InfoRow label={t('volume_24h')}>${formatLargeNumber(token.volume?.h24)}</InfoRow>
+                        <InfoRow label={t('holders')}>N/A</InfoRow>
+                        <InfoRow label={t('circulating_supply')}>N/A</InfoRow>
+                    </InfoCard>
+                     <InfoCard title={t('pool_info')}>
+                        <InfoRow label={`Pooled ${token.quoteToken?.symbol}`}>{<span className="flex items-center gap-1 justify-end">{pooledQuoteSymbol} {formatLargeNumber(token.liquidity?.quote)}</span>}</InfoRow>
+                        <InfoRow label={`Pooled ${token.symbol}`}>{<span className="flex items-center gap-1 justify-end">{pooledBaseSymbol} {formatLargeNumber(token.liquidity?.base)}</span>}</InfoRow>
+                        <InfoRow label={t('pool_age')}>{formatDate(token.poolCreatedAt)}</InfoRow>
+                    </InfoCard>
+                    <InfoCard title={t('on_chain_security')}>
+                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} t={t} />
+                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} t={t} />
+                         <SecurityCheckRow label={t('is_mintable')} value={isMintable} />
+                         <SecurityCheckRow label={t('is_freezable')} value={isFreezable} />
                     </InfoCard>
                 </div>
+
+                {/* Right Column */}
+                <div className="lg:col-span-2 space-y-4">
+                    <div className="w-full h-[500px] bg-primary-50 dark:bg-darkPrimary-950 rounded-lg">
+                       {token.chainId && token.pairAddress && (
+                           <iframe 
+                                src={`https://dexscreener.com/${token.chainId}/${token.pairAddress}?embed=1&theme=${theme}`}
+                                className="w-full h-full rounded-lg border-0"
+                                allowFullScreen
+                           />
+                       )}
+                    </div>
+                    {/* Trade History */}
+                     <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d">
+                        <h3 className="text-md font-bold mb-3">{t('trading_stats')}</h3>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-xs text-left">
+                                <thead className="text-gray-500 dark:text-gray-400 uppercase bg-primary-100 dark:bg-darkPrimary-700">
+                                    <tr>
+                                        <th className="p-2">Date</th>
+                                        <th className="p-2">Type</th>
+                                        <th className="p-2 text-right">Price USD</th>
+                                        <th className="p-2 text-right">Amount ({token.symbol})</th>
+                                        <th className="p-2 text-right">Total</th>
+                                        <th className="p-2">Maker</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {trades.map(trade => (
+                                        <tr key={trade.txHash} className="border-b dark:border-darkPrimary-700 hover:bg-primary-50 dark:hover:bg-darkPrimary-700/50">
+                                            <td className="p-2">{new Date(trade.timestamp).toLocaleTimeString()}</td>
+                                            <td className={`p-2 font-bold ${trade.type === 'buy' ? 'text-green-500' : 'text-red-500'}`}>{trade.type}</td>
+                                            <td className="p-2 text-right font-mono">{formatPrice(trade.priceUsd)}</td>
+                                            <td className="p-2 text-right font-mono">{formatLargeNumber(trade.amountBase)}</td>
+                                            <td className="p-2 text-right font-mono">${formatLargeNumber(trade.amountQuote)}</td>
+                                            <td className="p-2"><AddressDisplay address={trade.maker} /></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {/* Bottom Section */}
+            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d space-y-6">
+                <h2 className="text-2xl font-bold">PepeWifPork Live Price and Buy Information</h2>
+                <p className="text-primary-600 dark:text-darkPrimary-400">
+                    The PepeWifPork live price is {formatPrice(price)} USD with a market cap of {formatLargeNumber(token.fdv)} USD, a 24-hour trading volume of {formatLargeNumber(token.volume?.h24)} USD.
+                </p>
+                <div className="space-y-4">
+                    <details className="border-b dark:border-darkPrimary-700 pb-2">
+                        <summary className="font-semibold cursor-pointer flex justify-between">How much is 1 PEPEWP? <HelpCircle size={16} className="inline-block"/> </summary>
+                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">The price of 1 PEPEWP is {formatPrice(price)}.</p>
+                    </details>
+                     <details className="border-b dark:border-darkPrimary-700 pb-2">
+                        <summary className="font-semibold cursor-pointer flex justify-between">Which is the PEPEWP contract on Solana? <HelpCircle size={16} className="inline-block"/> </summary>
+                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400"><AddressDisplay address={mintAddress!} type="token"/></p>
+                    </details>
+                </div>
+
+                <h3 className="text-xl font-bold pt-4">How much PEPEWP can I buy with 100 USD?</h3>
+                 <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-primary-100 dark:bg-darkPrimary-700">
+                            <tr>
+                                <th className="p-2">USD</th>
+                                <th className="p-2 text-right">{token.symbol}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1, 5, 10, 25, 50, 100, 500, 1000].map(usd => (
+                                <tr key={usd} className="border-b dark:border-darkPrimary-700">
+                                    <td className="p-2">${usd}</td>
+                                    <td className="p-2 text-right font-mono">{price > 0 ? (usd/price).toLocaleString(undefined, {maximumFractionDigits: 2}) : 'N/A'}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     );

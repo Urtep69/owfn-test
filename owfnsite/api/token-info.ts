@@ -1,9 +1,9 @@
-import type { TokenDetails, TokenExtension, Trade } from '../types.ts';
+import type { TokenDetails, Trade } from '../types.ts';
 
 const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
 const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
 
-async function fetchTokenDetails(mintAddress: string) {
+async function fetchTokenDetails(mintAddress: string): Promise<Partial<TokenDetails>> {
     // Step 1: Fetch market data from DexScreener first to find the best trading pair.
     const dexScreenerUrl = `https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`;
     const dexResponse = await fetch(dexScreenerUrl);
@@ -52,13 +52,17 @@ async function fetchTokenDetails(mintAddress: string) {
     const links = content.links || {};
     const tokenInfo = asset.token_info || {};
     const ownership = asset.ownership || {};
-    const authorities = Array.isArray(asset.authorities) ? asset.authorities : [];
     
     const decimals = tokenInfo.decimals ?? 0;
     const totalSupply = parseFloat(tokenInfo.supply) / Math.pow(10, decimals);
 
     const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
     const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
+    
+    // Find the update authority. Helius provides it in a separate array if it's a different type of authority.
+    const authorities = Array.isArray(asset.authorities) ? asset.authorities : [];
+    const updateAuthority = authorities.find(a => a?.scopes?.includes('metadata_writer'))?.address;
+
 
     const responseData: Partial<TokenDetails> = {
         mintAddress: asset.id,
@@ -69,14 +73,14 @@ async function fetchTokenDetails(mintAddress: string) {
         totalSupply,
         description: metadata.description || null,
         links: links,
-        creatorAddress: authorities.find(a => a?.scopes?.includes('owner'))?.address || ownership.owner || 'Unknown',
+        creatorAddress: asset.grouping?.find((g: any) => g.group_key === 'collection')?.group_value || 'Unknown',
         mintAuthority: tokenInfo.mint_authority ?? null,
         freezeAuthority: tokenInfo.freeze_authority ?? null,
+        updateAuthority: updateAuthority ?? null,
         tokenStandard,
-        // Placeholders for data we can't easily get
-        holders: undefined,
-        circulatingSupply: undefined,
-        volatility: undefined,
+        holders: undefined, // N/A, requires dedicated indexing
+        circulatingSupply: undefined, // N/A
+        volatility: undefined, // N/A
     };
 
     if (primaryPair) {
@@ -116,8 +120,8 @@ async function fetchTokenDetails(mintAddress: string) {
     return responseData;
 }
 
-async function fetchTokenTrades(pairAddress: string) {
-    const dexScreenerUrl = `https://api.dexscreener.com/latest/dex/pairs/${pairAddress}/swaps?desc=true&limit=30`;
+async function fetchTokenTrades(pairAddress: string): Promise<Trade[]> {
+    const dexScreenerUrl = `https://api.dexscreener.com/latest/dex/pairs/solana/${pairAddress}/swaps?desc=true&limit=30`;
     const response = await fetch(dexScreenerUrl);
     if (!response.ok) throw new Error(`DexScreener swaps API failed with status ${response.status}`);
     

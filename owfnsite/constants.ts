@@ -106,9 +106,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         pricePerToken: 0,
         decimals: 9,
         description: 'OWFN (Official World Family Network) is a Solana-based token designed to unite families globally through blockchain technology, focusing on social impact, education, health, and humanitarian aid with full transparency.',
-        holders: 0,
         totalSupply: 18_000_000_000,
-        circulatingSupply: 0,
     },
     'SOL': {
         name: 'Solana',
@@ -120,9 +118,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         pricePerToken: 0,
         decimals: 9,
         description: 'Solana is a high-performance blockchain supporting builders around the world creating crypto apps that scale today.',
-        holders: 0,
         totalSupply: 0,
-        circulatingSupply: 0,
     },
      'USDC': {
         name: 'USD Coin',
@@ -134,9 +130,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         pricePerToken: 0,
         decimals: 6,
         description: 'USDC is a fully collateralized US dollar stablecoin. It is an Ethereum-powered coin and is the product of a collaboration between Circle and Coinbase.',
-        holders: 0,
         totalSupply: 0,
-        circulatingSupply: 0,
     },
      'USDT': {
         name: 'Tether',
@@ -148,8 +142,6 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         pricePerToken: 0,
         decimals: 6,
         description: 'Tether (USDT) is a stablecoin pegged to the U.S. dollar. It is issued by the Hong Kong-based company Tether Limited.',
-        holders: 0,
         totalSupply: 0,
-        circulatingSupply: 0,
     }
 };
