@@ -1,60 +1,80 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Loader2, ArrowLeft, Database, Shield, Code, Percent, Zap, Hand, UserCog, Ban, Star } from 'lucide-react';
+import { Loader2, ArrowLeft, Database, Shield, Code, TrendingUp, DollarSign, BarChart2, Repeat, Droplets, Clock, ArrowRightLeft, FileText, Link as LinkIcon, Globe, Twitter, Send, ExternalLink } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import type { TokenDetails, TokenExtension } from '../types.ts';
+import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
+import { DualProgressBar } from '../components/DualProgressBar.tsx';
+import { DiscordIcon } from '../components/IconComponents.tsx';
 
-// Helper component for displaying data
-const InfoRow = ({ label, children }: { label: string, children: React.ReactNode }) => (
-    <div className="flex justify-between items-center py-3 border-b border-primary-200 dark:border-darkPrimary-700 last:border-b-0">
-        <span className="text-primary-600 dark:text-darkPrimary-400">{label}</span>
-        <div className="font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
+// --- Helper Functions & Components ---
+
+const formatLargeNumber = (num?: number): string => {
+    if (num === undefined || num === null) return 'N/A';
+    if (num < 1000) return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (num < 1_000_000) return `${(num / 1000).toFixed(2)}K`;
+    if (num < 1_000_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
+    return `${(num / 1_000_000_000).toFixed(2)}B`;
+};
+
+const formatTimeAgo = (timestamp?: number): string => {
+    if (!timestamp) return 'N/A';
+    const seconds = Math.floor((new Date().getTime() - timestamp) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " minutes ago";
+    return Math.floor(seconds) + " seconds ago";
+};
+
+const StatCard = ({ title, value, change, icon }: { title: string, value: string, change?: number, icon: React.ReactNode }) => (
+    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
+        <div className="flex items-center space-x-3">
+            <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">{icon}</div>
+            <div>
+                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+                <div className="flex items-baseline gap-2">
+                    <p className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">{value}</p>
+                    {change !== undefined && (
+                        <p className={`text-sm font-bold ${change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            {change >= 0 ? '▲' : '▼'} {Math.abs(change).toFixed(2)}%
+                        </p>
+                    )}
+                </div>
+            </div>
+        </div>
     </div>
 );
 
-// Helper component for authority rows
-const AuthorityRow = ({ label, address }: { label: string, address?: string | null }) => (
-    <InfoRow label={label}>
-        {address ? (
-            <AddressDisplay address={address} />
-        ) : (
-            <span className="text-green-500 dark:text-green-400 font-bold flex items-center justify-end gap-1.5">
-                <Shield size={14} /> Revoked
-            </span>
-        )}
-    </InfoRow>
+const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-primary-800 dark:text-darkPrimary-200">{icon}{title}</h3>
+        <div className="space-y-3">{children}</div>
+    </div>
 );
 
-// Helper for Token-2022 Extensions
-const ExtensionDisplay = ({ extension }: { extension: TokenExtension }) => {
-    const { extension: name, state } = extension;
-    let content = null;
-    switch (name) {
-        case 'transferFeeConfig':
-            const fee = (state.newerTransferFee?.transferFeeBasisPoints ?? state.olderTransferFee?.transferFeeBasisPoints ?? 0) / 100;
-            const maxFee = Number(state.newerTransferFee?.maximumFee ?? state.olderTransferFee?.maximumFee ?? 0) / (10 ** state.mintDecimals);
-            content = <><Percent size={14} /> Transfer Fee: {fee.toFixed(2)}% (Max: {maxFee.toLocaleString()})</>;
-            break;
-        case 'interestBearingConfig':
-            const rate = state.rate / 100; // Assuming basis points
-            content = <><Zap size={14} /> Interest Bearing: {rate.toFixed(2)}% APR</>;
-            break;
-        case 'defaultAccountState':
-            content = <><Hand size={14} /> Default State: {state.state}</>;
-            break;
-        case 'permanentDelegate':
-             content = <><UserCog size={14} /> Permanent Delegate</>;
-             break;
-        case 'nonTransferable':
-            content = <><Ban size={14} /> Non-Transferable</>;
-            break;
-        default:
-            content = <><Star size={14} /> {name}</>;
-    }
-    return <div className="text-xs bg-primary-100 dark:bg-darkPrimary-700 p-2 rounded-md flex items-center gap-2">{content}</div>;
-};
+const InfoRow = ({ label, children }: { label: string, children: React.ReactNode }) => (
+    <div className="flex justify-between items-center py-2 border-b border-primary-200/50 dark:border-darkPrimary-700/50 last:border-b-0">
+        <span className="text-sm text-primary-600 dark:text-darkPrimary-400">{label}</span>
+        <div className="text-sm font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
+    </div>
+);
+
+const LinkButton = ({ href, icon, text }: { href: string, icon: React.ReactNode, text: string }) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="flex-grow flex items-center justify-center gap-2 bg-primary-100 dark:bg-darkPrimary-700 hover:bg-primary-200 dark:hover:bg-darkPrimary-600 text-primary-700 dark:text-darkPrimary-200 font-semibold py-2 px-3 rounded-md transition-colors">
+        {icon}{text}
+    </a>
+);
+
+
+// --- Main Component ---
 
 export default function TokenDetail() {
     const { t } = useAppContext();
@@ -62,15 +82,19 @@ export default function TokenDetail() {
     const [location] = useLocation();
     const mintAddress = params?.['mint'];
     
-    // Logic to handle back link
     const query = new URLSearchParams(location.split('?')[1] || '');
     const fromPath = query.get('from') || '/dashboard';
     const backLinkText = fromPath === '/profile' ? t('back_to_profile') : t('back_to_dashboard');
 
-
     const [token, setToken] = useState<Partial<TokenDetails> | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    
+    const AuthorityRow = ({ label, address }: { label: string, address?: string | null }) => (
+        <InfoRow label={label}>
+            {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold">{t('revoked')}</span>}
+        </InfoRow>
+    );
 
     useEffect(() => {
         if (!mintAddress) {
@@ -88,8 +112,7 @@ export default function TokenDetail() {
                     const errorBody = await response.json().catch(() => ({ error: `Server error: ${response.status}` }));
                     throw new Error(errorBody.error || "Failed to fetch token data.");
                 }
-                const data: Partial<TokenDetails> = await response.json();
-                setToken(data);
+                setToken(await response.json());
             } catch (err) {
                 console.error("Failed to fetch token details:", err);
                 setError(err instanceof Error ? err.message : "An unknown error occurred.");
@@ -101,12 +124,16 @@ export default function TokenDetail() {
         fetchTokenData();
     }, [mintAddress]);
 
+    const getLinkIcon = (key: string) => {
+        if (key.includes('twitter')) return <Twitter size={16} />;
+        if (key.includes('telegram')) return <Send size={16} />;
+        if (key.includes('discord')) return <DiscordIcon className="w-4 h-4" />;
+        if (key.includes('website')) return <Globe size={16} />;
+        return <LinkIcon size={16} />;
+    };
+
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-96">
-                <Loader2 className="w-12 h-12 animate-spin text-accent-500 dark:text-darkAccent-500" />
-            </div>
-        );
+        return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>;
     }
 
     if (error || !token) {
@@ -121,56 +148,87 @@ export default function TokenDetail() {
         );
     }
     
+    const isMarketDataAvailable = (token.marketCap ?? 0) > 0;
+
     return (
-        <div className="space-y-8 text-primary-900 dark:text-darkPrimary-100 animate-fade-in-up">
-             <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
+        <div className="space-y-8 animate-fade-in-up">
+            <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
                 <ArrowLeft size={16} /> {backLinkText}
             </Link>
 
-            {/* Header */}
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+            <header className="flex flex-col md:flex-row items-start md:items-center gap-4">
                 <GenericTokenIcon uri={token.logo as string} className="w-16 h-16 flex-shrink-0" />
-                <div>
+                <div className="flex-grow">
                     <h1 className="text-3xl font-bold">{token.name}</h1>
-                    <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">{token.symbol}</p>
+                    <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
                 </div>
+                {isMarketDataAvailable && token.mintAddress && (
+                    <a href={`https://jup.ag/swap/SOL-${token.mintAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors flex items-center gap-2">
+                        {t('swap')} <ExternalLink size={16} />
+                    </a>
+                )}
+            </header>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <StatCard title={t('pricePerToken', {defaultValue: 'Price'})} value={isMarketDataAvailable ? `$${token.pricePerToken?.toPrecision(4)}` : 'N/A'} change={token.price24hChange} icon={<DollarSign />} />
+                <StatCard title={t('market_cap')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.marketCap)}` : 'N/A'} icon={<BarChart2 />} />
+                <StatCard title={t('volume_24h')} value={isMarketDataAvailable ? `$${formatLargeNumber(token.volume24h)}` : 'N/A'} icon={<Repeat />} />
             </div>
 
-            {/* Details Grid */}
-            <div className="grid md:grid-cols-2 gap-8">
-                {/* Column 1 */}
-                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Database/>{t('tokenomics_details_title')}</h3>
-                    <div className="space-y-1">
-                        <InfoRow label={t('presale_token_address_label')}><AddressDisplay address={token.mintAddress!} type="token"/></InfoRow>
-                        <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, {maximumFractionDigits: token.decimals}) ?? 'N/A'}</InfoRow>
-                        <InfoRow label={t('token_decimals')}>{token.decimals}</InfoRow>
-                         <InfoRow label="Creator"><AddressDisplay address={token.creatorAddress ?? 'Unknown'} /></InfoRow>
-                    </div>
-                </div>
+            <div className="grid lg:grid-cols-3 gap-8 items-start">
+                <div className="lg:col-span-2 space-y-8">
+                    {isMarketDataAvailable ? (
+                        <>
+                            <InfoCard title={t('market_stats')} icon={<TrendingUp />}>
+                                <InfoRow label={t('fully_diluted_valuation')}>{`$${formatLargeNumber(token.fdv)}`}</InfoRow>
+                                <InfoRow label={t('liquidity')}>{`$${formatLargeNumber(token.liquidity)}`}</InfoRow>
+                                <InfoRow label={t('holders')}>N/A</InfoRow>
+                                <InfoRow label={t('circulating_supply')}>N/A</InfoRow>
+                            </InfoCard>
 
-                {/* Column 2 */}
-                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Shield/>Authorities</h3>
-                    <div className="space-y-1">
-                        <AuthorityRow label="Update Authority" address={token.updateAuthority} />
-                        <AuthorityRow label="Mint Authority" address={token.mintAuthority} />
-                        <AuthorityRow label="Freeze Authority" address={token.freezeAuthority} />
-                    </div>
-                </div>
+                            <InfoCard title={t('trading_stats')} icon={<ArrowRightLeft />}>
+                                <DualProgressBar value1={token.txns?.h24.buys ?? 0} label1={t('buys')} value2={token.txns?.h24.sells ?? 0} label2={t('sells')} />
+                                <InfoRow label={t('total_transactions_24h')}>{(token.txns?.h24.buys ?? 0) + (token.txns?.h24.sells ?? 0)}</InfoRow>
+                            </InfoCard>
 
-                {/* Full Width */}
-                <div className="md:col-span-2 bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Code/>{t('token_standard')}</h3>
-                    <div className="bg-primary-100 dark:bg-darkPrimary-700 p-3 rounded-md font-mono text-center font-bold text-lg">{token.tokenStandard}</div>
-                    {token.tokenStandard === 'Token-2022' && token.tokenExtensions && token.tokenExtensions.length > 0 && (
-                         <div className="mt-6 pt-4 border-t border-primary-200 dark:border-darkPrimary-700 space-y-2">
-                            <h4 className="font-bold">Active Extensions:</h4>
-                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                {token.tokenExtensions.map((ext, i) => <ExtensionDisplay key={i} extension={ext} />)}
-                            </div>
-                         </div>
+                            <InfoCard title={t('pool_info')} icon={<Droplets />}>
+                                <InfoRow label={t('pair_address')}><AddressDisplay address={token.pairAddress!} type="address" /></InfoRow>
+                                <InfoRow label={t('exchange')}>{token.dexId}</InfoRow>
+                                <InfoRow label={t('pool_age')}>{formatTimeAgo(token.poolCreatedAt)}</InfoRow>
+                            </InfoCard>
+                        </>
+                    ) : (
+                        <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner-3d">
+                            <p className="text-primary-600 dark:text-darkPrimary-400">Live market data is not available for this token. It may not be listed on a decentralized exchange yet.</p>
+                        </div>
                     )}
+                </div>
+                
+                <div className="lg:col-span-1 space-y-8">
+                    {token.description && (
+                        <InfoCard title={t('token_description_title')} icon={<FileText />}>
+                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{token.description}</p>
+                        </InfoCard>
+                    )}
+                    
+                    {token.links && Object.keys(token.links).length > 0 && (
+                        <InfoCard title="Links" icon={<LinkIcon />}>
+                            <div className="flex flex-wrap gap-2">
+                                {Object.entries(token.links).map(([key, href]) => href && (
+                                    <LinkButton key={key} href={href} icon={getLinkIcon(key)} text={key.charAt(0).toUpperCase() + key.slice(1)} />
+                                ))}
+                            </div>
+                        </InfoCard>
+                    )}
+
+                    <InfoCard title={t('on_chain_security')} icon={<Shield />}>
+                        <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
+                        <InfoRow label="Creator"><AddressDisplay address={token.creatorAddress ?? 'Unknown'} /></InfoRow>
+                        <InfoRow label={t('token_standard')}>{token.tokenStandard}</InfoRow>
+                        <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
+                        <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
+                        <AuthorityRow label="Update Authority" address={token.updateAuthority} />
+                    </InfoCard>
                 </div>
             </div>
         </div>
