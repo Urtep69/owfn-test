@@ -25,74 +25,42 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
-        darkMode: 'class',
+        darkMode: 'class', // Using class strategy is essential
         theme: {
           extend: {
             colors: {
-              primary: { // Light Theme
-                '50': '#ffffff', // White background
-                '100': '#f5f7fa', // Slightly off-white for cards
-                '200': '#e9eef5', // Borders, dividers
-                '300': '#d8e0ec',
-                '400': '#a6b7d2',
-                '500': '#7c8eab', // Muted text
-                '600': '#5f7392',
-                '700': '#485a78', // Body text
-                '800': '#33425b',
-                '900': '#222d41', // Headings
-                '950': '#151c2a',
-              },
-              accent: { // Light/Dark Theme Accent (Vibrant Cyan/Green)
-                '50': '#e0fcfc',
-                '100': '#c4f8f8',
-                '200': '#91f2f2',
-                '300': '#5eecec',
-                '400': '#2ce5e5',
-                '500': '#08d6d6', // Main accent color
-                '600': '#00b4b4',
-                '700': '#009090',
-                '800': '#006c6c',
-                '900': '#004949',
-                '950': '#002f2f',
-              },
-              darkPrimary: { // Dark Theme
-                '50': '#eef2f9',
-                '100': '#dbe5f2',
-                '200': '#c0d2e8',
-                '300': '#9cb8db',
-                '400': '#7298c9',
-                '500': '#557bb5',
-                '600': '#41619a',
-                '700': '#354e81',
-                '800': '#2d416a', // Body Text (Light on Dark)
-                '900': '#111827', // Main dark background
-                '950': '#0c111d', // Darker background variant
-              },
+              // New Ultramodern Neon Theme
+              'dark-bg': '#0D0C1D', // Deep Indigo
+              'dark-card': '#19182C', // Midnight Blue
+              'dark-border': '#2D2B4A', // Muted Purple
+              'neon-cyan': '#00FFFF',
+              'neon-magenta': '#FF00FF',
+              'neon-purple': '#9D00FF',
+              'text-primary': '#E0E0FF', // Lavender White
+              'text-secondary': '#A0A0C0', // Cool Gray
             },
             boxShadow: {
-              'sharp': '4px 4px 0px 0px rgba(0,0,0,1)',
-              'sharp-accent': '4px 4px 0px 0px var(--color-accent-500)',
-              'sharp-light': '4px 4px 0px 0px rgba(255,255,255,0.8)',
-              'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+              'neon-cyan': '0 0 5px #00FFFF, 0 0 10px #00FFFF, 0 0 20px #00FFFF, 0 0 30px #00BFFF',
+              'neon-magenta': '0 0 5px #FF00FF, 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #C71585',
+              'glass': '0 4px 30px rgba(0, 0, 0, 0.2)',
             },
             animation: {
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
-              'slide-in': 'slideIn 0.5s ease-out forwards',
-              'gradient-bg': 'gradient-bg 15s ease infinite',
+              'background-pan': 'backgroundPan 15s linear infinite',
+              'logo-pulse': 'logoPulse 4s ease-in-out infinite',
             },
             keyframes: {
               fadeInUp: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
+                '0%': { opacity: '0', transform: 'translateY(20px) scale(0.98)' },
+                '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
               },
-              slideIn: {
-                '0%': { transform: 'translateX(100%)' },
-                '100%': { transform: 'translateX(0)' },
+              backgroundPan: {
+                '0%': { backgroundPosition: '0% 0%' },
+                '100%': { backgroundPosition: '100% 100%' },
               },
-              'gradient-bg': {
-                '0%': { 'background-position': '0% 50%' },
-                '50%': { 'background-position': '100% 50%' },
-                '100%': { 'background-position': '0% 50%' },
+              logoPulse: {
+                '0%, 100%': { filter: 'drop-shadow(0 0 10px rgba(0, 255, 255, 0.5))' },
+                '50%': { filter: 'drop-shadow(0 0 25px rgba(0, 255, 255, 0.8))' },
               }
             },
           },
@@ -100,66 +68,102 @@
       };
     </script>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+      
+      :root {
+        --dark-bg: #0D0C1D;
+        --dark-card: #19182C;
+        --dark-border: #2D2B4A;
+        --neon-cyan: #00FFFF;
+        --neon-magenta: #FF00FF;
+        --text-primary: #E0E0FF;
+        --text-secondary: #A0A0C0;
+      }
+
       html {
-          font-size: 15px;
-          font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        font-family: 'Inter', sans-serif;
+        color: var(--text-primary);
+        scroll-behavior: smooth;
       }
+      
       body {
-        background-size: 200% 200%;
+        background-color: var(--dark-bg);
+        background-image: linear-gradient(135deg, #0D0C1D 0%, #151424 25%, #0A091A 50%, #19182C 75%, #0D0C1D 100%);
+        background-size: 400% 400%;
+        animation: backgroundPan 15s linear infinite;
+        overflow-x: hidden;
       }
-      .light body {
-        background-color: #f5f7fa;
-      }
-      .dark body {
-        background-image: linear-gradient(-45deg, #111827, #0c111d, #1e293b, #0c111d);
-        animation: gradient-bg 15s ease infinite;
+
+      #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
       }
 
       /* Glassmorphism Card Style */
       .glass-card {
-        background: rgba(255, 255, 255, 0.05); /* Semi-transparent background */
-        -webkit-backdrop-filter: blur(12px); /* For Safari */
-        backdrop-filter: blur(12px); /* Blur effect */
-        border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
-        border-radius: 1rem; /* Rounded corners */
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      }
-      .dark .glass-card {
-        background: rgba(28, 37, 54, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-      }
-      html.light .glass-card {
-        background: rgba(255, 255, 255, 0.6);
-        border: 1px solid rgba(0, 0, 0, 0.08);
+        background: rgba(25, 24, 44, 0.6); /* --dark-card with alpha */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--dark-border);
+        border-radius: 1rem;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
 
-      /* Neobrutalism Button Style */
-      .neo-button {
-        transition: all 0.2s ease-in-out;
-        border: 2px solid #222d41; /* Dark border */
-        box-shadow: 4px 4px 0px 0px #222d41;
+      .card-3d-hover {
+        transform-style: preserve-3d;
       }
-      .neo-button:hover {
-        transform: translate(2px, 2px);
-        box-shadow: 2px 2px 0px 0px #222d41;
+      .card-3d-hover:hover {
+        transform: perspective(1000px) rotateY(var(--rotateY)) rotateX(var(--rotateX)) scale3d(1.05, 1.05, 1.05);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), 0 0 30px rgba(255, 0, 255, 0.2);
       }
-       .neo-button:active {
-        transform: translate(4px, 4px);
-        box-shadow: 0px 0px 0px 0px #222d41;
+
+      /* Neon Button Style */
+      .neon-button {
+        border: 2px solid var(--neon-cyan);
+        color: var(--neon-cyan);
+        background-color: transparent;
+        text-shadow: 0 0 5px var(--neon-cyan);
+        box-shadow: 0 0 5px var(--neon-cyan), inset 0 0 5px var(--neon-cyan);
+        transition: all 0.3s ease;
       }
-       .dark .neo-button {
-        border: 2px solid #d8e0ec;
-        box-shadow: 4px 4px 0px 0px #d8e0ec;
-       }
-        .dark .neo-button:hover {
-          transform: translate(2px, 2px);
-          box-shadow: 2px 2px 0px 0px #d8e0ec;
-        }
-        .dark .neo-button:active {
-          transform: translate(4px, 4px);
-          box-shadow: 0px 0px 0px 0px #d8e0ec;
-        }
+      .neon-button:hover {
+        color: var(--dark-bg);
+        background-color: var(--neon-cyan);
+        box-shadow: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+      }
+      
+      .neon-button-magenta {
+        border-color: var(--neon-magenta);
+        color: var(--neon-magenta);
+        text-shadow: 0 0 5px var(--neon-magenta);
+        box-shadow: 0 0 5px var(--neon-magenta), inset 0 0 5px var(--neon-magenta);
+      }
+      .neon-button-magenta:hover {
+        background-color: var(--neon-magenta);
+        box-shadow: 0 0 20px var(--neon-magenta), 0 0 30px var(--neon-magenta);
+      }
+
+      /* Scrollbar styles */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--dark-bg);
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: var(--dark-border);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: var(--neon-cyan);
+      }
+
     </style>
 <script type="importmap">
 {
@@ -183,8 +187,29 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-primary-50 text-primary-800 dark:bg-darkPrimary-900 dark:text-darkPrimary-200">
+  <body>
+    <div id="particles-js"></div>
     <div id="root"></div>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS('particles-js', {
+          "particles": {
+            "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+            "color": { "value": "#2D2B4A" },
+            "shape": { "type": "circle" },
+            "opacity": { "value": 0.5, "random": true },
+            "size": { "value": 3, "random": true },
+            "line_linked": { "enable": true, "distance": 150, "color": "#2D2B4A", "opacity": 0.4, "width": 1 },
+            "move": { "enable": true, "speed": 1, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+          },
+          "interactivity": {
+            "detect_on": "canvas",
+            "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": false }, "resize": true },
+            "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } } }
+          },
+          "retina_detect": true
+        });
+    </script>
     <script type="module" src="/bundle.js"></script>
   <script type="module" src="/index.tsx"></script>
 </body>

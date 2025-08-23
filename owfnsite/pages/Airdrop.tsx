@@ -7,14 +7,14 @@ const MOCK_AIRDROP_AMOUNT = 5000;
 const ConnectWalletPrompt = () => {
     const { t, solana, setWalletModalOpen } = useAppContext();
     return (
-        <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d max-w-md mx-auto">
-            <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
+        <div className="text-center p-12 glass-card max-w-md mx-auto card-3d-hover">
+            <Wallet className="mx-auto w-16 h-16 text-neon-cyan mb-4" />
             <h2 className="text-2xl font-bold">{t('airdrop')}</h2>
-            <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('airdrop_connect_prompt')}</p>
+            <p className="text-text-secondary mb-6">{t('airdrop_connect_prompt')}</p>
             <button
                 onClick={() => setWalletModalOpen(true)}
                 disabled={solana.loading}
-                className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
+                className="font-bold py-3 px-6 rounded-full text-lg neon-button disabled:opacity-50"
             >
                 {solana.loading ? t('connecting') : t('connect_wallet')}
             </button>
@@ -47,20 +47,20 @@ const EligibilityChecker = () => {
 
 
     return (
-        <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d max-w-md mx-auto text-center">
+        <div className="glass-card p-8 rounded-lg max-w-md mx-auto text-center card-3d-hover">
             {isChecking && (
                 <>
-                    <Loader2 className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4 animate-spin" />
+                    <Loader2 className="mx-auto w-16 h-16 text-neon-cyan mb-4 animate-spin" />
                     <h2 className="text-2xl font-bold mb-2">{t('airdrop_checking')}</h2>
-                    <p className="text-primary-600 dark:text-darkPrimary-400">{t('airdrop_subtitle')}</p>
+                    <p className="text-text-secondary">{t('airdrop_subtitle')}</p>
                 </>
             )}
 
             {!isChecking && eligibilityStatus === 'eligible' && (
                 <div className="animate-fade-in-up">
-                    <CheckCircle className="mx-auto w-16 h-16 text-green-500 mb-4" />
-                    <h2 className="text-2xl font-bold text-green-500 dark:text-green-400 mb-2">{t('airdrop_congratulations')}</h2>
-                    <p className="text-primary-700 dark:text-darkPrimary-300 text-lg">
+                    <CheckCircle className="mx-auto w-16 h-16 text-green-400 mb-4" />
+                    <h2 className="text-2xl font-bold text-green-400 mb-2">{t('airdrop_congratulations')}</h2>
+                    <p className="text-text-primary text-lg">
                         {t('airdrop_eligible_message', { amount: MOCK_AIRDROP_AMOUNT.toLocaleString() })}
                     </p>
                 </div>
@@ -68,8 +68,8 @@ const EligibilityChecker = () => {
              {!isChecking && eligibilityStatus === 'not_eligible' && (
                 <div className="animate-fade-in-up">
                     <XCircle className="mx-auto w-16 h-16 text-red-500 mb-4" />
-                    <h2 className="text-2xl font-bold text-red-500 dark:text-red-400 mb-2">{t('airdrop_not_eligible')}</h2>
-                    <p className="text-primary-600 dark:text-darkPrimary-400">
+                    <h2 className="text-2xl font-bold text-red-500 mb-2">{t('airdrop_not_eligible')}</h2>
+                    <p className="text-text-secondary">
                         {t('airdrop_not_eligible_message')}
                     </p>
                 </div>
@@ -79,22 +79,22 @@ const EligibilityChecker = () => {
 };
 
 export default function Airdrop() {
-    const { t, solana } = useAppContext();
+    const { t, solana, isVerified } = useAppContext();
 
     return (
-        <div className="animate-fade-in-up space-y-8">
+        <div className="animate-fade-in-up space-y-12">
             <div className="text-center">
-                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('airdrop_title')}</h1>
-                <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">
+                <h1 className="text-4xl font-bold text-text-primary" style={{ textShadow: '0 0 10px var(--neon-cyan)' }}>{t('airdrop_title')}</h1>
+                <p className="mt-4 max-w-2xl mx-auto text-lg text-text-secondary">
                     {t('airdrop_subtitle')}
                 </p>
             </div>
             
-            {!solana.connected ? <ConnectWalletPrompt /> : <EligibilityChecker />}
+            {!solana.connected || !isVerified ? <ConnectWalletPrompt /> : <EligibilityChecker />}
 
-            <div className="max-w-2xl mx-auto mt-12 p-6 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d">
-                <h3 className="text-xl font-bold mb-2">{t('airdrop_info_box_title')}</h3>
-                <p className="text-primary-600 dark:text-darkPrimary-400">
+            <div className="max-w-2xl mx-auto mt-12 p-6 glass-card card-3d-hover">
+                <h3 className="text-xl font-bold mb-2 text-text-primary">{t('airdrop_info_box_title')}</h3>
+                <p className="text-text-secondary">
                     {t('airdrop_info_box_desc')}
                 </p>
             </div>

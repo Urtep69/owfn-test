@@ -8,7 +8,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen text-primary-800 dark:text-darkPrimary-200 font-sans transition-colors duration-300">
+    <div className="min-h-screen text-text-primary font-sans transition-colors duration-300">
       <div className="flex">
         <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} />
         <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>

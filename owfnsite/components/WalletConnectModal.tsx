@@ -16,25 +16,21 @@ const socialConnectors = [
 ]
 
 export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, onClose }) => {
-    const { t } = useAppContext();
+    const { t, setSignatureRequired } = useAppContext();
     const { wallets, select, connect } = useWallet();
     
     const handleWalletSelect = async (walletName: WalletName) => {
         try {
             select(walletName);
-            // The connection is triggered by the wallet adapter's logic after selection,
-            // especially with autoConnect. A slight delay can help ensure the adapter
-            // has processed the selection before we attempt to connect.
-            setTimeout(() => {
-                connect().catch(error => {
-                    console.error(`Failed to connect to ${walletName}:`, error);
-                    // Optionally show an error message to the user
-                });
-            }, 100);
-        } catch (error) {
-            console.error(`Error selecting wallet ${walletName}:`, error);
-        } finally {
+            // The connect() promise resolves when the wallet is connected.
+            await connect();
+            // After successful connection, close this modal and trigger the signature request.
             onClose();
+            setSignatureRequired(true);
+        } catch (error) {
+            console.error(`Failed to connect to ${walletName}:`, error);
+            // Optionally show an error message to the user
+            onClose(); // Close even on error
         }
     };
     
@@ -42,33 +38,33 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
 
     return (
         <div 
-            className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
         >
             <div 
-                className="bg-white dark:bg-darkPrimary-800 rounded-2xl shadow-3d-lg w-full max-w-md m-auto animate-fade-in-up"
+                className="glass-card w-full max-w-md m-auto animate-fade-in-up text-text-primary"
                 style={{ animationDuration: '300ms' }}
                 onClick={e => e.stopPropagation()}
             >
-                <header className="flex items-center justify-between p-4 border-b border-primary-200 dark:border-darkPrimary-700">
-                    <h2 className="text-lg font-bold text-primary-900 dark:text-darkPrimary-100">{t('connect_wallet')}</h2>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-primary-100 dark:hover:bg-darkPrimary-700">
-                        <X size={20} className="text-primary-500 dark:text-darkPrimary-400" />
+                <header className="flex items-center justify-between p-4 border-b border-dark-border">
+                    <h2 className="text-lg font-bold">{t('connect_wallet')}</h2>
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-dark-card">
+                        <X size={20} className="text-text-secondary" />
                     </button>
                 </header>
                 
                 <div className="p-6 space-y-6">
                     {/* Easy Connect Section */}
                     <div>
-                        <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">Easy Connect (Recommended)</h3>
+                        <h3 className="text-sm font-semibold text-text-secondary mb-2">Easy Connect (Recommended)</h3>
                          <div className="space-y-2">
                             {socialConnectors.map(connector => (
-                                <button key={connector.name} disabled={connector.comingSoon} className="w-full flex items-center space-x-4 p-3 rounded-lg bg-primary-100 dark:bg-darkPrimary-700/50 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group">
+                                <button key={connector.name} disabled={connector.comingSoon} className="w-full flex items-center space-x-4 p-3 rounded-lg bg-dark-card border border-dark-border hover:border-neon-cyan transition-colors disabled:opacity-50 disabled:cursor-not-allowed group">
                                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">{connector.icon}</div>
-                                    <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{connector.name}</span>
-                                    {connector.comingSoon && <span className="ml-auto text-xs font-bold text-accent-600 dark:text-darkAccent-500 bg-accent-100 dark:bg-darkAccent-900/50 px-2 py-1 rounded-full">{t('coming_soon_title')}</span>}
+                                    <span className="font-semibold text-text-primary">{connector.name}</span>
+                                    {connector.comingSoon && <span className="ml-auto text-xs font-bold text-neon-magenta bg-dark-card px-2 py-1 rounded-full">{t('coming_soon_title')}</span>}
                                 </button>
                             ))}
                         </div>
@@ -77,32 +73,32 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                      {/* Divider */}
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                            <div className="w-full border-t border-primary-200 dark:border-darkPrimary-600"></div>
+                            <div className="w-full border-t border-dark-border"></div>
                         </div>
                         <div className="relative flex justify-center">
-                            <span className="bg-white dark:bg-darkPrimary-800 px-2 text-sm text-primary-500 dark:text-darkPrimary-400">OR</span>
+                            <span className="bg-dark-card px-2 text-sm text-text-secondary">OR</span>
                         </div>
                     </div>
 
                     {/* Traditional Wallet Section */}
                     <div>
-                         <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">Connect with a Wallet</h3>
+                         <h3 className="text-sm font-semibold text-text-secondary mb-2">Connect with a Wallet</h3>
                          <div className="space-y-2">
                             {wallets.filter(w => w.readyState === 'Installed').map(wallet => (
                                 <button
                                     key={wallet.adapter.name}
                                     onClick={() => handleWalletSelect(wallet.adapter.name as WalletName)}
-                                    className="w-full flex items-center space-x-4 p-3 rounded-lg bg-primary-100 dark:bg-darkPrimary-700/50 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"
+                                    className="w-full flex items-center space-x-4 p-3 rounded-lg bg-dark-card border border-dark-border hover:border-neon-cyan transition-colors"
                                 >
                                      <img src={wallet.adapter.icon} alt={wallet.adapter.name} className="w-8 h-8 rounded-full"/>
-                                     <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{wallet.adapter.name}</span>
+                                     <span className="font-semibold text-text-primary">{wallet.adapter.name}</span>
                                 </button>
                             ))}
                          </div>
                     </div>
                 </div>
 
-                 <footer className="p-4 text-center text-xs text-primary-500 dark:text-darkPrimary-500 bg-primary-50 dark:bg-darkPrimary-800/50 border-t border-primary-200 dark:border-darkPrimary-700 rounded-b-2xl">
+                 <footer className="p-4 text-center text-xs text-text-secondary bg-dark-bg border-t border-dark-border rounded-b-2xl">
                     <p>By connecting, you agree to our Terms of Service.</p>
                 </footer>
             </div>
