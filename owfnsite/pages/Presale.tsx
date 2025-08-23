@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
@@ -397,8 +398,8 @@ export default function Presale() {
     }
 
     const numValue = parseFloat(value);
-    if ((numValue > 0 && numValue < PRESALE_DETAILS.minBuy) || numValue > maxAllowedBuy) {
-        setError(t('presale_amount_error', { min: PRESALE_DETAILS.minBuy.toFixed(2), max: maxAllowedBuy.toFixed(6) }));
+    if (numValue <= 0 || numValue > maxAllowedBuy) {
+        setError(t('presale_amount_error_max_only', { max: maxAllowedBuy.toFixed(6) }));
     } else {
         setError('');
     }
@@ -413,18 +414,15 @@ export default function Presale() {
     const numValue = parseFloat(value);
     let correctedValue = value;
 
-    if (numValue > 0 && numValue < PRESALE_DETAILS.minBuy) {
-        correctedValue = String(PRESALE_DETAILS.minBuy);
-    } else if (numValue > maxAllowedBuy) {
+    if (numValue > maxAllowedBuy) {
         correctedValue = maxAllowedBuy.toFixed(6);
-    }
-    
-    if (correctedValue !== value) {
         setSolAmount(correctedValue);
     }
     
-    const correctedNum = parseFloat(correctedValue);
-    if (correctedNum >= PRESALE_DETAILS.minBuy && correctedNum <= maxAllowedBuy) {
+    const finalValue = parseFloat(correctedValue);
+     if (finalValue <= 0 || finalValue > maxAllowedBuy) {
+        setError(t('presale_amount_error_max_only', { max: maxAllowedBuy.toFixed(6) }));
+    } else {
         setError('');
     }
   };
@@ -476,7 +474,7 @@ export default function Presale() {
 
   const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
   const numSolAmount = parseFloat(solAmount);
-  const isAmountInvalid = isNaN(numSolAmount) || numSolAmount < PRESALE_DETAILS.minBuy || numSolAmount > maxAllowedBuy;
+  const isAmountInvalid = isNaN(numSolAmount) || numSolAmount <= 0 || numSolAmount > maxAllowedBuy;
 
 
   const handleBuy = async () => {
@@ -655,7 +653,7 @@ export default function Presale() {
                     {/* Buy Section */}
                     <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6 space-y-4">
                         <p className="text-sm text-primary-700 dark:text-darkPrimary-300 text-center">
-                            {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
+                            {t('presale_buy_info_max_only', { max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
                         {solana.connected && (
                             <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
