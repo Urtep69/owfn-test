@@ -13,7 +13,6 @@ export const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
 export const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
 export const HELIUS_API_BASE_URL = 'https://api.helius.xyz';
 
-export const BIRDEYE_API_KEY = 'YOUR_BIRDEYE_API_KEY_HERE'; // TODO: Replace with your actual Birdeye API key
 export const BIRDEYE_API_BASE_URL = 'https://public-api.birdeye.so';
 
 
