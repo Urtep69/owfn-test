@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -25,40 +24,29 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
     const { t } = useAppContext();
     const [transactions, setTransactions] = useState<PresaleTransaction[]>([]);
     const [loading, setLoading] = useState(true);
-    const wsRef = useRef<WebSocket | null>(null);
 
-    // Effect to handle the user's own new transaction for immediate feedback
     useEffect(() => {
         if (newTransaction) {
-            setTransactions(prev => {
-                // Prevent adding a duplicate if the transaction arrived via WebSocket first
-                if (prev.some(tx => tx.id === newTransaction.id)) {
-                    return prev;
-                }
-                return [newTransaction, ...prev.slice(0, 19)];
-            });
+            setTransactions(prev => [newTransaction, ...prev.slice(0, 19)]);
         }
     }, [newTransaction]);
     
-    // Effect to fetch initial transactions and set up WebSocket connection
     useEffect(() => {
-        let isMounted = true;
-
-        const fetchInitialTransactions = async () => {
-            if (!isMounted) return;
+        const fetchTransactions = async () => {
             setLoading(true);
             try {
                 const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
                 const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch initial transactions');
+                if (!response.ok) throw new Error('Failed to fetch transactions');
                 const data = await response.json();
                 
                 const parsedTxs: PresaleTransaction[] = data
                     .filter((tx: any) => 
                         tx.timestamp >= presaleStartTimestamp &&
-                        tx.type === 'NATIVE_TRANSFER' && 
-                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
+                        tx.type === 'NATIVE_TRANSFER' &&
+                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                        tx.nativeTransfers[0]?.fromUserAccount !== DISTRIBUTION_WALLETS.presale
                     )
                     .map((tx: any) => ({
                         id: tx.signature,
@@ -68,104 +56,17 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         time: new Date(tx.timestamp * 1000),
                     }));
                 
-                if (isMounted) {
-                    setTransactions(prev => {
-                        // Merge initial with any potential new local transactions, avoiding duplicates
-                        const existingIds = new Set(prev.map(p => p.id));
-                        const uniqueFetched = parsedTxs.filter(p => !existingIds.has(p.id));
-                        return [...prev, ...uniqueFetched].slice(0, 20);
-                    });
-                }
+                setTransactions(parsedTxs.slice(0, 20));
             } catch (error) {
                 console.error("Failed to fetch presale transactions:", error);
             } finally {
-                if (isMounted) setLoading(false);
+                setLoading(false);
             }
         };
 
-        const connectWebSocket = () => {
-            const heliusWsUrl = `wss://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
-            wsRef.current = new WebSocket(heliusWsUrl);
-
-            wsRef.current.onopen = () => {
-                console.log("WebSocket connected for Live Presale Feed");
-                wsRef.current?.send(JSON.stringify({
-                    jsonrpc: "2.0",
-                    id: 1,
-                    method: "transactionSubscribe",
-                    params: [{
-                        accountInclude: [DISTRIBUTION_WALLETS.presale]
-                    }, {
-                        commitment: "finalized",
-                        encoding: "jsonParsed",
-                        transactionDetails: "full",
-                        showRewards: false
-                    }]
-                }));
-            };
-
-            wsRef.current.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    if (data.method === "transactionNotification") {
-                        const tx = data.params.result.transaction;
-                        const signature = tx.signatures[0];
-
-                        // Look for native SOL transfers to our presale wallet
-                        const nativeTransfer = tx.message.instructions.find((inst: any) => 
-                            inst.program === 'system' && 
-                            inst.parsed?.type === 'transfer' &&
-                            inst.parsed?.info?.destination === DISTRIBUTION_WALLETS.presale
-                        );
-                        
-                        if (nativeTransfer) {
-                            const newTx: PresaleTransaction = {
-                                id: signature,
-                                address: nativeTransfer.parsed.info.source,
-                                solAmount: nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL,
-                                owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                                time: new Date(), // Use current time for live feed
-                            };
-
-                            if (isMounted) {
-                                setTransactions(prev => {
-                                    if (prev.some(t => t.id === newTx.id)) {
-                                        return prev; // Already have this one
-                                    }
-                                    return [newTx, ...prev.slice(0, 19)];
-                                });
-                            }
-                        }
-                    }
-                } catch (e) {
-                    console.error("Error parsing WebSocket message:", e);
-                }
-            };
-            
-            wsRef.current.onclose = () => {
-                console.log("WebSocket disconnected. Attempting to reconnect in 5 seconds...");
-                if (isMounted) {
-                    setTimeout(connectWebSocket, 5000);
-                }
-            };
-
-            wsRef.current.onerror = (error) => {
-                console.error("WebSocket error:", error);
-                wsRef.current?.close(); // This will trigger the onclose reconnect logic
-            };
-        };
-
-        fetchInitialTransactions();
-        connectWebSocket();
-
-        return () => {
-            isMounted = false;
-            if (wsRef.current) {
-                wsRef.current.onclose = null; // Prevent reconnection on unmount
-                wsRef.current.close();
-                console.log("WebSocket disconnected on component unmount.");
-            }
-        };
+        fetchTransactions();
+        const interval = setInterval(fetchTransactions, 30000); // refresh every 30 seconds
+        return () => clearInterval(interval);
     }, []);
 
 
@@ -186,7 +87,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         <Loader2 className="w-6 h-6 animate-spin text-accent-500 dark:text-darkAccent-500" />
                     </div>
                 ) : transactions.length > 0 ? transactions.map((tx) => (
-                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 10000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
+                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 5000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
                         <div className="col-span-2 flex items-center gap-2">
                            <AddressDisplay address={tx.address} className="text-xs" />
                         </div>
@@ -233,7 +134,7 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 
 
 export default function Presale() {
-  const { t, solana, setWalletModalOpen } = useAppContext();
+  const { t, solana } = useAppContext();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -275,6 +176,7 @@ export default function Presale() {
                 tx.timestamp >= presaleStartTimestamp &&
                 tx.type === 'NATIVE_TRANSFER' && 
                 tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                tx.nativeTransfers[0]?.fromUserAccount !== DISTRIBUTION_WALLETS.presale &&
                 tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111'
             );
 
@@ -344,7 +246,7 @@ export default function Presale() {
 
   useEffect(() => {
     const fetchUserContribution = async () => {
-        if (!solana.connected || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
+        if (!solana.address || new Date() < PRESALE_DETAILS.startDate) {
             setUserContribution(0);
             return;
         }
@@ -384,7 +286,7 @@ export default function Presale() {
     };
 
     fetchUserContribution();
-  }, [solana.connected, solana.address]);
+  }, [solana.address]);
 
   const maxAllowedBuy = Math.max(0, PRESALE_DETAILS.maxBuy - userContribution);
 
@@ -398,39 +300,19 @@ export default function Presale() {
     }
 
     const numValue = parseFloat(value);
-    if (numValue <= 0 || numValue > maxAllowedBuy) {
-        setError(t('presale_amount_error_max_only', { max: maxAllowedBuy.toFixed(6) }));
-    } else {
-        setError('');
-    }
-  };
-  
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '' || isNaN(parseFloat(value))) {
-        return;
-    }
-
-    const numValue = parseFloat(value);
-    let correctedValue = value;
-
     if (numValue > maxAllowedBuy) {
-        correctedValue = maxAllowedBuy.toFixed(6);
-        setSolAmount(correctedValue);
-    }
-    
-    const finalValue = parseFloat(correctedValue);
-     if (finalValue <= 0 || finalValue > maxAllowedBuy) {
-        setError(t('presale_amount_error_max_only', { max: maxAllowedBuy.toFixed(6) }));
+        setError(t('presale_max_amount_error', { max: maxAllowedBuy.toFixed(6) }));
+    } else if (numValue > 0 && numValue < PRESALE_DETAILS.minBuy) {
+        setError(t('presale_min_amount_error', { min: PRESALE_DETAILS.minBuy }));
     } else {
         setError('');
     }
   };
 
-  const calculation = useMemo(() => {
+  const { owfnAmount, bonusApplied } = useMemo(() => {
     const numAmount = parseFloat(solAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
-        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
+        return { owfnAmount: 0, bonusApplied: false };
     }
 
     try {
@@ -438,6 +320,7 @@ export default function Presale() {
         const owfnDecimals = BigInt(TOKEN_DETAILS.decimals);
         const owfnDecimalsMultiplier = 10n ** owfnDecimals;
 
+        // Convert SOL string to lamports BigInt to avoid floating point issues
         const parts = solAmount.split('.');
         const integerPart = BigInt(parts[0] || '0');
         const fractionalPart = (parts[1] || '').slice(0, 9).padEnd(9, '0');
@@ -446,64 +329,57 @@ export default function Presale() {
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
         const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * LAMPORTS_PER_SOL_BIGINT;
         
-        const baseOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
-        let bonusOwfnSmallestUnit = 0n;
-        let isBonus = false;
+        let totalOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
 
+        let isBonus = false;
         if (lamports >= bonusThresholdLamports) {
-            bonusOwfnSmallestUnit = (baseOwfnSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
+            const bonusAmount = (totalOwfnSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
+            totalOwfnSmallestUnit += bonusAmount;
             isBonus = true;
         }
 
-        const totalOwfnSmallestUnit = baseOwfnSmallestUnit + bonusOwfnSmallestUnit;
-
-        const toDisplayAmount = (amountInSmallestUnit: bigint) => Number(amountInSmallestUnit) / Number(owfnDecimalsMultiplier);
+        const finalOwfnAmount = Number(totalOwfnSmallestUnit) / Number(owfnDecimalsMultiplier);
         
-        return {
-            base: toDisplayAmount(baseOwfnSmallestUnit),
-            bonus: toDisplayAmount(bonusOwfnSmallestUnit),
-            total: toDisplayAmount(totalOwfnSmallestUnit),
-            bonusApplied: isBonus,
-        };
+        return { owfnAmount: finalOwfnAmount, bonusApplied: isBonus };
+
     } catch (e) {
         console.error("Error calculating OWFN amount:", e);
-        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
+        return { owfnAmount: 0, bonusApplied: false };
     }
   }, [solAmount]);
 
 
   const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
-  const numSolAmount = parseFloat(solAmount);
-  const isAmountInvalid = isNaN(numSolAmount) || numSolAmount <= 0 || numSolAmount > maxAllowedBuy;
-
+  const isAmountInvalid = error !== '' || isNaN(parseFloat(solAmount)) || parseFloat(solAmount) < PRESALE_DETAILS.minBuy || parseFloat(solAmount) > maxAllowedBuy;
 
   const handleBuy = async () => {
-        if (!solana.connected) {
-            setWalletModalOpen(true);
+        if (!solana.address) {
+            solana.connectWallet();
             return;
         }
         if (presaleStatus !== 'active') return;
-        
+
+        const numAmount = parseFloat(solAmount);
         if (isAmountInvalid) return;
 
-        const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numSolAmount, 'SOL');
+        const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numAmount, 'SOL');
 
         if (result.success && result.signature) {
             alert(t('presale_purchase_success_alert', { 
-                amount: numSolAmount.toFixed(2), 
-                owfnAmount: calculation.total.toLocaleString() 
+                amount: numAmount.toFixed(2), 
+                owfnAmount: owfnAmount.toLocaleString() 
             }));
             const newTx: PresaleTransaction = {
                 id: result.signature,
                 address: solana.address!,
-                solAmount: numSolAmount,
-                owfnAmount: numSolAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
+                solAmount: numAmount,
+                owfnAmount: numAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
                 time: new Date(),
             };
             setLatestPurchase(newTx);
             setSolAmount('');
-            setUserContribution(prev => prev + numSolAmount);
-            setSoldSOL(prev => prev + numSolAmount);
+            setUserContribution(prev => prev + numAmount);
+            setSoldSOL(prev => prev + numAmount);
             fetchPresaleProgress(); // Re-fetch progress immediately
         } else {
             alert(t(result.messageKey));
@@ -650,13 +526,18 @@ export default function Presale() {
 
                 {/* Right Column: Buy & Feed */}
                 <div className="lg:col-span-2 space-y-6 flex flex-col">
-                    {/* Buy Section */}
-                    <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6 space-y-4">
-                        <p className="text-sm text-primary-700 dark:text-darkPrimary-300 text-center">
-                            {t('presale_buy_info_max_only', { max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
+                     {/* Buy Section */}
+                    <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6">
+                        <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center mb-4">
+                            <p className="font-bold text-accent-700 dark:text-darkAccent-200 flex items-center justify-center gap-2">
+                                <Gift size={18} /> {t('presale_bonus_offer', { threshold: PRESALE_DETAILS.bonusThreshold, percentage: PRESALE_DETAILS.bonusPercentage })}
+                            </p>
+                        </div>
+                        <p className="text-sm text-primary-700 dark:text-darkPrimary-300 mb-2 text-center">
+                            {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
-                        {solana.connected && (
-                            <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
+                        {solana.address && (
+                            <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 mb-3 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
                                 {isCheckingContribution ? (
                                     <div className="flex items-center justify-center gap-2">
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -671,62 +552,34 @@ export default function Presale() {
                                 )}
                             </div>
                         )}
-                        
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-                                <SolIcon className="w-6 h-6" />
+                        <div className="flex gap-2">
+                            <div className="flex-grow relative">
+                                <input 
+                                    id="buy-amount"
+                                    type="number"
+                                    value={solAmount}
+                                    onChange={handleAmountChange}
+                                    className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg p-3 text-primary-900 dark:text-darkPrimary-100 focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
+                                    placeholder="0.00"
+                                    disabled={maxAllowedBuy < PRESALE_DETAILS.minBuy || isCheckingContribution || presaleStatus !== 'active'}
+                                />
                             </div>
-                            <input
-                                id="buy-amount"
-                                type="number"
-                                value={solAmount}
-                                onChange={handleAmountChange}
-                                onBlur={handleBlur}
-                                className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 text-right focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
-                                placeholder="0.00"
-                                disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
-                            />
+                            <button 
+                                onClick={handleBuy}
+                                className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                                disabled={solana.loading || isCheckingContribution || (solana.address && (isAmountInvalid || maxAllowedBuy < PRESALE_DETAILS.minBuy || presaleStatus !== 'active'))}
+                            >
+                                {solana.loading || isCheckingContribution ? t('processing') : (solana.address ? t('buy') : t('connect_wallet'))}
+                            </button>
                         </div>
-
-                        {error && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
-                        
-                        <div className="bg-primary-100 dark:bg-darkPrimary-800/50 p-4 rounded-lg space-y-3">
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-primary-600 dark:text-darkPrimary-400">{t('owfn_base_amount')}</span>
-                                <span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
-                            </div>
-                            
-                            {calculation.bonusApplied && (
-                                <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
-                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> Bonus ({PRESALE_DETAILS.bonusPercentage}%)</span>
-                                    <span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
-                                </div>
-                            )}
-
-                            <div className="border-t border-primary-200/80 dark:border-darkPrimary-700/80 my-2"></div>
-                            
-                            <div className="flex justify-between items-center text-lg">
-                                <span className="font-bold text-primary-800 dark:text-darkPrimary-200">{t('you_receive')}</span>
-                                <div className="flex items-center gap-2">
-                                    <OwfnIcon className="w-6 h-6"/>
-                                    <span className="font-mono font-bold text-2xl text-accent-600 dark:text-darkAccent-400">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button 
-                            onClick={handleBuy}
-                            className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                            disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
-                        >
-                            {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
-                        </button>
-
-                         <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center">
-                            <p className="font-bold text-accent-700 dark:text-darkAccent-200 flex items-center justify-center gap-2">
-                                <Gift size={18} /> {t('presale_bonus_offer', { threshold: PRESALE_DETAILS.bonusThreshold, percentage: PRESALE_DETAILS.bonusPercentage })}
-                            </p>
-                        </div>
+                        {error && <p className="text-red-500 dark:text-red-400 text-sm mt-2 text-center">{error}</p>}
+                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400 mt-2 text-center flex items-center justify-center">
+                            {t('presale_buying_owfn', { amount: isNaN(owfnAmount) ? '0.00' : owfnAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) })}
+                            {bonusApplied && <span className="ml-1.5 text-xs font-bold text-green-500 dark:text-green-400">(+10% Bonus!)</span>}
+                            <span className="ml-1.5 cursor-pointer" title={t('presale_estimate_tooltip')}>
+                                <Info size={14} />
+                            </span>
+                        </p>
                     </div>
                     {/* Live Feed */}
                     <div className="flex-grow">

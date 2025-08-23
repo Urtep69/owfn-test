@@ -13,7 +13,7 @@ const socialLinks = [
 ];
 
 export default function Maintenance() {
-    const { t, setWalletModalOpen } = useAppContext();
+    const { t, solana } = useAppContext();
 
     return (
         <div className="relative min-h-screen bg-primary-100 dark:bg-darkPrimary-900 flex flex-col justify-center items-center text-center p-4 animate-fade-in-up">
@@ -49,7 +49,7 @@ export default function Maintenance() {
             </div>
              <div className="absolute bottom-4">
                 <button
-                    onClick={() => setWalletModalOpen(true)}
+                    onClick={() => solana.connectWallet()}
                     className="text-sm text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400 transition-colors"
                 >
                     {t('admin_login')}

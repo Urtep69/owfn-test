@@ -1,6 +1,5 @@
 
 
-
 export interface Token {
   name: string;
   symbol: string;
@@ -65,25 +64,31 @@ export interface TokenExtension {
     state: TokenExtensionState;
 }
 
-export interface LiquidityPool {
-    dexId?: string;
-    pairAddress?: string;
-    liquidity?: number;
-    baseToken?: { symbol?: string; address?: string };
-    quoteToken?: { symbol?: string; address?: string };
-    url?: string;
-}
-
-export interface Socials {
-    website?: string;
-    twitter?: string;
-    telegram?: string;
-    discord?: string;
-}
-
 export interface TokenDetails extends Token {
-    description?: string;
+    description?: Record<string, string>;
+    marketCap?: number;
+    volume24h?: number;
+    price24hChange?: number;
+    holders?: number;
+    totalSupply: number;
+    circulatingSupply?: number;
     
+    priceSol?: number;
+    priceChange?: {
+        m5: number;
+        h1: number;
+        h6: number;
+        h24: number;
+    };
+    liquidity?: number;
+    pairAddress?: string;
+    fdv?: number;
+    poolCreatedAt?: number; // Timestamp
+    txns?: {
+        h24: { buys: number, sells: number };
+    };
+    dexId?: string;
+
     // On-chain technical details
     creatorAddress?: string;
     mintAuthority?: string | null;
@@ -91,37 +96,19 @@ export interface TokenDetails extends Token {
     updateAuthority?: string | null;
     tokenStandard?: 'SPL Token' | 'Token-2022';
     tokenExtensions?: TokenExtension[];
-    totalSupply: number;
-    socials?: Socials;
-
-    // Market Data from DexScreener/Birdeye
-    chainId?: string;
-    pairAddress?: string;
-    liquidity?: { usd: number; base: number; quote: number };
-    liquidityPools?: LiquidityPool[];
-    volume?: { h24: number; h6: number; h1: number };
-    priceChange?: { m5: number; h1: number; h6: number; h24: number };
-    fdv?: number; // Fully Diluted Valuation
-    holders?: number; // Holder count is hard to get reliably, will be optional
-    circulatingSupply?: number; // Will be optional
-    baseToken?: { symbol: string; address: string; };
-    quoteToken?: { symbol: string; address: string; };
-    poolCreatedAt?: number; // Timestamp
-    txns?: {
-        h24: { buys: number, sells: number, buysVolume: number, sellsVolume: number };
-    };
-    dexId?: string;
-    dexScreenerUrl?: string;
 }
 
-export interface Trade {
-    timestamp: number;
+export interface LiveTransaction {
+    id: string;
+    time: string;
     type: 'buy' | 'sell';
-    priceUsd: number;
-    amountQuote: number;
-    amountBase: number;
-    maker: string;
-    txHash: string;
+    price: number;
+    amount: number;
+    totalUsd?: number;
+    priceSol?: number;
+    amountSol?: number;
+    maker?: string;
+    othersCount?: number;
 }
 
 export interface VestingSchedule {

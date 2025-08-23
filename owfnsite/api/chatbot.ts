@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 
@@ -126,7 +125,7 @@ OWFN directly funds initiatives in three core areas:
 - **Presale Dates:** The presale starts on August 13, 2025 and ends on September 12, 2025.
 - **Presale Rate:** 1 SOL = 10,000,000 OWFN
 - **DEX Launch Price (Estimated):** 1 SOL ≈ 6,670,000 OWFN
-- **Contribution Limits:** There is no minimum purchase amount, but any contribution must be a positive value. The maximum purchase amount is 5 SOL per wallet (Max Buy: 5 SOL). This limit is in place to ensure fair distribution.
+- **Contribution Limits:** There is no minimum purchase amount (Min Buy: 0 SOL). The maximum purchase amount is 5 SOL per wallet (Max Buy: 5 SOL). This limit ensures fair distribution.
 - **Bonus:** A 10% bonus on OWFN tokens is given for any single presale purchase of 2 SOL or more.
 - **Token Distribution:** Tokens purchased during the presale will be automatically airdropped to the buyer's wallet at the end of the presale period. No further action is needed from the buyer.
 - **Post-Presale Trading:** After the presale, the $OWFN token will be listed on decentralized exchanges (DEXs) within the Solana ecosystem. The exact dates and platforms will be announced on official channels.
@@ -147,8 +146,7 @@ OWFN directly funds initiatives in three core areas:
   - Q4 2025 (Launch): DEX launch, first social impact projects initiated.
   - Q1 2026 (Expansion): Global aid expansion, NGO partnerships, voting platform development.
   - Q2 2026 & Beyond (Sustained Impact): Full DAO implementation, long-term impact fund.
-- **Future Features:** Features like Staking (for additional rewards), Token Vesting schedules, and a full Governance (DAO) platform are planned for the future.
-- **Airdrops:** Airdrops are planned to reward early supporters and active community members. Eligibility will be based on factors like participation in the presale and engagement in community events.
+- **Future Features:** Features like Staking (for additional rewards), Token Vesting schedules, Airdrops for community members, and a full Governance (DAO) platform are planned for the future.
 - **Proposing Social Cases:** Initially, projects are selected by the team. In the future, a Governance (DAO) system will allow community members to propose and vote on which social cases to fund.
 
 **8. Community & Involvement**
@@ -172,7 +170,7 @@ OWFN directly funds initiatives in three core areas:
   - Use ONLY these platform names and URLs:
     - For X/Twitter: [Social Link: X|https://x.com/OWFN_Official]
     - For Telegram Group: [Social Link: Telegram Group|https://t.me/OWFNOfficial]
-    - For Telegram Channel: [Social Link: Telegram Channel|https://t.me/OWFN_Official]
+    - For Telegram Channel: [Social Link: Telegram Channel|https://t.me/OWFNOfficial]
     - For Discord: [Social Link: Discord|https://discord.gg/DzHm5HCqDW]`;
         
         const resultStream = await ai.models.generateContentStream({

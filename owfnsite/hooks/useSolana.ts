@@ -1,7 +1,10 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
-import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, ComputeBudgetProgram, VersionedTransaction, TransactionMessage } from '@solana/web3.js';
+import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { WalletSendTransactionError } from '@solana/wallet-adapter-base';
 import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
@@ -22,6 +25,7 @@ export interface UseSolanaReturn {
   stakedBalance: number;
   earnedRewards: number;
   connection: Connection;
+  connectWallet: () => void;
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
   sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
@@ -44,11 +48,45 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
+  const { publicKey, connected, connecting, wallet, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
+  const { setVisible } = useWalletModal();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
+  const wasConnectedRef = useRef(false);
+
+  if (connected) {
+    wasConnectedRef.current = true;
+  }
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
+
+  const disconnectAndClear = useCallback(async () => {
+      await disconnect();
+      wasConnectedRef.current = false;
+      try {
+          // This helps prevent auto-reconnection issues after a manual disconnect.
+          localStorage.removeItem('wallet-adapter-wallet-name');
+      } catch (e) {
+          console.warn("Could not clear wallet name from storage", e);
+      }
+  }, [disconnect]);
+
+  const derivedLoading = useMemo(() => {
+    // The wallet is in a loading/unstable state if:
+    // 1. We are doing an internal async operation (e.g., fetching balances).
+    // 2. The wallet adapter itself reports it's in the process of connecting.
+    // 3. We *know* a wallet was previously connected, but we currently don't have a public key.
+    //    This is the key fix for the mobile race condition where the wallet state flickers upon
+    //    returning to the browser, preventing the UI from incorrectly showing a "Connect" state.
+    return loading || connecting || (wasConnectedRef.current && !publicKey);
+  }, [loading, connecting, publicKey, wasConnectedRef]);
+
+
+  const connectWallet = useCallback(() => {
+    if (!connected) {
+      setVisible(true);
+    }
+  }, [connected, setVisible]);
 
   const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
     const cached = balanceCache.get(walletAddress);
@@ -174,8 +212,8 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, address, getWalletBalances]);
 
- const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
-    if (!connected || !publicKey || !signTransaction) {
+  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
+    if (!connected || !publicKey) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
     setLoading(true);
@@ -183,6 +221,13 @@ export const useSolana = (): UseSolanaReturn => {
     try {
         const toPublicKey = new PublicKey(to);
         const instructions: TransactionInstruction[] = [];
+        
+        // Set a compute budget limit for the transaction. This is good practice.
+        instructions.push(
+            ComputeBudgetProgram.setComputeUnitLimit({
+                units: 200_000,
+            })
+        );
         
         if (tokenSymbol === 'SOL') {
             instructions.push(
@@ -201,75 +246,71 @@ export const useSolana = (): UseSolanaReturn => {
             if (!tokenInfo) throw new Error(`Token ${tokenSymbol} not found in user's wallet.`);
             
             const decimals = tokenInfo.decimals;
-            const transferAmount = BigInt(Math.round(amount * Math.pow(10, decimals)));
 
             const fromTokenAccount = await getAssociatedTokenAddress(mintPublicKey, publicKey);
             const toTokenAccount = await getAssociatedTokenAddress(mintPublicKey, toPublicKey);
-            
-            try {
-                await getAccount(connection, toTokenAccount, 'confirmed');
-            } catch (error) {
-                if (error instanceof Error && (error.name === 'TokenAccountNotFoundError' || error.message.includes('not found'))) {
-                    instructions.push(
-                        createAssociatedTokenAccountInstruction(
-                            publicKey,
-                            toTokenAccount,
-                            toPublicKey,
-                            mintPublicKey
-                        )
-                    );
-                } else {
-                    throw error;
-                }
-            }
             
             instructions.push(
                 createTransferInstruction(
                     fromTokenAccount,
                     toTokenAccount,
                     publicKey,
-                    transferAmount
+                    amount * Math.pow(10, decimals) 
                 )
             );
         }
-
-        const latestBlockHash = await connection.getLatestBlockhash('finalized');
         
+        // --- VERSIONED TRANSACTION IMPLEMENTATION ---
+        const latestBlockhash = await connection.getLatestBlockhash('confirmed');
         const messageV0 = new TransactionMessage({
             payerKey: publicKey,
-            recentBlockhash: latestBlockHash.blockhash,
+            recentBlockhash: latestBlockhash.blockhash,
             instructions,
         }).compileToV0Message();
-
-        const transaction = new VersionedTransaction(messageV0);
-
-        const signedTransaction = await signTransaction(transaction);
-
-        const signature = await connection.sendTransaction(signedTransaction, {
-            skipPreflight: false,
-            preflightCommitment: 'finalized',
-        });
         
+        const transaction = new VersionedTransaction(messageV0);
+        // --- END VERSIONED TRANSACTION IMPLEMENTATION ---
+
+        const signature = await walletSendTransaction(transaction, connection);
+        
+        // Use a more robust confirmation strategy
         await connection.confirmTransaction({
-            blockhash: latestBlockHash.blockhash,
-            lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-            signature: signature
-        }, 'finalized');
+            signature,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+        }, 'confirmed');
 
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
-        if (address) {
-            balanceCache.delete(address);
-            getWalletBalances(address).then(setUserTokens);
-        }
+        balanceCache.delete(address!); // Invalidate cache after a transaction
+        getWalletBalances(address!).then(setUserTokens);
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
     } catch (error) {
         console.error("Transaction failed:", error);
         setLoading(false);
-        return { success: false, messageKey: 'transaction_failed_alert' };
+        
+        let messageKey = 'transaction_failed_alert';
+        let errorMessage = '';
+
+        if (error instanceof WalletSendTransactionError || (error instanceof Error && error.name.includes('Wallet'))) {
+            errorMessage = error.message;
+        } else if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        if (errorMessage) {
+            const lowerCaseError = errorMessage.toLowerCase();
+            if (lowerCaseError.includes('user rejected') || lowerCaseError.includes('request rejected')) {
+                messageKey = 'transaction_failed_user_rejected';
+            } else if (lowerCaseError.includes('insufficient funds') || lowerCaseError.includes('insufficient lamports')) {
+                messageKey = 'transaction_failed_insufficient_funds';
+            }
+        }
+    
+        return { success: false, messageKey: messageKey };
     }
-  }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
+  }, [connected, publicKey, connection, walletSendTransaction, userTokens, address, getWalletBalances]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
@@ -281,7 +322,7 @@ export const useSolana = (): UseSolanaReturn => {
     connected,
     address,
     userTokens,
-    loading,
+    loading: derivedLoading,
     connection,
     userStats: { 
         totalDonated: 0,
@@ -292,7 +333,8 @@ export const useSolana = (): UseSolanaReturn => {
     },
     stakedBalance: 0,
     earnedRewards: 0,
-    disconnectWallet: disconnect,
+    connectWallet,
+    disconnectWallet: disconnectAndClear,
     getWalletBalances,
     sendTransaction,
     stakeTokens: notImplemented,

@@ -24,8 +24,8 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
 );
 
 export default function Profile() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, loading, userStats } = solana;
+    const { t, solana } = useAppContext();
+    const { connected, address, userTokens, loading, connectWallet, userStats } = solana;
 
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
@@ -43,7 +43,7 @@ export default function Profile() {
                 <h1 className="text-2xl font-bold mb-2">{t('my_profile')}</h1>
                 <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_connect_prompt')}</p>
                 <button
-                    onClick={() => setWalletModalOpen(true)}
+                    onClick={() => connectWallet()}
                     disabled={loading}
                     className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
                 >
@@ -93,31 +93,29 @@ export default function Profile() {
                         </div>
                         {/* Token List */}
                         {userTokens.map(token => (
-                           <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
-                                <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors duration-200 cursor-pointer">
-                                    {/* Column 1: Asset Info */}
-                                    <div className="flex items-center space-x-4">
-                                        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                                            {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
-                                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
-                                        </div>
+                            <div key={token.mintAddress} className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg transition-colors duration-200 opacity-75 cursor-not-allowed">
+                                {/* Column 1: Asset Info */}
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                                        {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
                                     </div>
+                                    <div>
+                                        <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
+                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
+                                    </div>
+                                </div>
 
-                                    {/* Column 2: Balance */}
-                                    <div className="text-right font-mono">
-                                        <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
-                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
-                                    </div>
+                                {/* Column 2: Balance */}
+                                <div className="text-right font-mono">
+                                    <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
+                                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
+                                </div>
 
-                                    {/* Column 3: Value */}
-                                    <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
-                                        ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                                    </div>
-                                </a>
-                            </Link>
+                                {/* Column 3: Value */}
+                                <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
+                                    ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                </div>
+                            </div>
                         ))}
                     </div>
                 ) : (

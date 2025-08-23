@@ -1,3 +1,5 @@
+
+
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, TrendingUp, Gift, Database, HeartHandshake } from 'lucide-react';
@@ -19,14 +21,14 @@ const StatCard = ({ icon, title, value, subtext }: { icon: React.ReactNode, titl
 );
 
 const ConnectWalletPrompt = () => {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana } = useAppContext();
     return (
         <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d">
             <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
             <h2 className="text-2xl font-bold mb-2">{t('staking_connect_title')}</h2>
             <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('staking_connect_prompt')}</p>
             <button
-                onClick={() => setWalletModalOpen(true)}
+                onClick={() => solana.connectWallet()}
                 disabled={solana.loading}
                 className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
             >

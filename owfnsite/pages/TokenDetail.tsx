@@ -1,328 +1,176 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, Link } from 'wouter';
-import { Loader2, ArrowLeft, Star, Share2, Globe, Twitter, Send, ExternalLink, HelpCircle, Check, X, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useLocation } from 'wouter';
+import { Loader2, ArrowLeft, Database, Shield, Code, Percent, Zap, Hand, UserCog, Ban, Star } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import type { TokenDetails, Trade } from '../types.ts';
+import type { TokenDetails, TokenExtension } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import { GenericTokenIcon, DiscordIcon, SolIcon } from '../components/IconComponents.tsx';
+import { GenericTokenIcon } from '../components/IconComponents.tsx';
 
-// --- Custom Hook for Intervals ---
-const useInterval = (callback: () => void, delay: number | null) => {
-    const savedCallback = useRef(callback);
-    useEffect(() => { savedCallback.current = callback; }, [callback]);
-    useEffect(() => {
-        if (delay !== null) {
-            const id = setInterval(() => savedCallback.current(), delay);
-            return () => clearInterval(id);
-        }
-    }, [delay]);
-};
-
-
-// --- Helper & UI Components (defined inside for single-file update) ---
-
-const formatPrice = (price?: number) => {
-    if (typeof price !== 'number' || isNaN(price)) return '$--';
-    if (price < 0.000001 && price > 0) return `$0.0...${price.toExponential(2).split('e-')[1]}`;
-    if (price < 1) return `$${price.toPrecision(4)}`;
-    return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`;
-};
-
-const formatLargeNumber = (num?: number, prefix = '', suffix = ''): string => {
-    if (typeof num !== 'number' || isNaN(num)) return 'N/A';
-    const absNum = Math.abs(num);
-    let formattedNum;
-    if (absNum < 1000) formattedNum = num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    else if (absNum < 1_000_000) formattedNum = `${(num / 1000).toFixed(2)}K`;
-    else if (absNum < 1_000_000_000) formattedNum = `${(num / 1_000_000).toFixed(2)}M`;
-    else formattedNum = `${(num / 1_000_000_000).toFixed(2)}B`;
-    return `${prefix}${formattedNum}${suffix}`;
-};
-
-const formatDate = (timestamp?: number): string => {
-    if (!timestamp) return 'N/A';
-    return new Date(timestamp).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' });
-};
-
-const InfoCard = ({ title, children, className = '' }: { title: string, children: React.ReactNode, className?: string }) => (
-    <div className={`bg-primary-100 dark:bg-darkPrimary-800 p-4 rounded-lg shadow-md ${className}`}>
-        <h3 className="text-sm font-bold mb-3 text-primary-700 dark:text-darkPrimary-300 uppercase tracking-wider">{title}</h3>
-        <div className="space-y-3">{children}</div>
+// Helper component for displaying data
+const InfoRow = ({ label, children }: { label: string, children: React.ReactNode }) => (
+    <div className="flex justify-between items-center py-3 border-b border-primary-200 dark:border-darkPrimary-700 last:border-b-0">
+        <span className="text-primary-600 dark:text-darkPrimary-400">{label}</span>
+        <div className="font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
     </div>
 );
 
-const InfoRow = ({ label, children, tooltip }: { label:string, children:React.ReactNode, tooltip?: string }) => (
-    <div className="flex justify-between items-center text-sm">
-        <span className="text-primary-600 dark:text-darkPrimary-400 flex items-center gap-1.5">
-            {label}
-            {tooltip && <span title={tooltip}><HelpCircle size={14} className="cursor-help" /></span>}
-        </span>
-        <div className="font-semibold text-primary-900 dark:text-darkPrimary-100 text-right break-all">{children}</div>
-    </div>
-);
-
-const AuthorityStatus = ({ label, address }: { label: string, address?: string | null }) => (
+// Helper component for authority rows
+const AuthorityRow = ({ label, address }: { label: string, address?: string | null }) => (
     <InfoRow label={label}>
         {address ? (
-            <span className="text-red-500 font-bold flex items-center gap-1.5"><X size={14}/> Active</span>
+            <AddressDisplay address={address} />
         ) : (
-            <span className="text-green-500 font-bold flex items-center gap-1.5"><Check size={14}/> Revoked</span>
+            <span className="text-green-500 dark:text-green-400 font-bold flex items-center justify-end gap-1.5">
+                <Shield size={14} /> Revoked
+            </span>
         )}
     </InfoRow>
 );
 
-const DualProgressBar = ({ value1, value2 }: { value1: number, value2: number }) => {
-  const total = value1 + value2;
-  const percentage1 = total > 0 ? (value1 / total) * 100 : 50;
-
-  return (
-    <div className="flex w-full h-2.5 rounded-full overflow-hidden bg-primary-200 dark:bg-darkPrimary-700">
-      <div className="bg-green-500" style={{ width: `${percentage1}%` }}></div>
-      <div className="bg-red-500" style={{ width: `${100 - percentage1}%` }}></div>
-    </div>
-  );
+// Helper for Token-2022 Extensions
+const ExtensionDisplay = ({ extension }: { extension: TokenExtension }) => {
+    const { extension: name, state } = extension;
+    let content = null;
+    switch (name) {
+        case 'transferFeeConfig':
+            const fee = (state.newerTransferFee?.transferFeeBasisPoints ?? state.olderTransferFee?.transferFeeBasisPoints ?? 0) / 100;
+            const maxFee = Number(state.newerTransferFee?.maximumFee ?? state.olderTransferFee?.maximumFee ?? 0) / (10 ** state.mintDecimals);
+            content = <><Percent size={14} /> Transfer Fee: {fee.toFixed(2)}% (Max: {maxFee.toLocaleString()})</>;
+            break;
+        case 'interestBearingConfig':
+            const rate = state.rate / 100; // Assuming basis points
+            content = <><Zap size={14} /> Interest Bearing: {rate.toFixed(2)}% APR</>;
+            break;
+        case 'defaultAccountState':
+            content = <><Hand size={14} /> Default State: {state.state}</>;
+            break;
+        case 'permanentDelegate':
+             content = <><UserCog size={14} /> Permanent Delegate</>;
+             break;
+        case 'nonTransferable':
+            content = <><Ban size={14} /> Non-Transferable</>;
+            break;
+        default:
+            content = <><Star size={14} /> {name}</>;
+    }
+    return <div className="text-xs bg-primary-100 dark:bg-darkPrimary-700 p-2 rounded-md flex items-center gap-2">{content}</div>;
 };
 
-
-// --- Main Component ---
 export default function TokenDetail() {
-    const { t, theme, solana } = useAppContext();
+    const { t } = useAppContext();
     const params = useParams();
+    const [location] = useLocation();
     const mintAddress = params?.['mint'];
     
+    // Logic to handle back link
+    const query = new URLSearchParams(location.split('?')[1] || '');
+    const fromPath = query.get('from') || '/dashboard';
+    const backLinkText = fromPath === '/profile' ? t('back_to_profile') : t('back_to_dashboard');
+
+
     const [token, setToken] = useState<Partial<TokenDetails> | null>(null);
-    const [trades, setTrades] = useState<Trade[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchAllData = useCallback(async () => {
-        if (!mintAddress) return;
-        try {
-            const response = await fetch(`/api/token-info?mint=${mintAddress}`);
-            if (!response.ok) {
-                let errorMessage = "Failed to fetch token data from the server.";
-                try {
-                    const errorJson = await response.json();
-                    errorMessage = errorJson.error || `Server responded with status: ${response.status}`;
-                } catch (e) {
-                    const errorText = await response.text().catch(() => "Could not read error response body.");
-                    console.error("Non-JSON error response from API:", errorText);
-                    errorMessage = `An unexpected server error occurred (status ${response.status}). Check server logs for details.`;
+    useEffect(() => {
+        if (!mintAddress) {
+            setLoading(false);
+            setError('No mint address provided.');
+            return;
+        }
+
+        const fetchTokenData = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await fetch(`/api/token-info?mint=${mintAddress}`);
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => ({ error: `Server error: ${response.status}` }));
+                    throw new Error(errorBody.error || "Failed to fetch token data.");
                 }
-                throw new Error(errorMessage);
+                const data: Partial<TokenDetails> = await response.json();
+                setToken(data);
+            } catch (err) {
+                console.error("Failed to fetch token details:", err);
+                setError(err instanceof Error ? err.message : "An unknown error occurred.");
+            } finally {
+                setLoading(false);
             }
-            // If response is ok, it should be valid JSON
-            setToken(await response.json());
-        } catch (err) {
-            console.error("Failed to fetch token details:", err);
-            setError(err instanceof Error ? err.message : "An unknown error occurred.");
-            setToken(null);
-        }
+        };
+
+        fetchTokenData();
     }, [mintAddress]);
-    
-    const fetchTrades = useCallback(async () => {
-        if (token?.pairAddress) {
-             try {
-                const response = await fetch(`/api/token-info?type=trades&pair=${token.pairAddress}`);
-                if (response.ok) setTrades(await response.json());
-            } catch (err) { console.error("Failed to fetch trades:", err); }
-        }
-    }, [token?.pairAddress]);
-
-    useEffect(() => {
-        setLoading(true);
-        setError(null);
-        setToken(null);
-        setTrades([]);
-        fetchAllData().finally(() => setLoading(false));
-    }, [fetchAllData]);
-
-    useEffect(() => {
-        if (token?.pairAddress) {
-            fetchTrades(); // Initial fetch
-        }
-    }, [token?.pairAddress, fetchTrades]);
-
-    useInterval(fetchAllData, 60000); // Refresh main data every 60s
-    useInterval(fetchTrades, 10000); // Refresh trades every 10s
 
     if (loading) {
-        return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>;
+        return (
+            <div className="flex justify-center items-center h-96">
+                <Loader2 className="w-12 h-12 animate-spin text-accent-500 dark:text-darkAccent-500" />
+            </div>
+        );
     }
 
     if (error || !token) {
         return (
-            <div className="text-center py-10 animate-fade-in-up">
+            <div className="text-center py-10">
                 <h2 className="text-2xl font-bold">{t('token_not_found')}</h2>
                 {error && <p className="text-red-400 mt-2">{error}</p>}
-                <Link to="/dashboard" className="text-accent-500 hover:underline mt-4 inline-flex items-center gap-2">
-                    <ArrowLeft size={16} /> {t('back_to_dashboard')}
+                <Link to={fromPath} className="text-accent-500 hover:underline mt-4 inline-flex items-center gap-2">
+                    <ArrowLeft size={16} /> {backLinkText}
                 </Link>
             </div>
         );
     }
     
-    const priceChange = token.priceChange?.h24 ?? 0;
-    const price = token.pricePerToken ?? 0;
-    const quotePrice = token.quoteToken?.symbol === 'SOL' ? price / (solana.userTokens.find(t=>t.symbol==='SOL')?.pricePerToken || 1) : 0;
-
     return (
-        <div className="space-y-6 animate-fade-in-up">
+        <div className="space-y-8 text-primary-900 dark:text-darkPrimary-100 animate-fade-in-up">
+             <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
+                <ArrowLeft size={16} /> {backLinkText}
+            </Link>
+
             {/* Header */}
-            <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <GenericTokenIcon uri={token.logo as string} className="w-12 h-12 flex-shrink-0" />
-                    <div>
-                        <div className="flex items-center gap-2">
-                             <h1 className="text-2xl font-bold">{token.name} / {token.quoteToken?.symbol}</h1>
-                             <div className="flex items-center gap-2">
-                                {token.socials?.website && <a href={token.socials.website} target="_blank" rel="noopener noreferrer"><Globe size={16} /></a>}
-                                {token.socials?.twitter && <a href={token.socials.twitter} target="_blank" rel="noopener noreferrer"><Twitter size={16} /></a>}
-                                {token.socials?.telegram && <a href={token.socials.telegram} target="_blank" rel="noopener noreferrer"><Send size={16} /></a>}
-                                {token.socials?.discord && <a href={token.socials.discord} target="_blank" rel="noopener noreferrer"><DiscordIcon className="w-4 h-4" /></a>}
-                             </div>
-                        </div>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-md">${token.symbol}</span>
-                            <AddressDisplay address={token.mintAddress!} type="token" />
-                        </div>
-                    </div>
-                </div>
-                 <div className="flex items-center gap-2 self-start md:self-center">
-                    <button className="p-2 rounded-md hover:bg-primary-200 dark:hover:bg-darkPrimary-700"><Star size={20}/></button>
-                    <button className="p-2 rounded-md hover:bg-primary-200 dark:hover:bg-darkPrimary-700"><Share2 size={20}/></button>
-                </div>
-            </header>
-
-            {/* Price Info */}
-            <div className="bg-primary-50 dark:bg-darkPrimary-800 p-4 rounded-lg shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+                <GenericTokenIcon uri={token.logo as string} className="w-16 h-16 flex-shrink-0" />
                 <div>
-                    <p className="text-3xl font-bold">{formatPrice(price)}</p>
-                    {quotePrice > 0 && <p className="text-md text-primary-600 dark:text-darkPrimary-400 font-mono flex items-center gap-1.5"><SolIcon className="w-4 h-4"/> {quotePrice.toPrecision(5)}</p>}
-                </div>
-                <div className={`px-3 py-1.5 rounded-md text-lg font-bold ${priceChange >= 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                    {priceChange >= 0 ? '▲' : '▼'} {Math.abs(priceChange).toFixed(2)}% (24h)
+                    <h1 className="text-3xl font-bold">{token.name}</h1>
+                    <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">{token.symbol}</p>
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div className="grid lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
-                {/* Left Column */}
-                <div className="lg:col-span-1 space-y-4">
-                    <InfoCard title={t('market_stats')}>
-                        <InfoRow label={t('market_cap')} tooltip="Market Capitalization">${formatLargeNumber(token.fdv)}</InfoRow>
-                        <InfoRow label={t('liquidity')}>${formatLargeNumber(token.liquidity?.usd)}</InfoRow>
-                        <InfoRow label={t('volume_24h')}>${formatLargeNumber(token.volume?.h24)}</InfoRow>
-                        <InfoRow label={t('holders')}>{formatLargeNumber(token.holders)}</InfoRow>
-                        <InfoRow label={t('circulating_supply')}>{formatLargeNumber(token.circulatingSupply)}</InfoRow>
-                    </InfoCard>
-                     <InfoCard title="Pool Info">
-                        <InfoRow label={`Pooled ${token.quoteToken?.symbol}`}>{formatLargeNumber(token.liquidity?.quote)}</InfoRow>
-                        <InfoRow label={`Pooled ${token.symbol}`}>{formatLargeNumber(token.liquidity?.base)}</InfoRow>
-                        <InfoRow label="Pool Created">{formatDate(token.poolCreatedAt)}</InfoRow>
-                        <InfoRow label="DEX">{token.dexId}</InfoRow>
-                    </InfoCard>
-                    <InfoCard title="24h Trading Stats">
-                        <DualProgressBar value1={token.txns?.h24.buys || 0} value2={token.txns?.h24.sells || 0}/>
-                        <InfoRow label="Buys / Sells">{token.txns?.h24.buys} / {token.txns?.h24.sells}</InfoRow>
-                        <InfoRow label="Buy / Sell Volume">{formatLargeNumber(token.txns?.h24.buysVolume, '$')} / {formatLargeNumber(token.txns?.h24.sellsVolume, '$')}</InfoRow>
-                    </InfoCard>
-                    <InfoCard title="On-chain Security">
-                         <AuthorityStatus label="Mint Authority" address={token.mintAuthority} />
-                         <AuthorityStatus label="Freeze Authority" address={token.freezeAuthority} />
-                         <AuthorityStatus label="Update Authority" address={token.updateAuthority} />
-                    </InfoCard>
+            {/* Details Grid */}
+            <div className="grid md:grid-cols-2 gap-8">
+                {/* Column 1 */}
+                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Database/>{t('tokenomics_details_title')}</h3>
+                    <div className="space-y-1">
+                        <InfoRow label={t('presale_token_address_label')}><AddressDisplay address={token.mintAddress!} type="token"/></InfoRow>
+                        <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, {maximumFractionDigits: token.decimals}) ?? 'N/A'}</InfoRow>
+                        <InfoRow label={t('token_decimals')}>{token.decimals}</InfoRow>
+                         <InfoRow label="Creator"><AddressDisplay address={token.creatorAddress ?? 'Unknown'} /></InfoRow>
+                    </div>
                 </div>
 
-                {/* Right Column */}
-                <div className="lg:col-span-2 xl:col-span-3 space-y-4">
-                    <div className="w-full h-[500px] bg-primary-50 dark:bg-darkPrimary-950 rounded-lg">
-                       {token.chainId && token.pairAddress && (
-                           <iframe 
-                                src={`https://dexscreener.com/${token.chainId}/${token.pairAddress}?embed=1&theme=${theme}&info=0`}
-                                className="w-full h-full rounded-lg border-0"
-                                allowFullScreen
-                           />
-                       )}
+                {/* Column 2 */}
+                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Shield/>Authorities</h3>
+                    <div className="space-y-1">
+                        <AuthorityRow label="Update Authority" address={token.updateAuthority} />
+                        <AuthorityRow label="Mint Authority" address={token.mintAuthority} />
+                        <AuthorityRow label="Freeze Authority" address={token.freezeAuthority} />
                     </div>
-                     <div className="bg-primary-50 dark:bg-darkPrimary-800 p-4 rounded-lg shadow-md">
-                        <h3 className="text-sm font-bold mb-3 text-primary-700 dark:text-darkPrimary-300 uppercase tracking-wider">Trade History</h3>
-                        <div className="overflow-x-auto max-h-96">
-                            <table className="w-full text-xs text-left">
-                                <thead className="text-primary-500 dark:text-darkPrimary-400 uppercase bg-primary-100 dark:bg-darkPrimary-900/50 sticky top-0">
-                                    <tr>
-                                        <th className="p-2">Time</th>
-                                        <th className="p-2">Type</th>
-                                        <th className="p-2 text-right">Price USD</th>
-                                        <th className="p-2 text-right">Amount ({token.symbol})</th>
-                                        <th className="p-2 text-right">Total</th>
-                                        <th className="p-2">Maker</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {trades.map((trade, idx) => (
-                                        <tr key={`${trade.txHash}-${idx}`} className="border-b border-primary-200 dark:border-darkPrimary-700 hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50">
-                                            <td className="p-2">{new Date(trade.timestamp).toLocaleTimeString()}</td>
-                                            <td className={`p-2 font-bold ${trade.type === 'buy' ? 'text-green-500' : 'text-red-500'}`}>{trade.type}</td>
-                                            <td className="p-2 text-right font-mono">{formatPrice(trade.priceUsd)}</td>
-                                            <td className="p-2 text-right font-mono">{formatLargeNumber(trade.amountBase)}</td>
-                                            <td className="p-2 text-right font-mono">{formatLargeNumber(trade.amountQuote, '$')}</td>
-                                            <td className="p-2"><AddressDisplay address={trade.maker} /></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            {/* Bottom Section */}
-            <div className="bg-primary-50 dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md space-y-6">
-                <h2 className="text-2xl font-bold">{token.name} Live Price and Information</h2>
-                {token.description && <p className="text-primary-600 dark:text-darkPrimary-400">{token.description}</p>}
-                
-                <div className="space-y-4">
-                    <details className="border-b border-primary-200 dark:border-darkPrimary-700 pb-2">
-                        <summary className="font-semibold cursor-pointer flex justify-between items-center">How much is 1 ${token.symbol}? <ChevronDown className="w-5 h-5"/></summary>
-                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">The price of 1 ${token.symbol} is {formatPrice(price)} USD.</p>
-                    </details>
-                     <details className="border-b border-primary-200 dark:border-darkPrimary-700 pb-2">
-                        <summary className="font-semibold cursor-pointer flex justify-between items-center">What is the ${token.symbol} contract on Solana? <ChevronDown className="w-5 h-5"/></summary>
-                        <div className="mt-2 text-primary-600 dark:text-darkPrimary-400"><AddressDisplay address={mintAddress!} type="token"/></div>
-                    </details>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-8 items-start">
-                    <div>
-                        <h3 className="text-xl font-bold mb-4">How much ${token.symbol} can I buy?</h3>
-                         <div className="overflow-x-auto rounded-lg border border-primary-200 dark:border-darkPrimary-700">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-primary-100 dark:bg-darkPrimary-900/50">
-                                    <tr>
-                                        <th className="p-3">USD</th>
-                                        <th className="p-3 text-right">{token.symbol}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {[1, 5, 10, 25, 50, 100, 500, 1000].map(usd => (
-                                        <tr key={usd} className="border-t border-primary-200 dark:border-darkPrimary-700">
-                                            <td className="p-3 font-semibold">${usd.toLocaleString()}</td>
-                                            <td className="p-3 text-right font-mono">{price > 0 ? (usd/price).toLocaleString(undefined, {maximumFractionDigits: 2}) : 'N/A'}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-bold mb-4">How to buy ${token.symbol}?</h3>
-                        <div className="bg-primary-100 dark:bg-darkPrimary-900/50 p-4 rounded-lg space-y-2 text-primary-700 dark:text-darkPrimary-300">
-                           <p>1. Connect your wallet to a DEX like Raydium or Jupiter.</p>
-                           <p>2. Ensure you have SOL in your wallet for the purchase and transaction fees.</p>
-                           <p>3. Swap your SOL for ${token.symbol} using the mint address.</p>
-                        </div>
-                    </div>
+                {/* Full Width */}
+                <div className="md:col-span-2 bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Code/>{t('token_standard')}</h3>
+                    <div className="bg-primary-100 dark:bg-darkPrimary-700 p-3 rounded-md font-mono text-center font-bold text-lg">{token.tokenStandard}</div>
+                    {token.tokenStandard === 'Token-2022' && token.tokenExtensions && token.tokenExtensions.length > 0 && (
+                         <div className="mt-6 pt-4 border-t border-primary-200 dark:border-darkPrimary-700 space-y-2">
+                            <h4 className="font-bold">Active Extensions:</h4>
+                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                {token.tokenExtensions.map((ext, i) => <ExtensionDisplay key={i} extension={ext} />)}
+                            </div>
+                         </div>
+                    )}
                 </div>
             </div>
         </div>

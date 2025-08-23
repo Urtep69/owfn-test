@@ -77,6 +77,7 @@ export default function AdminPresale() {
         setLoading(true);
         let allTxs: PresaleTx[] = [];
         let lastSignature: string | undefined = undefined;
+        const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
 
         try {
             while (true) {
@@ -87,8 +88,10 @@ export default function AdminPresale() {
 
                 const parsedTxs: PresaleTx[] = data
                     .filter((tx: any) => 
+                        tx.timestamp >= presaleStartTimestamp &&
                         tx.type === 'NATIVE_TRANSFER' && 
                         tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
+                        tx.nativeTransfers[0]?.fromUserAccount !== DISTRIBUTION_WALLETS.presale &&
                         tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111' // System Program
                     )
                     .map((tx: any): PresaleTx => ({
@@ -101,12 +104,12 @@ export default function AdminPresale() {
                     }));
                 
                 allTxs.push(...parsedTxs);
-
-                if (data.length < 100) {
-                    break; 
-                } else {
-                    lastSignature = data[data.length - 1].signature;
+                
+                if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
+                    break;
                 }
+                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
+                if (!lastSignature) break;
             }
             setTransactions(allTxs);
         } catch (error) {
