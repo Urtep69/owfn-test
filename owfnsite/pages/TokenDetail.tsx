@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useLocation } from 'wouter';
+import { useParams, Link } from 'wouter';
 import { Loader2, ArrowLeft, Database, Shield, Code, TrendingUp, DollarSign, BarChart2, Repeat, Droplets, Clock, ArrowRightLeft, FileText, Link as LinkIcon, Globe, Twitter, Send, ExternalLink } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { TokenDetails } from '../types.ts';
@@ -79,10 +79,9 @@ const LinkButton = ({ href, icon, text }: { href: string, icon: React.ReactNode,
 export default function TokenDetail() {
     const { t } = useAppContext();
     const params = useParams();
-    const [location] = useLocation();
     const mintAddress = params?.['mint'];
     
-    const query = new URLSearchParams(location.split('?')[1] || '');
+    const query = new URLSearchParams(window.location.search);
     const fromPath = query.get('from') || '/dashboard';
     const backLinkText = fromPath === '/profile' ? t('back_to_profile') : t('back_to_dashboard');
 
