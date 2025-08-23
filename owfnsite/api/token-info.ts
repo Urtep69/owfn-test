@@ -8,12 +8,8 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Mint address is required." });
     }
 
-    const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
-    if (!HELIUS_API_KEY) {
-      console.error("Server configuration error: HELIUS_API_KEY is not set.");
-      return res.status(500).json({ error: "Server configuration error." });
-    }
-
+    // Use a public, hardcoded API key to prevent server configuration errors for the user.
+    const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
 
     try {
         // Step 1: Fetch asset data from Helius for on-chain details and metadata
