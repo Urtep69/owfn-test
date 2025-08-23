@@ -430,7 +430,6 @@ export const es = {
     airdrop_eligible_message: `¡Tu billetera es elegible! Recibirás {amount} tokens OWFN en la próxima distribución.`,
     airdrop_not_eligible: `No Elegible`,
     airdrop_not_eligible_message: `Lo sentimos, esta dirección de billetera no es elegible para el airdrop actual. ¡Mantente activo en nuestra comunidad para futuras oportunidades!`,
-    airdrop_info_box_title: `Acerca de este Airdrop`,
     airdrop_info_box_desc: `Este airdrop está diseñado para recompensar a los primeros partidarios y miembros activos de la comunidad. La elegibilidad se basa en factores como la participación en la preventa y el compromiso en eventos de la comunidad.`,
 
     // Governance
@@ -536,12 +535,13 @@ export const es = {
     contact_faq_button: `Ver Preguntas Frecuentes`,
     contact_required_fields: `Los campos marcados con un asterisco (*) son obligatorios.`,
     contact_disclaimer_title: `Nota sobre nuestra política de comunicación`,
-    contact_disclaimer_message: `Para asegurar que nuestro equipo pueda apoyar eficazmente a la comunidad y avanzar en el proyecto, damos prioridad a las consultas directamente relacionadas con la Red Familiar Mundial Oficial. Los mensajes que no estén relacionados con el tema, sean spam o solicitudes no solicitadas pueden no recibir respuesta. Gracias por su comprensión y por ayudarnos a mantenernos enfocados en nuestra misión.`,
+    contact_disclaimer_message: `Para asegurar que nuestro equipo pueda apoyar eficazmente a la comunidad y avanzar en el proyecto, damos prioridad a las consultas directamente relacionadas con la Red Familiar Mundial Oficial. Los mensajes que no estén relacionados con el tema, sean spam o nesolicitadas pueden no recibir respuesta. Gracias por su comprensión y por ayudarnos a mantenernos enfocados en nuestra misión.`,
     contact_social_x_title: `X.com / Twitter`,
     contact_social_x_desc: `Síganos para obtener actualizaciones en tiempo real, noticias y anuncios.`,
     contact_social_telegram_channel_title: `Canal de Telegram`,
     contact_social_telegram_channel_desc: `Suscríbase para anuncios importantes y noticias oficiales.`,
     contact_social_telegram_group_title: `Grupo de Telegram`,
     contact_social_telegram_group_desc: `Únase a nuestro grupo comunitario para discutir e interactuar con otros miembros.`,
+    contact_social_discord_title: `Discord`,
     contact_social_discord_desc: `Forme parte de nuestra comunidad activa para discusiones y apoyo.`
 };

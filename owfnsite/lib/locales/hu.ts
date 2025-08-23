@@ -428,7 +428,6 @@ export const hu = {
     airdrop_eligible_message: `A pénztárcád jogosult! A következő kiosztáskor {amount} OWFN tokent fogsz kapni.`,
     airdrop_not_eligible: `Nem Jogosult`,
     airdrop_not_eligible_message: `Sajnos ez a pénztárca cím nem jogosult a jelenlegi airdropra. Maradj aktív a közösségünkben a jövőbeli lehetőségekért!`,
-    airdrop_info_box_title: `Erről az Airdropról`,
     airdrop_info_box_desc: `Ez az airdrop a korai támogatók és az aktív közösségi tagok jutalmazására szolgál. A jogosultság olyan tényezőkön alapul, mint az elővásárláson való részvétel és a közösségi eseményeken való részvétel.`,
     
     // Governance
@@ -541,5 +540,6 @@ export const hu = {
     contact_social_telegram_channel_desc: `Iratkozzon fel a fontos bejelentésekért és hivatalos hírekért.`,
     contact_social_telegram_group_title: `Telegram Csoport`,
     contact_social_telegram_group_desc: `Csatlakozzon közösségi csoportunkhoz, hogy megvitassa és kapcsolatba lépjen más tagokkal.`,
+    contact_social_discord_title: `Discord`,
     contact_social_discord_desc: `Legyen része aktív közösségünknek a megbeszélésekért és támogatásért.`,
 };

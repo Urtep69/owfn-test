@@ -429,7 +429,6 @@ export const fr = {
     airdrop_eligible_message: `Votre portefeuille est éligible ! Vous recevrez {amount} jetons OWFN lors de la prochaine distribution.`,
     airdrop_not_eligible: `Non Éligible`,
     airdrop_not_eligible_message: `Désolé, cette adresse de portefeuille n'est pas éligible pour l'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !`,
-    airdrop_info_box_title: `À propos de cet Airdrop`,
     airdrop_info_box_desc: `Cet airdrop est conçu pour récompenser les premiers supporters et les membres actifs de la communauté. L'éligibilité est basée sur des facteurs tels que la participation à la prévente et l'engagement dans les événements communautaires.`,
 
     // Governance
@@ -450,7 +449,7 @@ export const fr = {
     status_passed: `Adoptée`,
     status_failed: `Rejetée`,
     you_voted: `Vous avez voté`,
-    no_active_proposals: `Il n'y a actuellement aucune proposition active.`,
+    no_active_proposals: `Il n'y a currently aucune proposition active.`,
     no_past_proposals: `Il n'y a aucune proposition passée à afficher.`,
     no_active_cases_in_category: `Il n'y a actuellement aucun cas actif dans cette catégorie.`,
 
@@ -542,6 +541,6 @@ export const fr = {
     contact_social_telegram_channel_desc: `Abonnez-vous pour les annonces importantes et les nouvelles officielles.`,
     contact_social_telegram_group_title: `Groupe Telegram`,
     contact_social_telegram_group_desc: `Rejoignez notre groupe communautaire pour discuter et échanger avec d'autres membres.`,
-    contact_social_discord_title: `Serveur Discord`,
+    contact_social_discord_title: `Discord`,
     contact_social_discord_desc: `Devenez membre de notre communauté active pour des discussions et du soutien.`,
 };
