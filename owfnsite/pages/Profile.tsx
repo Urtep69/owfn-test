@@ -1,93 +1,53 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Wallet, DollarSign, Gem, Loader2, Image as ImageIcon, Activity, Layers, ArrowUpRight, ArrowDownLeft, HelpCircle, ExternalLink } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { ImpactBadge, Nft, HumanizedTransaction } from '../types.ts';
-import { PortfolioChart } from '../components/PortfolioChart.tsx';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
+import type { ImpactBadge, ImpactNFT } from '../types.ts';
+import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
 
+const MOCK_BADGES: ImpactBadge[] = [
+    { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
+    { id: 'badge2', titleKey: 'badge_community_voter', descriptionKey: 'badge_community_voter_desc', icon: <Vote /> },
+    { id: 'badge3', titleKey: 'badge_diverse_donor', descriptionKey: 'badge_diverse_donor_desc', icon: <Gem /> },
+];
 
-// --- In-page Components for Profile Dashboard ---
-
-const NftCard = ({ nft }: { nft: Nft }) => {
-    const [imageLoaded, setImageLoaded] = useState(false);
-    return (
-        <a href={nft.solscanUrl} target="_blank" rel="noopener noreferrer" className="block bg-primary-100 dark:bg-darkPrimary-700/50 rounded-lg overflow-hidden group shadow-md hover:shadow-xl transition-shadow">
-            <div className="aspect-square w-full relative">
-                {!imageLoaded && <div className="absolute inset-0 bg-primary-200 dark:bg-darkPrimary-600 animate-pulse"></div>}
-                <img 
-                    src={nft.imageUrl} 
-                    alt={nft.name} 
-                    className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                    onLoad={() => setImageLoaded(true)}
-                    onError={(e) => { e.currentTarget.src = `https://via.placeholder.com/300?text=${nft.name.charAt(0)}`; setImageLoaded(true); }}
-                />
-            </div>
-            <div className="p-3">
-                <p className="font-bold text-sm truncate group-hover:text-accent-600 dark:group-hover:text-darkAccent-400">{nft.name}</p>
-                <p className="text-xs text-primary-500 dark:text-darkPrimary-400 truncate">{nft.collectionName || 'Unknown Collection'}</p>
-            </div>
-        </a>
-    );
-};
-
-const TransactionRow = ({ tx }: { tx: HumanizedTransaction }) => {
-    const getIcon = () => {
-        switch(tx.type) {
-            case 'send': return <ArrowUpRight className="w-5 h-5 text-red-500" />;
-            case 'receive': return <ArrowDownLeft className="w-5 h-5 text-green-500" />;
-            default: return <HelpCircle className="w-5 h-5 text-primary-500 dark:text-darkPrimary-400" />;
-        }
-    };
-    return (
-        <div className="flex items-center justify-between p-3 hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 rounded-md">
-            <div className="flex items-center gap-3">
-                <div className="bg-primary-100 dark:bg-darkPrimary-700 p-2 rounded-full">{getIcon()}</div>
-                <div>
-                    <p className="text-sm font-semibold">{tx.description}</p>
-                    <p className="text-xs text-primary-500 dark:text-darkPrimary-500">{tx.timestamp.toLocaleString()}</p>
-                </div>
-            </div>
-            <a href={tx.solscanUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-primary-500 dark:text-darkPrimary-400 hover:text-accent-600 dark:hover:text-darkAccent-400">
-                <ExternalLink size={16}/>
-            </a>
+const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => (
+    <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg flex items-center space-x-4">
+        <div className="text-accent-500 dark:text-darkAccent-400">{icon}</div>
+        <div>
+            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+            <p className="text-xl font-bold">{value}</p>
         </div>
-    );
-};
-
+    </div>
+);
 
 export default function Profile() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, nfts, transactions, solDomain, loading, isAuthenticating } = solana;
-    const [activeTab, setActiveTab] = useState<'tokens' | 'nfts' | 'activity'>('tokens');
+    const { t, solana } = useAppContext();
+    const { connected, address, userTokens, loading, connectWallet, userStats } = solana;
 
+    const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
+    
     const totalUsdValue = useMemo(() => {
-        if (!userTokens || userTokens.length === 0) return 0;
+        if (!userTokens || userTokens.length === 0) {
+            return 0;
+        }
         return userTokens.reduce((sum, token) => sum + token.usdValue, 0);
     }, [userTokens]);
 
-    if (isAuthenticating) {
-        return (
-            <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
-                <Loader2 className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4 animate-spin" />
-                <h1 className="text-2xl font-bold mb-2">{t('authenticating')}</h1>
-                <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('auth_prompt')}</p>
-            </div>
-        );
-    }
-
-    if (!address) {
+    if (!connected) {
         return (
             <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
                 <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
                 <h1 className="text-2xl font-bold mb-2">{t('my_profile')}</h1>
                 <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_connect_prompt')}</p>
                 <button
-                    onClick={() => setWalletModalOpen(true)}
-                    className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300"
+                    onClick={() => connectWallet()}
+                    disabled={loading}
+                    className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
                 >
-                    {t('connect_wallet')}
+                    {loading ? t('connecting') : t('connect_wallet')}
                 </button>
             </div>
         );
@@ -95,111 +55,115 @@ export default function Profile() {
     
     return (
         <div className="animate-fade-in-up space-y-8">
-            <header className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d space-y-4">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl font-bold text-accent-600 dark:text-darkAccent-400">{solDomain ? `${solDomain}` : t('impact_dashboard_title')}</h1>
-                        {address && <AddressDisplay address={address} />}
-                    </div>
-                    {loading ? (
-                         <div className="h-10 bg-primary-200 dark:bg-darkPrimary-700 rounded w-48 animate-pulse"></div>
-                    ) : (
-                        <div className="text-right">
-                             <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
-                             <p className="text-3xl font-bold text-green-600 dark:text-green-400">${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                        </div>
-                    )}
+            <div>
+                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('impact_dashboard_title')}</h1>
+                <div className="flex items-center space-x-2 mt-2">
+                    <span className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('connected_as')}:</span>
+                    {address && <AddressDisplay address={address} />}
                 </div>
-            </header>
+            </div>
 
-            <div className="grid lg:grid-cols-3 gap-8 items-start">
-                <main className="lg:col-span-2 bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                    <div className="border-b border-primary-200 dark:border-darkPrimary-700 mb-4">
-                        <nav className="flex space-x-4">
-                             {[
-                                { id: 'tokens', label: t('my_tokens'), icon: <Layers size={18} /> },
-                                { id: 'nfts', label: 'NFTs', icon: <ImageIcon size={18} /> },
-                                { id: 'activity', label: t('activity_tab'), icon: <Activity size={18} /> },
-                            ].map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id as any)}
-                                    className={`flex items-center gap-2 pb-2 px-1 border-b-2 font-semibold transition-colors ${
-                                        activeTab === tab.id
-                                            ? 'border-accent-500 text-accent-600 dark:border-darkAccent-400 dark:text-darkAccent-400'
-                                            : 'border-transparent text-primary-500 dark:text-darkPrimary-400 hover:text-primary-800 dark:hover:text-darkPrimary-200'
-                                    }`}
-                                >{tab.icon} {tab.label}</button>
+            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                <h2 className="text-2xl font-bold mb-4">{t('my_tokens')}</h2>
+                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
+                    <div>
+                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('token_types')}</p>
+                        <p className="text-2xl font-bold">{loading ? '-' : userTokens.length}</p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                            {loading ? '-' : `$${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                        </p>
+                    </div>
+                </div>
+                
+                {loading ? (
+                    <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <span>{t('profile_loading_tokens')}</span>
+                    </div>
+                ) : userTokens.length > 0 ? (
+                    <div className="space-y-2">
+                        {/* Header */}
+                        <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
+                            <span>{t('asset')}</span>
+                            <span className="text-right">{t('balance')}</span>
+                            <span className="text-right">{t('value_usd')}</span>
+                        </div>
+                        {/* Token List */}
+                        {userTokens.map(token => (
+                            <div key={token.mintAddress} className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg transition-colors duration-200 opacity-75 cursor-not-allowed">
+                                {/* Column 1: Asset Info */}
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                                        {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
+                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
+                                    </div>
+                                </div>
+
+                                {/* Column 2: Balance */}
+                                <div className="text-right font-mono">
+                                    <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
+                                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
+                                </div>
+
+                                {/* Column 3: Value */}
+                                <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
+                                    ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                     <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400">
+                        <p>{t('profile_no_tokens')}</p>
+                    </div>
+                )}
+            </div>
+            
+            <ComingSoonWrapper>
+                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
+                    <div className="grid md:grid-cols-3 gap-4">
+                        <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
+                        <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
+                        <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
+                    </div>
+                </div>
+            </ComingSoonWrapper>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+                <ComingSoonWrapper showMessage={false}>
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <h2 className="text-2xl font-bold mb-4">{t('impact_trophies_nfts')}</h2>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                           {/* Live NFT data would be populated here */}
+                        </div>
+                    </div>
+                </ComingSoonWrapper>
+                 <ComingSoonWrapper showMessage={false}>
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <h2 className="text-2xl font-bold mb-4">{t('impact_badges')}</h2>
+                         <div className="flex flex-wrap gap-4">
+                            {MOCK_BADGES.map(badge => (
+                                 <div key={badge.id} className="group relative flex flex-col items-center text-center w-24">
+                                    <div className="bg-primary-100 dark:bg-darkPrimary-700 rounded-full p-4 text-accent-500 dark:text-darkAccent-400 group-hover:scale-110 transition-transform">
+                                        {React.cloneElement(badge.icon as React.ReactElement<{ size: number }>, { size: 32 })}
+                                    </div>
+                                    <p className="text-sm font-semibold mt-2">{t(badge.titleKey)}</p>
+                                    <div className="absolute bottom-full mb-2 w-48 bg-primary-900 text-white dark:bg-darkPrimary-950 text-xs rounded py-1 px-2 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                        {t(badge.descriptionKey)}
+                                        <svg className="absolute text-primary-900 dark:text-darkPrimary-950 h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon className="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+                                    </div>
+                                </div>
                             ))}
-                        </nav>
-                    </div>
-
-                    {loading ? (
-                        <div className="text-center py-20 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
-                            <Loader2 className="w-8 h-8 animate-spin" />
-                            <span className="text-lg">{t('profile_loading_data')}</span>
-                        </div>
-                    ) : (
-                        <div>
-                            {activeTab === 'tokens' && (
-                                userTokens.length > 0 ? (
-                                     <div className="space-y-1">
-                                        {userTokens.map(token => (
-                                            <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
-                                                <a className="grid grid-cols-3 gap-4 items-center p-3 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors cursor-pointer">
-                                                    <div className="flex items-center space-x-3">
-                                                        <div className="w-8 h-8 flex-shrink-0">{token.logo}</div>
-                                                        <div>
-                                                            <p className="font-bold text-sm">{token.symbol}</p>
-                                                            <p className="text-xs text-primary-500 dark:text-darkPrimary-500">{token.name}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right font-mono text-sm">
-                                                        <p className="font-semibold">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p>
-                                                        <p className="text-primary-500 dark:text-darkPrimary-500">@ ${token.pricePerToken.toPrecision(3)}</p>
-                                                    </div>
-                                                    <p className="text-right font-semibold font-mono text-sm">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                                </a>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                ) : <p className="text-center py-10">{t('profile_no_tokens')}</p>
-                            )}
-                             {activeTab === 'nfts' && (
-                                nfts.length > 0 ? (
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                        {nfts.map(nft => <NftCard key={nft.id} nft={nft}/>)}
-                                    </div>
-                                ) : <p className="text-center py-10">{t('profile_no_nfts')}</p>
-                            )}
-                             {activeTab === 'activity' && (
-                                transactions.length > 0 ? (
-                                    <div className="space-y-1">
-                                        {transactions.map(tx => <TransactionRow key={tx.signature} tx={tx}/>)}
-                                    </div>
-                                ) : <p className="text-center py-10">{t('profile_no_activity')}</p>
-                            )}
-                        </div>
-                    )}
-                </main>
-
-                <aside className="lg:col-span-1 space-y-8">
-                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h3 className="text-lg font-bold mb-2">{t('portfolio_allocation')}</h3>
-                         {loading ? (
-                             <div className="h-64 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
-                         ) : (
-                             <PortfolioChart tokens={userTokens}/>
-                         )}
-                    </div>
-                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h3 className="text-lg font-bold mb-4">{t('my_impact_stats')}</h3>
-                        <div className="space-y-3">
-                             <div className="flex items-center gap-3"><DollarSign className="w-5 h-5 text-accent-500 dark:text-darkAccent-400"/><span>{t('total_donated')}: $0.00</span></div>
-                             <p className="text-xs text-center text-primary-500 dark:text-darkPrimary-400 p-2 bg-primary-100 dark:bg-darkPrimary-700/50 rounded-md">{t('coming_soon_impact_tracking')}</p>
                         </div>
                     </div>
-                </aside>
+                </ComingSoonWrapper>
             </div>
         </div>
     );

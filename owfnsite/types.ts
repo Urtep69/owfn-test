@@ -1,4 +1,5 @@
 
+
 export interface Token {
   name: string;
   symbol: string;
@@ -64,8 +65,7 @@ export interface TokenExtension {
 }
 
 export interface TokenDetails extends Token {
-    description?: string;
-    links?: Record<string, string>;
+    description?: Record<string, string>;
     marketCap?: number;
     volume24h?: number;
     price24hChange?: number;
@@ -74,6 +74,12 @@ export interface TokenDetails extends Token {
     circulatingSupply?: number;
     
     priceSol?: number;
+    priceChange?: {
+        m5: number;
+        h1: number;
+        h6: number;
+        h24: number;
+    };
     liquidity?: number;
     pairAddress?: string;
     fdv?: number;
@@ -146,21 +152,4 @@ export interface PresaleTransaction {
   solAmount: number;
   owfnAmount: number;
   time: Date;
-}
-
-export interface Nft {
-  id: string; // mint address
-  name: string;
-  imageUrl?: string;
-  collectionName?: string;
-  solscanUrl: string;
-}
-
-export interface HumanizedTransaction {
-  signature: string;
-  timestamp: Date;
-  type: 'send' | 'receive' | 'swap' | 'unknown' | 'airdrop';
-  description: string;
-  solscanUrl: string;
-  status: 'success' | 'failed';
 }

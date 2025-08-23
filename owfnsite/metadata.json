@@ -1,6 +1,6 @@
 {
-  "name": "Develop teste 22-08-2025  (OWFN) test 1 ",
-  "description": "LIVE pe owfn.org. Plata corecta pe Desktop si pe mobil dar pe mobil plata se face direct din Wallet. Adaugat si Aspect Presale.\nOK Site functional. acesta este originalul LIVE",
+  "name": "Test pentru varianta-LIVE pe vercel -16-02025- (OWFN)",
+  "description": "Testare optiuni plati wallet mobil este actualizata cu minim 0.1 SOL. dar functioneza plata pe mobil doar din interiorul Phantom. actualizat 18.08.2025 ora 13:00.",
   "requestFramePermissions": [],
   "prompt": ""
 }

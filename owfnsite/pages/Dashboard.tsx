@@ -54,25 +54,23 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
 
                     <div className="space-y-1 max-h-60 overflow-y-auto pr-2">
                         {balances.length > 0 ? balances.map(token => (
-                             <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/dashboard`}>
-                                <a className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors cursor-pointer">
-                                    {/* Asset Info */}
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">{token.logo}</div>
-                                        <div>
-                                            <p className="font-semibold">{token.symbol}</p>
-                                            <p className="text-xs text-primary-500 dark:text-darkPrimary-500">
-                                                @ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}
-                                            </p>
-                                        </div>
+                            <div key={token.mintAddress} className="grid grid-cols-2 gap-4 items-center py-2 px-2 rounded-md opacity-75 cursor-not-allowed">
+                                {/* Asset Info */}
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">{token.logo}</div>
+                                    <div>
+                                        <p className="font-semibold">{token.symbol}</p>
+                                        <p className="text-xs text-primary-500 dark:text-darkPrimary-500">
+                                            @ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}
+                                        </p>
                                     </div>
-                                    {/* Balance & Value */}
-                                    <div className="text-right">
-                                        <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p>
-                                        <p className="text-xs text-primary-500 dark:text-darkPrimary-400">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                                    </div>
-                                </a>
-                            </Link>
+                                </div>
+                                {/* Balance & Value */}
+                                <div className="text-right">
+                                    <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p>
+                                    <p className="text-xs text-primary-500 dark:text-darkPrimary-400">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                                </div>
+                            </div>
                         )) : (
                              <div className="text-center py-8 text-primary-500 dark:text-darkPrimary-400">
                                 <p>{t('profile_no_tokens')}</p>

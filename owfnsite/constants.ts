@@ -105,13 +105,17 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         usdValue: 0,
         pricePerToken: 0,
         decimals: 9,
-        description: 'OWFN (Official World Family Network) is a Solana-based token designed to unite families globally through blockchain technology, focusing on social impact, education, health, and humanitarian aid with full transparency.',
+        description: {
+            en: 'OWFN (Official World Family Network) is a Solana-based token designed to unite families globally through blockchain technology, focusing on social impact, education, health, and humanitarian aid with full transparency.',
+            // Add other languages as needed
+        },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
         totalSupply: 18_000_000_000,
         circulatingSupply: 0,
+        pairAddress: '8Vq82rQfT2nqzH8c4g8x9a2avp13aWv12t1nCvZ5X3qg',
     },
     'SOL': {
         name: 'Solana',
@@ -122,13 +126,14 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         usdValue: 0,
         pricePerToken: 0,
         decimals: 9,
-        description: 'Solana is a high-performance blockchain supporting builders around the world creating crypto apps that scale today.',
+        description: { en: 'Solana is a high-performance blockchain supporting builders around the world creating crypto apps that scale today.' },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
         totalSupply: 0,
         circulatingSupply: 0,
+        pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDC': {
         name: 'USD Coin',
@@ -139,13 +144,14 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         usdValue: 0,
         pricePerToken: 0,
         decimals: 6,
-        description: 'USDC is a fully collateralized US dollar stablecoin. It is an Ethereum-powered coin and is the product of a collaboration between Circle and Coinbase.',
+        description: { en: 'USDC is a fully collateralized US dollar stablecoin. It is an Ethereum-powered coin and is the product of a collaboration between Circle and Coinbase.' },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
         totalSupply: 0,
         circulatingSupply: 0,
+        pairAddress: '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbAaGgG9pFSzsG6', // SOL/USDC
     },
      'USDT': {
         name: 'Tether',
@@ -156,12 +162,13 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         usdValue: 0,
         pricePerToken: 0,
         decimals: 6,
-        description: 'Tether (USDT) is a stablecoin pegged to the U.S. dollar. It is issued by the Hong Kong-based company Tether Limited.',
+        description: { en: 'Tether (USDT) is a stablecoin pegged to the U.S. dollar. It is issued by the Hong Kong-based company Tether Limited.' },
         marketCap: 0,
         volume24h: 0,
         price24hChange: 0,
         holders: 0,
         totalSupply: 0,
         circulatingSupply: 0,
+        pairAddress: '7xKXtg2CW87d97TXJSD40M5M5gajNdkgdsDEsMmL2trn', // SOL/USDT
     }
 };

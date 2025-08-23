@@ -1,60 +1,14 @@
+
 import React from 'react';
-import { Menu, X, LogOut, Wallet, Loader2 } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 import { ThemeSwitcher } from './ThemeSwitcher.tsx';
-import { useAppContext } from '../contexts/AppContext.tsx';
 
 interface HeaderProps {
     toggleSidebar: () => void;
     isSidebarOpen: boolean;
 }
-
-const ConnectButton = () => {
-    const { t, setWalletModalOpen, solana } = useAppContext();
-
-    const truncateAddress = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
-
-    if (solana.isAuthenticating) {
-        return (
-            <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg px-3 py-2">
-                <Loader2 size={18} className="animate-spin text-primary-700 dark:text-darkPrimary-200"/>
-                <span className="font-semibold text-sm text-primary-700 dark:text-darkPrimary-200">{t('authenticating')}</span>
-            </div>
-        );
-    }
-    
-    if (solana.address) {
-        return (
-             <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
-                <button
-                    onClick={() => setWalletModalOpen(true)}
-                    className="flex items-center space-x-2 pl-3 pr-2 py-2 text-primary-700 dark:text-darkPrimary-200 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-l-lg transition-colors"
-                    aria-label={t('change_wallet')}
-                >
-                    <Wallet size={18} />
-                    <span className="font-semibold text-sm font-mono">{truncateAddress(solana.address)}</span>
-                </button>
-                 <button
-                    onClick={solana.disconnectWallet}
-                    className="p-2 text-primary-600 dark:text-darkPrimary-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-r-lg transition-colors"
-                    aria-label={t('disconnect_wallet')}
-                >
-                    <LogOut size={18} />
-                </button>
-            </div>
-        );
-    }
-
-    return (
-        <button
-            onClick={() => setWalletModalOpen(true)}
-            className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors"
-        >
-            {t('connect_wallet')}
-        </button>
-    );
-};
-
 
 export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
   return (
@@ -74,7 +28,7 @@ export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
           <div className="flex items-center space-x-2">
             <ThemeSwitcher />
             <LanguageSwitcher />
-            <ConnectButton />
+            <WalletMultiButton />
           </div>
         </div>
       </div>

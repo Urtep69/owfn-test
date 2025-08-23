@@ -105,10 +105,12 @@ export const nl = {
     you_receive: 'U ontvangt',
     min_buy: 'Min. aankoop',
     max_buy: 'Max. aankoop',
+    invalid_amount: 'Bedrag moet tussen {min} en {max} SOL liggen.',
     presale_purchase_success_alert: 'Aankoop succesvol! U heeft {amount} SOL bijgedragen. Uw {owfnAmount} OWFN-tokens zijn gereserveerd en worden aan het einde van de voorverkoop automatisch naar uw wallet ge-airdrops.',
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: '{progress}% verkocht',
     presale_buy_info: 'Kopen (Min: {min} SOL, Max: {max} SOL)',
+    presale_buy_info_max_only: 'Kopen (Max: {max} SOL per wallet)',
     buy: 'Kopen',
     presale_buying_owfn: 'U koopt {amount} $OWFN',
     presale_estimate_tooltip: 'Dit is een schatting. Het uiteindelijke bedrag kan variëren.',
@@ -133,6 +135,7 @@ export const nl = {
     presale_dyor_nfa_desc: 'Doe uw eigen onderzoek. Geen financieel advies.',
     presale_footer_copyright: '© {year} Official World Family Network | Alle rechten voorbehouden.',
     presale_amount_error: 'Bedrag moet tussen {min} en {max} SOL zijn.',
+    presale_max_amount_error: 'Bedrag mag niet hoger zijn dan {max} SOL.',
     live_presale_feed: 'Live Voorverkoop Feed',
     wallet: 'Wallet',
     sol_spent: 'Besteedde SOL',
@@ -158,6 +161,8 @@ export const nl = {
     select_token: 'Selecteer Token',
     amount: 'Bedrag',
     donations_form_title: 'Donatieformulier',
+    donations_stats_title: 'Live Donatiestatistieken (Gesimuleerd)',
+    donated: 'Gedoneerd',
     donation_success_alert: 'Donatie succesvol! Bedankt voor uw bijdrage van {amount} {tokenSymbol}.',
     donation_no_token_balance: 'U bezit geen {symbol}.',
     
@@ -245,7 +250,7 @@ export const nl = {
     partnerships_invitation_title: 'Overweegt u een samenwerking?',
     partnerships_invitation_desc: `Als deze visie resoneert met uw organisatie, nodigen wij u uit om onze voortgang te volgen. Bereid alstublieft uw voorstel voor waarin u uiteenzet hoe een samenwerking onze gedeelde missie kan versterken. Contactgegevens zullen prominenter worden gemaakt en we zullen formele kanalen voor discussie openen nadat de voorverkoopfase is voltooid.`,
     partnerships_thank_you: 'Bedankt voor uw interesse in het bouwen van een betere wereld met ons.',
-    
+
     // FAQ Page
     faq_title: 'Veelgestelde Vragen',
     faq_subtitle: 'Vind antwoorden op de meest gestelde vragen over OWFN.',
@@ -367,7 +372,6 @@ export const nl = {
     no_risk_factors_found: 'Geen kritieke risicofactoren gevonden zoals veranderlijke metadata of niet-ingetrokken autoriteiten.',
     risk_factors_found: 'Potentiële risico\'s gedetecteerd. Ga voorzichtig te werk.',
     swap: 'Ruilen',
-    revoked: 'Ingetrokken',
     
     // Staking & Vesting
     staking_title: 'Stake OWFN, Verdien Beloningen',
@@ -454,7 +458,6 @@ export const nl = {
     // Maintenance
     maintenance_heading: 'We zijn dingen aan het verbeteren!',
     maintenance_message: 'Ons platform ondergaat momenteel gepland onderhoud om uw ervaring te verbeteren. We waarderen uw geduld en begrip. We zijn snel weer online.',
-    maintenance_stay_tuned: 'Blijf op de hoogte van updates op onze sociale kanalen:',
     admin_controls: 'Beheerderscontroles',
     maintenance_status: 'Status',
     maintenance_status_active: 'ACTIEF',
