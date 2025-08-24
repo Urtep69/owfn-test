@@ -137,26 +137,35 @@ export const useSolana = (): UseSolanaReturn => {
         if (result.items && Array.isArray(result.items)) {
             const splTokens: Token[] = result.items
                 .map((asset: any): Token | null => {
-                    // Defensive parsing for each asset
                     try {
-                        if (asset.interface !== 'fungible_token' || !asset.ownership?.token_info?.balance) {
-                            return null;
-                        }
+                        if (asset.interface !== 'fungible_token') return null;
                         
-                        const balanceStr = String(asset.ownership.token_info.balance);
-                        if (balanceStr === '0') {
-                            return null; // Skip zero balance tokens
-                        }
+                        const ownerInfo = asset.ownership;
+                        const tokenMeta = ownerInfo?.token_info;
+                        
+                        if (!tokenMeta || !tokenMeta.balance) return null;
 
-                        const decimals = asset.ownership.token_info.decimals ?? 0;
+                        let balanceRaw = tokenMeta.balance.toString();
+                        if (balanceRaw === '0') return null;
+
+                        const decimals = tokenMeta.decimals ?? 0;
                         
-                        // CRITICAL FIX: Avoid mixing BigInt with Number in division, which throws a TypeError.
-                        // Use pure number arithmetic, which is safe for balances up to Number.MAX_SAFE_INTEGER.
-                        const balance = Number(balanceStr) / (10 ** decimals);
-                        
-                        if (balance <= 0) {
-                            return null;
+                        let balance: number;
+                        if (decimals === 0) {
+                            balance = parseInt(balanceRaw, 10);
+                        } else {
+                            const len = balanceRaw.length;
+                            if (len <= decimals) {
+                                const padded = '0'.repeat(decimals - len) + balanceRaw;
+                                balance = parseFloat('0.' + padded);
+                            } else {
+                                const intPart = balanceRaw.substring(0, len - decimals);
+                                const fracPart = balanceRaw.substring(len - decimals);
+                                balance = parseFloat(intPart + '.' + fracPart);
+                            }
                         }
+                        
+                        if (balance <= 0) return null;
 
                         const price = prices.get(asset.id) || 0;
                         const mintAddress = asset.id;
