@@ -94,7 +94,9 @@ export const useSolana = (): UseSolanaReturn => {
         // Collect all fungible token mints for price fetching
         if (result.items && Array.isArray(result.items)) {
             result.items.forEach((asset: any) => {
-                if (asset.interface === 'fungible_token' && asset.id) {
+                // We check for token_info existence to identify fungibles, which is more robust
+                // than checking the 'interface' string.
+                if (asset.id && asset.token_info && asset.token_info.balance > 0) {
                     mintsToPrice.push(asset.id);
                 }
             });
@@ -138,33 +140,35 @@ export const useSolana = (): UseSolanaReturn => {
             const splTokens: Token[] = result.items
                 .map((asset: any): Token | null => {
                     try {
-                        // Simplified and more robust filtering
-                        if (asset.interface !== 'fungible_token') {
-                            return null; // Exclude non-fungible tokens (NFTs)
-                        }
+                        // New robust filtering: Instead of checking a specific 'interface' string,
+                        // we identify a fungible token by its essential properties. This works for
+                        // standard SPL tokens and newer Token-2022 assets (V1_FUNGIBLE_ASSET).
+                        const tokenData = asset.token_info;
 
-                        const tokenData = asset.token_info || asset.ownership?.token_info || asset.spl_token_info;
-                        
-                        if (!tokenData || typeof tokenData.balance === 'undefined' || tokenData.balance === null) {
-                            return null; // Skip if no valid balance data
-                        }
-
-                        const decimals = tokenData.decimals ?? 0;
-                        // Exclude tokens that are likely NFTs (0 decimals) and zero balance tokens
-                        if (decimals === 0 || tokenData.balance === '0') {
+                        if (
+                            !tokenData ||
+                            typeof tokenData.balance === 'undefined' ||
+                            tokenData.balance === null ||
+                            tokenData.balance === '0' ||
+                            typeof tokenData.decimals !== 'number' ||
+                            tokenData.decimals === 0
+                        ) {
+                            // This asset is not a fungible token with a positive balance that we can display.
                             return null;
                         }
 
-                        const balanceRaw = tokenData.balance.toString();
+                        const { balance: balanceRaw, decimals } = tokenData;
+
+                        // Robust balance calculation using string manipulation.
                         let balance: number;
+                        const balanceString = balanceRaw.toString();
                         
-                        // Robust balance calculation using string manipulation to avoid BigInt and floating point issues.
-                        if (balanceRaw.length > decimals) {
-                            const integerPart = balanceRaw.slice(0, balanceRaw.length - decimals);
-                            const fractionalPart = balanceRaw.slice(balanceRaw.length - decimals);
+                        if (balanceString.length > decimals) {
+                            const integerPart = balanceString.slice(0, balanceString.length - decimals);
+                            const fractionalPart = balanceString.slice(balanceString.length - decimals);
                             balance = Number(`${integerPart}.${fractionalPart}`);
                         } else {
-                            const padded = balanceRaw.padStart(decimals, '0');
+                            const padded = balanceString.padStart(decimals, '0');
                             balance = Number(`0.${padded}`);
                         }
                         
@@ -174,7 +178,6 @@ export const useSolana = (): UseSolanaReturn => {
 
                         const mintAddress = asset.id;
                         const price = prices.get(mintAddress) || 0;
-
                         const metadata = asset.content?.metadata;
                         const links = asset.content?.links;
 
