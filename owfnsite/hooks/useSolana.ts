@@ -139,7 +139,7 @@ export const useSolana = (): UseSolanaReturn => {
 
                 if (priceData?.data?.[token.mintAddress]) {
                     const priceInfo = priceData.data[token.mintAddress];
-                    // FINAL ROBUSTNESS CHECK: Ensure price is a valid number before calculating.
+                    // FINAL ROBUSTNESS CHECK: Ensure price is a valid number before calculating to prevent NaN.
                     if (priceInfo && typeof priceInfo.price === 'number') {
                         const price = priceInfo.price;
                         token.pricePerToken = price;
