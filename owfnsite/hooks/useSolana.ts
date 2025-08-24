@@ -139,16 +139,16 @@ export const useSolana = (): UseSolanaReturn => {
                 .map((asset: any): Token | null => {
                     // Defensive parsing for each asset
                     try {
-                        if (asset.interface !== 'fungible_token' || !asset.token_info || !asset.token_info.balance) {
+                        if (asset.interface !== 'fungible_token' || !asset.ownership?.token_info?.balance) {
                             return null;
                         }
                         
-                        const balanceStr = String(asset.token_info.balance);
+                        const balanceStr = String(asset.ownership.token_info.balance);
                         if (balanceStr === '0') {
                             return null; // Skip zero balance tokens
                         }
 
-                        const decimals = asset.token_info.decimals ?? 0;
+                        const decimals = asset.ownership.token_info.decimals ?? 0;
                         const balance = Number(BigInt(balanceStr)) / Math.pow(10, decimals);
                         
                         if (balance <= 0) {
