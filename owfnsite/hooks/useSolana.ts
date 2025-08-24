@@ -46,8 +46,6 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 const isValidSolanaAddress = (address: any): boolean => {
     if (typeof address !== 'string') return false;
-    // This is a basic check; a more robust one might involve trying to create a PublicKey.
-    // However, for filtering RPC responses, this regex is generally sufficient.
     try {
         new PublicKey(address);
         return true;
@@ -149,17 +147,15 @@ export const useSolana = (): UseSolanaReturn => {
             let priceData: any = {};
             if (mintsToFetchPrice.size > 0) {
                 const mintList = Array.from(mintsToFetchPrice).join(',');
-                const priceRes = await fetch(`https://public-api.birdeye.so/defi/multi_price?list_address=${mintList}`);
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mintList}`);
 
                 if (priceRes.ok) {
-                    const birdeyePriceData = await priceRes.json();
-                    if (birdeyePriceData.success && birdeyePriceData.data) {
-                        priceData = birdeyePriceData.data;
-                    } else {
-                         console.warn(`Birdeye Price API returned success=false or no data.`);
+                    const jupiterPriceData = await priceRes.json();
+                    if (jupiterPriceData.data) {
+                        priceData = jupiterPriceData.data;
                     }
                 } else {
-                    console.warn(`Birdeye Price API call failed with status ${priceRes.status}`);
+                    console.warn(`Jupiter Price API call failed with status ${priceRes.status}`);
                 }
             }
             
@@ -176,8 +172,8 @@ export const useSolana = (): UseSolanaReturn => {
 
                 if (priceData?.[token.mintAddress]) {
                     const priceInfo = priceData[token.mintAddress];
-                    if (priceInfo && typeof priceInfo.value === 'number') {
-                        const price = priceInfo.value;
+                    if (priceInfo && typeof priceInfo.price === 'number') {
+                        const price = priceInfo.price;
                         token.pricePerToken = price;
                         token.usdValue = token.balance * price;
                         if (token.mintAddress === solMint) {

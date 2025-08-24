@@ -15,44 +15,10 @@ export default function Donations() {
     const { t, solana } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
-    const [tokenPrice, setTokenPrice] = useState(0);
 
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
 
-    useEffect(() => {
-        const fetchPrice = async () => {
-            // Prioritize using the price from the user's token data if available and valid.
-            if (currentUserToken && currentUserToken.pricePerToken > 0) {
-                setTokenPrice(currentUserToken.pricePerToken);
-                return;
-            }
-
-            // As a fallback, or if the user doesn't own the token, fetch the price from Jupiter.
-            const mintAddress = KNOWN_TOKEN_MINT_ADDRESSES[selectedToken];
-            if (!mintAddress || selectedToken === 'OWFN') { // OWFN has no market price yet
-                setTokenPrice(0);
-                return;
-            }
-
-            try {
-                const res = await fetch(`https://price.jup.ag/v4/price?ids=${mintAddress}`);
-                if (!res.ok) {
-                    throw new Error(`Jupiter API failed with status ${res.status}`);
-                }
-                const data = await res.json();
-                if (data.data && data.data[mintAddress]) {
-                    setTokenPrice(data.data[mintAddress].price);
-                } else {
-                    setTokenPrice(0);
-                }
-            } catch (e) {
-                console.error(`Failed to fetch price for ${selectedToken}:`, e);
-                setTokenPrice(0);
-            }
-        };
-
-        fetchPrice();
-    }, [selectedToken, currentUserToken]);
+    const tokenPrice = useMemo(() => currentUserToken?.pricePerToken ?? 0, [currentUserToken]);
 
     const usdValue = useMemo(() => {
         const numAmount = parseFloat(amount);
