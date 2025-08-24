@@ -1,3 +1,4 @@
+
 import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
@@ -6,7 +7,7 @@ import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
-import { ADMIN_WALLET_ADDRESS, SOLANA_RPC_URL } from './constants.ts';
+import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
 import { WalletConnectModal } from './components/WalletConnectModal.tsx';
 
@@ -97,7 +98,7 @@ const AppContent = () => {
 
 const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const network = WalletAdapterNetwork.Mainnet;
-  const endpoint = useMemo(() => SOLANA_RPC_URL, []);
+  const endpoint = useMemo(() => QUICKNODE_RPC_URL, []);
   
   const wallets = useMemo(
     () => [

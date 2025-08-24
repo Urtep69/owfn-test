@@ -1,12 +1,12 @@
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { PublicKey, Transaction, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount, ACCOUNT_SIZE } from '@solana/spl-token';
 
 import { 
     DISTRIBUTION_WALLETS, 
-    SOLANA_RPC_URL, 
     PRESALE_DETAILS,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
@@ -74,61 +74,57 @@ export default function AdminPresale() {
 
     const fetchAllTransactions = useCallback(async () => {
         setLoading(true);
-        let allTxs: PresaleTx[] = [];
-        let lastSignature: string | undefined = undefined;
-
         try {
+            const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            
+            let allSignatures: ConfirmedSignatureInfo[] = [];
+            let lastSignature: string | undefined = undefined;
+
             while (true) {
-                const response = await fetch(SOLANA_RPC_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        jsonrpc: '2.0',
-                        id: 1,
-                        method: 'qn_getTransactionsByAddress',
-                        params: {
-                            address: DISTRIBUTION_WALLETS.presale,
-                            limit: 100,
-                            before: lastSignature,
-                        },
-                    }),
-                });
-
-                if (!response.ok) throw new Error('Failed to fetch transactions from QuickNode');
-                const { result } = await response.json();
-                const data = result.transactions || [];
-
-                const parsedTxs: PresaleTx[] = data
-                    .map((tx: any) => {
-                        const transferInstruction = tx.transaction.message.instructions.find((inst: any) =>
-                            inst.program === 'system' &&
-                            inst.parsed?.type === 'transfer' &&
-                            inst.parsed?.info?.destination === DISTRIBUTION_WALLETS.presale
-                        );
-
-                        if (transferInstruction) {
-                            return {
-                                signature: tx.transaction.signatures[0],
-                                from: transferInstruction.parsed.info.source,
-                                solAmount: transferInstruction.parsed.info.lamports / LAMPORTS_PER_SOL,
-                                owfnAmount: (transferInstruction.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                                timestamp: tx.blockTime || 0,
-                                lamports: transferInstruction.parsed.info.lamports,
-                            };
-                        }
-                        return null;
-                    })
-                    .filter((tx: PresaleTx | null): tx is PresaleTx => tx !== null);
+                const signatures = await connection.getSignaturesForAddress(presalePublicKey, { before: lastSignature, limit: 1000 });
+                if (signatures.length === 0) break;
                 
-                allTxs.push(...parsedTxs);
+                allSignatures.push(...signatures);
+                lastSignature = signatures[signatures.length - 1].signature;
 
-                if (data.length < 100) {
-                    break; 
-                } else {
-                    lastSignature = data[data.length - 1].transaction.signatures[0];
-                }
+                const lastTxTime = signatures[signatures.length - 1].blockTime;
+                if (lastTxTime && lastTxTime < presaleStartTimestamp) break;
             }
-            setTransactions(allTxs);
+
+            const relevantSignatures = allSignatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
+            const signatureStrings = relevantSignatures.map(s => s.signature);
+            
+            if (signatureStrings.length === 0) {
+                setTransactions([]);
+                setLoading(false);
+                return;
+            }
+
+            const allParsedTxs: PresaleTx[] = [];
+            const BATCH_SIZE = 100;
+            for (let i = 0; i < signatureStrings.length; i += BATCH_SIZE) {
+                const batchSignatures = signatureStrings.slice(i, i + BATCH_SIZE);
+                const transactionsData = await connection.getParsedTransactions(batchSignatures, { maxSupportedTransactionVersion: 0 });
+
+                transactionsData.forEach((tx, index) => {
+                    if (tx && tx.blockTime) {
+                        tx.transaction.message.instructions.forEach(inst => {
+                            if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === DISTRIBUTION_WALLETS.presale && inst.parsed.info.source !== '11111111111111111111111111111111') {
+                                allParsedTxs.push({
+                                    signature: batchSignatures[index],
+                                    from: inst.parsed.info.source,
+                                    solAmount: inst.parsed.info.lamports / LAMPORTS_PER_SOL,
+                                    owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                                    timestamp: tx.blockTime,
+                                    lamports: inst.parsed.info.lamports,
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+            setTransactions(allParsedTxs);
         } catch (error) {
             console.error("Failed to fetch all presale transactions:", error);
         } finally {

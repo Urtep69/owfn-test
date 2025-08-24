@@ -1,9 +1,10 @@
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, PRESALE_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -32,25 +33,12 @@ export interface UseSolanaReturn {
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
 
-const ICON_MAP: { [key: string]: React.FC<any> } = {
-  OwfnIcon,
-  SolIcon,
-  UsdcIcon,
-  UsdtIcon,
-  GenericTokenIcon
+const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
+    [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon, null),
+    'So11111111111111111111111111111111111111112': React.createElement(SolIcon, null),
+    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon, null),
+    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
 };
-
-const deserializeLogo = (logoData: any): React.ReactNode => {
-  if (typeof logoData === 'string') {
-    return React.createElement(GenericTokenIcon, { uri: logoData });
-  }
-  if (logoData && typeof logoData === 'object' && logoData.type && ICON_MAP[logoData.type]) {
-    const Component = ICON_MAP[logoData.type];
-    return React.createElement(Component, logoData.props);
-  }
-  return React.createElement(GenericTokenIcon, {}); // fallback
-};
-
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
@@ -71,25 +59,104 @@ export const useSolana = (): UseSolanaReturn => {
       
     setLoading(true);
     try {
-        const response = await fetch(`/api/wallet-balances?walletAddress=${walletAddress}`);
+        const response = await fetch(QUICKNODE_RPC_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                id: 'my-id',
+                method: 'getAssetsByOwner',
+                params: {
+                    ownerAddress: walletAddress,
+                    page: 1,
+                    limit: 1000,
+                    displayOptions: {
+                        showFungible: true,
+                        showNativeBalance: true,
+                    },
+                },
+            }),
+        });
         
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: 'Failed to fetch balances and parse error.' }));
-            throw new Error(errorData.error || `Server responded with status ${response.status}`);
+            console.error('QuickNode API Error:', await response.text());
+            throw new Error('Failed to fetch assets from QuickNode');
         }
 
-        const rawTokens: any[] = await response.json();
-
-        const tokensWithLogos: Token[] = rawTokens.map(token => ({
-            ...token,
-            logo: deserializeLogo(token.logo),
-        }));
-
-        // Only cache successful, non-empty results to prevent caching failures.
-        if (tokensWithLogos && tokensWithLogos.length > 0) {
-            balanceCache.set(walletAddress, { data: tokensWithLogos, timestamp: Date.now() });
+        const { result } = await response.json();
+        
+        if (!result) {
+             return [];
         }
-        return tokensWithLogos;
+       
+        const allTokens: Token[] = [];
+        let solPrice = 0;
+
+        // Process native SOL balance first using data directly from the RPC
+        if (result.nativeBalance && result.nativeBalance.lamports > 0) {
+            const pricePerSol = result.nativeBalance.price_per_sol || 0;
+            const balance = result.nativeBalance.lamports / LAMPORTS_PER_SOL;
+            solPrice = pricePerSol;
+
+            const solToken: Token = {
+                mintAddress: 'So11111111111111111111111111111111111111112',
+                balance: balance,
+                decimals: 9,
+                name: 'Solana',
+                symbol: 'SOL',
+                logo: React.createElement(SolIcon, null),
+                pricePerToken: pricePerSol,
+                usdValue: result.nativeBalance.total_price || (balance * pricePerSol),
+            };
+            allTokens.push(solToken);
+        }
+
+        // Process SPL tokens from the 'items' array
+        const splTokens: Token[] = (result.items || [])
+            .filter((asset: any) => asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed)
+            .map((asset: any): Token => ({
+                mintAddress: asset.id,
+                balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
+                decimals: asset.token_info.decimals,
+                name: asset.content?.metadata?.name || 'Unknown Token',
+                symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
+                logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
+                usdValue: 0,
+                pricePerToken: 0,
+            }));
+
+        allTokens.push(...splTokens);
+
+        if (allTokens.length === 0) return [];
+        
+        const splMintsToFetch = splTokens.map(t => t.mintAddress).join(',');
+
+        if (splMintsToFetch) {
+            try {
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${splMintsToFetch}`);
+                if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
+                
+                const priceData = await priceRes.json();
+                
+                if (priceData.data) {
+                     allTokens.forEach(token => {
+                        if (token.mintAddress === 'So11111111111111111111111111111111111111112') return; // Skip SOL
+                        const priceInfo = priceData.data[token.mintAddress];
+                        if (priceInfo && priceInfo.price) {
+                            const price = priceInfo.price;
+                            token.pricePerToken = price;
+                            token.usdValue = token.balance * price;
+                        }
+                    });
+                }
+            } catch (priceError) {
+                console.error("Could not fetch token prices from Jupiter API:", priceError);
+            }
+        }
+        
+        const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
+        balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
+        return sortedTokens;
 
     } catch (error) {
         console.error("Error fetching wallet balances:", error);
@@ -97,7 +164,7 @@ export const useSolana = (): UseSolanaReturn => {
     } finally {
         setLoading(false);
     }
-  }, []);
+  }, [connection]);
 
   useEffect(() => {
     if (connected && address) {
