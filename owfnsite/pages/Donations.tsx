@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { DISTRIBUTION_WALLETS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
+import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { AlertTriangle, Info } from 'lucide-react';
 

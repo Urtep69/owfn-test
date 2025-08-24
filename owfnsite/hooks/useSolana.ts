@@ -6,15 +6,6 @@ import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
-// --- TYPE DEFINITION FOR JUPITER TOKEN LIST ---
-interface JupiterToken {
-    address: string;
-    name: string;
-    symbol: string;
-    logoURI?: string;
-    decimals: number;
-}
-
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
 export interface UseSolanaReturn {
   connected: boolean;
@@ -139,70 +130,38 @@ export const useSolana = (): UseSolanaReturn => {
 
         allTokens = [...allTokens, ...splTokens];
 
-        // 3. Batch fetch metadata and prices
-        const jupiterTokenList: JupiterToken[] = await (await fetch('https://token.jup.ag/strict')).json();
-        const tokenMap = new Map(jupiterTokenList.map((t: JupiterToken) => [t.address, t]));
-        
-        try {
-            let priceData: any = {};
-            if (mintsToFetchPrice.size > 0) {
-                const mintList = Array.from(mintsToFetchPrice).join(',');
-                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mintList}`);
-
-                if (priceRes.ok) {
-                    const jupiterPriceData = await priceRes.json();
-                    if (jupiterPriceData.data) {
-                        priceData = jupiterPriceData.data;
+        // 3. Batch fetch metadata and prices from Birdeye
+        let priceData: any = {};
+        if (mintsToFetchPrice.size > 0) {
+            const mintList = Array.from(mintsToFetchPrice).join(',');
+            try {
+                const birdeyeRes = await fetch(`https://public-api.birdeye.so/defi/multi_price?list_token=${mintList}`);
+                if (birdeyeRes.ok) {
+                    const birdeyeData = await birdeyeRes.json();
+                    if (birdeyeData.success && birdeyeData.data) {
+                        priceData = birdeyeData.data;
                     }
                 } else {
-                    console.warn(`Jupiter Price API call failed with status ${priceRes.status}`);
+                    console.warn(`Birdeye multi-price API call failed with status ${birdeyeRes.status}`);
                 }
+            } catch (priceError) {
+                console.error("Could not fetch token prices from Birdeye:", priceError);
             }
-            
-            let solPrice = 0;
-            const solMint = 'So11111111111111111111111111111111111111112';
-
-            allTokens.forEach(token => {
-                const metadata = tokenMap.get(token.mintAddress);
-                if (metadata) {
-                    token.name = metadata.name;
-                    token.symbol = metadata.symbol;
-                    token.logo = React.createElement(GenericTokenIcon, { uri: metadata.logoURI });
-                }
-
-                if (priceData?.[token.mintAddress]) {
-                    const priceInfo = priceData[token.mintAddress];
-                    if (priceInfo && typeof priceInfo.price === 'number') {
-                        const price = priceInfo.price;
-                        token.pricePerToken = price;
-                        token.usdValue = token.balance * price;
-                        if (token.mintAddress === solMint) {
-                            solPrice = price;
-                        }
-                    }
-                }
-            });
-            
-            if (solPrice > 0) {
-                const owfnToken = allTokens.find(token => token.mintAddress === OWFN_MINT_ADDRESS);
-                if (owfnToken && owfnToken.pricePerToken === 0) {
-                    const owfnPriceInSol = 1 / PRESALE_DETAILS.rate;
-                    const owfnPriceInUsd = owfnPriceInSol * solPrice;
-                    owfnToken.pricePerToken = owfnPriceInUsd;
-                    owfnToken.usdValue = owfnToken.balance * owfnPriceInUsd;
-                }
-            }
-        } catch (priceError) {
-            console.error("Could not fetch token prices:", priceError);
-            allTokens.forEach(token => {
-                 const metadata = tokenMap.get(token.mintAddress);
-                if (metadata) {
-                    token.name = metadata.name;
-                    token.symbol = metadata.symbol;
-                    token.logo = React.createElement(GenericTokenIcon, { uri: metadata.logoURI });
-                }
-            });
         }
+
+        allTokens.forEach(token => {
+            const data = priceData[token.mintAddress];
+            if (data) {
+                token.name = data.name || token.name;
+                token.symbol = data.symbol || token.symbol;
+                token.logo = React.createElement(GenericTokenIcon, { uri: data.logoURI });
+                token.pricePerToken = data.value || 0;
+                token.usdValue = token.balance * (data.value || 0);
+                if (data.decimals) {
+                    token.decimals = data.decimals;
+                }
+            }
+        });
         
         // 4. Override with known data for consistency
          const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {

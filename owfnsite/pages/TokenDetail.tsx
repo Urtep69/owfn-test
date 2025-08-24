@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Loader2, ArrowLeft, Database, Shield, DollarSign, FileText, Globe, Twitter, Send } from 'lucide-react';
+import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
-import { DiscordIcon } from '../components/IconComponents.tsx';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, ParsedAccountData } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { MOCK_TOKEN_DETAILS } from '../constants.ts';
-
-interface JupiterToken {
-    address: string;
-    name: string;
-    symbol: string;
-    logoURI?: string;
-    decimals: number;
-}
 
 const StatCard = ({ title, value, icon }: { title: string, value: string, icon: React.ReactNode }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
@@ -46,13 +37,6 @@ const InfoRow = ({ label, children }: { label: string, children: React.ReactNode
         <div className="text-sm font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
     </div>
 );
-
-const LinkButton = ({ href, icon, text }: { href: string, icon: React.ReactNode, text: string }) => (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="flex-grow flex items-center justify-center gap-2 bg-primary-100 dark:bg-darkPrimary-700 hover:bg-primary-200 dark:hover:bg-darkPrimary-600 text-primary-700 dark:text-darkPrimary-200 font-semibold py-2 px-3 rounded-md transition-colors">
-        {icon}{text}
-    </a>
-);
-
 
 export default function TokenDetail() {
     const { t } = useAppContext();
@@ -89,36 +73,30 @@ export default function TokenDetail() {
             try {
                 const responseData: Partial<TokenDetails> = { mintAddress };
 
-                const jupiterPricePromise = fetch(`https://price.jup.ag/v4/price?ids=${mintAddress}`);
-                const jupiterTokenListPromise = fetch('https://token.jup.ag/strict');
+                // Fetch market data from Birdeye and on-chain data from RPC in parallel
+                const birdeyePromise = fetch(`https://public-api.birdeye.so/defi/token_overview?address=${mintAddress}`);
                 const onChainInfoPromise = connection.getParsedAccountInfo(new PublicKey(mintAddress));
 
-                const [priceRes, tokenListRes, accountInfo] = await Promise.all([
-                    jupiterPricePromise,
-                    jupiterTokenListPromise,
+                const [birdeyeRes, accountInfo] = await Promise.all([
+                    birdeyePromise,
                     onChainInfoPromise
                 ]);
 
-                // 1. Process Price Data
-                if (priceRes.ok) {
-                    const jupiterPriceData = await priceRes.json();
-                    if (jupiterPriceData.data && jupiterPriceData.data[mintAddress]) {
-                        responseData.pricePerToken = jupiterPriceData.data[mintAddress].price || 0;
+                // 1. Process Market Data from Birdeye
+                if (birdeyeRes.ok) {
+                    const apiData = await birdeyeRes.json();
+                    if (apiData.success && apiData.data) {
+                        const data = apiData.data;
+                        responseData.name = data.name;
+                        responseData.symbol = data.symbol;
+                        responseData.logo = data.logoURI;
+                        responseData.decimals = data.decimals;
+                        responseData.pricePerToken = data.price || 0;
+                        responseData.marketCap = data.mc;
+                        responseData.volume24h = data.v24hUSD;
                     }
                 } else {
-                    console.warn(`Jupiter Price API call for ${mintAddress} failed with status ${priceRes.status}`);
-                }
-
-                // 2. Process Metadata from Jupiter List
-                if (tokenListRes.ok) {
-                    const tokenList: JupiterToken[] = await tokenListRes.json();
-                    const tokenMeta = tokenList.find(t => t.address === mintAddress);
-                    if (tokenMeta) {
-                        responseData.name = tokenMeta.name;
-                        responseData.symbol = tokenMeta.symbol;
-                        responseData.logo = tokenMeta.logoURI;
-                        responseData.decimals = tokenMeta.decimals;
-                    }
+                    console.warn(`Birdeye API call for ${mintAddress} failed with status ${birdeyeRes.status}`);
                 }
                 
                 // Fallback to MOCK data for core known tokens if metadata is still missing
@@ -132,7 +110,7 @@ export default function TokenDetail() {
                     responseData.description = responseData.description || mock.description;
                 }
 
-                // 3. Process On-chain Data (Source of Truth for supply/authorities)
+                // 2. Process On-chain Data (Source of Truth for supply/authorities)
                 if (accountInfo?.value) {
                     const programOwner = accountInfo.value.owner.toBase58();
                     if (programOwner === TOKEN_2022_PROGRAM_ID.toBase58()) {
@@ -161,7 +139,7 @@ export default function TokenDetail() {
                     }
                 }
 
-                // 4. Final Cleanup and Validation
+                // 3. Final Cleanup and Validation
                 if (!responseData.name) responseData.name = 'Unknown Token';
                 if (!responseData.symbol) responseData.symbol = `${mintAddress.slice(0,4)}...${mintAddress.slice(-4)}`;
                 responseData.updateAuthority = null; // Assume revoked/null as it's not easily available
@@ -221,17 +199,17 @@ export default function TokenDetail() {
                 </div>
             </header>
 
-            {isPriceAvailable && (
-                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <StatCard title={t('pricePerToken', {defaultValue: 'Price'})} value={`$${priceString}`} icon={<DollarSign />} />
-                </div>
-            )}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <StatCard title={t('pricePerToken', {defaultValue: 'Price'})} value={isPriceAvailable ? `$${priceString}`: 'N/A'} icon={<DollarSign />} />
+                <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<BarChart2 />} />
+                <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<BarChart2 />} />
+            </div>
 
             <div className="grid lg:grid-cols-3 gap-8 items-start">
                 <div className="lg:col-span-2 space-y-8">
                     <InfoCard title={t('on_chain_security')} icon={<Shield />}>
                         <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
-                        <InfoRow label={t('token_standard')}>{token.tokenStandard}</InfoRow>
+                        <InfoRow label={t('token_standard')}>{token.tokenStandard || 'N/A'}</InfoRow>
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
                         <AuthorityRow label="Update Authority" address={token.updateAuthority} />
