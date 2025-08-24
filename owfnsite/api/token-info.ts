@@ -1,5 +1,6 @@
 
-import type { TokenDetails, TokenExtension } from '../types.ts';
+import type { TokenDetails } from '../types.ts';
+import { PublicKey } from '@solana/web3.js';
 
 // Main handler function
 export default async function handler(req: any, res: any) {
@@ -12,86 +13,67 @@ export default async function handler(req: any, res: any) {
     const quicknodeUrl = 'https://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/';
 
     try {
-        // Step 1: Fetch asset data from QuickNode for on-chain details and metadata
-        const rpcResponse = await fetch(quicknodeUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 'my-id',
-                method: 'getAsset',
-                params: { id: mintAddress, displayOptions: { showFungible: true } },
-            }),
-        });
+        const responseData: Partial<TokenDetails> = { mintAddress };
 
-        if (!rpcResponse.ok) throw new Error(`RPC API failed with status ${rpcResponse.status}`);
-        
-        const rpcData = await rpcResponse.json();
-        if (rpcData.error) throw new Error(`RPC Error: ${rpcData.error.message}`);
-        
-        const asset = rpcData.result;
-        if (!asset || !asset.id) {
-            return res.status(404).json({ error: `Token data not found.` });
-        }
-
-        // --- Parse RPC Data ---
-        const content = asset.content || {};
-        const metadata = content.metadata || {};
-        const links = content.links || {};
-        const tokenInfo = asset.token_info || {};
-        const ownership = asset.ownership || {};
-        const authorities = Array.isArray(asset.authorities) ? asset.authorities : [];
-        const splTokenInfo = asset.spl_token_info || {};
-        const decimals = tokenInfo.decimals ?? 0;
-
-        let totalSupply = 0;
+        // --- Step 1: Fetch metadata from Jupiter Token List (more reliable for name, symbol, logo) ---
         try {
-            // Defensive parsing for potentially very large numbers
-            totalSupply = parseFloat(tokenInfo.supply) / Math.pow(10, decimals);
-        } catch { /* Fails gracefully, remains 0 */ }
-        
-        const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
-        const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
-        
-        let tokenExtensions: TokenExtension[] = [];
-        if (tokenStandard === 'Token-2022' && Array.isArray(splTokenInfo.token_extensions)) {
-            tokenExtensions = splTokenInfo.token_extensions.map((ext: any) => ({
-                extension: ext?.extension || 'unknown',
-                state: { ...(ext?.state || {}), mintDecimals: decimals },
-            }));
+            const jupiterResponse = await fetch('https://token.jup.ag/all');
+            if (jupiterResponse.ok) {
+                const tokenList = await jupiterResponse.json();
+                const tokenMeta = tokenList.find((t: any) => t.address === mintAddress);
+                if (tokenMeta) {
+                    responseData.name = tokenMeta.name;
+                    responseData.symbol = tokenMeta.symbol;
+                    responseData.logo = tokenMeta.logoURI;
+                    responseData.decimals = tokenMeta.decimals;
+                }
+            }
+        } catch (e) {
+            console.warn(`Could not fetch metadata from Jupiter for ${mintAddress}:`, e);
         }
         
-        const responseData: Partial<TokenDetails> = {
-            mintAddress: asset.id,
-            name: metadata.name || 'Unknown Token',
-            symbol: metadata.symbol || 'N/A',
-            logo: links.image || null,
-            decimals,
-            totalSupply,
-            description: metadata.description || null,
-            links: links,
-            creatorAddress: authorities.find(a => a?.scopes?.includes('owner'))?.address || ownership.owner || 'Unknown',
-            mintAuthority: tokenInfo.mint_authority ?? null,
-            freezeAuthority: tokenInfo.freeze_authority ?? null,
-            updateAuthority: authorities.find(a => a?.scopes?.includes('metaplex_metadata_update'))?.address ?? null,
-            tokenStandard,
-            tokenExtensions,
-        };
+        // --- Step 2: Fetch on-chain data using standard getParsedAccountInfo ---
+        try {
+            const rpcResponse = await fetch(quicknodeUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 'my-id',
+                    method: 'getParsedAccountInfo',
+                    params: [mintAddress],
+                }),
+            });
+            if (!rpcResponse.ok) throw new Error(`RPC getParsedAccountInfo failed with status ${rpcResponse.status}`);
 
-        // Step 2: Fetch LIVE market data from DexScreener
+            const rpcData = await rpcResponse.json();
+            if (rpcData.error) throw new Error(`RPC Error: ${rpcData.error.message}`);
+            
+            const accountInfo = rpcData.result?.value?.data?.parsed?.info;
+            if (accountInfo) {
+                responseData.decimals = accountInfo.decimals;
+                responseData.totalSupply = parseFloat(accountInfo.supply) / Math.pow(10, accountInfo.decimals);
+                responseData.mintAuthority = accountInfo.mintAuthority;
+                responseData.freezeAuthority = accountInfo.freezeAuthority;
+            }
+        } catch(e) {
+             console.error(`Could not fetch on-chain account info for ${mintAddress}:`, e);
+             // If this fails, we might not have vital info, but we can continue if other sources work
+        }
+
+        // --- Step 3: Fetch LIVE market data from DexScreener ---
         try {
             const dexScreenerUrl = `https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`;
             const dexResponse = await fetch(dexScreenerUrl);
             if (dexResponse.ok) {
                 const dexData = await dexResponse.json();
                 if (dexData.pairs && dexData.pairs.length > 0) {
-                    // Find the most liquid pair
                     const primaryPair = dexData.pairs.reduce((prev: any, current: any) => 
                         (prev.liquidity?.usd ?? 0) > (current.liquidity?.usd ?? 0) ? prev : current
                     );
 
                     responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
-                    responseData.marketCap = primaryPair.marketCap ?? 0; // Use marketCap directly if available
+                    responseData.marketCap = primaryPair.marketCap ?? 0;
                     responseData.fdv = primaryPair.fdv ?? 0;
                     responseData.volume24h = primaryPair.volume?.h24 || 0;
                     responseData.price24hChange = primaryPair.priceChange?.h24 || 0;
@@ -109,8 +91,12 @@ export default async function handler(req: any, res: any) {
             }
         } catch (dexError) {
             console.warn(`Could not fetch market data for ${mintAddress} from DexScreener:`, dexError);
-            // Gracefully continue without market data, the frontend will handle this
         }
+        
+        // --- Final Fallbacks ---
+        if (!responseData.name) responseData.name = 'Unknown Token';
+        if (!responseData.symbol) responseData.symbol = 'N/A';
+        if (!responseData.decimals) responseData.decimals = 0;
 
         return res.status(200).json(responseData);
 

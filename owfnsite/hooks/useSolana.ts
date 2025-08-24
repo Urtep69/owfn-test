@@ -33,15 +33,28 @@ export interface UseSolanaReturn {
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
 
-const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
-    [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon, null),
-    'So11111111111111111111111111111111111111112': React.createElement(SolIcon, null),
-    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon, null),
-    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
-};
-
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
+
+let jupiterTokenListCache: any[] | null = null;
+let lastJupiterFetch = 0;
+const JUPITER_CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+
+const getJupiterTokenList = async () => {
+    if (jupiterTokenListCache && (Date.now() - lastJupiterFetch < JUPITER_CACHE_DURATION)) {
+        return jupiterTokenListCache;
+    }
+    try {
+        const response = await fetch('https://token.jup.ag/all');
+        if (!response.ok) throw new Error('Failed to fetch Jupiter token list');
+        jupiterTokenListCache = await response.json();
+        lastJupiterFetch = Date.now();
+        return jupiterTokenListCache;
+    } catch (error) {
+        console.error("Failed to get Jupiter token list:", error);
+        return jupiterTokenListCache; // Return old cache if available
+    }
+};
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
@@ -62,10 +75,11 @@ export const useSolana = (): UseSolanaReturn => {
         const ownerPublicKey = new PublicKey(walletAddress);
         const allTokens: Token[] = [];
         const mintsToFetchPrice = new Set<string>();
+        const tokenList = await getJupiterTokenList() || [];
+        const tokenMap = new Map(tokenList.map(t => [t.address, t]));
         
         // 1. Fetch native SOL balance
         const solBalanceLamports = await connection.getBalance(ownerPublicKey);
-        // Add SOL to the list even if balance is 0 for profile display, but only fetch price if > 0
         if (solBalanceLamports > 0) {
              mintsToFetchPrice.add('So11111111111111111111111111111111111111112');
         }
@@ -81,33 +95,35 @@ export const useSolana = (): UseSolanaReturn => {
         });
 
 
-        // 2. Fetch SPL token accounts
+        // 2. Fetch SPL token accounts using a standard RPC call
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(ownerPublicKey, {
             programId: TOKEN_PROGRAM_ID,
         });
 
         tokenAccounts.value.forEach(accountInfo => {
             const { parsed } = accountInfo.account.data;
+            const mintAddress = parsed.info.mint;
             const tokenAmount = parsed.info.tokenAmount;
 
-            // We include tokens with a balance of 0 to show them in the user's wallet if they've owned them before.
-            // But we only fetch prices for tokens with a balance > 0 to be efficient.
             if (tokenAmount.uiAmount > 0) {
-                 mintsToFetchPrice.add(parsed.info.mint);
+                 mintsToFetchPrice.add(mintAddress);
             }
-
+            
+            const tokenMetadata = tokenMap.get(mintAddress);
+            
             allTokens.push({
-                mintAddress: parsed.info.mint,
+                mintAddress: mintAddress,
                 balance: tokenAmount.uiAmount,
                 decimals: tokenAmount.decimals,
-                name: 'Unknown Token',
-                symbol: `${parsed.info.mint.slice(0, 4)}..`,
-                logo: React.createElement(GenericTokenIcon, { uri: undefined }),
+                name: tokenMetadata?.name || 'Unknown Token',
+                symbol: tokenMetadata?.symbol || `${mintAddress.slice(0, 4)}..`,
+                logo: React.createElement(GenericTokenIcon, { uri: tokenMetadata?.logoURI }),
                 pricePerToken: 0,
                 usdValue: 0,
             });
         });
 
+        // 3. Batch fetch prices for all tokens with a balance
         if (mintsToFetchPrice.size > 0) {
             try {
                 const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${Array.from(mintsToFetchPrice).join(',')}`);
@@ -130,31 +146,28 @@ export const useSolana = (): UseSolanaReturn => {
             }
         }
         
-        // 4. Fill metadata for known tokens
+        // 4. Override with known icons for major tokens for consistency
+         const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
+            [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon, null),
+            'So11111111111111111111111111111111111111112': React.createElement(SolIcon, null),
+            'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon, null),
+            'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
+        };
+
         allTokens.forEach(token => {
             if (KNOWN_TOKEN_ICONS[token.mintAddress]) {
                 token.logo = KNOWN_TOKEN_ICONS[token.mintAddress];
             }
-            if (token.mintAddress === KNOWN_TOKEN_MINT_ADDRESSES.OWFN) {
-                token.name = 'Official World Family Network';
-                token.symbol = 'OWFN';
-            } else if (token.mintAddress === KNOWN_TOKEN_MINT_ADDRESSES.USDC) {
-                token.name = 'USD Coin';
-                token.symbol = 'USDC';
-            } else if (token.mintAddress === KNOWN_TOKEN_MINT_ADDRESSES.USDT) {
-                token.name = 'Tether';
-                token.symbol = 'USDT';
-            }
         });
         
-        const tokensWithBalance = allTokens.filter(t => t.balance > 0);
+        const tokensWithBalance = allTokens.filter(t => t.balance > 0.000001); // Filter out dust balances
         const sortedTokens = tokensWithBalance.sort((a,b) => b.usdValue - a.usdValue);
         balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
         return sortedTokens;
 
     } catch (error) {
         console.error("Error fetching wallet balances:", error);
-        return [];
+        return []; // Return empty array on critical failure
     } finally {
         setLoading(false);
     }
@@ -188,10 +201,10 @@ export const useSolana = (): UseSolanaReturn => {
                 })
             );
         } else {
-            const mintAddress = KNOWN_TOKEN_MINT_ADDRESSES[tokenSymbol];
+            const mintAddress = Object.keys(KNOWN_TOKEN_MINT_ADDRESSES).find(key => key === tokenSymbol && KNOWN_TOKEN_MINT_ADDRESSES[key]);
             if (!mintAddress) throw new Error(`Unknown token symbol: ${tokenSymbol}`);
-
-            const mintPublicKey = new PublicKey(mintAddress);
+            
+            const mintPublicKey = new PublicKey(KNOWN_TOKEN_MINT_ADDRESSES[tokenSymbol]);
             const tokenInfo = userTokens.find(t => t.symbol === tokenSymbol);
             if (!tokenInfo) throw new Error(`Token ${tokenSymbol} not found in user's wallet.`);
             
@@ -254,7 +267,7 @@ export const useSolana = (): UseSolanaReturn => {
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
         if (address) {
-            balanceCache.delete(address);
+            balanceCache.delete(address); // Invalidate cache after sending
             getWalletBalances(address).then(setUserTokens);
         }
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
