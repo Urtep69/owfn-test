@@ -26,11 +26,9 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Wallet address is required." });
     }
 
-    const rpcUrl = process.env.QUICKNODE_RPC_URL;
-    if (!rpcUrl) {
-        console.error("CRITICAL: QUICKNODE_RPC_URL environment variable is not set.");
-        return res.status(500).json({ error: "Server configuration error: RPC URL not configured." });
-    }
+    // Use a standard, public RPC endpoint to ensure reliability and bypass potential
+    // issues with third-party RPC service plans or environment variable configurations.
+    const rpcUrl = 'https://api.mainnet-beta.solana.com';
 
     try {
         const connection = new Connection(rpcUrl, 'confirmed');
@@ -95,7 +93,7 @@ export default async function handler(req: any, res: any) {
                 decimals: 9,
                 name: 'Solana',
                 symbol: 'SOL',
-                logo: getLogoData('So1111111111111111111111111111111111111111112'),
+                logo: getLogoData('So111111111111111111111111111111111111112'),
                 pricePerToken: solPrice,
                 usdValue: balance * solPrice,
             });
