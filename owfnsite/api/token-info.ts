@@ -1,4 +1,6 @@
-import type { TokenDetails, TokenExtension } from '../types.ts';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { getMint } from '@solana/spl-token';
+import type { TokenDetails } from '../types.ts';
 
 // Main handler function
 export default async function handler(req: any, res: any) {
@@ -9,113 +11,87 @@ export default async function handler(req: any, res: any) {
     }
 
     const QUICKNODE_RPC_URL = 'https://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/';
+    const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
 
     try {
-        // Step 1: Fetch asset data from QuickNode for on-chain details and metadata
-        const rpcResponse = await fetch(QUICKNODE_RPC_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 'my-id',
-                method: 'qn_getAsset',
-                params: { id: mintAddress },
-            }),
-        });
+        const mintPublicKey = new PublicKey(mintAddress);
+        
+        // Fetch on-chain data and market data in parallel
+        const onChainDataPromise = getMint(connection, mintPublicKey);
+        const marketDataPromise = fetch(`https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`);
+        
+        const [onChainData, marketDataResponse] = await Promise.all([
+            onChainDataPromise,
+            marketDataPromise
+        ]);
 
-        if (!rpcResponse.ok) throw new Error(`QuickNode API failed with status ${rpcResponse.status}`);
-        
-        const rpcData = await rpcResponse.json();
-        if (rpcData.error) throw new Error(`QuickNode RPC Error: ${rpcData.error.message}`);
-        
-        const asset = rpcData.result;
-        if (!asset || !asset.id) {
-            return res.status(404).json({ error: `Token data not found.` });
-        }
-
-        // --- Parse RPC Data ---
-        const content = asset.content || {};
-        const metadata = content.metadata || {};
-        const links = content.links || {};
-        const tokenInfo = asset.token_info || {};
-        const ownership = asset.ownership || {};
-        const authorities = Array.isArray(asset.authorities) ? asset.authorities : [];
-        const splTokenInfo = asset.spl_token_info || {};
-        const decimals = tokenInfo.decimals ?? 0;
-
-        let totalSupply = 0;
-        try {
-            // Defensive parsing for potentially very large numbers
-            totalSupply = parseFloat(tokenInfo.supply) / Math.pow(10, decimals);
-        } catch { /* Fails gracefully, remains 0 */ }
-        
-        const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
-        const tokenStandard = ownership.program === TOKEN_2022_PROGRAM_ID ? 'Token-2022' : 'SPL Token';
-        
-        let tokenExtensions: TokenExtension[] = [];
-        if (tokenStandard === 'Token-2022' && Array.isArray(splTokenInfo.token_extensions)) {
-            tokenExtensions = splTokenInfo.token_extensions.map((ext: any) => ({
-                extension: ext?.extension || 'unknown',
-                state: { ...(ext?.state || {}), mintDecimals: decimals },
-            }));
-        }
-        
+        // --- Start with On-Chain Data from getMint ---
         const responseData: Partial<TokenDetails> = {
-            mintAddress: asset.id,
-            name: metadata.name || 'Unknown Token',
-            symbol: metadata.symbol || 'N/A',
-            logo: links.image || null,
-            decimals,
-            totalSupply,
-            description: metadata.description || null,
-            links: links,
-            creatorAddress: authorities.find(a => a?.scopes?.includes('owner'))?.address || ownership.owner || 'Unknown',
-            mintAuthority: tokenInfo.mint_authority ?? null,
-            freezeAuthority: tokenInfo.freeze_authority ?? null,
-            updateAuthority: authorities.find(a => a?.scopes?.includes('metaplex_metadata_update'))?.address ?? null,
-            tokenStandard,
-            tokenExtensions,
+            mintAddress: mintAddress,
+            decimals: onChainData.decimals,
+            totalSupply: Number(onChainData.supply) / (10 ** onChainData.decimals),
+            mintAuthority: onChainData.mintAuthority?.toBase58() ?? null,
+            freezeAuthority: onChainData.freezeAuthority?.toBase58() ?? null,
+            tokenStandard: onChainData.tlvData ? 'Token-2022' : 'SPL Token',
         };
 
-        // Step 2: Fetch LIVE market data from DexScreener
-        try {
-            const dexScreenerUrl = `https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`;
-            const dexResponse = await fetch(dexScreenerUrl);
-            if (dexResponse.ok) {
-                const dexData = await dexResponse.json();
-                if (dexData.pairs && dexData.pairs.length > 0) {
-                    // Find the most liquid pair
-                    const primaryPair = dexData.pairs.reduce((prev: any, current: any) => 
-                        (prev.liquidity?.usd ?? 0) > (current.liquidity?.usd ?? 0) ? prev : current
-                    );
+        // --- Add Market & Metadata from DexScreener ---
+        if (marketDataResponse.ok) {
+            const dexData = await marketDataResponse.json();
+            if (dexData.pairs && dexData.pairs.length > 0) {
+                // Find the pair with the most liquidity to use as the primary source
+                const primaryPair = dexData.pairs.reduce((prev: any, current: any) => 
+                    (prev.liquidity?.usd ?? 0) > (current.liquidity?.usd ?? 0) ? prev : current
+                );
 
-                    responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
-                    responseData.marketCap = primaryPair.marketCap ?? 0; // Use marketCap directly if available
-                    responseData.fdv = primaryPair.fdv ?? 0;
-                    responseData.volume24h = primaryPair.volume?.h24 || 0;
-                    responseData.price24hChange = primaryPair.priceChange?.h24 || 0;
-                    responseData.liquidity = primaryPair.liquidity?.usd || 0;
-                    responseData.pairAddress = primaryPair.pairAddress;
-                    responseData.poolCreatedAt = primaryPair.pairCreatedAt ? new Date(primaryPair.pairCreatedAt).getTime() : undefined;
-                    responseData.txns = {
-                        h24: {
-                            buys: primaryPair.txns?.h24?.buys ?? 0,
-                            sells: primaryPair.txns?.h24?.sells ?? 0
-                        }
-                    };
-                    responseData.dexId = primaryPair.dexId;
-                }
+                // Populate metadata from DexScreener
+                responseData.name = primaryPair.baseToken.name;
+                responseData.symbol = primaryPair.baseToken.symbol;
+                responseData.logo = primaryPair.info?.imageUrl || null;
+                responseData.description = primaryPair.info?.description || null;
+                const socials = primaryPair.info?.socials || [];
+                responseData.links = {
+                    website: primaryPair.info?.websites?.[0]?.url,
+                    twitter: socials.find((s: any) => s.type === 'twitter')?.url,
+                    telegram: socials.find((s: any) => s.type === 'telegram')?.url,
+                    discord: socials.find((s: any) => s.type === 'discord')?.url,
+                };
+                
+                // Populate market data
+                responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
+                responseData.marketCap = primaryPair.marketCap ?? 0;
+                responseData.fdv = primaryPair.fdv ?? 0;
+                responseData.volume24h = primaryPair.volume?.h24 || 0;
+                responseData.price24hChange = primaryPair.priceChange?.h24 || 0;
+                responseData.liquidity = primaryPair.liquidity?.usd || 0;
+                responseData.pairAddress = primaryPair.pairAddress;
+                responseData.poolCreatedAt = primaryPair.pairCreatedAt ? new Date(primaryPair.pairCreatedAt).getTime() : undefined;
+                responseData.txns = {
+                    h24: {
+                        buys: primaryPair.txns?.h24?.buys ?? 0,
+                        sells: primaryPair.txns?.h24?.sells ?? 0
+                    }
+                };
+                responseData.dexId = primaryPair.dexId;
             }
-        } catch (dexError) {
-            console.warn(`Could not fetch market data for ${mintAddress} from DexScreener:`, dexError);
-            // Gracefully continue without market data, the frontend will handle this
-        }
+        } 
+        
+        // Ensure basic info exists even if DexScreener fails
+        if (!responseData.name) responseData.name = 'Unknown Token';
+        if (!responseData.symbol) responseData.symbol = mintAddress.substring(0, 4) + '...';
+
 
         return res.status(200).json(responseData);
 
     } catch (error) {
-        console.error(`[FATAL] Unhandled error in token-info API for mint ${mintAddress}:`, error);
+        console.error(`Error in token-info API for mint ${mintAddress}:`, error);
         const errorMessage = error instanceof Error ? error.message : "An unexpected server error occurred.";
+        
+        // Provide a more specific error if the mint address is invalid
+        if (errorMessage.includes("could not find account") || errorMessage.includes("Invalid public key")) {
+             return res.status(404).json({ error: `Token not found or invalid mint address provided.` });
+        }
+        
         return res.status(500).json({ error: `Failed to retrieve token data. Reason: ${errorMessage}` });
     }
 }
