@@ -84,28 +84,31 @@ export default async function handler(req: any, res: any) {
             const dexResponse = await fetch(dexScreenerUrl, { headers: { 'User-Agent': 'OWFN/1.0' } });
             if (dexResponse.ok) {
                 const dexData = await dexResponse.json();
-                // **ULTRA-ROBUSTNESS FIX**: Use optional chaining and initialize reducer correctly.
-                const primaryPair = dexData?.pairs?.reduce((prev: any, current: any) => 
-                    (prev?.liquidity?.usd ?? 0) > (current?.liquidity?.usd ?? 0) ? prev : current, null
-                );
+                
+                const pairs = dexData?.pairs;
+                if (Array.isArray(pairs) && pairs.length > 0) {
+                    const primaryPair = pairs.reduce((prev: any, current: any) => 
+                        (prev?.liquidity?.usd ?? 0) > (current?.liquidity?.usd ?? 0) ? prev : current
+                    );
 
-                if (primaryPair) {
-                    responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
-                    responseData.marketCap = primaryPair.marketCap ?? 0;
-                    responseData.fdv = primaryPair.fdv ?? 0;
-                    responseData.volume24h = primaryPair.volume?.h24 || 0;
-                    responseData.price24hChange = primaryPair.priceChange?.h24 || 0;
-                    responseData.liquidity = primaryPair.liquidity?.usd || 0;
-                    responseData.pairAddress = primaryPair.pairAddress;
-                    responseData.poolCreatedAt = primaryPair.pairCreatedAt ? new Date(primaryPair.pairCreatedAt).getTime() : undefined;
-                    responseData.txns = {
-                        h24: {
-                            buys: primaryPair.txns?.h24?.buys ?? 0,
-                            sells: primaryPair.txns?.h24?.sells ?? 0
-                        }
-                    };
-                    responseData.dexId = primaryPair.dexId;
-                    marketDataFetched = true;
+                    if (primaryPair) {
+                        responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
+                        responseData.marketCap = primaryPair.marketCap ?? 0;
+                        responseData.fdv = primaryPair.fdv ?? 0;
+                        responseData.volume24h = primaryPair.volume?.h24 || 0;
+                        responseData.price24hChange = primaryPair.priceChange?.h24 || 0;
+                        responseData.liquidity = primaryPair.liquidity?.usd || 0;
+                        responseData.pairAddress = primaryPair.pairAddress;
+                        responseData.poolCreatedAt = primaryPair.pairCreatedAt ? new Date(primaryPair.pairCreatedAt).getTime() : undefined;
+                        responseData.txns = {
+                            h24: {
+                                buys: primaryPair.txns?.h24?.buys ?? 0,
+                                sells: primaryPair.txns?.h24?.sells ?? 0
+                            }
+                        };
+                        responseData.dexId = primaryPair.dexId;
+                        marketDataFetched = true;
+                    }
                 }
             }
         } catch (dexError) {

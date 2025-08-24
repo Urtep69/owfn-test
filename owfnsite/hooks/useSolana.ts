@@ -138,9 +138,12 @@ export const useSolana = (): UseSolanaReturn => {
                 }
 
                 if (priceData.data && priceData.data[token.mintAddress]) {
-                    const price = priceData.data[token.mintAddress].price;
-                    token.pricePerToken = price;
-                    token.usdValue = token.balance * price;
+                    const priceInfo = priceData.data[token.mintAddress];
+                    if (priceInfo && typeof priceInfo.price === 'number') {
+                        const price = priceInfo.price;
+                        token.pricePerToken = price;
+                        token.usdValue = token.balance * price;
+                    }
                 }
             });
         } catch (priceError) {
