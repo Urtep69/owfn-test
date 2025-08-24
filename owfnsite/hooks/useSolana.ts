@@ -70,7 +70,7 @@ export const useSolana = (): UseSolanaReturn => {
                     page: 1,
                     limit: 1000,
                     displayOptions: {
-                        showFungible: true, // This is the crucial parameter that was missing
+                        showFungible: true,
                         showNativeBalance: true,
                     },
                 },
@@ -94,7 +94,7 @@ export const useSolana = (): UseSolanaReturn => {
         // Collect all fungible token mints for price fetching
         if (result.items && Array.isArray(result.items)) {
             result.items.forEach((asset: any) => {
-                if (asset.id && asset.ownership?.token_info) { // Check if it is a token-like asset
+                if (asset.interface === 'fungible_token' && asset.id) {
                     mintsToPrice.push(asset.id);
                 }
             });
@@ -136,11 +136,10 @@ export const useSolana = (): UseSolanaReturn => {
         // Process SPL tokens from the 'items' array
         if (result.items && Array.isArray(result.items)) {
             const splTokens: Token[] = result.items
-                .filter((asset: any) => asset.ownership?.token_info?.balance > 0)
+                .filter((asset: any) => asset.interface === 'fungible_token' && asset.token_info?.balance > 0)
                 .map((asset: any): Token => {
-                    const tokenInfo = asset.ownership.token_info;
+                    const tokenInfo = asset.token_info;
                     const decimals = tokenInfo?.decimals ?? 0;
-                    // Safely convert balance string to number before calculation
                     const balance = Number(tokenInfo?.balance) / Math.pow(10, decimals);
                     const price = prices.get(asset.id) || 0;
                     const mintAddress = asset.id;
