@@ -138,29 +138,37 @@ export const useSolana = (): UseSolanaReturn => {
             const splTokens: Token[] = result.items
                 .map((asset: any): Token | null => {
                     try {
-                        // More robust check for fungible tokens, excluding NFTs (which often have decimals: 0)
-                        if (asset.interface !== 'fungible_token' || (asset.token_info && asset.token_info.decimals === 0)) {
-                            return null;
+                        // Simplified and more robust filtering
+                        if (asset.interface !== 'fungible_token') {
+                            return null; // Exclude non-fungible tokens (NFTs)
                         }
-                        
-                        // Find the token data, which can be in multiple locations in the response
+
                         const tokenData = asset.token_info || asset.ownership?.token_info || asset.spl_token_info;
                         
                         if (!tokenData || typeof tokenData.balance === 'undefined' || tokenData.balance === null) {
-                            return null; // Skip if no valid token data block is found
+                            return null; // Skip if no valid balance data
                         }
-                        
-                        const balanceRaw = tokenData.balance.toString();
+
                         const decimals = tokenData.decimals ?? 0;
-
-                        if (balanceRaw === '0') {
-                            return null; // Skip zero-balance tokens
+                        // Exclude tokens that are likely NFTs (0 decimals) and zero balance tokens
+                        if (decimals === 0 || tokenData.balance === '0') {
+                            return null;
                         }
 
-                        // Use BigInt for calculation to avoid precision issues, then convert to Number for display.
-                        const balance = Number(BigInt(balanceRaw)) / Math.pow(10, decimals);
+                        const balanceRaw = tokenData.balance.toString();
+                        let balance: number;
                         
-                        if (balance <= 0) {
+                        // Robust balance calculation using string manipulation to avoid BigInt and floating point issues.
+                        if (balanceRaw.length > decimals) {
+                            const integerPart = balanceRaw.slice(0, balanceRaw.length - decimals);
+                            const fractionalPart = balanceRaw.slice(balanceRaw.length - decimals);
+                            balance = Number(`${integerPart}.${fractionalPart}`);
+                        } else {
+                            const padded = balanceRaw.padStart(decimals, '0');
+                            balance = Number(`0.${padded}`);
+                        }
+                        
+                        if (balance <= 0 || !isFinite(balance)) {
                             return null;
                         }
 
