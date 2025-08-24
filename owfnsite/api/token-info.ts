@@ -19,7 +19,7 @@ export default async function handler(req: any, res: any) {
                 jsonrpc: '2.0',
                 id: 'my-id',
                 method: 'qn_getAsset',
-                params: { id: mintAddress, displayOptions: { showFungible: true } },
+                params: { id: mintAddress },
             }),
         });
 
