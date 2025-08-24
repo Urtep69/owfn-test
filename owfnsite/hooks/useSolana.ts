@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
@@ -43,6 +44,11 @@ export interface UseSolanaReturn {
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
+
+const isValidSolanaAddress = (address: any): boolean => {
+    if (typeof address !== 'string') return false;
+    return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+};
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
@@ -95,18 +101,28 @@ export const useSolana = (): UseSolanaReturn => {
         
         const allTokenAccounts = [...tokenAccounts.value, ...token2022Accounts.value];
         
-        const splTokens: Token[] = allTokenAccounts.map(accountInfo => {
-            const { parsed } = accountInfo.account.data;
-            const mintAddress = parsed.info.mint;
+        const splTokens: Token[] = [];
+        allTokenAccounts.forEach(accountInfo => {
+            const parsedInfo = accountInfo.account.data?.parsed?.info;
+            // Add robust check for mint address validity
+            if (!parsedInfo || !isValidSolanaAddress(parsedInfo.mint)) {
+                console.warn('Skipping token account with invalid or missing mint address:', parsedInfo?.mint);
+                return; // Skip this malformed token account
+            }
+
+            const rawAmount = BigInt(parsedInfo.tokenAmount.amount);
+            if (rawAmount === 0n) {
+                return; // Skip zero-balance tokens
+            }
+
+            const mintAddress = parsedInfo.mint;
             mintsToFetchPrice.add(mintAddress);
             
-            // Manual, robust balance calculation to prevent precision errors with large numbers.
-            const rawAmount = BigInt(parsed.info.tokenAmount.amount);
-            const decimals = parsed.info.tokenAmount.decimals;
+            const decimals = parsedInfo.tokenAmount.decimals;
             const divisor = 10n ** BigInt(decimals);
             const balance = Number(rawAmount) / Number(divisor);
 
-            return {
+            splTokens.push({
                 mintAddress,
                 balance: balance,
                 decimals: decimals,
@@ -115,7 +131,7 @@ export const useSolana = (): UseSolanaReturn => {
                 logo: React.createElement(GenericTokenIcon, { uri: undefined }),
                 pricePerToken: 0,
                 usdValue: 0,
-            };
+            });
         });
 
         allTokens = [...allTokens, ...splTokens];
