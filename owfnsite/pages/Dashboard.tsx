@@ -5,6 +5,7 @@ import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import type { Wallet, Token } from '../types.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import { formatNumber } from '../lib/utils.ts';
 
 const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'> }) => {
     const { t, solana } = useAppContext();
@@ -68,7 +69,7 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                                     </div>
                                     {/* Balance & Value */}
                                     <div className="text-right">
-                                        <p className="font-semibold font-mono">{token.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}</p>
+                                        <p className="font-semibold font-mono">{formatNumber(token.balance)}</p>
                                         <p className="text-xs text-primary-500 dark:text-darkPrimary-400">${token.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                                     </div>
                                 </a>

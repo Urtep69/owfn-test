@@ -1,13 +1,12 @@
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { PublicKey, Transaction, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount, ACCOUNT_SIZE } from '@solana/spl-token';
 
 import { 
     DISTRIBUTION_WALLETS, 
-    HELIUS_API_KEY, 
-    HELIUS_API_BASE_URL, 
     PRESALE_DETAILS,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
@@ -75,40 +74,57 @@ export default function AdminPresale() {
 
     const fetchAllTransactions = useCallback(async () => {
         setLoading(true);
-        let allTxs: PresaleTx[] = [];
-        let lastSignature: string | undefined = undefined;
-
         try {
+            const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            
+            let allSignatures: ConfirmedSignatureInfo[] = [];
+            let lastSignature: string | undefined = undefined;
+
             while (true) {
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
-                const data = await response.json();
-
-                const parsedTxs: PresaleTx[] = data
-                    .filter((tx: any) => 
-                        tx.type === 'NATIVE_TRANSFER' && 
-                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                        tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111' // System Program
-                    )
-                    .map((tx: any): PresaleTx => ({
-                        signature: tx.signature,
-                        from: tx.nativeTransfers[0].fromUserAccount,
-                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
-                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                        timestamp: tx.timestamp,
-                        lamports: tx.nativeTransfers[0].amount,
-                    }));
+                const signatures = await connection.getSignaturesForAddress(presalePublicKey, { before: lastSignature, limit: 1000 });
+                if (signatures.length === 0) break;
                 
-                allTxs.push(...parsedTxs);
+                allSignatures.push(...signatures);
+                lastSignature = signatures[signatures.length - 1].signature;
 
-                if (data.length < 100) {
-                    break; 
-                } else {
-                    lastSignature = data[data.length - 1].signature;
-                }
+                const lastTxTime = signatures[signatures.length - 1].blockTime;
+                if (lastTxTime && lastTxTime < presaleStartTimestamp) break;
             }
-            setTransactions(allTxs);
+
+            const relevantSignatures = allSignatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
+            const signatureStrings = relevantSignatures.map(s => s.signature);
+            
+            if (signatureStrings.length === 0) {
+                setTransactions([]);
+                setLoading(false);
+                return;
+            }
+
+            const allParsedTxs: PresaleTx[] = [];
+            const BATCH_SIZE = 100;
+            for (let i = 0; i < signatureStrings.length; i += BATCH_SIZE) {
+                const batchSignatures = signatureStrings.slice(i, i + BATCH_SIZE);
+                const transactionsData = await connection.getParsedTransactions(batchSignatures, { maxSupportedTransactionVersion: 0 });
+
+                transactionsData.forEach((tx, index) => {
+                    if (tx && tx.blockTime) {
+                        tx.transaction.message.instructions.forEach(inst => {
+                            if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === DISTRIBUTION_WALLETS.presale && inst.parsed.info.source !== '11111111111111111111111111111111') {
+                                allParsedTxs.push({
+                                    signature: batchSignatures[index],
+                                    from: inst.parsed.info.source,
+                                    solAmount: inst.parsed.info.lamports / LAMPORTS_PER_SOL,
+                                    owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                                    timestamp: tx.blockTime,
+                                    lamports: inst.parsed.info.lamports,
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+            setTransactions(allParsedTxs);
         } catch (error) {
             console.error("Failed to fetch all presale transactions:", error);
         } finally {
@@ -129,29 +145,37 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        const contributorMap = new Map<string, { totalLamports: bigint }>();
-        transactions.forEach(tx => {
-            const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n };
-            existing.totalLamports += BigInt(tx.lamports);
-            contributorMap.set(tx.from, existing);
-        });
-        
+        // A map to store the final aggregated data for each contributor.
+        const contributorMap = new Map<string, { totalLamports: bigint; totalOwfn: bigint }>();
+
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * BigInt(LAMPORTS_PER_SOL);
+        const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * LAMPORTS_PER_SOL));
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
 
-        return Array.from(contributorMap.entries()).map(([address, data]) => {
-            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
+        // Process each transaction individually to calculate the correct OWFN amount with bonus.
+        transactions.forEach(tx => {
+            const lamports = BigInt(tx.lamports);
             
-            // Perform all calculations with BigInt for precision
-            let totalOwfnInSmallestUnit = (data.totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
+            // Calculate base OWFN for this single transaction
+            let owfnForThisTx = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
 
-            if (data.totalLamports >= bonusThresholdLamports) {
-                const bonusAmount = (totalOwfnInSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
-                totalOwfnInSmallestUnit += bonusAmount;
+            // Check if this single transaction qualifies for a bonus
+            if (lamports >= bonusThresholdLamports) {
+                const bonusAmount = (owfnForThisTx * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
+                owfnForThisTx += bonusAmount;
             }
 
-            return { address, totalSol, totalOwfn: totalOwfnInSmallestUnit };
+            // Aggregate the results for the contributor.
+            const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n, totalOwfn: 0n };
+            existing.totalLamports += lamports;
+            existing.totalOwfn += owfnForThisTx;
+            contributorMap.set(tx.from, existing);
+        });
+
+        // Convert the map to the final array structure.
+        return Array.from(contributorMap.entries()).map(([address, data]) => {
+            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
+            return { address, totalSol, totalOwfn: data.totalOwfn };
         });
     }, [transactions]);
 

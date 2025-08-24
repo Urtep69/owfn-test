@@ -12,13 +12,13 @@ import {
     TOKEN_ALLOCATIONS, 
     ROADMAP_DATA,
     DISTRIBUTION_WALLETS,
-    HELIUS_API_BASE_URL,
-    HELIUS_API_KEY,
+    QUICKNODE_RPC_URL,
+    QUICKNODE_WSS_URL,
 } from '../constants.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { PresaleTransaction } from '../types.ts';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
 
 const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransaction | null }) => {
     const { t } = useAppContext();
@@ -47,33 +47,44 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
             if (!isMounted) return;
             setLoading(true);
             try {
+                const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
+                const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
                 const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch initial transactions');
-                const data = await response.json();
+
+                const signatures = await connection.getSignaturesForAddress(presalePublicKey, { limit: 100 });
+                const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime > presaleStartTimestamp);
                 
-                const parsedTxs: PresaleTransaction[] = data
-                    .filter((tx: any) => 
-                        tx.timestamp >= presaleStartTimestamp &&
-                        tx.type === 'NATIVE_TRANSFER' && 
-                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
-                    )
-                    .map((tx: any) => ({
-                        id: tx.signature,
-                        address: tx.nativeTransfers[0].fromUserAccount,
-                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
-                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                        time: new Date(tx.timestamp * 1000),
-                    }));
-                
-                if (isMounted) {
-                    setTransactions(prev => {
-                        // Merge initial with any potential new local transactions, avoiding duplicates
-                        const existingIds = new Set(prev.map(p => p.id));
-                        const uniqueFetched = parsedTxs.filter(p => !existingIds.has(p.id));
-                        return [...prev, ...uniqueFetched].slice(0, 20);
+                if (relevantSignatures.length > 0) {
+                    const transactions = await connection.getParsedTransactions(
+                        relevantSignatures.map(s => s.signature),
+                        { maxSupportedTransactionVersion: 0 }
+                    );
+                    
+                    const parsedTxs: PresaleTransaction[] = [];
+                    transactions.forEach((tx, index) => {
+                        if (tx && tx.blockTime) {
+                            tx.transaction.message.instructions.forEach(inst => {
+                                if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === DISTRIBUTION_WALLETS.presale) {
+                                    parsedTxs.push({
+                                        id: relevantSignatures[index].signature,
+                                        address: inst.parsed.info.source,
+                                        solAmount: inst.parsed.info.lamports / LAMPORTS_PER_SOL,
+                                        owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                                        time: new Date(tx.blockTime! * 1000),
+                                    });
+                                }
+                            });
+                        }
                     });
+
+                    if (isMounted) {
+                         const sortedTxs = parsedTxs.sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 20);
+                        setTransactions(prev => {
+                            const existingIds = new Set(prev.map(p => p.id));
+                            const uniqueFetched = sortedTxs.filter(p => !existingIds.has(p.id));
+                            return [...prev, ...uniqueFetched].slice(0, 20);
+                        });
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch presale transactions:", error);
@@ -83,8 +94,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
         };
 
         const connectWebSocket = () => {
-            const heliusWsUrl = `wss://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
-            wsRef.current = new WebSocket(heliusWsUrl);
+            wsRef.current = new WebSocket(QUICKNODE_WSS_URL);
 
             wsRef.current.onopen = () => {
                 console.log("WebSocket connected for Live Presale Feed");
@@ -251,37 +261,36 @@ export default function Presale() {
         }
 
         try {
+            const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
+            const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
+            // In a real scenario, you'd paginate through all transactions for an exact total.
+            // For a progress bar, fetching recent transactions and summing them up gives a good-enough estimate
+            // without being too resource-intensive on the client. Let's fetch the max allowed (1000).
+            const signatures = await connection.getSignaturesForAddress(presalePublicKey, { limit: 1000 });
             const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
-            let allTxs: any[] = [];
-            let lastSignature: string | undefined = undefined;
-
-            while(true) {
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions');
-                const data = await response.json();
-                
-                allTxs.push(...data);
-                
-                if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
-                    break;
-                }
-                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
-                if (!lastSignature) break;
-            }
+            const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
             
-            const presaleTxs = allTxs.filter((tx: any) => 
-                tx.timestamp >= presaleStartTimestamp &&
-                tx.type === 'NATIVE_TRANSFER' && 
-                tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111'
-            );
+            let totalContributed = 0;
+            if (relevantSignatures.length > 0) {
+                 const transactions = await connection.getParsedTransactions(
+                    relevantSignatures.map(s => s.signature),
+                    { maxSupportedTransactionVersion: 0 }
+                );
 
-            const totalContributed = presaleTxs.reduce((sum: number, tx: any) => sum + (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL), 0);
+                transactions.forEach(tx => {
+                    if (tx) {
+                        tx.transaction.message.instructions.forEach(inst => {
+                            if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === DISTRIBUTION_WALLETS.presale) {
+                                totalContributed += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
+                            }
+                        });
+                    }
+                });
+            }
             setSoldSOL(totalContributed);
         } catch (error) {
             console.error("Failed to fetch presale progress:", error);
-            setSoldSOL(0);
+            // Don't reset to 0 if it fails, keep the last known value
         }
     }, []);
 
@@ -349,30 +358,31 @@ export default function Presale() {
         }
         setIsCheckingContribution(true);
         try {
+            const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
+            const userPublicKey = new PublicKey(solana.address);
+            // This is complex to get ALL signatures for a user to a specific address.
+            // For this UI feature, we can simplify by checking the user's recent transactions.
+            // A full, accurate accounting should be done on a backend or at the airdrop stage.
+            const signatures = await connection.getSignaturesForAddress(userPublicKey, { limit: 200 });
             const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
-            let allTxs: any[] = [];
-            let lastSignature: string | undefined = undefined;
-            while(true) {
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions');
-                const data = await response.json();
-                allTxs.push(...data);
-                if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
-                    break;
-                }
-                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
-                if (!lastSignature) break;
-            }
-
-            const userTxs = allTxs.filter((tx: any) => 
-                    tx.timestamp >= presaleStartTimestamp &&
-                    tx.type === 'NATIVE_TRANSFER' && 
-                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                    tx.nativeTransfers[0]?.fromUserAccount === solana.address
+            const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
+            
+            let totalContributed = 0;
+            if (relevantSignatures.length > 0) {
+                 const transactions = await connection.getParsedTransactions(
+                    relevantSignatures.map(s => s.signature),
+                    { maxSupportedTransactionVersion: 0 }
                 );
-
-            const totalContributed = userTxs.reduce((sum: number, tx: any) => sum + (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL), 0);
+                 transactions.forEach(tx => {
+                    if (tx) {
+                        tx.transaction.message.instructions.forEach(inst => {
+                            if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === DISTRIBUTION_WALLETS.presale && inst.parsed.info.source === solana.address) {
+                                totalContributed += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
+                            }
+                        });
+                    }
+                });
+            }
             setUserContribution(totalContributed);
         } catch (error) {
             console.error("Failed to fetch user contribution:", error);
@@ -397,8 +407,8 @@ export default function Presale() {
     }
 
     const numValue = parseFloat(value);
-    if ((numValue > 0 && numValue < PRESALE_DETAILS.minBuy) || numValue > maxAllowedBuy) {
-        setError(t('presale_amount_error', { min: PRESALE_DETAILS.minBuy.toFixed(2), max: maxAllowedBuy.toFixed(6) }));
+    if (numValue > maxAllowedBuy) {
+        setError(t('presale_amount_error_no_min', { max: maxAllowedBuy.toFixed(6) }));
     } else {
         setError('');
     }
@@ -413,9 +423,7 @@ export default function Presale() {
     const numValue = parseFloat(value);
     let correctedValue = value;
 
-    if (numValue > 0 && numValue < PRESALE_DETAILS.minBuy) {
-        correctedValue = String(PRESALE_DETAILS.minBuy);
-    } else if (numValue > maxAllowedBuy) {
+    if (numValue > maxAllowedBuy) {
         correctedValue = maxAllowedBuy.toFixed(6);
     }
     
@@ -424,7 +432,7 @@ export default function Presale() {
     }
     
     const correctedNum = parseFloat(correctedValue);
-    if (correctedNum >= PRESALE_DETAILS.minBuy && correctedNum <= maxAllowedBuy) {
+    if (correctedNum > 0 && correctedNum <= maxAllowedBuy) {
         setError('');
     }
   };
@@ -476,7 +484,7 @@ export default function Presale() {
 
   const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
   const numSolAmount = parseFloat(solAmount);
-  const isAmountInvalid = isNaN(numSolAmount) || numSolAmount < PRESALE_DETAILS.minBuy || numSolAmount > maxAllowedBuy;
+  const isAmountInvalid = isNaN(numSolAmount) || numSolAmount <= 0 || numSolAmount > maxAllowedBuy;
 
 
   const handleBuy = async () => {
@@ -655,7 +663,7 @@ export default function Presale() {
                     {/* Buy Section */}
                     <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6 space-y-4">
                         <p className="text-sm text-primary-700 dark:text-darkPrimary-300 text-center">
-                            {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
+                            {t('presale_buy_info_no_min', { max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
                         {solana.connected && (
                             <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
