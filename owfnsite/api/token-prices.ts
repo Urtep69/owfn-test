@@ -1,5 +1,11 @@
 // This server-side function securely fetches multiple token prices.
-// It previously used Birdeye, but now uses the public Jupiter Price API.
+// It uses the public Jupiter Price API.
+
+// A basic check for a valid Solana address format (32-44 base58 characters).
+const isValidSolanaAddress = (address: any): boolean => {
+    if (typeof address !== 'string') return false;
+    return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+};
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
@@ -7,14 +13,18 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
-        // Safer access to body parameter to prevent crashes
         const mints = req.body?.mints;
         if (!Array.isArray(mints) || mints.length === 0) {
             return res.status(400).json({ error: 'An array of mint addresses is required.' });
         }
         
-        // Use Jupiter's public price API as a replacement for Birdeye.
-        const mintList = mints.join(',');
+        // Filter for valid mint addresses to prevent the API call from failing due to one bad address.
+        const validMints = mints.filter(isValidSolanaAddress);
+        if (validMints.length === 0) {
+            return res.status(200).json({}); // Return empty if no valid mints to fetch.
+        }
+        
+        const mintList = validMints.join(',');
         const url = `https://price.jup.ag/v4/price?ids=${mintList}`;
 
         const response = await fetch(url);

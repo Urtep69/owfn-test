@@ -121,21 +121,26 @@ export const useSolana = (): UseSolanaReturn => {
         allTokens = [...allTokens, ...splTokens];
 
         // 3. Batch fetch metadata and prices
-        // Using the 'strict' list is much more performant than 'all' for client-side fetching.
         const jupiterTokenList: JupiterToken[] = await (await fetch('https://token.jup.ag/strict')).json();
         const tokenMap = new Map(jupiterTokenList.map((t: JupiterToken) => [t.address, t]));
-
+        
         try {
-            // Fetch prices from our API endpoint
-            const priceRes = await fetch(`/api/token-prices`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mints: Array.from(mintsToFetchPrice) })
-            });
+            let priceData: any = {};
+            if (mintsToFetchPrice.size > 0) {
+                const mintList = Array.from(mintsToFetchPrice).join(',');
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mintList}`);
 
-            if (!priceRes.ok) throw new Error(`Our token price API failed with status ${priceRes.status}`);
-            const priceData = await priceRes.json();
+                if (priceRes.ok) {
+                    const jupiterPriceData = await priceRes.json();
+                    priceData = jupiterPriceData.data;
+                } else {
+                    console.warn(`Jupiter Price API call failed with status ${priceRes.status}`);
+                }
+            }
             
+            let solPrice = 0;
+            const solMint = 'So11111111111111111111111111111111111111112';
+
             allTokens.forEach(token => {
                 const metadata = tokenMap.get(token.mintAddress);
                 if (metadata) {
@@ -144,20 +149,30 @@ export const useSolana = (): UseSolanaReturn => {
                     token.logo = React.createElement(GenericTokenIcon, { uri: metadata.logoURI });
                 }
 
-                // The priceData format is { mint: { value: price } }
                 if (priceData?.[token.mintAddress]) {
                     const priceInfo = priceData[token.mintAddress];
-                    // Ensure price is a valid number before calculating to prevent NaN.
-                    if (priceInfo && typeof priceInfo.value === 'number') {
-                        const price = priceInfo.value;
+                    if (priceInfo && typeof priceInfo.price === 'number') {
+                        const price = priceInfo.price;
                         token.pricePerToken = price;
                         token.usdValue = token.balance * price;
+                        if (token.mintAddress === solMint) {
+                            solPrice = price;
+                        }
                     }
                 }
             });
+            
+            if (solPrice > 0) {
+                const owfnToken = allTokens.find(token => token.mintAddress === OWFN_MINT_ADDRESS);
+                if (owfnToken && owfnToken.pricePerToken === 0) {
+                    const owfnPriceInSol = 1 / PRESALE_DETAILS.rate;
+                    const owfnPriceInUsd = owfnPriceInSol * solPrice;
+                    owfnToken.pricePerToken = owfnPriceInUsd;
+                    owfnToken.usdValue = owfnToken.balance * owfnPriceInUsd;
+                }
+            }
         } catch (priceError) {
             console.error("Could not fetch token prices:", priceError);
-            // Even if prices fail, we might have metadata, so we continue
             allTokens.forEach(token => {
                  const metadata = tokenMap.get(token.mintAddress);
                 if (metadata) {
@@ -168,7 +183,7 @@ export const useSolana = (): UseSolanaReturn => {
             });
         }
         
-        // 4. Override with known data for consistency and user requests
+        // 4. Override with known data for consistency
          const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
             [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon),
             'So11111111111111111111111111111111111111112': React.createElement(SolIcon),
@@ -180,23 +195,19 @@ export const useSolana = (): UseSolanaReturn => {
             if (KNOWN_TOKEN_ICONS[token.mintAddress]) {
                 token.logo = KNOWN_TOKEN_ICONS[token.mintAddress];
             }
-            // As requested, explicitly override the OWFN token's name and symbol
-            // to ensure it always displays correctly, regardless of API results.
             if (token.mintAddress === OWFN_MINT_ADDRESS) {
                 token.name = 'Official World Family Network';
                 token.symbol = 'OWFN';
             }
         });
         
-        // Display all token accounts, including those with zero balance, as requested by the user.
-        // Sorting by USD value ensures high-value assets appear first.
         const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
         balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
         return sortedTokens;
 
     } catch (error) {
         console.error("Error fetching wallet balances:", error);
-        return []; // Return empty array on critical failure
+        return [];
     } finally {
         setLoading(false);
     }
@@ -207,7 +218,7 @@ export const useSolana = (): UseSolanaReturn => {
       getWalletBalances(address).then(setUserTokens);
     } else {
       setUserTokens([]);
-      balanceCache.clear(); // Clear cache on disconnect
+      balanceCache.clear();
     }
   }, [connected, address, getWalletBalances]);
 
@@ -296,7 +307,7 @@ export const useSolana = (): UseSolanaReturn => {
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
         if (address) {
-            balanceCache.delete(address); // Invalidate cache after sending
+            balanceCache.delete(address);
             getWalletBalances(address).then(setUserTokens);
         }
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
