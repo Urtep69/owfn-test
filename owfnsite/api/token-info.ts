@@ -1,5 +1,5 @@
 import type { TokenDetails } from '../types.ts';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, ParsedAccountData } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { QUICKNODE_RPC_URL } from '../constants.ts';
 
@@ -47,18 +47,25 @@ export default async function handler(req: any, res: any) {
                     responseData.tokenStandard = 'SPL Token';
                 }
 
-                const info = (accountInfo.value.data as any)?.parsed?.info;
-                if (info) {
-                    if (typeof info.decimals === 'number') {
-                        responseData.decimals = info.decimals;
-                        if (typeof info.supply === 'string' || typeof info.supply === 'number') {
-                            const supplyBigInt = BigInt(info.supply);
-                            const divisor = 10n ** BigInt(info.decimals);
-                            responseData.totalSupply = Number(supplyBigInt) / Number(divisor);
+                const data = accountInfo.value.data;
+                // **ROBUSTNESS FIX**: Explicitly check if the data is parsed before accessing it.
+                // getParsedAccountInfo can return a buffer if it cannot parse the account data.
+                if (data && !Buffer.isBuffer(data) && 'parsed' in data) {
+                    const info = (data as ParsedAccountData).parsed?.info;
+                    if (info) {
+                        if (typeof info.decimals === 'number') {
+                            responseData.decimals = info.decimals;
+                            if (typeof info.supply === 'string' || typeof info.supply === 'number') {
+                                const supplyBigInt = BigInt(info.supply);
+                                const divisor = 10n ** BigInt(info.decimals);
+                                responseData.totalSupply = Number(supplyBigInt) / Number(divisor);
+                            }
                         }
+                        responseData.mintAuthority = info.mintAuthority ?? null;
+                        responseData.freezeAuthority = info.freezeAuthority ?? null;
                     }
-                    responseData.mintAuthority = info.mintAuthority ?? null;
-                    responseData.freezeAuthority = info.freezeAuthority ?? null;
+                } else {
+                     console.warn(`On-chain data for ${mintAddress} was not in a parsed format.`);
                 }
             } else {
                 console.warn(`No on-chain account info found for mint address ${mintAddress}.`);
@@ -74,8 +81,9 @@ export default async function handler(req: any, res: any) {
             const dexResponse = await fetch(dexScreenerUrl, { headers: { 'User-Agent': 'OWFN/1.0' } });
             if (dexResponse.ok) {
                 const dexData = await dexResponse.json();
-                if (dexData.pairs && dexData.pairs.length > 0) {
-                    const primaryPair = dexData.pairs.reduce((prev: any, current: any) => 
+                const pairs = dexData.pairs || []; // Ensure pairs is an array to prevent crashes
+                if (pairs.length > 0) {
+                    const primaryPair = pairs.reduce((prev: any, current: any) => 
                         (prev.liquidity?.usd ?? 0) > (current.liquidity?.usd ?? 0) ? prev : current
                     );
                     responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
