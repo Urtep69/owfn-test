@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
@@ -409,7 +408,7 @@ export default function Presale() {
 
     const numValue = parseFloat(value);
     if ((numValue > 0 && numValue < PRESALE_DETAILS.minBuy) || numValue > maxAllowedBuy) {
-        setError(t('presale_amount_error', { min: PRESALE_DETAILS.minBuy.toFixed(2), max: maxAllowedBuy.toFixed(6) }));
+        setError(t('presale_amount_error', { min: PRESALE_DETAILS.minBuy.toFixed(2), max: maxAllowedBuy.toFixed(2) }));
     } else {
         setError('');
     }
@@ -679,7 +678,7 @@ export default function Presale() {
                                     <>
                                         <span>{t('presale_you_contributed', { amount: userContribution.toFixed(6) })}</span>
                                         <br/>
-                                        <span className="font-semibold">{t('presale_you_can_buy', { amount: maxAllowedBuy.toFixed(6) })}</span>
+                                        <span className="font-semibold">{t('presale_you_can_buy', { amount: maxAllowedBuy.toFixed(2) })}</span>
                                     </>
                                 )}
                             </div>

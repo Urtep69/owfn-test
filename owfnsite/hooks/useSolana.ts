@@ -147,7 +147,7 @@ export const useSolana = (): UseSolanaReturn => {
             });
         }
         
-        // 4. Override with known icons for major tokens for consistency
+        // 4. Override with known data for consistency and user requests
          const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
             [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon),
             'So11111111111111111111111111111111111111112': React.createElement(SolIcon),
@@ -158,6 +158,12 @@ export const useSolana = (): UseSolanaReturn => {
         allTokens.forEach(token => {
             if (KNOWN_TOKEN_ICONS[token.mintAddress]) {
                 token.logo = KNOWN_TOKEN_ICONS[token.mintAddress];
+            }
+            // As requested, explicitly override the OWFN token's name and symbol
+            // to ensure it always displays correctly, regardless of API results.
+            if (token.mintAddress === OWFN_MINT_ADDRESS) {
+                token.name = 'Official World Family Network';
+                token.symbol = 'OWFN';
             }
         });
         
