@@ -88,7 +88,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                     <div>
                          <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">Connect with a Wallet</h3>
                          <div className="space-y-2">
-                            {wallets.filter(w => w.readyState === 'Installed').map(wallet => (
+                            {wallets.filter(w => w.readyState === 'Installed' || w.readyState === 'Loadable').map(wallet => (
                                 <button
                                     key={wallet.adapter.name}
                                     onClick={() => handleWalletSelect(wallet.adapter.name as WalletName)}
