@@ -58,7 +58,7 @@ export const ROADMAP_DATA: RoadmapPhase[] = [
 export const PRESALE_DETAILS = {
   softCap: 105,
   hardCap: 200,
-  minBuy: 0.1,
+  minBuy: 0,
   maxBuy: 5,
   rate: 10000000,
   bonusThreshold: 2, // Minimum SOL to get the bonus
