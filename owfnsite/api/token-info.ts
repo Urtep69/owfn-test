@@ -35,7 +35,7 @@ export default async function handler(req: any, res: any) {
             console.warn(`Could not fetch metadata from Jupiter for ${mintAddress}:`, e);
         }
         
-        // --- Step 2: Fetch on-chain data using standard getParsedAccountInfo ---
+        // --- Step 2: Fetch on-chain data using standard getParsedAccountInfo (Resiliently) ---
         try {
             const mintPublicKey = new PublicKey(mintAddress);
             const accountInfo = await connection.getParsedAccountInfo(mintPublicKey);
@@ -56,11 +56,10 @@ export default async function handler(req: any, res: any) {
                     responseData.freezeAuthority = info.freezeAuthority;
                 }
             } else {
-                 throw new Error(`No account info found for mint address.`);
+                 console.warn(`No on-chain account info found for mint address ${mintAddress}. Proceeding with API data only.`);
             }
         } catch(e) {
-             console.error(`Could not fetch on-chain account info for ${mintAddress}:`, e);
-             return res.status(500).json({ error: `Failed to retrieve on-chain data. Reason: ${ (e as Error).message }` });
+             console.warn(`Could not fetch on-chain account info for ${mintAddress}, may be a non-mint address. Proceeding with API data only. Error:`, e);
         }
 
         // --- Step 3: Fetch LIVE market data from DexScreener (Primary) ---

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
-import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
+import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
 import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
@@ -77,12 +77,22 @@ export const useSolana = (): UseSolanaReturn => {
             usdValue: 0,
         });
 
-        // 2. Fetch SPL token accounts
-        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(ownerPublicKey, {
+        // 2. Fetch SPL token accounts for both standards
+        const tokenAccountsPromise = connection.getParsedTokenAccountsByOwner(ownerPublicKey, {
             programId: TOKEN_PROGRAM_ID,
         });
+        const token2022AccountsPromise = connection.getParsedTokenAccountsByOwner(ownerPublicKey, {
+            programId: TOKEN_2022_PROGRAM_ID,
+        });
+
+        const [tokenAccounts, token2022Accounts] = await Promise.all([
+            tokenAccountsPromise,
+            token2022AccountsPromise,
+        ]);
         
-        const splTokens: Token[] = tokenAccounts.value.map(accountInfo => {
+        const allTokenAccounts = [...tokenAccounts.value, ...token2022Accounts.value];
+        
+        const splTokens: Token[] = allTokenAccounts.map(accountInfo => {
             const { parsed } = accountInfo.account.data;
             const mintAddress = parsed.info.mint;
             mintsToFetchPrice.add(mintAddress);
