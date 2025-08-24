@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Loader2, ArrowLeft, Database, Shield, Code, TrendingUp, DollarSign, BarChart2, Repeat, Droplets, Clock, ArrowRightLeft, FileText, Link as LinkIcon, Globe, Twitter, Send, ExternalLink } from 'lucide-react';
+import { Loader2, ArrowLeft, Database, Shield, TrendingUp, DollarSign, BarChart2, Repeat, Droplets, Clock, ArrowRightLeft, FileText, Link as LinkIcon, Globe, Twitter, Send, ExternalLink } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
@@ -13,27 +12,40 @@ import { DiscordIcon } from '../components/IconComponents.tsx';
 
 const formatLargeNumber = (num?: number): string => {
     if (num === undefined || num === null) return 'N/A';
-    if (num === 0) return '0.00';
-    if (num < 1000) return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    if (num < 1_000_000) return `${(num / 1000).toFixed(2)}K`;
-    if (num < 1_000_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
-    return `${(num / 1_000_000_000).toFixed(2)}B`;
+    if (num === 0) return '$0.00';
+    const options = {
+        notation: 'compact',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    } as Intl.NumberFormatOptions;
+    return new Intl.NumberFormat('en-US', options).format(num);
 };
 
-const formatTimeAgo = (timestamp?: number): string => {
+const formatTimeAgo = (timestamp?: number, t?: (key: string) => string): string => {
     if (!timestamp) return 'N/A';
-    const seconds = Math.floor((new Date().getTime() - timestamp) / 1000);
-    let interval = seconds / 31536000;
-    if (interval > 1) return Math.floor(interval) + " years ago";
-    interval = seconds / 2592000;
-    if (interval > 1) return Math.floor(interval) + " months ago";
-    interval = seconds / 86400;
-    if (interval > 1) return Math.floor(interval) + " days ago";
-    interval = seconds / 3600;
-    if (interval > 1) return Math.floor(interval) + " hours ago";
-    interval = seconds / 60;
-    if (interval > 1) return Math.floor(interval) + " minutes ago";
-    return Math.floor(seconds) + " seconds ago";
+    try {
+        const date = new Date(timestamp);
+        const formatter = new Intl.RelativeTimeFormat( 'en', { numeric: 'auto' });
+        const seconds = (date.getTime() - Date.now()) / 1000;
+
+        const intervals: { [key: string]: number } = {
+            year: 31536000,
+            month: 2592000,
+            day: 86400,
+            hour: 3600,
+            minute: 60,
+        };
+
+        for (const key in intervals) {
+            const interval = Math.floor(Math.abs(seconds) / intervals[key]);
+            if (interval > 0) {
+                return formatter.format(Math.round(seconds / intervals[key]), key as Intl.RelativeTimeFormatUnit);
+            }
+        }
+        return 'Just now';
+    } catch(e) {
+        return "Invalid Date";
+    }
 };
 
 const StatCard = ({ title, value, change, icon }: { title: string, value: string, change?: number, icon: React.ReactNode }) => (
@@ -94,7 +106,7 @@ export default function TokenDetail() {
     
     const AuthorityRow = ({ label, address }: { label: string, address?: string | null }) => (
         <InfoRow label={label}>
-            {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold">{t('revoked')}</span>}
+            {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold flex items-center justify-end gap-1.5"><Shield size={14}/> {t('revoked')}</span>}
         </InfoRow>
     );
 
@@ -130,8 +142,7 @@ export default function TokenDetail() {
         if (key.includes('twitter')) return <Twitter size={16} />;
         if (key.includes('telegram')) return <Send size={16} />;
         if (key.includes('discord')) return <DiscordIcon className="w-4 h-4" />;
-        if (key.includes('website')) return <Globe size={16} />;
-        return <LinkIcon size={16} />;
+        return <Globe size={16} />;
     };
 
     if (loading) {
@@ -164,9 +175,9 @@ export default function TokenDetail() {
                     <h1 className="text-3xl font-bold">{token.name}</h1>
                     <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
                 </div>
-                {isMarketDataAvailable && token.mintAddress && (
-                    <a href={`https://jup.ag/swap/SOL-${token.mintAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors flex items-center gap-2">
-                        {t('swap')} <ExternalLink size={16} />
+                {isMarketDataAvailable && token.dexId && token.pairAddress && (
+                    <a href={`https://dexscreener.com/solana/${token.pairAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors flex items-center gap-2">
+                        {t('swap')} on {token.dexId} <ExternalLink size={16} />
                     </a>
                 )}
             </header>
@@ -184,8 +195,6 @@ export default function TokenDetail() {
                             <InfoCard title={t('market_stats')} icon={<TrendingUp />}>
                                 <InfoRow label={t('fully_diluted_valuation')}>{`$${formatLargeNumber(token.fdv)}`}</InfoRow>
                                 <InfoRow label={t('liquidity')}>{`$${formatLargeNumber(token.liquidity)}`}</InfoRow>
-                                <InfoRow label={t('holders')}>N/A</InfoRow>
-                                <InfoRow label={t('circulating_supply')}>N/A</InfoRow>
                             </InfoCard>
 
                             <InfoCard title={t('trading_stats')} icon={<ArrowRightLeft />}>
@@ -194,8 +203,8 @@ export default function TokenDetail() {
                             </InfoCard>
 
                             <InfoCard title={t('pool_info')} icon={<Droplets />}>
+                                <InfoRow label={t('exchange')}>{<span className="capitalize">{token.dexId}</span>}</InfoRow>
                                 <InfoRow label={t('pair_address')}><AddressDisplay address={token.pairAddress!} type="address" /></InfoRow>
-                                <InfoRow label={t('exchange')}>{token.dexId}</InfoRow>
                                 <InfoRow label={t('pool_age')}>{formatTimeAgo(token.poolCreatedAt)}</InfoRow>
                             </InfoCard>
                         </>
@@ -213,7 +222,7 @@ export default function TokenDetail() {
                         </InfoCard>
                     )}
                     
-                    {token.links && Object.keys(token.links).length > 0 && (
+                    {token.links && Object.entries(token.links).filter(([, href]) => href).length > 0 && (
                         <InfoCard title="Links" icon={<LinkIcon />}>
                             <div className="flex flex-wrap gap-2">
                                 {Object.entries(token.links).map(([key, href]) => href && (
@@ -225,7 +234,6 @@ export default function TokenDetail() {
 
                     <InfoCard title={t('on_chain_security')} icon={<Shield />}>
                         <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
-                        <InfoRow label="Creator"><AddressDisplay address={token.creatorAddress ?? 'Unknown...own'} /></InfoRow>
                         <InfoRow label={t('token_standard')}>{token.tokenStandard}</InfoRow>
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />

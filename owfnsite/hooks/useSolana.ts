@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
@@ -6,6 +5,14 @@ import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID,
 import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
+
+// --- TYPE DEFINITION FOR JUPITER TOKEN LIST ---
+interface JupiterToken {
+    address: string;
+    name: string;
+    symbol: string;
+    logoURI?: string;
+}
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
 export interface UseSolanaReturn {
@@ -36,26 +43,6 @@ export interface UseSolanaReturn {
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
-let jupiterTokenListCache: any[] | null = null;
-let lastJupiterFetch = 0;
-const JUPITER_CACHE_DURATION = 60 * 60 * 1000; // 1 hour
-
-const getJupiterTokenList = async () => {
-    if (jupiterTokenListCache && (Date.now() - lastJupiterFetch < JUPITER_CACHE_DURATION)) {
-        return jupiterTokenListCache;
-    }
-    try {
-        const response = await fetch('https://token.jup.ag/all');
-        if (!response.ok) throw new Error('Failed to fetch Jupiter token list');
-        jupiterTokenListCache = await response.json();
-        lastJupiterFetch = Date.now();
-        return jupiterTokenListCache;
-    } catch (error) {
-        console.error("Failed to get Jupiter token list:", error);
-        return jupiterTokenListCache; // Return old cache if available
-    }
-};
-
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
@@ -73,85 +60,89 @@ export const useSolana = (): UseSolanaReturn => {
     setLoading(true);
     try {
         const ownerPublicKey = new PublicKey(walletAddress);
-        const allTokens: Token[] = [];
+        let allTokens: Token[] = [];
         const mintsToFetchPrice = new Set<string>();
-        const tokenList = await getJupiterTokenList() || [];
-        const tokenMap = new Map(tokenList.map(t => [t.address, t]));
-        
+
         // 1. Fetch native SOL balance
         const solBalanceLamports = await connection.getBalance(ownerPublicKey);
-        if (solBalanceLamports > 0) {
-             mintsToFetchPrice.add('So11111111111111111111111111111111111111112');
-        }
+        mintsToFetchPrice.add('So11111111111111111111111111111111111111112');
         allTokens.push({
             mintAddress: 'So11111111111111111111111111111111111111112',
             balance: solBalanceLamports / LAMPORTS_PER_SOL,
             decimals: 9,
             name: 'Solana',
             symbol: 'SOL',
-            logo: React.createElement(SolIcon, null),
+            logo: React.createElement(SolIcon),
             pricePerToken: 0,
             usdValue: 0,
         });
 
-
-        // 2. Fetch SPL token accounts using a standard RPC call
+        // 2. Fetch SPL token accounts
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(ownerPublicKey, {
             programId: TOKEN_PROGRAM_ID,
         });
-
-        tokenAccounts.value.forEach(accountInfo => {
+        
+        const splTokens: Token[] = tokenAccounts.value.map(accountInfo => {
             const { parsed } = accountInfo.account.data;
             const mintAddress = parsed.info.mint;
-            const tokenAmount = parsed.info.tokenAmount;
-
-            if (tokenAmount.uiAmount > 0) {
-                 mintsToFetchPrice.add(mintAddress);
-            }
-            
-            const tokenMetadata = tokenMap.get(mintAddress);
-            
-            allTokens.push({
-                mintAddress: mintAddress,
-                balance: tokenAmount.uiAmount,
-                decimals: tokenAmount.decimals,
-                name: tokenMetadata?.name || 'Unknown Token',
-                symbol: tokenMetadata?.symbol || `${mintAddress.slice(0, 4)}..`,
-                logo: React.createElement(GenericTokenIcon, { uri: tokenMetadata?.logoURI }),
+            mintsToFetchPrice.add(mintAddress);
+            return {
+                mintAddress,
+                balance: parsed.info.tokenAmount.uiAmount,
+                decimals: parsed.info.tokenAmount.decimals,
+                name: 'Unknown Token',
+                symbol: `${mintAddress.slice(0, 4)}...`,
+                logo: React.createElement(GenericTokenIcon, { uri: undefined }),
                 pricePerToken: 0,
                 usdValue: 0,
-            });
+            };
         });
 
-        // 3. Batch fetch prices for all tokens with a balance
-        if (mintsToFetchPrice.size > 0) {
-            try {
-                const priceRes = await fetch(`https://price.jup.ag/v6/price?ids=${Array.from(mintsToFetchPrice).join(',')}`);
-                if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
-                
-                const priceData = await priceRes.json();
-                
-                if (priceData.data) {
-                     allTokens.forEach(token => {
-                        const priceInfo = priceData.data[token.mintAddress];
-                        if (priceInfo && priceInfo.price) {
-                            const price = priceInfo.price;
-                            token.pricePerToken = price;
-                            token.usdValue = token.balance * price;
-                        }
-                    });
+        allTokens = [...allTokens, ...splTokens];
+
+        // 3. Batch fetch metadata and prices
+        const jupiterTokenList: JupiterToken[] = await (await fetch('https://token.jup.ag/all')).json();
+        const tokenMap = new Map(jupiterTokenList.map((t: JupiterToken) => [t.address, t]));
+
+        try {
+            const priceRes = await fetch(`https://price.jup.ag/v6/price?ids=${Array.from(mintsToFetchPrice).join(',')}`);
+            if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
+            const priceData = await priceRes.json();
+            
+            allTokens.forEach(token => {
+                const metadata = tokenMap.get(token.mintAddress);
+                if (metadata) {
+                    token.name = metadata.name;
+                    token.symbol = metadata.symbol;
+                    token.logo = React.createElement(GenericTokenIcon, { uri: metadata.logoURI });
                 }
-            } catch (priceError) {
-                console.error("Could not fetch token prices from Jupiter API:", priceError);
-            }
+
+                if (priceData.data && priceData.data[token.mintAddress]) {
+                    const price = priceData.data[token.mintAddress].price;
+                    token.pricePerToken = price;
+                    token.usdValue = token.balance * price;
+                }
+            });
+
+        } catch (priceError) {
+            console.error("Could not fetch token prices from Jupiter API:", priceError);
+            // Even if prices fail, we might have metadata, so we continue
+            allTokens.forEach(token => {
+                 const metadata = tokenMap.get(token.mintAddress);
+                if (metadata) {
+                    token.name = metadata.name;
+                    token.symbol = metadata.symbol;
+                    token.logo = React.createElement(GenericTokenIcon, { uri: metadata.logoURI });
+                }
+            });
         }
         
         // 4. Override with known icons for major tokens for consistency
          const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
-            [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon, null),
-            'So11111111111111111111111111111111111111112': React.createElement(SolIcon, null),
-            'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon, null),
-            'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
+            [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon),
+            'So11111111111111111111111111111111111111112': React.createElement(SolIcon),
+            'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon),
+            'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon),
         };
 
         allTokens.forEach(token => {

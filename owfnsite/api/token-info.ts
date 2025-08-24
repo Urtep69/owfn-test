@@ -1,7 +1,7 @@
-
 import type { TokenDetails } from '../types.ts';
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
+import { QUICKNODE_RPC_URL } from '../constants.ts';
 
 // Main handler function
 export default async function handler(req: any, res: any) {
@@ -11,8 +11,7 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Mint address is required." });
     }
 
-    const quicknodeUrl = 'https://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/';
-    const connection = new Connection(quicknodeUrl, 'confirmed');
+    const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
 
     try {
         const responseData: Partial<TokenDetails> = { mintAddress };
@@ -28,6 +27,8 @@ export default async function handler(req: any, res: any) {
                     responseData.symbol = tokenMeta.symbol;
                     responseData.logo = tokenMeta.logoURI;
                     responseData.decimals = tokenMeta.decimals;
+                    responseData.description = tokenMeta.description;
+                    responseData.links = tokenMeta.extensions;
                 }
             }
         } catch (e) {
@@ -59,7 +60,6 @@ export default async function handler(req: any, res: any) {
             }
         } catch(e) {
              console.error(`Could not fetch on-chain account info for ${mintAddress}:`, e);
-             // This is a critical failure, we can't proceed without decimals/supply
              return res.status(500).json({ error: `Failed to retrieve on-chain data. Reason: ${ (e as Error).message }` });
         }
 
@@ -95,15 +95,34 @@ export default async function handler(req: any, res: any) {
         } catch (dexError) {
             console.warn(`Could not fetch market data from DexScreener for ${mintAddress}:`, dexError);
         }
+
+        // --- Step 4: Fallback to CoinGecko for price if DexScreener failed ---
+        if (!marketDataFetched) {
+             try {
+                const coingeckoUrl = `https://api.coingecko.com/api/v3/simple/token_price/solana?contract_addresses=${mintAddress}&vs_currencies=usd`;
+                const cgResponse = await fetch(coingeckoUrl);
+                if (cgResponse.ok) {
+                    const cgData = await cgResponse.json();
+                    if (cgData[mintAddress] && cgData[mintAddress].usd) {
+                        responseData.pricePerToken = cgData[mintAddress].usd;
+                        // Calculate an estimated market cap if possible
+                        if(responseData.totalSupply && responseData.totalSupply > 0) {
+                            responseData.marketCap = responseData.totalSupply * responseData.pricePerToken;
+                        }
+                    }
+                }
+            } catch(cgError) {
+                 console.warn(`Could not fetch market data from CoinGecko for ${mintAddress}:`, cgError);
+            }
+        }
         
-        // --- Final Fallbacks and Cleanup ---
+        // --- Final Cleanup ---
         if (!responseData.name) responseData.name = 'Unknown Token';
         if (!responseData.symbol) responseData.symbol = `${mintAddress.slice(0,4)}...${mintAddress.slice(-4)}`;
-        if (responseData.decimals === undefined) responseData.decimals = 0;
         
-        // As we cannot reliably get creator/update authority from standard RPC, we set sane defaults.
-        // For a token like wSOL, all authorities are revoked, so this is a reasonable display.
-        responseData.creatorAddress = 'Unknown...own';
+        // For standard SPL tokens, update authority is not part of the mint account.
+        // It's part of the Metaplex metadata standard, which is complex to parse without specific libraries.
+        // Setting to null is a safe and often correct representation (implies it's revoked or not applicable).
         responseData.updateAuthority = null;
 
 
