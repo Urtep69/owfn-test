@@ -125,8 +125,14 @@ export const useSolana = (): UseSolanaReturn => {
         const tokenMap = new Map(jupiterTokenList.map((t: JupiterToken) => [t.address, t]));
 
         try {
-            const priceRes = await fetch(`https://price.jup.ag/v6/price?ids=${Array.from(mintsToFetchPrice).join(',')}`);
-            if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
+            // NEW: Fetch prices from our secure Birdeye API endpoint
+            const priceRes = await fetch(`/api/token-prices`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mints: Array.from(mintsToFetchPrice) })
+            });
+
+            if (!priceRes.ok) throw new Error(`Our token price API failed with status ${priceRes.status}`);
             const priceData = await priceRes.json();
             
             allTokens.forEach(token => {
@@ -137,18 +143,19 @@ export const useSolana = (): UseSolanaReturn => {
                     token.logo = React.createElement(GenericTokenIcon, { uri: metadata.logoURI });
                 }
 
-                if (priceData?.data?.[token.mintAddress]) {
-                    const priceInfo = priceData.data[token.mintAddress];
+                // The priceData is now the direct response from Birdeye: { mint: { value: price } }
+                if (priceData?.[token.mintAddress]) {
+                    const priceInfo = priceData[token.mintAddress];
                     // FINAL ROBUSTNESS CHECK: Ensure price is a valid number before calculating to prevent NaN.
-                    if (priceInfo && typeof priceInfo.price === 'number') {
-                        const price = priceInfo.price;
+                    if (priceInfo && typeof priceInfo.value === 'number') {
+                        const price = priceInfo.value;
                         token.pricePerToken = price;
                         token.usdValue = token.balance * price;
                     }
                 }
             });
         } catch (priceError) {
-            console.error("Could not fetch token prices from Jupiter API:", priceError);
+            console.error("Could not fetch token prices:", priceError);
             // Even if prices fail, we might have metadata, so we continue
             allTokens.forEach(token => {
                  const metadata = tokenMap.get(token.mintAddress);

@@ -10,12 +10,18 @@ export default async function handler(req: any, res: any) {
     if (!mintAddress || typeof mintAddress !== 'string') {
         return res.status(400).json({ error: "Mint address is required." });
     }
+    
+    const birdeyeApiKey = process.env.BIRDEYE_API_KEY;
+    if (!birdeyeApiKey) {
+        console.error("CRITICAL: BIRDEYE_API_KEY environment variable is not set.");
+        return res.status(500).json({ error: "Server configuration error." });
+    }
 
     const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
     const responseData: Partial<TokenDetails> = { mintAddress };
 
     try {
-        // --- Step 1: Fetch metadata from Jupiter Token List (in its own try-catch) ---
+        // --- Step 1: Fetch metadata from Jupiter Token List (good for static info) ---
         try {
             const jupiterResponse = await fetch('https://token.jup.ag/all');
             if (jupiterResponse.ok) {
@@ -26,15 +32,13 @@ export default async function handler(req: any, res: any) {
                     responseData.symbol = tokenMeta.symbol;
                     responseData.logo = tokenMeta.logoURI;
                     responseData.decimals = tokenMeta.decimals;
-                    responseData.description = tokenMeta.description;
-                    responseData.links = tokenMeta.extensions;
                 }
             }
         } catch (e) {
             console.warn(`Could not fetch metadata from Jupiter for ${mintAddress}:`, e);
         }
         
-        // --- Step 2: Fetch on-chain data (in its own try-catch) ---
+        // --- Step 2: Fetch on-chain data (most reliable source for supply/authorities) ---
         try {
             const mintPublicKey = new PublicKey(mintAddress);
             const accountInfo = await connection.getParsedAccountInfo(mintPublicKey);
@@ -47,7 +51,6 @@ export default async function handler(req: any, res: any) {
                     responseData.tokenStandard = 'SPL Token';
                 }
 
-                // **ULTIMATE ROBUSTNESS**: Access parsed data with extreme caution.
                 const info = (accountInfo.value.data as ParsedAccountData)?.parsed?.info;
                 
                 if (info && typeof info === 'object') {
@@ -60,7 +63,7 @@ export default async function handler(req: any, res: any) {
                                 responseData.totalSupply = Number(supplyBigInt) / Number(divisor);
                             } catch (parseError) {
                                 console.warn(`Could not parse supply for ${mintAddress}:`, info.supply, parseError);
-                                responseData.totalSupply = 0; // Fallback
+                                responseData.totalSupply = 0;
                             }
                         }
                     }
@@ -76,63 +79,39 @@ export default async function handler(req: any, res: any) {
             console.warn(`Could not fetch on-chain account info for ${mintAddress}. Error:`, e);
         }
 
-        // --- Step 3: Fetch LIVE market data from DexScreener (Primary) (in its own try-catch) ---
-        let marketDataFetched = false;
+        // --- Step 3: Fetch LIVE market data from Birdeye API (NEW PRIMARY SOURCE) ---
+        // This replaces both DexScreener and CoinGecko with a single, more robust call.
         try {
-            const dexScreenerUrl = `https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`;
-            const dexResponse = await fetch(dexScreenerUrl, { headers: { 'User-Agent': 'OWFN/1.0' } });
-            if (dexResponse.ok) {
-                const dexData = await dexResponse.json();
+            const birdeyeUrl = `https://public-api.birdeye.so/defi/token_overview?address=${mintAddress}`;
+            const birdeyeResponse = await fetch(birdeyeUrl, {
+                headers: { 'X-API-KEY': birdeyeApiKey }
+            });
+            
+            if (birdeyeResponse.ok) {
+                const birdeyeData = await birdeyeResponse.json();
                 
-                // FINAL ROBUSTNESS CHECK: Ensure dexData and its `pairs` property are a non-empty array before proceeding.
-                // This handles cases where `pairs` is null or undefined for unlisted tokens, which was the source of the 500 error.
-                if (dexData && Array.isArray(dexData.pairs) && dexData.pairs.length > 0) {
-                    const pairs = dexData.pairs;
-                    const primaryPair = pairs.reduce((prev: any, current: any) => 
-                        (prev?.liquidity?.usd ?? 0) > (current?.liquidity?.usd ?? 0) ? prev : current
-                    );
-
-                    if (primaryPair) {
-                        responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
-                        responseData.marketCap = primaryPair.marketCap ?? 0;
-                        responseData.fdv = primaryPair.fdv ?? 0;
-                        responseData.volume24h = primaryPair.volume?.h24 || 0;
-                        responseData.price24hChange = primaryPair.priceChange?.h24 || 0;
-                        responseData.liquidity = primaryPair.liquidity?.usd || 0;
-                        responseData.pairAddress = primaryPair.pairAddress;
-                        responseData.poolCreatedAt = primaryPair.pairCreatedAt ? new Date(primaryPair.pairCreatedAt).getTime() : undefined;
-                        responseData.txns = {
-                            h24: {
-                                buys: primaryPair.txns?.h24?.buys ?? 0,
-                                sells: primaryPair.txns?.h24?.sells ?? 0
-                            }
-                        };
-                        responseData.dexId = primaryPair.dexId;
-                        marketDataFetched = true;
+                // This check is crucial. It gracefully handles unlisted tokens by checking for `success: true` and a non-null `data` object.
+                if (birdeyeData.success && birdeyeData.data) {
+                    const data = birdeyeData.data;
+                    responseData.pricePerToken = data.price || 0;
+                    responseData.marketCap = data.mc || 0;
+                    if (responseData.totalSupply && responseData.totalSupply > 0 && data.price) {
+                         responseData.fdv = data.price * responseData.totalSupply;
                     }
+                    responseData.volume24h = data.v24hUSD || 0;
+                    responseData.price24hChange = data.priceChange24hPercent || 0;
+                    responseData.liquidity = data.liquidity || 0;
+                    responseData.holders = data.holders || 0;
+                } else {
+                    console.log(`No market data found on Birdeye for ${mintAddress}. This is expected for unlisted tokens.`);
                 }
+            } else {
+                // We log the error but don't crash, so the page can still display on-chain data.
+                 const errorBody = await birdeyeResponse.text();
+                 console.warn(`Birdeye API request failed for ${mintAddress} with status ${birdeyeResponse.status}:`, errorBody);
             }
-        } catch (dexError) {
-            console.warn(`Could not fetch market data from DexScreener for ${mintAddress}:`, dexError);
-        }
-
-        // --- Step 4: Fallback to CoinGecko (in its own try-catch) ---
-        if (!marketDataFetched) {
-            try {
-                const coingeckoUrl = `https://api.coingecko.com/api/v3/simple/token_price/solana?contract_addresses=${mintAddress}&vs_currencies=usd`;
-                const cgResponse = await fetch(coingeckoUrl);
-                if (cgResponse.ok) {
-                    const cgData = await cgResponse.json();
-                    if (cgData?.[mintAddress]?.usd) {
-                        responseData.pricePerToken = cgData[mintAddress].usd;
-                        if(responseData.totalSupply && responseData.totalSupply > 0) {
-                            responseData.marketCap = responseData.totalSupply * responseData.pricePerToken;
-                        }
-                    }
-                }
-            } catch(cgError) {
-                console.warn(`Could not fetch market data from CoinGecko for ${mintAddress}:`, cgError);
-            }
+        } catch (birdeyeError) {
+            console.warn(`Could not fetch market data from Birdeye for ${mintAddress}:`, birdeyeError);
         }
         
         // --- Final Cleanup & Response ---
