@@ -10,12 +10,6 @@ export default async function handler(req: any, res: any) {
     if (!mintAddress || typeof mintAddress !== 'string') {
         return res.status(400).json({ error: "Mint address is required." });
     }
-    
-    const birdeyeApiKey = process.env.BIRDEYE_API_KEY;
-    if (!birdeyeApiKey) {
-        console.error("CRITICAL: BIRDEYE_API_KEY environment variable is not set.");
-        return res.status(500).json({ error: "Server configuration error." });
-    }
 
     const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
     const responseData: Partial<TokenDetails> = { mintAddress };
@@ -32,6 +26,11 @@ export default async function handler(req: any, res: any) {
                     responseData.symbol = tokenMeta.symbol;
                     responseData.logo = tokenMeta.logoURI;
                     responseData.decimals = tokenMeta.decimals;
+                    responseData.description = tokenMeta.description; // Jupiter list sometimes has descriptions
+                    responseData.links = {
+                        website: tokenMeta.extensions?.website,
+                        twitter: tokenMeta.extensions?.twitter,
+                    };
                 }
             }
         } catch (e) {
@@ -79,39 +78,18 @@ export default async function handler(req: any, res: any) {
             console.warn(`Could not fetch on-chain account info for ${mintAddress}. Error:`, e);
         }
 
-        // --- Step 3: Fetch LIVE market data from Birdeye API (NEW PRIMARY SOURCE) ---
-        // This replaces both DexScreener and CoinGecko with a single, more robust call.
+        // --- Step 3: Fetch LIVE price data from Jupiter Price API ---
         try {
-            const birdeyeUrl = `https://public-api.birdeye.so/defi/token_overview?address=${mintAddress}`;
-            const birdeyeResponse = await fetch(birdeyeUrl, {
-                headers: { 'X-API-KEY': birdeyeApiKey }
-            });
-            
-            if (birdeyeResponse.ok) {
-                const birdeyeData = await birdeyeResponse.json();
-                
-                // This check is crucial. It gracefully handles unlisted tokens by checking for `success: true` and a non-null `data` object.
-                if (birdeyeData.success && birdeyeData.data) {
-                    const data = birdeyeData.data;
-                    responseData.pricePerToken = data.price || 0;
-                    responseData.marketCap = data.mc || 0;
-                    if (responseData.totalSupply && responseData.totalSupply > 0 && data.price) {
-                         responseData.fdv = data.price * responseData.totalSupply;
-                    }
-                    responseData.volume24h = data.v24hUSD || 0;
-                    responseData.price24hChange = data.priceChange24hPercent || 0;
-                    responseData.liquidity = data.liquidity || 0;
-                    responseData.holders = data.holders || 0;
-                } else {
-                    console.log(`No market data found on Birdeye for ${mintAddress}. This is expected for unlisted tokens.`);
+            const jupiterPriceUrl = `https://price.jup.ag/v4/price?ids=${mintAddress}`;
+            const jupiterPriceResponse = await fetch(jupiterPriceUrl);
+            if (jupiterPriceResponse.ok) {
+                const priceData = await jupiterPriceResponse.json();
+                if (priceData.data && priceData.data[mintAddress]) {
+                    responseData.pricePerToken = priceData.data[mintAddress].price || 0;
                 }
-            } else {
-                // We log the error but don't crash, so the page can still display on-chain data.
-                 const errorBody = await birdeyeResponse.text();
-                 console.warn(`Birdeye API request failed for ${mintAddress} with status ${birdeyeResponse.status}:`, errorBody);
             }
-        } catch (birdeyeError) {
-            console.warn(`Could not fetch market data from Birdeye for ${mintAddress}:`, birdeyeError);
+        } catch (priceError) {
+            console.warn(`Could not fetch price from Jupiter for ${mintAddress}:`, priceError);
         }
         
         // --- Final Cleanup & Response ---
