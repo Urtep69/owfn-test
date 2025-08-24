@@ -87,21 +87,24 @@ export const useSolana = (): UseSolanaReturn => {
         const allTokens: Token[] = [];
         const mintsToPrice: string[] = ['So11111111111111111111111111111111111111112'];
 
+        // Collect all fungible token mints for price fetching
         if (result.items && Array.isArray(result.items)) {
             result.items.forEach((asset: any) => {
-                if (asset.id) {
+                if (asset.id && asset.ownership?.token_info) { // Check if it is a token-like asset
                     mintsToPrice.push(asset.id);
                 }
             });
         }
         
+        // Fetch prices in a single batch call
         const prices = new Map<string, number>();
         try {
-            const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mintsToPrice.join(',')}`);
+            const uniqueMints = [...new Set(mintsToPrice)];
+            const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${uniqueMints.join(',')}`);
             if (priceRes.ok) {
                 const priceData = await priceRes.json();
-                for (const mint of mintsToPrice) {
-                    if (priceData.data?.[mint]) {
+                if (priceData.data) {
+                    for (const mint in priceData.data) {
                         prices.set(mint, priceData.data[mint].price);
                     }
                 }
@@ -129,10 +132,11 @@ export const useSolana = (): UseSolanaReturn => {
         // Process SPL tokens from the 'items' array
         if (result.items && Array.isArray(result.items)) {
             const splTokens: Token[] = result.items
-                .filter((asset: any) => asset.token_info?.balance > 0)
+                .filter((asset: any) => asset.ownership?.token_info?.balance > 0)
                 .map((asset: any): Token => {
-                    const decimals = asset.token_info?.decimals ?? 0;
-                    const balance = asset.token_info?.balance / Math.pow(10, decimals);
+                    const tokenInfo = asset.ownership.token_info;
+                    const decimals = tokenInfo?.decimals ?? 0;
+                    const balance = tokenInfo?.balance / Math.pow(10, decimals);
                     const price = prices.get(asset.id) || 0;
                     const mintAddress = asset.id;
 
