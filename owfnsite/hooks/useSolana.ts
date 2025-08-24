@@ -85,7 +85,10 @@ export const useSolana = (): UseSolanaReturn => {
             logo: deserializeLogo(token.logo),
         }));
 
-        balanceCache.set(walletAddress, { data: tokensWithLogos, timestamp: Date.now() });
+        // Only cache successful, non-empty results to prevent caching failures.
+        if (tokensWithLogos && tokensWithLogos.length > 0) {
+            balanceCache.set(walletAddress, { data: tokensWithLogos, timestamp: Date.now() });
+        }
         return tokensWithLogos;
 
     } catch (error) {

@@ -2,6 +2,7 @@ import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS } from '../constants.ts';
+import { COMMON_TOKENS } from '../lib/common-tokens.ts';
 
 // Helper to serialize icon components for JSON transport
 function getLogoData(mintAddress: string, imageUri?: string) {
@@ -9,34 +10,13 @@ function getLogoData(mintAddress: string, imageUri?: string) {
     if (mintAddress === 'So11111111111111111111111111111111111111112') return { type: 'SolIcon', props: {} };
     if (mintAddress === 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a') return { type: 'UsdcIcon', props: {} };
     if (mintAddress === 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB') return { type: 'UsdtIcon', props: {} };
-    // If we have an image URI from the token list, use it.
     if (imageUri) return { type: 'GenericTokenIcon', props: { uri: imageUri } };
-    // Fallback if no image is found
     return { type: 'GenericTokenIcon', props: {} };
 }
 
-// In-memory cache for the Jupiter token list to avoid fetching it on every request
-let tokenListCache: Map<string, any> | null = null;
-let lastCacheFetch: number = 0;
-const CACHE_TTL = 1000 * 60 * 60; // 1 hour
-
-async function getJupiterTokenList() {
-    if (tokenListCache && (Date.now() - lastCacheFetch < CACHE_TTL)) {
-        return tokenListCache;
-    }
-    try {
-        const response = await fetch('https://token.jup.ag/strict');
-        if (!response.ok) throw new Error('Failed to fetch from Jupiter');
-        const data = await response.json();
-        const map = new Map<string, any>(data.map((token: any) => [token.address, token]));
-        tokenListCache = map;
-        lastCacheFetch = Date.now();
-        return tokenListCache;
-    } catch (error) {
-        console.error("Failed to fetch Jupiter token list:", error);
-        return tokenListCache; // Return stale cache if available
-    }
-}
+// Create a lookup map from the pre-compiled list for fast access.
+// This is created once when the serverless function initializes.
+const tokenMetaMap = new Map<string, any>(COMMON_TOKENS.map(token => [token.address, token]));
 
 
 export default async function handler(req: any, res: any) {
@@ -56,25 +36,17 @@ export default async function handler(req: any, res: any) {
         const connection = new Connection(rpcUrl, 'confirmed');
         const publicKey = new PublicKey(walletAddress);
 
-        // Fetch everything in parallel for maximum speed
-        const [solBalanceResult, tokenAccountsResult, tokenMetaMapResult] = await Promise.allSettled([
+        // Fetch SOL balance and token accounts in parallel.
+        const [solBalance, tokenAccounts] = await Promise.all([
             connection.getBalance(publicKey),
             connection.getParsedTokenAccountsByOwner(publicKey, { programId: TOKEN_PROGRAM_ID }),
-            getJupiterTokenList()
         ]);
 
-        if (solBalanceResult.status === 'rejected') throw solBalanceResult.reason;
-        if (tokenAccountsResult.status === 'rejected') throw tokenAccountsResult.reason;
-        
-        const solBalance = solBalanceResult.value;
-        const tokenAccounts = tokenAccountsResult.value;
-        const tokenMetaMap = tokenMetaMapResult.status === 'fulfilled' ? tokenMetaMapResult.value : null;
-        
         type SerializableToken = Omit<Token, 'logo'> & { logo: { type: string, props: any } };
         const tokens: SerializableToken[] = [];
         const mintsForPricing: string[] = ['So11111111111111111111111111111111111111112'];
 
-        // Process SPL tokens
+        // Process SPL tokens and collect mints that the user actually owns.
         const splTokens = tokenAccounts.value
             .map(accountInfo => {
                 try {
@@ -92,7 +64,7 @@ export default async function handler(req: any, res: any) {
             })
             .filter((t): t is { mint: string, balance: number, decimals: number } => t !== null);
 
-        // Fetch all prices in a single batch call
+        // Fetch all prices in a single batch call from Jupiter.
         const prices = new Map<string, number>();
         try {
             const uniqueMints = [...new Set(mintsForPricing)];
@@ -109,11 +81,12 @@ export default async function handler(req: any, res: any) {
             }
         } catch (e) {
             console.error("Could not fetch prices from Jupiter API", e);
+            // Continue gracefully without prices if the API fails.
         }
 
         const solPrice = prices.get('So11111111111111111111111111111111111111112') || 0;
 
-        // Add SOL balance to the list
+        // Add SOL balance to the list.
         if (solBalance > 0) {
             const balance = solBalance / LAMPORTS_PER_SOL;
             tokens.push({
@@ -128,9 +101,9 @@ export default async function handler(req: any, res: any) {
             });
         }
         
-        // Add SPL tokens to the list, enriching with metadata and price
+        // Add SPL tokens to the list, enriching with metadata from our local list and prices from Jupiter.
         splTokens.forEach(token => {
-            const meta = tokenMetaMap?.get(token.mint);
+            const meta = tokenMetaMap.get(token.mint);
             const price = prices.get(token.mint) || 0;
             tokens.push({
                 mintAddress: token.mint,
