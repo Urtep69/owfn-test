@@ -1,6 +1,7 @@
 
 import type { TokenDetails } from '../types.ts';
-import { PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 
 // Main handler function
 export default async function handler(req: any, res: any) {
@@ -11,11 +12,12 @@ export default async function handler(req: any, res: any) {
     }
 
     const quicknodeUrl = 'https://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/';
+    const connection = new Connection(quicknodeUrl, 'confirmed');
 
     try {
         const responseData: Partial<TokenDetails> = { mintAddress };
 
-        // --- Step 1: Fetch metadata from Jupiter Token List (more reliable for name, symbol, logo) ---
+        // --- Step 1: Fetch metadata from Jupiter Token List ---
         try {
             const jupiterResponse = await fetch('https://token.jup.ag/all');
             if (jupiterResponse.ok) {
@@ -34,44 +36,44 @@ export default async function handler(req: any, res: any) {
         
         // --- Step 2: Fetch on-chain data using standard getParsedAccountInfo ---
         try {
-            const rpcResponse = await fetch(quicknodeUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    jsonrpc: '2.0',
-                    id: 'my-id',
-                    method: 'getParsedAccountInfo',
-                    params: [mintAddress],
-                }),
-            });
-            if (!rpcResponse.ok) throw new Error(`RPC getParsedAccountInfo failed with status ${rpcResponse.status}`);
-
-            const rpcData = await rpcResponse.json();
-            if (rpcData.error) throw new Error(`RPC Error: ${rpcData.error.message}`);
+            const mintPublicKey = new PublicKey(mintAddress);
+            const accountInfo = await connection.getParsedAccountInfo(mintPublicKey);
             
-            const accountInfo = rpcData.result?.value?.data?.parsed?.info;
-            if (accountInfo) {
-                responseData.decimals = accountInfo.decimals;
-                responseData.totalSupply = parseFloat(accountInfo.supply) / Math.pow(10, accountInfo.decimals);
-                responseData.mintAuthority = accountInfo.mintAuthority;
-                responseData.freezeAuthority = accountInfo.freezeAuthority;
+            if (accountInfo.value) {
+                const programOwner = accountInfo.value.owner.toBase58();
+                if (programOwner === TOKEN_2022_PROGRAM_ID.toBase58()) {
+                    responseData.tokenStandard = 'Token-2022';
+                } else if (programOwner === TOKEN_PROGRAM_ID.toBase58()) {
+                    responseData.tokenStandard = 'SPL Token';
+                }
+
+                const info = (accountInfo.value.data as any)?.parsed?.info;
+                if (info) {
+                    responseData.decimals = info.decimals;
+                    responseData.totalSupply = parseFloat(info.supply) / Math.pow(10, info.decimals);
+                    responseData.mintAuthority = info.mintAuthority;
+                    responseData.freezeAuthority = info.freezeAuthority;
+                }
+            } else {
+                 throw new Error(`No account info found for mint address.`);
             }
         } catch(e) {
              console.error(`Could not fetch on-chain account info for ${mintAddress}:`, e);
-             // If this fails, we might not have vital info, but we can continue if other sources work
+             // This is a critical failure, we can't proceed without decimals/supply
+             return res.status(500).json({ error: `Failed to retrieve on-chain data. Reason: ${ (e as Error).message }` });
         }
 
-        // --- Step 3: Fetch LIVE market data from DexScreener ---
+        // --- Step 3: Fetch LIVE market data from DexScreener (Primary) ---
+        let marketDataFetched = false;
         try {
             const dexScreenerUrl = `https://api.dexscreener.com/latest/dex/tokens/${mintAddress}`;
-            const dexResponse = await fetch(dexScreenerUrl);
+            const dexResponse = await fetch(dexScreenerUrl, { headers: { 'User-Agent': 'OWFN/1.0' } });
             if (dexResponse.ok) {
                 const dexData = await dexResponse.json();
                 if (dexData.pairs && dexData.pairs.length > 0) {
                     const primaryPair = dexData.pairs.reduce((prev: any, current: any) => 
                         (prev.liquidity?.usd ?? 0) > (current.liquidity?.usd ?? 0) ? prev : current
                     );
-
                     responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
                     responseData.marketCap = primaryPair.marketCap ?? 0;
                     responseData.fdv = primaryPair.fdv ?? 0;
@@ -87,16 +89,23 @@ export default async function handler(req: any, res: any) {
                         }
                     };
                     responseData.dexId = primaryPair.dexId;
+                    marketDataFetched = true;
                 }
             }
         } catch (dexError) {
-            console.warn(`Could not fetch market data for ${mintAddress} from DexScreener:`, dexError);
+            console.warn(`Could not fetch market data from DexScreener for ${mintAddress}:`, dexError);
         }
         
-        // --- Final Fallbacks ---
+        // --- Final Fallbacks and Cleanup ---
         if (!responseData.name) responseData.name = 'Unknown Token';
-        if (!responseData.symbol) responseData.symbol = 'N/A';
-        if (!responseData.decimals) responseData.decimals = 0;
+        if (!responseData.symbol) responseData.symbol = `${mintAddress.slice(0,4)}...${mintAddress.slice(-4)}`;
+        if (responseData.decimals === undefined) responseData.decimals = 0;
+        
+        // As we cannot reliably get creator/update authority from standard RPC, we set sane defaults.
+        // For a token like wSOL, all authorities are revoked, so this is a reasonable display.
+        responseData.creatorAddress = 'Unknown...own';
+        responseData.updateAuthority = null;
+
 
         return res.status(200).json(responseData);
 

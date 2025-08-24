@@ -126,7 +126,7 @@ export const useSolana = (): UseSolanaReturn => {
         // 3. Batch fetch prices for all tokens with a balance
         if (mintsToFetchPrice.size > 0) {
             try {
-                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${Array.from(mintsToFetchPrice).join(',')}`);
+                const priceRes = await fetch(`https://price.jup.ag/v6/price?ids=${Array.from(mintsToFetchPrice).join(',')}`);
                 if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
                 
                 const priceData = await priceRes.json();

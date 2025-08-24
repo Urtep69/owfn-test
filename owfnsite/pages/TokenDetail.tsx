@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
 import { Loader2, ArrowLeft, Database, Shield, Code, TrendingUp, DollarSign, BarChart2, Repeat, Droplets, Clock, ArrowRightLeft, FileText, Link as LinkIcon, Globe, Twitter, Send, ExternalLink } from 'lucide-react';
@@ -12,6 +13,7 @@ import { DiscordIcon } from '../components/IconComponents.tsx';
 
 const formatLargeNumber = (num?: number): string => {
     if (num === undefined || num === null) return 'N/A';
+    if (num === 0) return '0.00';
     if (num < 1000) return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     if (num < 1_000_000) return `${(num / 1000).toFixed(2)}K`;
     if (num < 1_000_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
@@ -148,7 +150,7 @@ export default function TokenDetail() {
         );
     }
     
-    const isMarketDataAvailable = (token.marketCap ?? 0) > 0;
+    const isMarketDataAvailable = (token.pricePerToken ?? 0) > 0 || (token.marketCap ?? 0) > 0;
 
     return (
         <div className="space-y-8 animate-fade-in-up">
@@ -223,7 +225,7 @@ export default function TokenDetail() {
 
                     <InfoCard title={t('on_chain_security')} icon={<Shield />}>
                         <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
-                        <InfoRow label="Creator"><AddressDisplay address={token.creatorAddress ?? 'Unknown'} /></InfoRow>
+                        <InfoRow label="Creator"><AddressDisplay address={token.creatorAddress ?? 'Unknown...own'} /></InfoRow>
                         <InfoRow label={t('token_standard')}>{token.tokenStandard}</InfoRow>
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
