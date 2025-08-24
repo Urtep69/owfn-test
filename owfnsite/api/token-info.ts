@@ -8,12 +8,11 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Mint address is required." });
     }
 
-    const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
+    const QUICKNODE_RPC_URL = 'https://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/';
 
     try {
-        // Step 1: Fetch asset data from Helius for on-chain details and metadata
-        const heliusUrl = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
-        const heliusResponse = await fetch(heliusUrl, {
+        // Step 1: Fetch asset data from QuickNode for on-chain details and metadata
+        const rpcResponse = await fetch(QUICKNODE_RPC_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -24,17 +23,17 @@ export default async function handler(req: any, res: any) {
             }),
         });
 
-        if (!heliusResponse.ok) throw new Error(`Helius API failed with status ${heliusResponse.status}`);
+        if (!rpcResponse.ok) throw new Error(`QuickNode API failed with status ${rpcResponse.status}`);
         
-        const heliusData = await heliusResponse.json();
-        if (heliusData.error) throw new Error(`Helius RPC Error: ${heliusData.error.message}`);
+        const rpcData = await rpcResponse.json();
+        if (rpcData.error) throw new Error(`QuickNode RPC Error: ${rpcData.error.message}`);
         
-        const asset = heliusData.result;
+        const asset = rpcData.result;
         if (!asset || !asset.id) {
             return res.status(404).json({ error: `Token data not found.` });
         }
 
-        // --- Parse Helius Data ---
+        // --- Parse RPC Data ---
         const content = asset.content || {};
         const metadata = content.metadata || {};
         const links = content.links || {};

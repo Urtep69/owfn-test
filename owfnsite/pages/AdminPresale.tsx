@@ -6,8 +6,7 @@ import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedT
 
 import { 
     DISTRIBUTION_WALLETS, 
-    HELIUS_API_KEY, 
-    HELIUS_API_BASE_URL, 
+    SOLANA_RPC_URL, 
     PRESALE_DETAILS,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
@@ -80,32 +79,53 @@ export default function AdminPresale() {
 
         try {
             while (true) {
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch transactions from Helius');
-                const data = await response.json();
+                const response = await fetch(SOLANA_RPC_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 1,
+                        method: 'qn_getTransactionsByAddress',
+                        params: {
+                            address: DISTRIBUTION_WALLETS.presale,
+                            limit: 100,
+                            before: lastSignature,
+                        },
+                    }),
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch transactions from QuickNode');
+                const { result } = await response.json();
+                const data = result.transactions || [];
 
                 const parsedTxs: PresaleTx[] = data
-                    .filter((tx: any) => 
-                        tx.type === 'NATIVE_TRANSFER' && 
-                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                        tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111' // System Program
-                    )
-                    .map((tx: any): PresaleTx => ({
-                        signature: tx.signature,
-                        from: tx.nativeTransfers[0].fromUserAccount,
-                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
-                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                        timestamp: tx.timestamp,
-                        lamports: tx.nativeTransfers[0].amount,
-                    }));
+                    .map((tx: any) => {
+                        const transferInstruction = tx.transaction.message.instructions.find((inst: any) =>
+                            inst.program === 'system' &&
+                            inst.parsed?.type === 'transfer' &&
+                            inst.parsed?.info?.destination === DISTRIBUTION_WALLETS.presale
+                        );
+
+                        if (transferInstruction) {
+                            return {
+                                signature: tx.transaction.signatures[0],
+                                from: transferInstruction.parsed.info.source,
+                                solAmount: transferInstruction.parsed.info.lamports / LAMPORTS_PER_SOL,
+                                owfnAmount: (transferInstruction.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                                timestamp: tx.blockTime || 0,
+                                lamports: transferInstruction.parsed.info.lamports,
+                            };
+                        }
+                        return null;
+                    })
+                    .filter((tx: PresaleTx | null): tx is PresaleTx => tx !== null);
                 
                 allTxs.push(...parsedTxs);
 
                 if (data.length < 100) {
                     break; 
                 } else {
-                    lastSignature = data[data.length - 1].signature;
+                    lastSignature = data[data.length - 1].transaction.signatures[0];
                 }
             }
             setTransactions(allTxs);

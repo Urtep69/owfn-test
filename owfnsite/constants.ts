@@ -1,4 +1,3 @@
-
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
@@ -9,9 +8,8 @@ export const OWFN_LOGO_URL: string = owfnLogo;
 export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenance mode globally
 
-export const HELIUS_API_KEY = 'a37ba545-d429-43e3-8f6d-d51128c49da9';
-export const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
-export const HELIUS_API_BASE_URL = 'https://api.helius.xyz';
+export const SOLANA_RPC_URL = 'https://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/';
+export const SOLANA_WSS_URL = 'wss://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/';
 
 
 export const TOKEN_DETAILS = {

@@ -12,8 +12,8 @@ import {
     TOKEN_ALLOCATIONS, 
     ROADMAP_DATA,
     DISTRIBUTION_WALLETS,
-    HELIUS_API_BASE_URL,
-    HELIUS_API_KEY,
+    SOLANA_RPC_URL,
+    SOLANA_WSS_URL,
 } from '../constants.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { PresaleTransaction } from '../types.ts';
@@ -47,29 +47,48 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
             if (!isMounted) return;
             setLoading(true);
             try {
-                const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}`;
-                const response = await fetch(url);
+                const response = await fetch(SOLANA_RPC_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 1,
+                        method: 'qn_getTransactionsByAddress',
+                        params: {
+                            address: DISTRIBUTION_WALLETS.presale,
+                            limit: 50,
+                        },
+                    }),
+                });
+
                 if (!response.ok) throw new Error('Failed to fetch initial transactions');
-                const data = await response.json();
+                const { result } = await response.json();
+                const data = result.transactions || [];
                 
                 const parsedTxs: PresaleTransaction[] = data
-                    .filter((tx: any) => 
-                        tx.timestamp >= presaleStartTimestamp &&
-                        tx.type === 'NATIVE_TRANSFER' && 
-                        tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale
-                    )
-                    .map((tx: any) => ({
-                        id: tx.signature,
-                        address: tx.nativeTransfers[0].fromUserAccount,
-                        solAmount: tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL,
-                        owfnAmount: (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
-                        time: new Date(tx.timestamp * 1000),
-                    }));
+                    .map((tx: any) => {
+                        const transferInstruction = tx.transaction.message.instructions.find((inst: any) =>
+                            inst.program === 'system' &&
+                            inst.parsed?.type === 'transfer' &&
+                            inst.parsed?.info?.destination === DISTRIBUTION_WALLETS.presale
+                        );
+
+                        if (transferInstruction) {
+                            return {
+                                id: tx.transaction.signatures[0],
+                                address: transferInstruction.parsed.info.source,
+                                solAmount: transferInstruction.parsed.info.lamports / LAMPORTS_PER_SOL,
+                                owfnAmount: (transferInstruction.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                                time: new Date((tx.blockTime || 0) * 1000),
+                            };
+                        }
+                        return null;
+                    })
+                    .filter((tx: PresaleTransaction | null): tx is PresaleTransaction => tx !== null)
+                    .filter((tx: PresaleTransaction) => tx.time.getTime() >= PRESALE_DETAILS.startDate.getTime());
                 
                 if (isMounted) {
                     setTransactions(prev => {
-                        // Merge initial with any potential new local transactions, avoiding duplicates
                         const existingIds = new Set(prev.map(p => p.id));
                         const uniqueFetched = parsedTxs.filter(p => !existingIds.has(p.id));
                         return [...prev, ...uniqueFetched].slice(0, 20);
@@ -83,8 +102,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
         };
 
         const connectWebSocket = () => {
-            const heliusWsUrl = `wss://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}`;
-            wsRef.current = new WebSocket(heliusWsUrl);
+            wsRef.current = new WebSocket(SOLANA_WSS_URL);
 
             wsRef.current.onopen = () => {
                 console.log("WebSocket connected for Live Presale Feed");
@@ -256,28 +274,47 @@ export default function Presale() {
             let lastSignature: string | undefined = undefined;
 
             while(true) {
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
-                const response = await fetch(url);
+                const response = await fetch(SOLANA_RPC_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 1,
+                        method: 'qn_getTransactionsByAddress',
+                        params: {
+                            address: DISTRIBUTION_WALLETS.presale,
+                            limit: 100,
+                            before: lastSignature,
+                        },
+                    }),
+                });
+
                 if (!response.ok) throw new Error('Failed to fetch transactions');
-                const data = await response.json();
+                const { result } = await response.json();
+                const data = result.transactions || [];
                 
                 allTxs.push(...data);
                 
-                if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
+                if (data.length < 100 || (data.length > 0 && (data[data.length - 1].blockTime || 0) < presaleStartTimestamp)) {
                     break;
                 }
-                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
+                lastSignature = data.length > 0 ? data[data.length - 1].transaction.signatures[0] : undefined;
                 if (!lastSignature) break;
             }
             
-            const presaleTxs = allTxs.filter((tx: any) => 
-                tx.timestamp >= presaleStartTimestamp &&
-                tx.type === 'NATIVE_TRANSFER' && 
-                tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                tx.nativeTransfers[0]?.fromUserAccount !== '11111111111111111111111111111111'
-            );
+            const presaleTxs = allTxs
+                .filter((tx: any) => (tx.blockTime || 0) >= presaleStartTimestamp)
+                .map((tx: any) => {
+                    return tx.transaction.message.instructions.find((inst: any) =>
+                        inst.program === 'system' &&
+                        inst.parsed?.type === 'transfer' &&
+                        inst.parsed?.info?.destination === DISTRIBUTION_WALLETS.presale
+                    );
+                })
+                .filter(Boolean);
 
-            const totalContributed = presaleTxs.reduce((sum: number, tx: any) => sum + (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL), 0);
+
+            const totalContributed = presaleTxs.reduce((sum: number, inst: any) => sum + (inst.parsed.info.lamports / LAMPORTS_PER_SOL), 0);
             setSoldSOL(totalContributed);
         } catch (error) {
             console.error("Failed to fetch presale progress:", error);
@@ -353,26 +390,45 @@ export default function Presale() {
             let allTxs: any[] = [];
             let lastSignature: string | undefined = undefined;
             while(true) {
-                const url = `${HELIUS_API_BASE_URL}/v0/addresses/${DISTRIBUTION_WALLETS.presale}/transactions?api-key=${HELIUS_API_KEY}${lastSignature ? `&before=${lastSignature}` : ''}`;
-                const response = await fetch(url);
+                const response = await fetch(SOLANA_RPC_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 1,
+                        method: 'qn_getTransactionsByAddress',
+                        params: {
+                            address: DISTRIBUTION_WALLETS.presale,
+                            limit: 100,
+                            before: lastSignature,
+                        },
+                    }),
+                });
+
                 if (!response.ok) throw new Error('Failed to fetch transactions');
-                const data = await response.json();
+                const { result } = await response.json();
+                const data = result.transactions || [];
                 allTxs.push(...data);
-                if (data.length < 100 || (data.length > 0 && data[data.length - 1].timestamp < presaleStartTimestamp)) {
+                if (data.length < 100 || (data.length > 0 && (data[data.length - 1].blockTime || 0) < presaleStartTimestamp)) {
                     break;
                 }
-                lastSignature = data.length > 0 ? data[data.length - 1].signature : undefined;
+                lastSignature = data.length > 0 ? data[data.length - 1].transaction.signatures[0] : undefined;
                 if (!lastSignature) break;
             }
 
-            const userTxs = allTxs.filter((tx: any) => 
-                    tx.timestamp >= presaleStartTimestamp &&
-                    tx.type === 'NATIVE_TRANSFER' && 
-                    tx.nativeTransfers[0]?.toUserAccount === DISTRIBUTION_WALLETS.presale &&
-                    tx.nativeTransfers[0]?.fromUserAccount === solana.address
-                );
+            const userTxs = allTxs
+                .filter((tx: any) => (tx.blockTime || 0) >= presaleStartTimestamp)
+                .map((tx: any) => {
+                     return tx.transaction.message.instructions.find((inst: any) =>
+                        inst.program === 'system' &&
+                        inst.parsed?.type === 'transfer' &&
+                        inst.parsed?.info?.destination === DISTRIBUTION_WALLETS.presale &&
+                        inst.parsed?.info?.source === solana.address
+                    );
+                })
+                .filter(Boolean);
 
-            const totalContributed = userTxs.reduce((sum: number, tx: any) => sum + (tx.nativeTransfers[0].amount / LAMPORTS_PER_SOL), 0);
+            const totalContributed = userTxs.reduce((sum: number, inst: any) => sum + (inst.parsed.info.lamports / LAMPORTS_PER_SOL), 0);
             setUserContribution(totalContributed);
         } catch (error) {
             console.error("Failed to fetch user contribution:", error);
