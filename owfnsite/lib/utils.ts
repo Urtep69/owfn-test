@@ -2,10 +2,17 @@ export const formatNumber = (num: number): string => {
     if (num === null || num === undefined) {
         return 'N/A';
     }
-    // Use toLocaleString to format with thousand separators and show a reasonable number of decimals.
-    // This avoids abbreviations like 'B' for billions, as requested by the user.
-    // The maximumFractionDigits is set high to accommodate various token decimal precisions.
-    return num.toLocaleString(undefined, { 
-        maximumFractionDigits: 9 
-    });
+    
+    // For large integers, we don't want any decimal places.
+    // For smaller numbers, we can show some precision.
+    const options: Intl.NumberFormatOptions = {};
+    if (num % 1 !== 0) {
+        // It's a float, show decimals
+        options.maximumFractionDigits = 9;
+    } else {
+        // It's an integer, don't show decimals
+        options.maximumFractionDigits = 0;
+    }
+
+    return num.toLocaleString(undefined, options);
 };

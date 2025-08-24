@@ -97,10 +97,17 @@ export const useSolana = (): UseSolanaReturn => {
             const { parsed } = accountInfo.account.data;
             const mintAddress = parsed.info.mint;
             mintsToFetchPrice.add(mintAddress);
+            
+            // Manual, robust balance calculation to prevent precision errors with large numbers.
+            const rawAmount = BigInt(parsed.info.tokenAmount.amount);
+            const decimals = parsed.info.tokenAmount.decimals;
+            const divisor = 10n ** BigInt(decimals);
+            const balance = Number(rawAmount) / Number(divisor);
+
             return {
                 mintAddress,
-                balance: parsed.info.tokenAmount.uiAmount,
-                decimals: parsed.info.tokenAmount.decimals,
+                balance: balance,
+                decimals: decimals,
                 name: 'Unknown Token',
                 symbol: `${mintAddress.slice(0, 4)}...`,
                 logo: React.createElement(GenericTokenIcon, { uri: undefined }),
