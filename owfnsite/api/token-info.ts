@@ -48,24 +48,31 @@ export default async function handler(req: any, res: any) {
                 }
 
                 const data = accountInfo.value.data;
-                // **ROBUSTNESS FIX**: Explicitly check if the data is parsed before accessing it.
-                // getParsedAccountInfo can return a buffer if it cannot parse the account data.
-                if (data && !Buffer.isBuffer(data) && 'parsed' in data) {
-                    const info = (data as ParsedAccountData).parsed?.info;
-                    if (info) {
-                        if (typeof info.decimals === 'number') {
-                            responseData.decimals = info.decimals;
-                            if (typeof info.supply === 'string' || typeof info.supply === 'number') {
+                 // **SUPER-ROBUSTNESS FIX**: Explicitly check every level of the parsed data object.
+                 // This prevents server crashes when the RPC returns unparsed data (buffer/string) or an
+                 // incomplete/unexpected object structure for non-standard tokens.
+                if (data && typeof data === 'object' && !Buffer.isBuffer(data) && 'parsed' in data &&
+                    data.parsed && typeof data.parsed === 'object' && 'info' in data.parsed &&
+                    data.parsed.info && typeof data.parsed.info === 'object') {
+                    
+                    const info: any = data.parsed.info; // Treat as 'any' for defensive access
+
+                    if (typeof info.decimals === 'number') {
+                        responseData.decimals = info.decimals;
+                        if (info.supply) { // Check for existence before using
+                            try {
                                 const supplyBigInt = BigInt(info.supply);
                                 const divisor = 10n ** BigInt(info.decimals);
                                 responseData.totalSupply = Number(supplyBigInt) / Number(divisor);
+                            } catch (parseError) {
+                                console.warn(`Could not parse supply for ${mintAddress}:`, info.supply, parseError);
                             }
                         }
-                        responseData.mintAuthority = info.mintAuthority ?? null;
-                        responseData.freezeAuthority = info.freezeAuthority ?? null;
                     }
+                    responseData.mintAuthority = info.mintAuthority ?? null;
+                    responseData.freezeAuthority = info.freezeAuthority ?? null;
                 } else {
-                     console.warn(`On-chain data for ${mintAddress} was not in a parsed format.`);
+                     console.warn(`On-chain data for ${mintAddress} was not in a parsed format or was incomplete.`);
                 }
             } else {
                 console.warn(`No on-chain account info found for mint address ${mintAddress}.`);

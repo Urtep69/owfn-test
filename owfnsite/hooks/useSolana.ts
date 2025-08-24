@@ -174,8 +174,9 @@ export const useSolana = (): UseSolanaReturn => {
             }
         });
         
-        const tokensWithBalance = allTokens.filter(t => t.balance > 0.000001); // Filter out dust balances
-        const sortedTokens = tokensWithBalance.sort((a,b) => b.usdValue - a.usdValue);
+        // Display all token accounts, including those with zero balance, as requested by the user.
+        // Sorting by USD value ensures high-value assets appear first.
+        const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
         balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
         return sortedTokens;
 
