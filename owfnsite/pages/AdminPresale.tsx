@@ -145,29 +145,37 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        const contributorMap = new Map<string, { totalLamports: bigint }>();
-        transactions.forEach(tx => {
-            const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n };
-            existing.totalLamports += BigInt(tx.lamports);
-            contributorMap.set(tx.from, existing);
-        });
-        
+        // A map to store the final aggregated data for each contributor.
+        const contributorMap = new Map<string, { totalLamports: bigint; totalOwfn: bigint }>();
+
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * BigInt(LAMPORTS_PER_SOL);
+        const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * LAMPORTS_PER_SOL));
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
 
-        return Array.from(contributorMap.entries()).map(([address, data]) => {
-            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
+        // Process each transaction individually to calculate the correct OWFN amount with bonus.
+        transactions.forEach(tx => {
+            const lamports = BigInt(tx.lamports);
             
-            // Perform all calculations with BigInt for precision
-            let totalOwfnInSmallestUnit = (data.totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
+            // Calculate base OWFN for this single transaction
+            let owfnForThisTx = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
 
-            if (data.totalLamports >= bonusThresholdLamports) {
-                const bonusAmount = (totalOwfnInSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
-                totalOwfnInSmallestUnit += bonusAmount;
+            // Check if this single transaction qualifies for a bonus
+            if (lamports >= bonusThresholdLamports) {
+                const bonusAmount = (owfnForThisTx * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
+                owfnForThisTx += bonusAmount;
             }
 
-            return { address, totalSol, totalOwfn: totalOwfnInSmallestUnit };
+            // Aggregate the results for the contributor.
+            const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n, totalOwfn: 0n };
+            existing.totalLamports += lamports;
+            existing.totalOwfn += owfnForThisTx;
+            contributorMap.set(tx.from, existing);
+        });
+
+        // Convert the map to the final array structure.
+        return Array.from(contributorMap.entries()).map(([address, data]) => {
+            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
+            return { address, totalSol, totalOwfn: data.totalOwfn };
         });
     }, [transactions]);
 
