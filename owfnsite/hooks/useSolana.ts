@@ -3,7 +3,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, SOLANA_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -32,12 +32,25 @@ export interface UseSolanaReturn {
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
 
-const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
-    [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon, null),
-    'So11111111111111111111111111111111111111112': React.createElement(SolIcon, null),
-    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon, null),
-    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon, null),
+const ICON_MAP: { [key: string]: React.FC<any> } = {
+  OwfnIcon,
+  SolIcon,
+  UsdcIcon,
+  UsdtIcon,
+  GenericTokenIcon
 };
+
+const deserializeLogo = (logoData: any): React.ReactNode => {
+  if (typeof logoData === 'string') {
+    return React.createElement(GenericTokenIcon, { uri: logoData });
+  }
+  if (logoData && typeof logoData === 'object' && logoData.type && ICON_MAP[logoData.type]) {
+    const Component = ICON_MAP[logoData.type];
+    return React.createElement(Component, logoData.props);
+  }
+  return React.createElement(GenericTokenIcon, {}); // fallback
+};
+
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
@@ -58,136 +71,22 @@ export const useSolana = (): UseSolanaReturn => {
       
     setLoading(true);
     try {
-        const response = await fetch(SOLANA_RPC_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 'my-id',
-                method: 'qn_getAssetsByOwner',
-                params: {
-                    ownerAddress: walletAddress,
-                    page: 1,
-                    limit: 1000,
-                    displayOptions: {
-                        showFungible: true,
-                        showNativeBalance: true,
-                    },
-                },
-            }),
-        });
+        const response = await fetch(`/api/wallet-balances?walletAddress=${walletAddress}`);
         
         if (!response.ok) {
-            console.error('QuickNode API Error:', await response.text());
-            throw new Error('Failed to fetch assets from QuickNode');
+            const errorData = await response.json().catch(() => ({ error: 'Failed to fetch balances and parse error.' }));
+            throw new Error(errorData.error || `Server responded with status ${response.status}`);
         }
 
-        const { result } = await response.json();
-        
-        if (!result) {
-             return [];
-        }
-       
-        const allTokens: Token[] = [];
-        const mintsToPrice: string[] = ['So11111111111111111111111111111111111111112'];
+        const rawTokens: any[] = await response.json();
 
-        // Collect all fungible token mints for price fetching
-        if (result.items && Array.isArray(result.items)) {
-            result.items.forEach((asset: any) => {
-                const tokenData = asset.token_info || asset.ownership?.token_info;
-                if (asset.id && tokenData && tokenData.balance > 0) {
-                    mintsToPrice.push(asset.id);
-                }
-            });
-        }
-        
-        // Fetch prices in a single batch call
-        const prices = new Map<string, number>();
-        try {
-            const uniqueMints = [...new Set(mintsToPrice)];
-            const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${uniqueMints.join(',')}`);
-            if (priceRes.ok) {
-                const priceData = await priceRes.json();
-                if (priceData.data) {
-                    for (const mint in priceData.data) {
-                        prices.set(mint, priceData.data[mint].price);
-                    }
-                }
-            }
-        } catch (e) { console.error("Could not fetch prices from Jupiter API", e); }
-        
-        const solPrice = prices.get('So11111111111111111111111111111111111111112') || 0;
+        const tokensWithLogos: Token[] = rawTokens.map(token => ({
+            ...token,
+            logo: deserializeLogo(token.logo),
+        }));
 
-        // Process native SOL balance
-        if (result.nativeBalance && result.nativeBalance > 0) {
-            const balance = result.nativeBalance / LAMPORTS_PER_SOL;
-            const solToken: Token = {
-                mintAddress: 'So11111111111111111111111111111111111111112',
-                balance: balance,
-                decimals: 9,
-                name: 'Solana',
-                symbol: 'SOL',
-                logo: React.createElement(SolIcon, null),
-                pricePerToken: solPrice,
-                usdValue: balance * solPrice,
-            };
-            allTokens.push(solToken);
-        }
-
-        // Process SPL tokens from the 'items' array robustly
-        if (result.items && Array.isArray(result.items)) {
-            const splTokens: Token[] = result.items
-                .map((asset: any): Token | null => {
-                    try {
-                        // DEFINITIVE FIX #1: Check both possible locations for token data.
-                        const tokenData = asset.token_info || asset.ownership?.token_info;
-
-                        if (
-                            !tokenData ||
-                            (typeof tokenData.balance !== 'string' && typeof tokenData.balance !== 'number') ||
-                            tokenData.balance === '0' ||
-                            tokenData.balance === 0 ||
-                            typeof tokenData.decimals !== 'number'
-                        ) {
-                            // This asset is not a fungible token with a positive balance that we can display.
-                            return null;
-                        }
-                        
-                        // DEFINITIVE FIX #2: Use BigInt for safe calculation to avoid precision errors.
-                        const balance = Number(BigInt(tokenData.balance)) / (10 ** tokenData.decimals);
-
-                        if (balance <= 0 || !isFinite(balance)) {
-                            return null;
-                        }
-
-                        const mintAddress = asset.id;
-                        const price = prices.get(mintAddress) || 0;
-                        const metadata = asset.content?.metadata;
-                        const links = asset.content?.links;
-
-                        return {
-                            mintAddress,
-                            balance,
-                            decimals: tokenData.decimals,
-                            name: metadata?.name || 'Unknown Token',
-                            symbol: metadata?.symbol || mintAddress.substring(0, 4) + '...',
-                            logo: KNOWN_TOKEN_ICONS[mintAddress] || React.createElement(GenericTokenIcon, { uri: links?.image }),
-                            pricePerToken: price,
-                            usdValue: balance * price,
-                        };
-                    } catch (e) {
-                        console.error(`Error processing asset ${asset.id}:`, e, asset);
-                        return null; // Ensure any error skips the token, not crashing the loop.
-                    }
-                })
-                .filter((token): token is Token => token !== null);
-
-            allTokens.push(...splTokens);
-        }
-        
-        const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
-        balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
-        return sortedTokens;
+        balanceCache.set(walletAddress, { data: tokensWithLogos, timestamp: Date.now() });
+        return tokensWithLogos;
 
     } catch (error) {
         console.error("Error fetching wallet balances:", error);
@@ -195,7 +94,7 @@ export const useSolana = (): UseSolanaReturn => {
     } finally {
         setLoading(false);
     }
-  }, [connection]);
+  }, []);
 
   useEffect(() => {
     if (connected && address) {
