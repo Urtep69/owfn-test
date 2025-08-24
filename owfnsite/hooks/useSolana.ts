@@ -133,28 +133,47 @@ export const useSolana = (): UseSolanaReturn => {
             allTokens.push(solToken);
         }
 
-        // Process SPL tokens from the 'items' array
+        // Process SPL tokens from the 'items' array robustly
         if (result.items && Array.isArray(result.items)) {
             const splTokens: Token[] = result.items
-                .filter((asset: any) => asset.interface === 'fungible_token' && asset.token_info?.balance > 0)
-                .map((asset: any): Token => {
-                    const tokenInfo = asset.token_info;
-                    const decimals = tokenInfo?.decimals ?? 0;
-                    const balance = Number(tokenInfo?.balance) / Math.pow(10, decimals);
-                    const price = prices.get(asset.id) || 0;
-                    const mintAddress = asset.id;
+                .map((asset: any): Token | null => {
+                    // Defensive parsing for each asset
+                    try {
+                        if (asset.interface !== 'fungible_token' || !asset.token_info || !asset.token_info.balance) {
+                            return null;
+                        }
+                        
+                        const balanceStr = String(asset.token_info.balance);
+                        if (balanceStr === '0') {
+                            return null; // Skip zero balance tokens
+                        }
 
-                    return {
-                        mintAddress: mintAddress,
-                        balance: balance,
-                        decimals: decimals,
-                        name: asset.content?.metadata?.name || 'Unknown Token',
-                        symbol: asset.content?.metadata?.symbol || `${mintAddress.slice(0, 4)}..`,
-                        logo: KNOWN_TOKEN_ICONS[mintAddress] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
-                        usdValue: balance * price,
-                        pricePerToken: price,
-                    };
-                });
+                        const decimals = asset.token_info.decimals ?? 0;
+                        const balance = Number(BigInt(balanceStr)) / Math.pow(10, decimals);
+                        
+                        if (balance <= 0) {
+                            return null;
+                        }
+
+                        const price = prices.get(asset.id) || 0;
+                        const mintAddress = asset.id;
+
+                        return {
+                            mintAddress: mintAddress,
+                            balance: balance,
+                            decimals: decimals,
+                            name: asset.content?.metadata?.name || 'Unknown Token',
+                            symbol: asset.content?.metadata?.symbol || `${mintAddress.slice(0, 4)}..`,
+                            logo: KNOWN_TOKEN_ICONS[mintAddress] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
+                            usdValue: balance * price,
+                            pricePerToken: price,
+                        };
+                    } catch (mapError) {
+                        console.error(`Failed to process asset ${asset.id}:`, mapError, asset);
+                        return null; // Skip tokens that cause an error
+                    }
+                })
+                .filter((token): token is Token => token !== null); // Filter out nulls
 
             allTokens.push(...splTokens);
         }
