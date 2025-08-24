@@ -94,9 +94,8 @@ export const useSolana = (): UseSolanaReturn => {
         // Collect all fungible token mints for price fetching
         if (result.items && Array.isArray(result.items)) {
             result.items.forEach((asset: any) => {
-                // We check for token_info existence to identify fungibles, which is more robust
-                // than checking the 'interface' string.
-                if (asset.id && asset.token_info && asset.token_info.balance > 0) {
+                const tokenData = asset.token_info || asset.ownership?.token_info;
+                if (asset.id && tokenData && tokenData.balance > 0) {
                     mintsToPrice.push(asset.id);
                 }
             });
@@ -140,36 +139,23 @@ export const useSolana = (): UseSolanaReturn => {
             const splTokens: Token[] = result.items
                 .map((asset: any): Token | null => {
                     try {
-                        const tokenData = asset.token_info;
+                        // DEFINITIVE FIX #1: Check both possible locations for token data.
+                        const tokenData = asset.token_info || asset.ownership?.token_info;
 
                         if (
                             !tokenData ||
-                            typeof tokenData.balance === 'undefined' ||
-                            tokenData.balance === null ||
+                            (typeof tokenData.balance !== 'string' && typeof tokenData.balance !== 'number') ||
                             tokenData.balance === '0' ||
+                            tokenData.balance === 0 ||
                             typeof tokenData.decimals !== 'number'
                         ) {
                             // This asset is not a fungible token with a positive balance that we can display.
                             return null;
                         }
-
-                        const { balance: balanceRaw, decimals } = tokenData;
-
-                        // Robust balance calculation using string manipulation.
-                        let balance: number;
-                        const balanceString = balanceRaw.toString();
                         
-                        if (decimals === 0) {
-                            balance = Number(balanceString);
-                        } else if (balanceString.length > decimals) {
-                            const integerPart = balanceString.slice(0, balanceString.length - decimals);
-                            const fractionalPart = balanceString.slice(balanceString.length - decimals);
-                            balance = Number(`${integerPart}.${fractionalPart}`);
-                        } else {
-                            const padded = balanceString.padStart(decimals, '0');
-                            balance = Number(`0.${padded}`);
-                        }
-                        
+                        // DEFINITIVE FIX #2: Use BigInt for safe calculation to avoid precision errors.
+                        const balance = Number(BigInt(tokenData.balance)) / (10 ** tokenData.decimals);
+
                         if (balance <= 0 || !isFinite(balance)) {
                             return null;
                         }
@@ -182,7 +168,7 @@ export const useSolana = (): UseSolanaReturn => {
                         return {
                             mintAddress,
                             balance,
-                            decimals,
+                            decimals: tokenData.decimals,
                             name: metadata?.name || 'Unknown Token',
                             symbol: metadata?.symbol || mintAddress.substring(0, 4) + '...',
                             logo: KNOWN_TOKEN_ICONS[mintAddress] || React.createElement(GenericTokenIcon, { uri: links?.image }),
