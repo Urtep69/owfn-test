@@ -69,6 +69,10 @@ export const useSolana = (): UseSolanaReturn => {
                     ownerAddress: walletAddress,
                     page: 1,
                     limit: 1000,
+                    displayOptions: {
+                        showFungible: true, // This is the crucial parameter that was missing
+                        showNativeBalance: true,
+                    },
                 },
             }),
         });
@@ -136,7 +140,8 @@ export const useSolana = (): UseSolanaReturn => {
                 .map((asset: any): Token => {
                     const tokenInfo = asset.ownership.token_info;
                     const decimals = tokenInfo?.decimals ?? 0;
-                    const balance = tokenInfo?.balance / Math.pow(10, decimals);
+                    // Safely convert balance string to number before calculation
+                    const balance = Number(tokenInfo?.balance) / Math.pow(10, decimals);
                     const price = prices.get(asset.id) || 0;
                     const mintAddress = asset.id;
 
