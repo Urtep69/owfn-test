@@ -140,9 +140,6 @@ export const useSolana = (): UseSolanaReturn => {
             const splTokens: Token[] = result.items
                 .map((asset: any): Token | null => {
                     try {
-                        // New robust filtering: Instead of checking a specific 'interface' string,
-                        // we identify a fungible token by its essential properties. This works for
-                        // standard SPL tokens and newer Token-2022 assets (V1_FUNGIBLE_ASSET).
                         const tokenData = asset.token_info;
 
                         if (
@@ -150,8 +147,7 @@ export const useSolana = (): UseSolanaReturn => {
                             typeof tokenData.balance === 'undefined' ||
                             tokenData.balance === null ||
                             tokenData.balance === '0' ||
-                            typeof tokenData.decimals !== 'number' ||
-                            tokenData.decimals === 0
+                            typeof tokenData.decimals !== 'number'
                         ) {
                             // This asset is not a fungible token with a positive balance that we can display.
                             return null;
@@ -163,7 +159,9 @@ export const useSolana = (): UseSolanaReturn => {
                         let balance: number;
                         const balanceString = balanceRaw.toString();
                         
-                        if (balanceString.length > decimals) {
+                        if (decimals === 0) {
+                            balance = Number(balanceString);
+                        } else if (balanceString.length > decimals) {
                             const integerPart = balanceString.slice(0, balanceString.length - decimals);
                             const fractionalPart = balanceString.slice(balanceString.length - decimals);
                             balance = Number(`${integerPart}.${fractionalPart}`);
