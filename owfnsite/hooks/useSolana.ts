@@ -138,54 +138,54 @@ export const useSolana = (): UseSolanaReturn => {
             const splTokens: Token[] = result.items
                 .map((asset: any): Token | null => {
                     try {
-                        if (asset.interface !== 'fungible_token') return null;
-                        
-                        const ownerInfo = asset.ownership;
-                        const tokenMeta = ownerInfo?.token_info;
-                        
-                        if (!tokenMeta || !tokenMeta.balance) return null;
-
-                        let balanceRaw = tokenMeta.balance.toString();
-                        if (balanceRaw === '0') return null;
-
-                        const decimals = tokenMeta.decimals ?? 0;
-                        
-                        let balance: number;
-                        if (decimals === 0) {
-                            balance = parseInt(balanceRaw, 10);
-                        } else {
-                            const len = balanceRaw.length;
-                            if (len <= decimals) {
-                                const padded = '0'.repeat(decimals - len) + balanceRaw;
-                                balance = parseFloat('0.' + padded);
-                            } else {
-                                const intPart = balanceRaw.substring(0, len - decimals);
-                                const fracPart = balanceRaw.substring(len - decimals);
-                                balance = parseFloat(intPart + '.' + fracPart);
-                            }
+                        // More robust check for fungible tokens, excluding NFTs (which often have decimals: 0)
+                        if (asset.interface !== 'fungible_token' || (asset.token_info && asset.token_info.decimals === 0)) {
+                            return null;
                         }
                         
-                        if (balance <= 0) return null;
+                        // Find the token data, which can be in multiple locations in the response
+                        const tokenData = asset.token_info || asset.ownership?.token_info || asset.spl_token_info;
+                        
+                        if (!tokenData || typeof tokenData.balance === 'undefined' || tokenData.balance === null) {
+                            return null; // Skip if no valid token data block is found
+                        }
+                        
+                        const balanceRaw = tokenData.balance.toString();
+                        const decimals = tokenData.decimals ?? 0;
 
-                        const price = prices.get(asset.id) || 0;
+                        if (balanceRaw === '0') {
+                            return null; // Skip zero-balance tokens
+                        }
+
+                        // Use BigInt for calculation to avoid precision issues, then convert to Number for display.
+                        const balance = Number(BigInt(balanceRaw)) / Math.pow(10, decimals);
+                        
+                        if (balance <= 0) {
+                            return null;
+                        }
+
                         const mintAddress = asset.id;
+                        const price = prices.get(mintAddress) || 0;
+
+                        const metadata = asset.content?.metadata;
+                        const links = asset.content?.links;
 
                         return {
-                            mintAddress: mintAddress,
-                            balance: balance,
-                            decimals: decimals,
-                            name: asset.content?.metadata?.name || 'Unknown Token',
-                            symbol: asset.content?.metadata?.symbol || `${mintAddress.slice(0, 4)}..`,
-                            logo: KNOWN_TOKEN_ICONS[mintAddress] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
-                            usdValue: balance * price,
+                            mintAddress,
+                            balance,
+                            decimals,
+                            name: metadata?.name || 'Unknown Token',
+                            symbol: metadata?.symbol || mintAddress.substring(0, 4) + '...',
+                            logo: KNOWN_TOKEN_ICONS[mintAddress] || React.createElement(GenericTokenIcon, { uri: links?.image }),
                             pricePerToken: price,
+                            usdValue: balance * price,
                         };
-                    } catch (mapError) {
-                        console.error(`Failed to process asset ${asset.id}:`, mapError, asset);
-                        return null; // Skip tokens that cause an error
+                    } catch (e) {
+                        console.error(`Error processing asset ${asset.id}:`, e, asset);
+                        return null; // Ensure any error skips the token, not crashing the loop.
                     }
                 })
-                .filter((token): token is Token => token !== null); // Filter out nulls
+                .filter((token): token is Token => token !== null);
 
             allTokens.push(...splTokens);
         }
