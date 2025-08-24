@@ -149,7 +149,10 @@ export const useSolana = (): UseSolanaReturn => {
                         }
 
                         const decimals = asset.ownership.token_info.decimals ?? 0;
-                        const balance = Number(BigInt(balanceStr)) / Math.pow(10, decimals);
+                        
+                        // CRITICAL FIX: Avoid mixing BigInt with Number in division, which throws a TypeError.
+                        // Use pure number arithmetic, which is safe for balances up to Number.MAX_SAFE_INTEGER.
+                        const balance = Number(balanceStr) / (10 ** decimals);
                         
                         if (balance <= 0) {
                             return null;
