@@ -1,6 +1,24 @@
-// This server-side function fetches token metadata and prices from the Birdeye API.
-// It uses a single, comprehensive endpoint to retrieve price, name, symbol, and logo,
-// providing better coverage and reliability than separate data sources.
+// Re-architected to be more robust.
+// It uses the official Jupiter token list for reliable metadata (name, symbol, logo)
+// and Jupiter's dedicated Price API for real-time values. This two-source approach
+// ensures token information is both accurate and consistently available, fixing the
+// "Unknown Token" and missing price issues.
+
+const JUPITER_TOKEN_LIST_URL = 'https://token.jup.ag/all';
+
+async function getJupiterTokenList() {
+    try {
+        const response = await fetch(JUPITER_TOKEN_LIST_URL);
+        if (!response.ok) {
+            console.error("Failed to fetch Jupiter token list");
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching Jupiter token list:", error);
+        return null;
+    }
+}
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
@@ -14,40 +32,56 @@ export default async function handler(req: any, res: any) {
         }
         const uniqueMints = Array.from(new Set(mints as string[]));
 
-        const apiUrl = `https://public-api.birdeye.so/defi/multi_price?list_address=${uniqueMints.join(',')}&include_platform_data=true`;
-        
-        const response = await fetch(apiUrl, {
-            headers: { 'x-chain': 'solana' }
-        });
-        
-        if (!response.ok) {
-            // Log the error and try to return a graceful empty response
-            console.error(`Birdeye API failed with status ${response.status}: ${await response.text()}`);
-            // Return an empty object so the frontend can handle it without crashing.
-            return res.status(200).json({});
+        // Step 1: Get metadata from Jupiter's token list
+        const tokenList = await getJupiterTokenList();
+        const tokenMap = new Map<string, any>();
+        if (tokenList) {
+            tokenList.forEach((token: any) => {
+                tokenMap.set(token.address, token);
+            });
         }
         
-        const birdeyeData = await response.json();
-        
-        if (!birdeyeData.success || !birdeyeData.data) {
-             console.warn("Birdeye API call was not successful or returned no data.", birdeyeData);
-             return res.status(200).json({});
-        }
-
         const finalData: { [key: string]: any } = {};
-        
-        for (const mint of uniqueMints) {
-            const tokenData = birdeyeData.data[mint];
-            if (tokenData) {
-                // Find the platform data, preferring one that isn't just a generic name
-                const platformData = tokenData.platforms?.find((p: any) => p.name && !p.name.toLowerCase().includes('unknown')) || tokenData.platforms?.[0];
 
-                finalData[mint] = {
-                    price: tokenData.value || 0,
-                    name: platformData?.name || 'Unknown Token',
-                    symbol: platformData?.symbol || `${mint.slice(0, 4)}...`,
-                    logoURI: platformData?.logoURI || null,
-                    decimals: platformData?.decimals ?? 9, // Fallback decimals
+        // Step 2: Fetch prices from Jupiter's price API
+        const priceApiUrl = `https://price.jup.ag/v4/price?ids=${uniqueMints.join(',')}`;
+        let priceData: { [key: string]: any } = {};
+        try {
+            const priceResponse = await fetch(priceApiUrl);
+            if (priceResponse.ok) {
+                const responseJson = await priceResponse.json();
+                priceData = responseJson.data || {};
+            } else {
+                 console.warn(`Jupiter price API failed with status ${priceResponse.status}`);
+            }
+        } catch (priceError) {
+             console.error("Could not fetch token prices from Jupiter:", priceError);
+        }
+
+        // Step 3: Combine metadata and price data
+        for (const mint of uniqueMints) {
+            const metadata = tokenMap.get(mint);
+            const priceInfo = priceData[mint];
+
+            // Prioritize metadata from the token list.
+            // If it exists, we show name/symbol even if price is missing.
+            if (metadata) {
+                 finalData[mint] = {
+                    price: priceInfo?.price || 0,
+                    name: metadata.name,
+                    symbol: metadata.symbol,
+                    logoURI: metadata.logoURI,
+                    decimals: metadata.decimals,
+                };
+            } else {
+                 // If not in the list, it might be a new/obscure token.
+                 // We still provide price if available, but with default metadata.
+                 finalData[mint] = {
+                    price: priceInfo?.price || 0,
+                    name: 'Unknown Token',
+                    symbol: `${mint.slice(0, 4)}...`,
+                    logoURI: null,
+                    decimals: 9, // Fallback decimals
                 };
             }
         }
