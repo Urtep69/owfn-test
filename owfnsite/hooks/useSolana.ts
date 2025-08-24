@@ -64,19 +64,21 @@ export const useSolana = (): UseSolanaReturn => {
         let allTokens: Token[] = [];
         const mintsToFetchPrice = new Set<string>();
 
-        // 1. Fetch native SOL balance
+        // 1. Fetch native SOL balance and only add it if it's greater than zero.
         const solBalanceLamports = await connection.getBalance(ownerPublicKey);
-        mintsToFetchPrice.add('So11111111111111111111111111111111111111112');
-        allTokens.push({
-            mintAddress: 'So11111111111111111111111111111111111111112',
-            balance: solBalanceLamports / LAMPORTS_PER_SOL,
-            decimals: 9,
-            name: 'Solana',
-            symbol: 'SOL',
-            logo: React.createElement(SolIcon),
-            pricePerToken: 0,
-            usdValue: 0,
-        });
+        if (solBalanceLamports > 0) {
+            mintsToFetchPrice.add('So11111111111111111111111111111111111111112');
+            allTokens.push({
+                mintAddress: 'So11111111111111111111111111111111111111112',
+                balance: solBalanceLamports / LAMPORTS_PER_SOL,
+                decimals: 9,
+                name: 'Solana',
+                symbol: 'SOL',
+                logo: React.createElement(SolIcon),
+                pricePerToken: 0,
+                usdValue: 0,
+            });
+        }
 
         // 2. Fetch SPL token accounts for both standards
         const tokenAccountsPromise = connection.getParsedTokenAccountsByOwner(ownerPublicKey, {

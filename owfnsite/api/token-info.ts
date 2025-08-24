@@ -39,7 +39,7 @@ export default async function handler(req: any, res: any) {
             const mintPublicKey = new PublicKey(mintAddress);
             const accountInfo = await connection.getParsedAccountInfo(mintPublicKey);
             
-            if (accountInfo.value) {
+            if (accountInfo?.value) {
                 const programOwner = accountInfo.value.owner.toBase58();
                 if (programOwner === TOKEN_2022_PROGRAM_ID.toBase58()) {
                     responseData.tokenStandard = 'Token-2022';
@@ -48,31 +48,27 @@ export default async function handler(req: any, res: any) {
                 }
 
                 const data = accountInfo.value.data;
-                 // **SUPER-ROBUSTNESS FIX**: Explicitly check every level of the parsed data object.
-                 // This prevents server crashes when the RPC returns unparsed data (buffer/string) or an
-                 // incomplete/unexpected object structure for non-standard tokens.
-                if (data && typeof data === 'object' && !Buffer.isBuffer(data) && 'parsed' in data &&
-                    data.parsed && typeof data.parsed === 'object' && 'info' in data.parsed &&
-                    data.parsed.info && typeof data.parsed.info === 'object') {
-                    
-                    const info: any = data.parsed.info; // Treat as 'any' for defensive access
-
+                // **ULTIMATE ROBUSTNESS**: Access parsed data with extreme caution.
+                const info = (data as ParsedAccountData)?.parsed?.info;
+                
+                if (info && typeof info === 'object') {
                     if (typeof info.decimals === 'number') {
                         responseData.decimals = info.decimals;
-                        if (info.supply) { // Check for existence before using
+                        if (info.supply) {
                             try {
                                 const supplyBigInt = BigInt(info.supply);
                                 const divisor = 10n ** BigInt(info.decimals);
                                 responseData.totalSupply = Number(supplyBigInt) / Number(divisor);
                             } catch (parseError) {
                                 console.warn(`Could not parse supply for ${mintAddress}:`, info.supply, parseError);
+                                responseData.totalSupply = 0; // Fallback
                             }
                         }
                     }
                     responseData.mintAuthority = info.mintAuthority ?? null;
                     responseData.freezeAuthority = info.freezeAuthority ?? null;
                 } else {
-                     console.warn(`On-chain data for ${mintAddress} was not in a parsed format or was incomplete.`);
+                     console.warn(`On-chain data for ${mintAddress} was not in the expected parsed format.`);
                 }
             } else {
                 console.warn(`No on-chain account info found for mint address ${mintAddress}.`);
@@ -88,11 +84,12 @@ export default async function handler(req: any, res: any) {
             const dexResponse = await fetch(dexScreenerUrl, { headers: { 'User-Agent': 'OWFN/1.0' } });
             if (dexResponse.ok) {
                 const dexData = await dexResponse.json();
-                const pairs = dexData.pairs || []; // Ensure pairs is an array to prevent crashes
-                if (pairs.length > 0) {
-                    const primaryPair = pairs.reduce((prev: any, current: any) => 
-                        (prev.liquidity?.usd ?? 0) > (current.liquidity?.usd ?? 0) ? prev : current
-                    );
+                // **ULTRA-ROBUSTNESS FIX**: Use optional chaining and initialize reducer correctly.
+                const primaryPair = dexData?.pairs?.reduce((prev: any, current: any) => 
+                    (prev?.liquidity?.usd ?? 0) > (current?.liquidity?.usd ?? 0) ? prev : current, null
+                );
+
+                if (primaryPair) {
                     responseData.pricePerToken = parseFloat(primaryPair.priceUsd) || 0;
                     responseData.marketCap = primaryPair.marketCap ?? 0;
                     responseData.fdv = primaryPair.fdv ?? 0;
