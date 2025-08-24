@@ -85,16 +85,30 @@ export const useSolana = (): UseSolanaReturn => {
         }
        
         const allTokens: Token[] = [];
+        const mintsToPrice: string[] = ['So11111111111111111111111111111111111111112'];
+
+        if (result.items && Array.isArray(result.items)) {
+            result.items.forEach((asset: any) => {
+                if (asset.id) {
+                    mintsToPrice.push(asset.id);
+                }
+            });
+        }
         
-        let solPrice = 0;
+        const prices = new Map<string, number>();
         try {
-            const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=So11111111111111111111111111111111111111112`);
+            const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mintsToPrice.join(',')}`);
             if (priceRes.ok) {
                 const priceData = await priceRes.json();
-                solPrice = priceData.data?.So1111111111111111111111111111111111111111112?.price || 0;
+                for (const mint of mintsToPrice) {
+                    if (priceData.data?.[mint]) {
+                        prices.set(mint, priceData.data[mint].price);
+                    }
+                }
             }
-        } catch (e) { console.error("Could not fetch SOL price from Jupiter API", e); }
+        } catch (e) { console.error("Could not fetch prices from Jupiter API", e); }
         
+        const solPrice = prices.get('So11111111111111111111111111111111111111112') || 0;
 
         // Process native SOL balance
         if (result.nativeBalance && result.nativeBalance > 0) {
@@ -112,20 +126,27 @@ export const useSolana = (): UseSolanaReturn => {
             allTokens.push(solToken);
         }
 
-        // Process SPL tokens from the 'assets' array
-        if (result.assets && Array.isArray(result.assets)) {
-            const splTokens: Token[] = result.assets
-                .filter((asset: any) => asset.amount > 0)
-                .map((asset: any): Token => ({
-                    mintAddress: asset.tokenAddress,
-                    balance: asset.amount / Math.pow(10, asset.decimals),
-                    decimals: asset.decimals,
-                    name: asset.name || 'Unknown Token',
-                    symbol: asset.symbol || `${asset.tokenAddress.slice(0, 4)}..`,
-                    logo: KNOWN_TOKEN_ICONS[asset.tokenAddress] || React.createElement(GenericTokenIcon, { uri: asset.image }),
-                    usdValue: (asset.amount / Math.pow(10, asset.decimals)) * (asset.price || 0),
-                    pricePerToken: asset.price || 0,
-                }));
+        // Process SPL tokens from the 'items' array
+        if (result.items && Array.isArray(result.items)) {
+            const splTokens: Token[] = result.items
+                .filter((asset: any) => asset.token_info?.balance > 0)
+                .map((asset: any): Token => {
+                    const decimals = asset.token_info?.decimals ?? 0;
+                    const balance = asset.token_info?.balance / Math.pow(10, decimals);
+                    const price = prices.get(asset.id) || 0;
+                    const mintAddress = asset.id;
+
+                    return {
+                        mintAddress: mintAddress,
+                        balance: balance,
+                        decimals: decimals,
+                        name: asset.content?.metadata?.name || 'Unknown Token',
+                        symbol: asset.content?.metadata?.symbol || `${mintAddress.slice(0, 4)}..`,
+                        logo: KNOWN_TOKEN_ICONS[mintAddress] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
+                        usdValue: balance * price,
+                        pricePerToken: price,
+                    };
+                });
 
             allTokens.push(...splTokens);
         }
