@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
@@ -47,7 +46,14 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 const isValidSolanaAddress = (address: any): boolean => {
     if (typeof address !== 'string') return false;
-    return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address);
+    // This is a basic check; a more robust one might involve trying to create a PublicKey.
+    // However, for filtering RPC responses, this regex is generally sufficient.
+    try {
+        new PublicKey(address);
+        return true;
+    } catch (e) {
+        return false;
+    }
 };
 
 export const useSolana = (): UseSolanaReturn => {  
@@ -104,15 +110,14 @@ export const useSolana = (): UseSolanaReturn => {
         const splTokens: Token[] = [];
         allTokenAccounts.forEach(accountInfo => {
             const parsedInfo = accountInfo.account.data?.parsed?.info;
-            // Add robust check for mint address validity
             if (!parsedInfo || !isValidSolanaAddress(parsedInfo.mint)) {
                 console.warn('Skipping token account with invalid or missing mint address:', parsedInfo?.mint);
-                return; // Skip this malformed token account
+                return;
             }
 
             const rawAmount = BigInt(parsedInfo.tokenAmount.amount);
             if (rawAmount === 0n) {
-                return; // Skip zero-balance tokens
+                return;
             }
 
             const mintAddress = parsedInfo.mint;
@@ -144,13 +149,17 @@ export const useSolana = (): UseSolanaReturn => {
             let priceData: any = {};
             if (mintsToFetchPrice.size > 0) {
                 const mintList = Array.from(mintsToFetchPrice).join(',');
-                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${mintList}`);
+                const priceRes = await fetch(`https://public-api.birdeye.so/defi/multi_price?list_address=${mintList}`);
 
                 if (priceRes.ok) {
-                    const jupiterPriceData = await priceRes.json();
-                    priceData = jupiterPriceData.data;
+                    const birdeyePriceData = await priceRes.json();
+                    if (birdeyePriceData.success && birdeyePriceData.data) {
+                        priceData = birdeyePriceData.data;
+                    } else {
+                         console.warn(`Birdeye Price API returned success=false or no data.`);
+                    }
                 } else {
-                    console.warn(`Jupiter Price API call failed with status ${priceRes.status}`);
+                    console.warn(`Birdeye Price API call failed with status ${priceRes.status}`);
                 }
             }
             
@@ -167,8 +176,8 @@ export const useSolana = (): UseSolanaReturn => {
 
                 if (priceData?.[token.mintAddress]) {
                     const priceInfo = priceData[token.mintAddress];
-                    if (priceInfo && typeof priceInfo.price === 'number') {
-                        const price = priceInfo.price;
+                    if (priceInfo && typeof priceInfo.value === 'number') {
+                        const price = priceInfo.value;
                         token.pricePerToken = price;
                         token.usdValue = token.balance * price;
                         if (token.mintAddress === solMint) {

@@ -6,6 +6,10 @@ import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { GenericTokenIcon } from '../components/IconComponents.tsx';
 import { DiscordIcon } from '../components/IconComponents.tsx';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { PublicKey, ParsedAccountData } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
+
 
 // --- Helper Functions & Components ---
 
@@ -48,6 +52,7 @@ const LinkButton = ({ href, icon, text }: { href: string, icon: React.ReactNode,
 
 export default function TokenDetail() {
     const { t } = useAppContext();
+    const { connection } = useConnection();
     const params = useParams();
     const [location] = useLocation();
     const mintAddress = params?.['mint'];
@@ -76,13 +81,78 @@ export default function TokenDetail() {
         const fetchTokenData = async () => {
             setLoading(true);
             setError(null);
+            const responseData: Partial<TokenDetails> = { mintAddress };
+
             try {
-                const response = await fetch(`/api/token-info?mint=${mintAddress}`);
-                if (!response.ok) {
-                    const errorBody = await response.json().catch(() => ({ error: `Server error: ${response.status}` }));
-                    throw new Error(errorBody.error || "Failed to fetch token data.");
+                // Step 1: Fetch from Birdeye
+                try {
+                    const birdeyeResponse = await fetch(`https://public-api.birdeye.so/defi/token_overview?address=${mintAddress}`);
+                    if (birdeyeResponse.ok) {
+                        const apiData = await birdeyeResponse.json();
+                        if (apiData.success && apiData.data) {
+                            const tokenData = apiData.data;
+                            responseData.name = tokenData.name;
+                            responseData.symbol = tokenData.symbol;
+                            responseData.logo = tokenData.logoURI;
+                            responseData.decimals = tokenData.decimals;
+                            responseData.pricePerToken = tokenData.price || 0;
+                            responseData.description = tokenData.description;
+                            responseData.links = tokenData.links;
+                        }
+                    } else {
+                        console.warn(`Birdeye API for ${mintAddress} failed with status ${birdeyeResponse.status}`);
+                    }
+                } catch (e) {
+                    console.warn(`Could not fetch metadata from Birdeye for ${mintAddress}:`, e);
                 }
-                setToken(await response.json());
+
+                // Step 2: Fetch on-chain data
+                try {
+                    const mintPublicKey = new PublicKey(mintAddress);
+                    const accountInfo = await connection.getParsedAccountInfo(mintPublicKey);
+
+                    if (accountInfo?.value) {
+                        const programOwner = accountInfo.value.owner.toBase58();
+                        if (programOwner === TOKEN_2022_PROGRAM_ID.toBase58()) {
+                            responseData.tokenStandard = 'Token-2022';
+                        } else if (programOwner === TOKEN_PROGRAM_ID.toBase58()) {
+                            responseData.tokenStandard = 'SPL Token';
+                        }
+
+                        const info = (accountInfo.value.data as ParsedAccountData)?.parsed?.info;
+
+                        if (info && typeof info === 'object') {
+                            if (typeof info.decimals === 'number') {
+                                responseData.decimals = info.decimals; // On-chain is truth
+                                if (info.supply) {
+                                    try {
+                                        const supplyBigInt = BigInt(info.supply);
+                                        const divisor = 10n ** BigInt(info.decimals);
+                                        responseData.totalSupply = Number(supplyBigInt) / Number(divisor);
+                                    } catch (parseError) {
+                                        responseData.totalSupply = 0;
+                                    }
+                                }
+                            }
+                            responseData.mintAuthority = info.mintAuthority ?? null;
+                            responseData.freezeAuthority = info.freezeAuthority ?? null;
+                        }
+                    }
+                } catch(e) {
+                    console.warn(`Could not fetch on-chain account info for ${mintAddress}. Error:`, e);
+                }
+
+                // Step 3: Final Cleanup & Set State
+                if (!responseData.name) responseData.name = 'Unknown Token';
+                if (!responseData.symbol) responseData.symbol = `${mintAddress.slice(0,4)}...${mintAddress.slice(-4)}`;
+                responseData.updateAuthority = null; // Assume null
+
+                if (responseData.totalSupply === undefined && responseData.decimals === undefined) {
+                     throw new Error(`Token data not found.`);
+                }
+                
+                setToken(responseData);
+
             } catch (err) {
                 console.error("Failed to fetch token details:", err);
                 setError(err instanceof Error ? err.message : "An unknown error occurred.");
@@ -92,7 +162,7 @@ export default function TokenDetail() {
         };
 
         fetchTokenData();
-    }, [mintAddress]);
+    }, [mintAddress, connection]);
 
     const getLinkIcon = (key: string) => {
         if (key.includes('twitter')) return <Twitter size={16} />;
