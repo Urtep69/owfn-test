@@ -4,7 +4,7 @@ import { useAppContext } from '../contexts/AppContext.tsx';
 import { ProgressBar } from '../components/ProgressBar.tsx';
 import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
-import { DISTRIBUTION_WALLETS, KNOWN_TOKEN_MINT_ADDRESSES } from '../constants.ts';
+import { DISTRIBUTION_WALLETS } from '../constants.ts';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -27,33 +27,11 @@ export default function ImpactCaseDetail() {
 
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
-    const [tokenPrice, setTokenPrice] = useState(0);
     
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
     const percentages = [5, 10, 15, 25, 50, 75, 100];
 
-    useEffect(() => {
-        const fetchPrice = async () => {
-            const mintAddress = KNOWN_TOKEN_MINT_ADDRESSES[selectedToken];
-            if (!mintAddress) {
-                setTokenPrice(0);
-                return;
-            }
-            try {
-                const res = await fetch(`https://price.jup.ag/v4/price?ids=${mintAddress}`);
-                const data = await res.json();
-                if(data.data[mintAddress]) {
-                    setTokenPrice(data.data[mintAddress].price);
-                } else {
-                    setTokenPrice(0);
-                }
-            } catch (e) {
-                console.error("Failed to fetch price", e);
-                setTokenPrice(0);
-            }
-        };
-        fetchPrice();
-    }, [selectedToken]);
+    const tokenPrice = useMemo(() => currentUserToken?.pricePerToken ?? 0, [currentUserToken]);
 
     const usdValue = useMemo(() => {
         const numAmount = parseFloat(amount);
