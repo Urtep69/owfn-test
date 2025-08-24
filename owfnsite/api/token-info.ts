@@ -41,30 +41,54 @@ export default async function handler(req: any, res: any) {
         }
         
         const jsonResponse = await response.json();
+
+        if (jsonResponse.error) {
+            console.error(`Helius API returned an error object for getAsset`, jsonResponse.error);
+            return res.status(400).json({ error: `Helius Error: ${jsonResponse.error.message}` });
+        }
+        
         const asset = jsonResponse.result;
         
         if (!asset) {
             return res.status(404).json({ error: `No data could be found for mint: ${mintAddress}.` });
         }
-
-        const decimals = asset.token_info?.decimals ?? 9;
-        const price = asset.token_info?.price_info?.price_per_token || 0;
-        const supply = asset.token_info?.supply ? Number(BigInt(asset.token_info.supply)) / (10 ** decimals) : 0;
         
-        // Safely extract authorities by checking if 'authorities' is an array
-        // and correctly checking the 'scopes' array for permissions.
+        // Defensively access nested properties
+        const tokenInfo = asset.token_info || {};
+        const content = asset.content || {};
+        const metadata = content.metadata || {};
+        const links = content.links || {};
+        const priceInfo = tokenInfo.price_info || {};
+
+        const decimals = tokenInfo.decimals ?? 9;
+        const price = priceInfo.price_per_token || 0;
+        const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
+        
         let mintAuthority: string | null = null;
         let freezeAuthority: string | null = null;
+        let updateAuthority: string | null = null;
+
         if (Array.isArray(asset.authorities)) {
-            mintAuthority = asset.authorities.find((a: any) => Array.isArray(a.scopes) && a.scopes.includes('mint'))?.address ?? null;
-            freezeAuthority = asset.authorities.find((a: any) => Array.isArray(a.scopes) && a.scopes.includes('freeze'))?.address ?? null;
+             for (const authority of asset.authorities) {
+                if (authority && typeof authority === 'object' && Array.isArray(authority.scopes)) {
+                    if (authority.scopes.includes('mint')) {
+                        mintAuthority = authority.address;
+                    }
+                    if (authority.scopes.includes('freeze')) {
+                        freezeAuthority = authority.address;
+                    }
+                     if (authority.scopes.includes('update')) {
+                        updateAuthority = authority.address;
+                    }
+                }
+            }
         }
 
         const responseData: Partial<TokenDetails> = {
             mintAddress: asset.id,
-            name: asset.content?.metadata?.name || 'Unknown Token',
-            symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}...`,
-            logo: asset.content?.links?.image || null,
+            name: metadata.name || 'Unknown Token',
+            symbol: metadata.symbol || `${asset.id.slice(0, 4)}...`,
+            logo: links.image || null,
             decimals: decimals,
             pricePerToken: price,
             totalSupply: supply,
@@ -72,7 +96,7 @@ export default async function handler(req: any, res: any) {
             
             mintAuthority: mintAuthority,
             freezeAuthority: freezeAuthority,
-            updateAuthority: null, // This is not reliably provided for fungible tokens via this endpoint.
+            updateAuthority: updateAuthority,
             tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
         };
 
