@@ -24,10 +24,6 @@ interface AppContextType {
   isMaintenanceActive: boolean;
   isWalletModalOpen: boolean;
   setWalletModalOpen: (isOpen: boolean) => void;
-  isSignatureRequired: boolean;
-  setSignatureRequired: (isRequired: boolean) => void;
-  isVerified: boolean;
-  setIsVerified: (isVerified: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -37,24 +33,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
   const solana = useSolana();
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
-  const [isSignatureRequired, setSignatureRequired] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
-
-  // When wallet connects, require signature. When it disconnects, reset verification.
-  useEffect(() => {
-    if (solana.connected && !isVerified) {
-      setSignatureRequired(true);
-    }
-    if (!solana.connected) {
-      setIsVerified(false);
-      setSignatureRequired(false);
-    }
-  }, [solana.connected, isVerified]);
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
@@ -138,10 +121,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isMaintenanceActive,
     isWalletModalOpen,
     setWalletModalOpen,
-    isSignatureRequired,
-    setSignatureRequired,
-    isVerified,
-    setIsVerified,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

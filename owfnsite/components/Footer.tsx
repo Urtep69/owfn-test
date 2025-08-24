@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Twitter, Send } from 'lucide-react';
 import { PROJECT_LINKS } from '../constants.ts';
@@ -13,10 +14,10 @@ const socialLinks = [
 export const Footer = () => {
   const { t } = useAppContext();
   return (
-    <footer className="bg-dark-bg/80 backdrop-blur-sm border-t border-dark-border mt-12">
+    <footer className="bg-primary-200 dark:bg-darkPrimary-800 shadow-inner">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-text-secondary">
+        <div className="flex justify-between items-center">
+          <p className="text-sm text-primary-600 dark:text-darkPrimary-400">
             {t('footer_copyright', { year: new Date().getFullYear() })}
           </p>
           <div className="flex space-x-6">
@@ -26,7 +27,7 @@ export const Footer = () => {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-secondary hover:text-neon-cyan transition-colors"
+                className="text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400 transition-colors"
               >
                 <span className="sr-only">{link.name}</span>
                 {link.icon}

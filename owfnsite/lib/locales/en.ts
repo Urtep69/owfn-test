@@ -108,7 +108,7 @@ export const en = {
     presale_purchase_success_alert: `Purchase successful! You contributed {amount} SOL. Your {owfnAmount} OWFN tokens are reserved and will be automatically airdropped to your wallet at the end of the presale.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Sold {progress}%`,
-    presale_buy_info: `Buy (Max: {max} SOL per wallet)`,
+    presale_buy_info: `Buy (Min: {min} SOL, Max: {max} SOL)`,
     buy: `Buy`,
     owfn_base_amount: `OWFN Base Amount`,
     presale_buying_owfn: `You're buying {amount} $OWFN`,
@@ -133,7 +133,7 @@ export const en = {
     presale_dyor_nfa_title: `DYOR, NFA`,
     presale_dyor_nfa_desc: `Do Your Own Research. Not Financial Advice.`,
     presale_footer_copyright: `© {year} Official World Family Network | All rights reserved.`,
-    presale_amount_error: `Amount must be greater than 0 and up to {max} SOL.`,
+    presale_amount_error: `Amount must be between {min} and {max} SOL.`,
     live_presale_feed: `Live Presale Feed`,
     wallet: `Wallet`,
     sol_spent: `SOL Spent`,
@@ -429,6 +429,7 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
+    airdrop_info_box_title: `About this Airdrop`,
     airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors such as presale participation and engagement in community events.`,
     
     // Governance
@@ -541,6 +542,6 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
-    contact_social_discord_title: 'Discord Server',
+    contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
 };

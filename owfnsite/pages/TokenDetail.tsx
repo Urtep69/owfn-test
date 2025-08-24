@@ -35,9 +35,9 @@ const formatTimeAgo = (timestamp?: number): string => {
 };
 
 const StatCard = ({ title, value, change, icon }: { title: string, value: string, change?: number, icon: React.ReactNode }) => (
-    <div className="glass-card p-4">
+    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
         <div className="flex items-center space-x-3">
-            <div className="bg-accent-500/10 text-accent-500 rounded-lg p-3">{icon}</div>
+            <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">{icon}</div>
             <div>
                 <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
                 <div className="flex items-baseline gap-2">
@@ -54,7 +54,7 @@ const StatCard = ({ title, value, change, icon }: { title: string, value: string
 );
 
 const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
-    <div className="glass-card p-6">
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
         <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-primary-800 dark:text-darkPrimary-200">{icon}{title}</h3>
         <div className="space-y-3">{children}</div>
     </div>
@@ -152,7 +152,7 @@ export default function TokenDetail() {
 
     return (
         <div className="space-y-8 animate-fade-in-up">
-            <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-accent-400 hover:underline">
+            <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
                 <ArrowLeft size={16} /> {backLinkText}
             </Link>
 
@@ -163,7 +163,7 @@ export default function TokenDetail() {
                     <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
                 </div>
                 {isMarketDataAvailable && token.mintAddress && (
-                    <a href={`https://jup.ag/swap/SOL-${token.mintAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent-500 text-white font-bold py-2 px-4 rounded-full neo-button border-accent-900/50 dark:border-accent-200/50 flex items-center gap-2">
+                    <a href={`https://jup.ag/swap/SOL-${token.mintAddress}`} target="_blank" rel="noopener noreferrer" className="bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors flex items-center gap-2">
                         {t('swap')} <ExternalLink size={16} />
                     </a>
                 )}
@@ -198,7 +198,7 @@ export default function TokenDetail() {
                             </InfoCard>
                         </>
                     ) : (
-                        <div className="text-center p-12 glass-card">
+                        <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner-3d">
                             <p className="text-primary-600 dark:text-darkPrimary-400">Live market data is not available for this token. It may not be listed on a decentralized exchange yet.</p>
                         </div>
                     )}

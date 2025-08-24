@@ -2,10 +2,9 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
-import type { Token, ImpactBadge, ImpactNFT, VestingSchedule } from '../types.ts';
+import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, HELIUS_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
-import { HandHeart, Vote, Gem, Check, ShieldCheck } from 'lucide-react';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
 export interface UseSolanaReturn {
@@ -19,10 +18,6 @@ export interface UseSolanaReturn {
     votesCast: number;
     donations: any[]; 
     votedProposalIds: string[];
-    impactScore: number;
-    memberTier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum';
-    impactNFTs: ImpactNFT[];
-    impactBadges: ImpactBadge[];
   };
   stakedBalance: number;
   earnedRewards: number;
@@ -30,12 +25,11 @@ export interface UseSolanaReturn {
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
   sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
-  stakeTokens: (amount: number) => Promise<{ success: boolean; messageKey: string; params?: { amount: number } }>;
-  unstakeTokens: (amount: number) => Promise<{ success: boolean; messageKey: string; params?: { amount: number } }>;
-  claimRewards: () => Promise<{ success: boolean; messageKey: string; params?: { amount: number } }>;
+  stakeTokens: (amount: number) => Promise<any>;
+  unstakeTokens: (amount: number) => Promise<any>;
+  claimRewards: () => Promise<any>;
   claimVestedTokens: (amount: number) => Promise<any>;
-  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<{ success: boolean; messageKey: string }>;
-  signMessage: (message: string) => Promise<Uint8Array | null>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
 
 const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
@@ -48,49 +42,14 @@ const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
-const MOCK_BADGES: ImpactBadge[] = [
-    { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: React.createElement(HandHeart) },
-    { id: 'badge2', titleKey: 'badge_community_voter', descriptionKey: 'badge_community_voter_desc', icon: React.createElement(Vote) },
-    { id: 'badge3', titleKey: 'badge_diverse_donor', descriptionKey: 'badge_diverse_donor_desc', icon: React.createElement(Gem) },
-    { id: 'badge4', titleKey: 'badge_verified_human', descriptionKey: 'badge_verified_human_desc', icon: React.createElement(ShieldCheck) },
-];
-
-
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, signMessage: walletSignMessage, disconnect } = useWallet();
+  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
-  const [userStats, setUserStats] = useState<UseSolanaReturn['userStats']>({
-        totalDonated: 0,
-        projectsSupported: 0,
-        votesCast: 0,
-        donations: [],
-        votedProposalIds: [],
-        impactScore: 0,
-        memberTier: 'Bronze',
-        impactNFTs: [],
-        impactBadges: MOCK_BADGES, // Using mock badges for now
-  });
-  const [stakedBalance, setStakedBalance] = useState(0);
-  const [earnedRewards, setEarnedRewards] = useState(0);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
 
-  const signMessage = useCallback(async (message: string) => {
-    if (!walletSignMessage) {
-      console.error('Wallet does not support signMessage');
-      return null;
-    }
-    try {
-      const encodedMessage = new TextEncoder().encode(message);
-      return await walletSignMessage(encodedMessage);
-    } catch (error) {
-      console.error('Error signing message:', error);
-      return null;
-    }
-  }, [walletSignMessage]);
-  
   const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
     const cached = balanceCache.get(walletAddress);
     if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
@@ -206,26 +165,6 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connection]);
 
-    // Calculate Impact Score and Tier based on tokens
-    useEffect(() => {
-        if (connected && address) {
-            const owfnToken = userTokens.find(t => t.symbol === 'OWFN');
-            const solToken = userTokens.find(t => t.symbol === 'SOL');
-
-            // More advanced scoring logic
-            const score = (owfnToken?.balance || 0) * 0.1 + (solToken?.balance || 0) * 10 + (userStats.votesCast * 50) + (userStats.totalDonated * 2);
-            let tier: UseSolanaReturn['userStats']['memberTier'] = 'Bronze';
-            if (score > 10000) tier = 'Platinum';
-            else if (score > 5000) tier = 'Gold';
-            else if (score > 1000) tier = 'Silver';
-            
-            setUserStats(prev => ({ ...prev, impactScore: Math.round(score), memberTier: tier }));
-        } else {
-            setUserStats(prev => ({ ...prev, impactScore: 0, memberTier: 'Bronze' }));
-        }
-    }, [userTokens, connected, address, userStats.votesCast, userStats.totalDonated]);
-
-
   useEffect(() => {
     if (connected && address) {
       getWalletBalances(address).then(setUserTokens);
@@ -332,58 +271,10 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
-  const stakeTokens = async (amount: number): Promise<{ success: boolean; messageKey: string; params?: { amount: number } }> => {
-    console.warn("This feature is a placeholder and not implemented on-chain yet.");
-    setLoading(true);
-    await new Promise(res => setTimeout(res, 1000)); // Simulate transaction
-    setStakedBalance(prev => prev + amount);
-    // In a real scenario, you'd update the user's OWFN token balance too
-    setLoading(false);
-    return Promise.resolve({ success: true, messageKey: 'stake_success_alert', params: { amount } });
-  };
-  
-  const unstakeTokens = async (amount: number): Promise<{ success: boolean; messageKey: string; params?: { amount: number } }> => {
-    console.warn("This feature is a placeholder and not implemented on-chain yet.");
-    if (amount > stakedBalance) {
-        alert("Cannot unstake more than you have staked.");
-        return Promise.resolve({ success: false, messageKey: 'transaction_failed_alert' });
-    }
-    setLoading(true);
-    await new Promise(res => setTimeout(res, 1000)); // Simulate transaction
-    setStakedBalance(prev => prev - amount);
-    setLoading(false);
-    return Promise.resolve({ success: true, messageKey: 'unstake_success_alert', params: { amount } });
-  };
-  
-  const claimRewards = async (): Promise<{ success: boolean; messageKey: string; params?: { amount: number } }> => {
-    console.warn("This feature is a placeholder and not implemented on-chain yet.");
-    const amount = earnedRewards;
-    setLoading(true);
-    await new Promise(res => setTimeout(res, 1000)); // Simulate transaction
-    setEarnedRewards(0);
-    setLoading(false);
-    return Promise.resolve({ success: true, messageKey: 'claim_success_alert', params: { amount } });
-  };
-
-  const voteOnProposal = async (proposalId: string, vote: 'for' | 'against'): Promise<{ success: boolean; messageKey: string }> => {
+  const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
-       setLoading(true);
-       await new Promise(res => setTimeout(res, 1000));
-       setUserStats(prev => ({
-            ...prev,
-            votedProposalIds: [...prev.votedProposalIds, proposalId],
-            votesCast: prev.votesCast + 1,
-       }));
-       setLoading(false);
-       return Promise.resolve({ success: true, messageKey: 'vote_success_alert' });
-  };
-  
-  const claimVestedTokens = async (amount: number): Promise<any> => {
-    console.warn("This feature is a placeholder and not implemented on-chain yet.");
-    setLoading(true);
-    await new Promise(res => setTimeout(res, 1000));
-    setLoading(false);
-    return Promise.resolve({ success: true, messageKey: 'vesting_claim_success', params: { amount }});
+      alert("This feature is coming soon and requires on-chain programs to be deployed.");
+      return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
   }
 
   return {
@@ -392,17 +283,22 @@ export const useSolana = (): UseSolanaReturn => {
     userTokens,
     loading,
     connection,
-    userStats,
-    stakedBalance,
-    earnedRewards,
+    userStats: { 
+        totalDonated: 0,
+        projectsSupported: 0,
+        votesCast: 0,
+        donations: [],
+        votedProposalIds: []
+    },
+    stakedBalance: 0,
+    earnedRewards: 0,
     disconnectWallet: disconnect,
     getWalletBalances,
     sendTransaction,
-    stakeTokens,
-    unstakeTokens,
-    claimRewards,
-    voteOnProposal,
-    claimVestedTokens,
-    signMessage,
+    stakeTokens: notImplemented,
+    unstakeTokens: notImplemented,
+    claimRewards: notImplemented,
+    claimVestedTokens: notImplemented,
+    voteOnProposal: notImplemented,
   };
 };
