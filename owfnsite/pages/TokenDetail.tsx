@@ -74,13 +74,14 @@ export default function TokenDetail() {
 
                 if (!response.ok) {
                     let errorMsg = `Error: ${response.status} ${response.statusText}`;
+                    const errorText = await response.text(); // Read body once as text
                     try {
-                        const errorData = await response.json();
+                        // Try parsing it as JSON
+                        const errorData = JSON.parse(errorText);
                         errorMsg = errorData.error || errorMsg;
                     } catch (e) {
-                        const textError = await response.text();
-                        // Use the text error, but trim it to avoid huge HTML pages in the error message.
-                        errorMsg = textError.substring(0, 200) || errorMsg;
+                         // If it's not JSON, use the raw text (or a snippet)
+                        errorMsg = errorText.substring(0, 200) || errorMsg;
                     }
                     throw new Error(errorMsg);
                 }
