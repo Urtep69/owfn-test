@@ -137,8 +137,9 @@ export const useSolana = (): UseSolanaReturn => {
                     token.logo = React.createElement(GenericTokenIcon, { uri: metadata.logoURI });
                 }
 
-                if (priceData.data && priceData.data[token.mintAddress]) {
+                if (priceData?.data?.[token.mintAddress]) {
                     const priceInfo = priceData.data[token.mintAddress];
+                    // FINAL ROBUSTNESS CHECK: Ensure price is a valid number before calculating.
                     if (priceInfo && typeof priceInfo.price === 'number') {
                         const price = priceInfo.price;
                         token.pricePerToken = price;

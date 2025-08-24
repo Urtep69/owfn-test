@@ -47,9 +47,8 @@ export default async function handler(req: any, res: any) {
                     responseData.tokenStandard = 'SPL Token';
                 }
 
-                const data = accountInfo.value.data;
                 // **ULTIMATE ROBUSTNESS**: Access parsed data with extreme caution.
-                const info = (data as ParsedAccountData)?.parsed?.info;
+                const info = (accountInfo.value.data as ParsedAccountData)?.parsed?.info;
                 
                 if (info && typeof info === 'object') {
                     if (typeof info.decimals === 'number') {
@@ -85,8 +84,10 @@ export default async function handler(req: any, res: any) {
             if (dexResponse.ok) {
                 const dexData = await dexResponse.json();
                 
-                const pairs = dexData?.pairs;
-                if (Array.isArray(pairs) && pairs.length > 0) {
+                // FINAL ROBUSTNESS CHECK: Ensure dexData and its `pairs` property are a non-empty array before proceeding.
+                // This handles cases where `pairs` is null or undefined for unlisted tokens, which was the source of the 500 error.
+                if (dexData && Array.isArray(dexData.pairs) && dexData.pairs.length > 0) {
+                    const pairs = dexData.pairs;
                     const primaryPair = pairs.reduce((prev: any, current: any) => 
                         (prev?.liquidity?.usd ?? 0) > (current?.liquidity?.usd ?? 0) ? prev : current
                     );
@@ -122,7 +123,7 @@ export default async function handler(req: any, res: any) {
                 const cgResponse = await fetch(coingeckoUrl);
                 if (cgResponse.ok) {
                     const cgData = await cgResponse.json();
-                    if (cgData[mintAddress] && cgData[mintAddress].usd) {
+                    if (cgData?.[mintAddress]?.usd) {
                         responseData.pricePerToken = cgData[mintAddress].usd;
                         if(responseData.totalSupply && responseData.totalSupply > 0) {
                             responseData.marketCap = responseData.totalSupply * responseData.pricePerToken;
