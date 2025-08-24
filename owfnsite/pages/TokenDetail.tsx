@@ -71,14 +71,22 @@ export default function TokenDetail() {
             
             try {
                 const response = await fetch(`/api/token-info?mint=${mintAddress}`);
+
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `Token data not found.`);
+                    let errorMsg = `Error: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.error || errorMsg;
+                    } catch (e) {
+                        const textError = await response.text();
+                        // Use the text error, but trim it to avoid huge HTML pages in the error message.
+                        errorMsg = textError.substring(0, 200) || errorMsg;
+                    }
+                    throw new Error(errorMsg);
                 }
                 
                 const data: TokenDetails = await response.json();
 
-                // Fallback to MOCK data for core known tokens if description is missing
                 const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
                 if (mockDetailsKey) {
                     const mock = MOCK_TOKEN_DETAILS[mockDetailsKey];
@@ -102,10 +110,10 @@ export default function TokenDetail() {
 
     if (error || !token) {
         return (
-            <div className="text-center py-10">
-                <h2 className="text-2xl font-bold">{t('token_not_found')}</h2>
-                {error && <p className="text-red-400 mt-2">{error}</p>}
-                <Link to={fromPath} className="text-accent-500 hover:underline mt-4 inline-flex items-center gap-2">
+            <div className="text-center py-10 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner">
+                <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">{t('token_not_found')}</h2>
+                {error && <p className="text-primary-600 dark:text-darkPrimary-400 mt-2 p-4 bg-primary-100 dark:bg-darkPrimary-700 rounded-md font-mono text-sm break-all">{error}</p>}
+                <Link to={fromPath} className="text-accent-500 dark:text-darkAccent-400 hover:underline mt-4 inline-flex items-center gap-2">
                     <ArrowLeft size={16} /> {backLinkText}
                 </Link>
             </div>
