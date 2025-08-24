@@ -121,11 +121,12 @@ export const useSolana = (): UseSolanaReturn => {
         allTokens = [...allTokens, ...splTokens];
 
         // 3. Batch fetch metadata and prices
-        const jupiterTokenList: JupiterToken[] = await (await fetch('https://token.jup.ag/all')).json();
+        // Using the 'strict' list is much more performant than 'all' for client-side fetching.
+        const jupiterTokenList: JupiterToken[] = await (await fetch('https://token.jup.ag/strict')).json();
         const tokenMap = new Map(jupiterTokenList.map((t: JupiterToken) => [t.address, t]));
 
         try {
-            // NEW: Fetch prices from our secure Birdeye API endpoint
+            // Fetch prices from our API endpoint
             const priceRes = await fetch(`/api/token-prices`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -143,10 +144,10 @@ export const useSolana = (): UseSolanaReturn => {
                     token.logo = React.createElement(GenericTokenIcon, { uri: metadata.logoURI });
                 }
 
-                // The priceData is now the direct response from Birdeye: { mint: { value: price } }
+                // The priceData format is { mint: { value: price } }
                 if (priceData?.[token.mintAddress]) {
                     const priceInfo = priceData[token.mintAddress];
-                    // FINAL ROBUSTNESS CHECK: Ensure price is a valid number before calculating to prevent NaN.
+                    // Ensure price is a valid number before calculating to prevent NaN.
                     if (priceInfo && typeof priceInfo.value === 'number') {
                         const price = priceInfo.value;
                         token.pricePerToken = price;

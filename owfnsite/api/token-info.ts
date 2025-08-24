@@ -5,7 +5,8 @@ import { QUICKNODE_RPC_URL } from '../constants.ts';
 
 // Main handler function
 export default async function handler(req: any, res: any) {
-    const { mint: mintAddress } = req.query;
+    // Safer access to query parameter to prevent crashes if req.query is null/undefined
+    const mintAddress = req.query?.mint;
 
     if (!mintAddress || typeof mintAddress !== 'string') {
         return res.status(400).json({ error: "Mint address is required." });
@@ -17,7 +18,8 @@ export default async function handler(req: any, res: any) {
     try {
         // --- Step 1: Fetch metadata from Jupiter Token List (good for static info) ---
         try {
-            const jupiterResponse = await fetch('https://token.jup.ag/all');
+            // Using the 'strict' list which is much smaller than 'all' to avoid server timeouts/memory issues.
+            const jupiterResponse = await fetch('https://token.jup.ag/strict');
             if (jupiterResponse.ok) {
                 const tokenList = await jupiterResponse.json();
                 const tokenMeta = tokenList.find((t: any) => t.address === mintAddress);
