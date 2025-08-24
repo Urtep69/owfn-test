@@ -130,40 +130,39 @@ export const useSolana = (): UseSolanaReturn => {
 
         allTokens = [...allTokens, ...splTokens];
 
-        // 3. Batch fetch metadata and prices from Birdeye
+        // 3. Batch fetch metadata and prices from our server-side API route for reliability
         let priceData: any = {};
         if (mintsToFetchPrice.size > 0) {
-            const mintList = Array.from(mintsToFetchPrice).join(',');
             try {
-                const birdeyeRes = await fetch(`https://public-api.birdeye.so/defi/multi_price?list_token=${mintList}`);
-                if (birdeyeRes.ok) {
-                    const birdeyeData = await birdeyeRes.json();
-                    if (birdeyeData.success && birdeyeData.data) {
-                        priceData = birdeyeData.data;
-                    }
+                const res = await fetch('/api/token-prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mints: Array.from(mintsToFetchPrice) }),
+                });
+                if (res.ok) {
+                    priceData = await res.json();
                 } else {
-                    console.warn(`Birdeye multi-price API call failed with status ${birdeyeRes.status}`);
+                    console.warn(`Token prices API route failed with status ${res.status}`);
                 }
             } catch (priceError) {
-                console.error("Could not fetch token prices from Birdeye:", priceError);
+                console.error("Could not fetch token prices from API route:", priceError);
             }
         }
-
+        
+        // 4. Populate token data with the fetched prices and metadata
         allTokens.forEach(token => {
             const data = priceData[token.mintAddress];
             if (data) {
-                token.name = data.name || token.name;
-                token.symbol = data.symbol || token.symbol;
+                token.name = data.name || 'Unknown Token';
+                token.symbol = data.symbol || `${token.mintAddress.slice(0, 4)}...`;
                 token.logo = React.createElement(GenericTokenIcon, { uri: data.logoURI });
-                token.pricePerToken = data.value || 0;
-                token.usdValue = token.balance * (data.value || 0);
-                if (data.decimals) {
-                    token.decimals = data.decimals;
-                }
+                token.pricePerToken = data.price || 0;
+                token.usdValue = token.balance * (data.price || 0);
+                token.decimals = data.decimals ?? token.decimals;
             }
         });
         
-        // 4. Override with known data for consistency
+        // 5. Override with known data for consistency
          const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
             [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon),
             'So11111111111111111111111111111111111111112': React.createElement(SolIcon),

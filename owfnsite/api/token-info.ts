@@ -1,4 +1,3 @@
-
 import type { TokenDetails } from '../types.ts';
 import { Connection, PublicKey, ParsedAccountData } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
@@ -22,13 +21,21 @@ export default async function handler(req: any, res: any) {
             if (birdeyeResponse.ok) {
                 const apiData = await birdeyeResponse.json();
                 if (apiData.success && apiData.data) {
-                    const tokenData = apiData.data;
-                    responseData.name = tokenData.name;
-                    responseData.symbol = tokenData.symbol;
-                    responseData.logo = tokenData.logoURI;
-                    responseData.decimals = tokenData.decimals;
-                    responseData.pricePerToken = tokenData.price || 0;
-                    // Note: Birdeye doesn't provide a general description or extensive links.
+                    const data = apiData.data;
+                    responseData.name = data.name;
+                    responseData.symbol = data.symbol;
+                    responseData.logo = data.logoURI;
+                    responseData.decimals = data.decimals;
+                    responseData.pricePerToken = data.price || 0;
+                    responseData.marketCap = data.mc;
+                    responseData.volume24h = data.v24hUSD;
+                    responseData.price24hChange = data.v24hChangePercent;
+                    responseData.liquidity = data.liquidity;
+                    responseData.holders = data.holders;
+                    responseData.fdv = data.fdv;
+                    if (data.txs24h) {
+                         responseData.txns = { h24: { buys: data.txs24h.buys, sells: data.txs24h.sells } };
+                    }
                 }
             } else {
                  console.warn(`Birdeye API for ${mintAddress} failed with status ${birdeyeResponse.status}`);
