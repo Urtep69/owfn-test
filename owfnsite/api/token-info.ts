@@ -18,7 +18,7 @@ export default async function handler(req: any, res: any) {
             body: JSON.stringify({
                 jsonrpc: '2.0',
                 id: 'my-id',
-                method: 'getAsset',
+                method: 'qn_getAsset',
                 params: { id: mintAddress, displayOptions: { showFungible: true } },
             }),
         });
