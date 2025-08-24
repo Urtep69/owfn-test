@@ -12,6 +12,7 @@ interface JupiterToken {
     name: string;
     symbol: string;
     logoURI?: string;
+    decimals: number;
 }
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -119,6 +120,9 @@ export const useSolana = (): UseSolanaReturn => {
             if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
             const priceData = await priceRes.json();
             
+            const solPriceData = priceData.data ? priceData.data['So11111111111111111111111111111111111111112'] : null;
+            const solPrice = solPriceData ? solPriceData.price : 0;
+            
             allTokens.forEach(token => {
                 const metadata = tokenMap.get(token.mintAddress);
                 if (metadata) {
@@ -133,6 +137,18 @@ export const useSolana = (): UseSolanaReturn => {
                     token.usdValue = token.balance * price;
                 }
             });
+            
+            // Post-processing to calculate OWFN value based on presale rate
+            const owfnToken = allTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS);
+            if (owfnToken) {
+                owfnToken.name = 'Official World Family Network';
+                owfnToken.symbol = 'OWFN';
+                if (owfnToken.pricePerToken === 0 && solPrice > 0) {
+                    owfnToken.pricePerToken = solPrice / PRESALE_DETAILS.rate;
+                    owfnToken.usdValue = owfnToken.balance * owfnToken.pricePerToken;
+                }
+            }
+
 
         } catch (priceError) {
             console.error("Could not fetch token prices from Jupiter API:", priceError);
@@ -145,6 +161,12 @@ export const useSolana = (): UseSolanaReturn => {
                     token.logo = React.createElement(GenericTokenIcon, { uri: metadata.logoURI });
                 }
             });
+            // Manual override for OWFN name if price fetch fails
+             const owfnToken = allTokens.find(t => t.mintAddress === OWFN_MINT_ADDRESS);
+            if (owfnToken) {
+                owfnToken.name = 'Official World Family Network';
+                owfnToken.symbol = 'OWFN';
+            }
         }
         
         // 4. Override with known icons for major tokens for consistency

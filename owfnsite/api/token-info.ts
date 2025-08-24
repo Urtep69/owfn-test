@@ -50,10 +50,17 @@ export default async function handler(req: any, res: any) {
 
                 const info = (accountInfo.value.data as any)?.parsed?.info;
                 if (info) {
-                    responseData.decimals = info.decimals;
-                    responseData.totalSupply = parseFloat(info.supply) / Math.pow(10, info.decimals);
-                    responseData.mintAuthority = info.mintAuthority;
-                    responseData.freezeAuthority = info.freezeAuthority;
+                    if (typeof info.decimals === 'number') {
+                        responseData.decimals = info.decimals;
+                        if (typeof info.supply === 'string' || typeof info.supply === 'number') {
+                             // Use BigInt for precision with large supply values
+                             const supplyBigInt = BigInt(info.supply);
+                             const divisor = 10n ** BigInt(info.decimals);
+                             responseData.totalSupply = Number(supplyBigInt) / Number(divisor);
+                        }
+                    }
+                    responseData.mintAuthority = info.mintAuthority ?? null;
+                    responseData.freezeAuthority = info.freezeAuthority ?? null;
                 }
             } else {
                  console.warn(`No on-chain account info found for mint address ${mintAddress}. Proceeding with API data only.`);
