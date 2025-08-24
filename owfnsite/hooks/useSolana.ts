@@ -59,88 +59,64 @@ export const useSolana = (): UseSolanaReturn => {
       
     setLoading(true);
     try {
-        const response = await fetch(QUICKNODE_RPC_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 'my-id',
-                method: 'getAssetsByOwner',
-                params: {
-                    ownerAddress: walletAddress,
-                    page: 1,
-                    limit: 1000,
-                    displayOptions: {
-                        showFungible: true,
-                        showNativeBalance: true,
-                    },
-                },
-            }),
-        });
-        
-        if (!response.ok) {
-            console.error('QuickNode API Error:', await response.text());
-            throw new Error('Failed to fetch assets from QuickNode');
-        }
-
-        const { result } = await response.json();
-        
-        if (!result) {
-             return [];
-        }
-       
+        const ownerPublicKey = new PublicKey(walletAddress);
         const allTokens: Token[] = [];
-        let solPrice = 0;
-
-        // Process native SOL balance first using data directly from the RPC
-        if (result.nativeBalance && result.nativeBalance.lamports > 0) {
-            const pricePerSol = result.nativeBalance.price_per_sol || 0;
-            const balance = result.nativeBalance.lamports / LAMPORTS_PER_SOL;
-            solPrice = pricePerSol;
-
-            const solToken: Token = {
-                mintAddress: 'So11111111111111111111111111111111111111112',
-                balance: balance,
-                decimals: 9,
-                name: 'Solana',
-                symbol: 'SOL',
-                logo: React.createElement(SolIcon, null),
-                pricePerToken: pricePerSol,
-                usdValue: result.nativeBalance.total_price || (balance * pricePerSol),
-            };
-            allTokens.push(solToken);
-        }
-
-        // Process SPL tokens from the 'items' array
-        const splTokens: Token[] = (result.items || [])
-            .filter((asset: any) => asset.interface === 'FungibleToken' && asset.token_info?.balance > 0 && !asset.compression?.compressed)
-            .map((asset: any): Token => ({
-                mintAddress: asset.id,
-                balance: asset.token_info.balance / Math.pow(10, asset.token_info.decimals),
-                decimals: asset.token_info.decimals,
-                name: asset.content?.metadata?.name || 'Unknown Token',
-                symbol: asset.content?.metadata?.symbol || `${asset.id.slice(0, 4)}..`,
-                logo: KNOWN_TOKEN_ICONS[asset.id] || React.createElement(GenericTokenIcon, { uri: asset.content?.links?.image }),
-                usdValue: 0,
-                pricePerToken: 0,
-            }));
-
-        allTokens.push(...splTokens);
-
-        if (allTokens.length === 0) return [];
+        const mintsToFetchPrice = new Set<string>();
         
-        const splMintsToFetch = splTokens.map(t => t.mintAddress).join(',');
+        // 1. Fetch native SOL balance
+        const solBalanceLamports = await connection.getBalance(ownerPublicKey);
+        // Add SOL to the list even if balance is 0 for profile display, but only fetch price if > 0
+        if (solBalanceLamports > 0) {
+             mintsToFetchPrice.add('So11111111111111111111111111111111111111112');
+        }
+        allTokens.push({
+            mintAddress: 'So11111111111111111111111111111111111111112',
+            balance: solBalanceLamports / LAMPORTS_PER_SOL,
+            decimals: 9,
+            name: 'Solana',
+            symbol: 'SOL',
+            logo: React.createElement(SolIcon, null),
+            pricePerToken: 0,
+            usdValue: 0,
+        });
 
-        if (splMintsToFetch) {
+
+        // 2. Fetch SPL token accounts
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(ownerPublicKey, {
+            programId: TOKEN_PROGRAM_ID,
+        });
+
+        tokenAccounts.value.forEach(accountInfo => {
+            const { parsed } = accountInfo.account.data;
+            const tokenAmount = parsed.info.tokenAmount;
+
+            // We include tokens with a balance of 0 to show them in the user's wallet if they've owned them before.
+            // But we only fetch prices for tokens with a balance > 0 to be efficient.
+            if (tokenAmount.uiAmount > 0) {
+                 mintsToFetchPrice.add(parsed.info.mint);
+            }
+
+            allTokens.push({
+                mintAddress: parsed.info.mint,
+                balance: tokenAmount.uiAmount,
+                decimals: tokenAmount.decimals,
+                name: 'Unknown Token',
+                symbol: `${parsed.info.mint.slice(0, 4)}..`,
+                logo: React.createElement(GenericTokenIcon, { uri: undefined }),
+                pricePerToken: 0,
+                usdValue: 0,
+            });
+        });
+
+        if (mintsToFetchPrice.size > 0) {
             try {
-                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${splMintsToFetch}`);
+                const priceRes = await fetch(`https://price.jup.ag/v4/price?ids=${Array.from(mintsToFetchPrice).join(',')}`);
                 if (!priceRes.ok) throw new Error(`Jupiter API failed with status ${priceRes.status}`);
                 
                 const priceData = await priceRes.json();
                 
                 if (priceData.data) {
                      allTokens.forEach(token => {
-                        if (token.mintAddress === 'So11111111111111111111111111111111111111112') return; // Skip SOL
                         const priceInfo = priceData.data[token.mintAddress];
                         if (priceInfo && priceInfo.price) {
                             const price = priceInfo.price;
@@ -154,7 +130,25 @@ export const useSolana = (): UseSolanaReturn => {
             }
         }
         
-        const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
+        // 4. Fill metadata for known tokens
+        allTokens.forEach(token => {
+            if (KNOWN_TOKEN_ICONS[token.mintAddress]) {
+                token.logo = KNOWN_TOKEN_ICONS[token.mintAddress];
+            }
+            if (token.mintAddress === KNOWN_TOKEN_MINT_ADDRESSES.OWFN) {
+                token.name = 'Official World Family Network';
+                token.symbol = 'OWFN';
+            } else if (token.mintAddress === KNOWN_TOKEN_MINT_ADDRESSES.USDC) {
+                token.name = 'USD Coin';
+                token.symbol = 'USDC';
+            } else if (token.mintAddress === KNOWN_TOKEN_MINT_ADDRESSES.USDT) {
+                token.name = 'Tether';
+                token.symbol = 'USDT';
+            }
+        });
+        
+        const tokensWithBalance = allTokens.filter(t => t.balance > 0);
+        const sortedTokens = tokensWithBalance.sort((a,b) => b.usdValue - a.usdValue);
         balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
         return sortedTokens;
 
