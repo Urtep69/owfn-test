@@ -6,29 +6,45 @@ const SESSION_KEY = 'owfn-siws-session';
 const SESSION_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
 
 export const useSiws = (): SiwsReturn => {
-    const { publicKey, signMessage, disconnect } = useWallet();
+    const { publicKey, signMessage, disconnect, connecting } = useWallet();
     const [session, setSession] = useState<SiwsSession | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
 
-    const checkSession = useCallback(() => {
-        if (!publicKey) {
-            setIsAuthenticated(false);
-            setSession(null);
+    useEffect(() => {
+        // If the wallet adapter is in the middle of an auto-connect attempt,
+        // we are definitely in a loading state. We should wait for it to resolve.
+        if (connecting) {
+            setIsSessionLoading(true);
             return;
         }
 
+        // If the adapter is NOT connecting and we have NO public key, it means the user
+        // is definitively not connected. Session loading is complete, and there's no session.
+        if (!publicKey) {
+            setIsAuthenticated(false);
+            setSession(null);
+            setIsSessionLoading(false);
+            return;
+        }
+
+        // If we reach this point, we have a stable public key and are not in the middle of connecting.
+        // This is the correct and only time to check for a session in localStorage.
         try {
             const storedSessionStr = localStorage.getItem(SESSION_KEY);
             if (!storedSessionStr) {
                 setIsAuthenticated(false);
+                setSession(null);
+                // No session found, but the check is complete.
+                setIsSessionLoading(false);
                 return;
             }
 
             const storedSession: SiwsSession = JSON.parse(storedSessionStr);
             const now = Date.now();
 
-            const isSessionValid = 
+            const isSessionValid =
                 storedSession.publicKey === publicKey.toBase58() &&
                 (now - storedSession.signedAt) < SESSION_DURATION;
 
@@ -45,12 +61,12 @@ export const useSiws = (): SiwsReturn => {
             localStorage.removeItem(SESSION_KEY);
             setIsAuthenticated(false);
             setSession(null);
+        } finally {
+            // Regardless of whether a session was found or not, the loading process is complete.
+            setIsSessionLoading(false);
         }
-    }, [publicKey]);
+    }, [publicKey, connecting]);
 
-    useEffect(() => {
-        checkSession();
-    }, [publicKey, checkSession]);
 
     const signIn = useCallback(async (): Promise<boolean> => {
         if (!publicKey || !signMessage) {
@@ -88,13 +104,16 @@ export const useSiws = (): SiwsReturn => {
     }, [publicKey, signMessage]);
 
     const signOut = useCallback(async () => {
-        localStorage.removeItem(SESSION_KEY);
-        setSession(null);
-        setIsAuthenticated(false);
+        // Disconnect the wallet adapter first. This will set `connected` to false.
         if (disconnect) {
             await disconnect();
         }
+        // THEN, clear local session and update state. This prevents the useEffect in AppContext
+        // from re-triggering signIn during the disconnect process.
+        localStorage.removeItem(SESSION_KEY);
+        setSession(null);
+        setIsAuthenticated(false);
     }, [disconnect]);
     
-    return { isAuthenticated, isLoading, session, signIn, signOut };
+    return { isAuthenticated, isLoading, isSessionLoading, session, signIn, signOut };
 };
