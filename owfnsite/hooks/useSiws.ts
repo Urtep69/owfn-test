@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import type { SiwsSession, SiwsReturn } from '../types.ts';
 
 const SESSION_KEY = 'owfn-siws-session';
+const SESSION_ATTEMPTED_KEY = 'owfn-siws-attempted';
 const SESSION_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
 
 export const useSiws = (): SiwsReturn => {
@@ -11,7 +12,6 @@ export const useSiws = (): SiwsReturn => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
-    const signInAttempted = useRef(false);
 
     const signIn = useCallback(async (): Promise<boolean> => {
         if (!publicKey || !signMessage) {
@@ -37,7 +37,9 @@ export const useSiws = (): SiwsReturn => {
             setIsAuthenticated(true);
             return true;
         } catch (error) {
-            console.error("SIWS sign-in failed:", error);
+            console.error("SIWS sign-in failed (likely user cancellation):", error);
+            // Don't clear session storage here; the user just cancelled.
+            // We want to remember the attempt so we don't re-prompt on refresh.
             localStorage.removeItem(SESSION_KEY);
             setSession(null);
             setIsAuthenticated(false);
@@ -47,79 +49,81 @@ export const useSiws = (): SiwsReturn => {
         }
     }, [publicKey, signMessage]);
 
-    // Effect to check for an existing session in localStorage
     useEffect(() => {
+        // While the wallet is in the process of connecting, we are in a loading state.
         if (connecting) {
             setIsSessionLoading(true);
             return;
         }
 
+        // If there's no public key, it means the wallet is disconnected. Reset all states.
         if (!publicKey) {
             setIsAuthenticated(false);
             setSession(null);
             setIsSessionLoading(false);
-            signInAttempted.current = false; // Reset on disconnect
             return;
         }
+        
+        // This function now contains the complete, sequential logic for checking a session and then deciding to sign in.
+        // This avoids race conditions between multiple useEffects.
+        const checkAndSignIn = async () => {
+            setIsSessionLoading(true);
+            let sessionIsValid = false;
 
-        try {
-            const storedSessionStr = localStorage.getItem(SESSION_KEY);
-            if (!storedSessionStr) {
-                setIsAuthenticated(false);
-                setSession(null);
-                setIsSessionLoading(false);
-                return;
-            }
-
-            const storedSession: SiwsSession = JSON.parse(storedSessionStr);
-            const now = Date.now();
-            const isSessionValid =
-                storedSession.publicKey === publicKey.toBase58() &&
-                (now - storedSession.signedAt) < SESSION_DURATION;
-
-            if (isSessionValid) {
-                setSession(storedSession);
-                setIsAuthenticated(true);
-            } else {
+            try {
+                const storedSessionStr = localStorage.getItem(SESSION_KEY);
+                if (storedSessionStr) {
+                    const storedSession: SiwsSession = JSON.parse(storedSessionStr);
+                    sessionIsValid =
+                        storedSession.publicKey === publicKey.toBase58() &&
+                        (Date.now() - storedSession.signedAt) < SESSION_DURATION;
+                    
+                    if (sessionIsValid) {
+                        setSession(storedSession);
+                        setIsAuthenticated(true);
+                    } else {
+                        // The session is expired or invalid. Clear it and also clear the attempt flag
+                        // to allow for a new sign-in prompt when the session expires.
+                        localStorage.removeItem(SESSION_KEY);
+                        sessionStorage.removeItem(SESSION_ATTEMPTED_KEY);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to parse or validate SIWS session:", error);
                 localStorage.removeItem(SESSION_KEY);
+                sessionStorage.removeItem(SESSION_ATTEMPTED_KEY);
+            }
+
+            // This block runs ONLY if no valid session was found above.
+            if (!sessionIsValid) {
                 setIsAuthenticated(false);
                 setSession(null);
+
+                // We use sessionStorage to track if we've already tried to sign in during this browser session.
+                // This prevents re-prompting on every page refresh if the user cancels the initial prompt.
+                const hasAttempted = sessionStorage.getItem(SESSION_ATTEMPTED_KEY);
+                if (!hasAttempted) {
+                    sessionStorage.setItem(SESSION_ATTEMPTED_KEY, 'true');
+                    signIn(); // This is non-blocking. The UI will update based on loading states.
+                }
             }
-        } catch (error) {
-            console.error("Failed to check SIWS session:", error);
-            localStorage.removeItem(SESSION_KEY);
-            setIsAuthenticated(false);
-            setSession(null);
-        } finally {
+            
             setIsSessionLoading(false);
-        }
-    }, [publicKey, connecting]);
+        };
 
-    // Effect to trigger auto sign-in if no valid session is found
-    useEffect(() => {
-        const shouldAttemptSignIn = 
-            !isSessionLoading &&
-            publicKey &&
-            !connecting &&
-            !isAuthenticated &&
-            !isLoading &&
-            !signInAttempted.current;
-
-        if (shouldAttemptSignIn) {
-            signInAttempted.current = true;
-            signIn();
-        }
-    }, [isSessionLoading, isAuthenticated, isLoading, connecting, publicKey, signIn]);
-
+        checkAndSignIn();
+        
+    }, [publicKey, connecting, signIn]);
 
     const signOut = useCallback(async () => {
         if (disconnect) {
             await disconnect();
         }
+        // On an explicit sign-out, clear everything to ensure a clean state for the next connection.
         localStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(SESSION_ATTEMPTED_KEY);
         setSession(null);
         setIsAuthenticated(false);
-        signInAttempted.current = false; // Reset on explicit sign-out
     }, [disconnect]);
     
     return { isAuthenticated, isLoading, isSessionLoading, session, signIn, signOut };
