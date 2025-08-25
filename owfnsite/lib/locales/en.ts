@@ -41,6 +41,8 @@ export const en = {
     yes: `Yes`,
     no: `No`,
     authenticating: `Authenticating...`,
+    sign_in_to_buy: `Sign In to Buy`,
+    sign_in_to_donate: `Sign In to Donate`,
 
     // SIWS (Sign-In With Solana)
     siws_message_statement: `Sign this message to authenticate with Official World Family Network (OWFN).`,
@@ -552,5 +554,6 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
+    contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
 };

@@ -488,37 +488,50 @@ export default function Presale() {
 
 
   const handleBuy = async () => {
-        if (!siws.isAuthenticated) {
-            setWalletModalOpen(true);
-            return;
-        }
-        if (presaleStatus !== 'active') return;
-        
-        if (isAmountInvalid) return;
+    if (!solana.connected) {
+        setWalletModalOpen(true);
+        return;
+    }
 
-        const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numSolAmount, 'SOL');
+    if (!siws.isAuthenticated) {
+        await siws.signIn();
+        return;
+    }
 
-        if (result.success && result.signature) {
-            alert(t('presale_purchase_success_alert', { 
-                amount: numSolAmount.toFixed(2), 
-                owfnAmount: calculation.total.toLocaleString() 
-            }));
-            const newTx: PresaleTransaction = {
-                id: result.signature,
-                address: solana.address!,
-                solAmount: numSolAmount,
-                owfnAmount: numSolAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
-                time: new Date(),
-            };
-            setLatestPurchase(newTx);
-            setSolAmount('');
-            setUserContribution(prev => prev + numSolAmount);
-            setSoldSOL(prev => prev + numSolAmount);
-            fetchPresaleProgress(); // Re-fetch progress immediately
-        } else {
-            alert(t(result.messageKey));
-        }
-    };
+    if (presaleStatus !== 'active' || isAmountInvalid || solana.loading) {
+        return;
+    }
+
+    const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numSolAmount, 'SOL');
+
+    if (result.success && result.signature) {
+        alert(t('presale_purchase_success_alert', { 
+            amount: numSolAmount.toFixed(2), 
+            owfnAmount: calculation.total.toLocaleString() 
+        }));
+        const newTx: PresaleTransaction = {
+            id: result.signature,
+            address: solana.address!,
+            solAmount: numSolAmount,
+            owfnAmount: numSolAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
+            time: new Date(),
+        };
+        setLatestPurchase(newTx);
+        setSolAmount('');
+        setUserContribution(prev => prev + numSolAmount);
+        setSoldSOL(prev => prev + numSolAmount);
+        fetchPresaleProgress(); // Re-fetch progress immediately
+    } else {
+        alert(t(result.messageKey));
+    }
+  };
+
+  const buttonText = useMemo(() => {
+    if (solana.loading || siws.isLoading) return t('processing');
+    if (!solana.connected) return t('connect_wallet');
+    if (!siws.isAuthenticated) return t('sign_in_to_buy');
+    return t('buy');
+  }, [solana.connected, solana.loading, siws.isAuthenticated, siws.isLoading, t]);
 
 
   const formatSaleDate = (date: Date) => {
@@ -727,9 +740,9 @@ export default function Presale() {
                         <button 
                             onClick={handleBuy}
                             className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                            disabled={solana.loading || isCheckingContribution || (siws.isAuthenticated && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
+                            disabled={solana.loading || siws.isLoading || isCheckingContribution || (siws.isAuthenticated && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
                         >
-                            {solana.loading || siws.isLoading ? t('processing') : (siws.isAuthenticated ? t('buy') : t('connect_wallet'))}
+                            {buttonText}
                         </button>
 
                          <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center">

@@ -41,6 +41,8 @@ export const ro = {
     yes: `Da`,
     no: `Nu`,
     authenticating: `Autentificare...`,
+    sign_in_to_buy: `Autentifică-te pentru a Cumpăra`,
+    sign_in_to_donate: `Autentifică-te pentru a Dona`,
 
     // SIWS (Sign-In With Solana)
     siws_message_statement: `Semnați acest mesaj pentru a vă autentifica la Official World Family Network (OWFN).`,
