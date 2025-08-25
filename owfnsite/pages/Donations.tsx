@@ -38,8 +38,13 @@ export default function Donations() {
     };
 
     const handleDonate = async () => {
-        if (!siws.isAuthenticated) {
+        if (!solana.connected) {
             setWalletModalOpen(true);
+            return;
+        }
+    
+        if (!siws.isAuthenticated) {
+            await siws.signIn();
             return;
         }
         
@@ -59,6 +64,13 @@ export default function Donations() {
         }
     };
     
+    const buttonText = useMemo(() => {
+        if (solana.loading || siws.isLoading) return t('processing');
+        if (!solana.connected) return t('connect_wallet');
+        if (!siws.isAuthenticated) return t('sign_in_to_donate');
+        return t('donate');
+    }, [solana.connected, solana.loading, siws.isAuthenticated, siws.isLoading, t]);
+
     const percentages = [5, 10, 15, 25, 50, 75, 100];
 
     return (
@@ -172,8 +184,8 @@ export default function Donations() {
                             </p>
                         </div>
                     )}
-                     <button onClick={handleDonate} disabled={solana.loading || !siws.isAuthenticated || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
-                         {solana.loading || siws.isLoading ? t('processing') : (siws.isAuthenticated ? t('donate') : t('connect_wallet'))}
+                     <button onClick={handleDonate} disabled={solana.loading || siws.isLoading || (siws.isAuthenticated && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                         {buttonText}
                     </button>
                 </div>
             </div>

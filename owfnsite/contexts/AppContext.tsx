@@ -42,22 +42,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
-  const signInAttempted = useRef(false);
-
-  useEffect(() => {
-    // If wallet is connected, user is not authenticated, and we haven't tried to sign them in yet
-    if (solana.connected && !siws.isAuthenticated && !siws.isLoading && !signInAttempted.current) {
-      // Mark that we are attempting to sign in to prevent re-triggering on every render
-      signInAttempted.current = true;
-      siws.signIn(); // Trigger sign-in immediately without delay
-    }
-
-    // If the wallet disconnects, reset the flag for the next connection attempt
-    if (!solana.connected) {
-      signInAttempted.current = false;
-    }
-  }, [solana.connected, siws.isAuthenticated, siws.isLoading, siws.signIn]);
-
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);

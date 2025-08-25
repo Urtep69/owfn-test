@@ -41,6 +41,8 @@ export const ru = {
     yes: 'Да',
     no: 'Нет',
     authenticating: 'Аутентификация...',
+    sign_in_to_buy: 'Войти, чтобы купить',
+    sign_in_to_donate: 'Войти, чтобы пожертвовать',
 
     // SIWS (Sign-In With Solana)
     siws_message_statement: 'Подпишите это сообщение для аутентификации в Official World Family Network (OWFN).',
