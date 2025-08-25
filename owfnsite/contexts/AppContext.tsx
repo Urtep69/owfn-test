@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
@@ -41,15 +41,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
-
-  useEffect(() => {
-    // Automatically trigger Sign-In With Solana after the wallet is fully connected and idle.
-    // This prevents race conditions on mobile where `autoConnect` and `signIn` might conflict.
-    if (solana.connected && !solana.connecting && !solana.loading && !siws.isAuthenticated && !siws.isLoading && !siws.isSessionLoading) {
-      siws.signIn();
-    }
-  }, [solana.connected, solana.connecting, solana.loading, siws.isAuthenticated, siws.isLoading, siws.isSessionLoading, siws.signIn]);
-
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);

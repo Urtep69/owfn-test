@@ -3,6 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import type { SiwsSession, SiwsReturn } from '../types.ts';
 
 const SESSION_KEY = 'owfn-siws-session';
+const SESSION_ATTEMPTED_KEY = 'owfn-siws-attempted';
 const SESSION_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
 
 export const useSiws = (): SiwsReturn => {
@@ -11,62 +12,6 @@ export const useSiws = (): SiwsReturn => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        // If the wallet adapter is in the middle of an auto-connect attempt,
-        // we are definitely in a loading state. We should wait for it to resolve.
-        if (connecting) {
-            setIsSessionLoading(true);
-            return;
-        }
-
-        // If the adapter is NOT connecting and we have NO public key, it means the user
-        // is definitively not connected. Session loading is complete, and there's no session.
-        if (!publicKey) {
-            setIsAuthenticated(false);
-            setSession(null);
-            setIsSessionLoading(false);
-            return;
-        }
-
-        // If we reach this point, we have a stable public key and are not in the middle of connecting.
-        // This is the correct and only time to check for a session in localStorage.
-        try {
-            const storedSessionStr = localStorage.getItem(SESSION_KEY);
-            if (!storedSessionStr) {
-                setIsAuthenticated(false);
-                setSession(null);
-                // No session found, but the check is complete.
-                setIsSessionLoading(false);
-                return;
-            }
-
-            const storedSession: SiwsSession = JSON.parse(storedSessionStr);
-            const now = Date.now();
-
-            const isSessionValid =
-                storedSession.publicKey === publicKey.toBase58() &&
-                (now - storedSession.signedAt) < SESSION_DURATION;
-
-            if (isSessionValid) {
-                setSession(storedSession);
-                setIsAuthenticated(true);
-            } else {
-                localStorage.removeItem(SESSION_KEY);
-                setIsAuthenticated(false);
-                setSession(null);
-            }
-        } catch (error) {
-            console.error("Failed to check SIWS session:", error);
-            localStorage.removeItem(SESSION_KEY);
-            setIsAuthenticated(false);
-            setSession(null);
-        } finally {
-            // Regardless of whether a session was found or not, the loading process is complete.
-            setIsSessionLoading(false);
-        }
-    }, [publicKey, connecting]);
-
 
     const signIn = useCallback(async (): Promise<boolean> => {
         if (!publicKey || !signMessage) {
@@ -92,8 +37,9 @@ export const useSiws = (): SiwsReturn => {
             setIsAuthenticated(true);
             return true;
         } catch (error) {
-            console.error("SIWS sign-in failed:", error);
-            // User likely rejected the request, clear any invalid session
+            console.error("SIWS sign-in failed (likely user cancellation):", error);
+            // Don't clear session storage here; the user just cancelled.
+            // We want to remember the attempt so we don't re-prompt on refresh.
             localStorage.removeItem(SESSION_KEY);
             setSession(null);
             setIsAuthenticated(false);
@@ -103,14 +49,79 @@ export const useSiws = (): SiwsReturn => {
         }
     }, [publicKey, signMessage]);
 
+    useEffect(() => {
+        // While the wallet is in the process of connecting, we are in a loading state.
+        if (connecting) {
+            setIsSessionLoading(true);
+            return;
+        }
+
+        // If there's no public key, it means the wallet is disconnected. Reset all states.
+        if (!publicKey) {
+            setIsAuthenticated(false);
+            setSession(null);
+            setIsSessionLoading(false);
+            return;
+        }
+        
+        // This function now contains the complete, sequential logic for checking a session and then deciding to sign in.
+        // This avoids race conditions between multiple useEffects.
+        const checkAndSignIn = async () => {
+            setIsSessionLoading(true);
+            let sessionIsValid = false;
+
+            try {
+                const storedSessionStr = localStorage.getItem(SESSION_KEY);
+                if (storedSessionStr) {
+                    const storedSession: SiwsSession = JSON.parse(storedSessionStr);
+                    sessionIsValid =
+                        storedSession.publicKey === publicKey.toBase58() &&
+                        (Date.now() - storedSession.signedAt) < SESSION_DURATION;
+                    
+                    if (sessionIsValid) {
+                        setSession(storedSession);
+                        setIsAuthenticated(true);
+                    } else {
+                        // The session is expired or invalid. Clear it and also clear the attempt flag
+                        // to allow for a new sign-in prompt when the session expires.
+                        localStorage.removeItem(SESSION_KEY);
+                        sessionStorage.removeItem(SESSION_ATTEMPTED_KEY);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to parse or validate SIWS session:", error);
+                localStorage.removeItem(SESSION_KEY);
+                sessionStorage.removeItem(SESSION_ATTEMPTED_KEY);
+            }
+
+            // This block runs ONLY if no valid session was found above.
+            if (!sessionIsValid) {
+                setIsAuthenticated(false);
+                setSession(null);
+
+                // We use sessionStorage to track if we've already tried to sign in during this browser session.
+                // This prevents re-prompting on every page refresh if the user cancels the initial prompt.
+                const hasAttempted = sessionStorage.getItem(SESSION_ATTEMPTED_KEY);
+                if (!hasAttempted) {
+                    sessionStorage.setItem(SESSION_ATTEMPTED_KEY, 'true');
+                    signIn(); // This is non-blocking. The UI will update based on loading states.
+                }
+            }
+            
+            setIsSessionLoading(false);
+        };
+
+        checkAndSignIn();
+        
+    }, [publicKey, connecting, signIn]);
+
     const signOut = useCallback(async () => {
-        // Disconnect the wallet adapter first. This will set `connected` to false.
         if (disconnect) {
             await disconnect();
         }
-        // THEN, clear local session and update state. This prevents the useEffect in AppContext
-        // from re-triggering signIn during the disconnect process.
+        // On an explicit sign-out, clear everything to ensure a clean state for the next connection.
         localStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(SESSION_ATTEMPTED_KEY);
         setSession(null);
         setIsAuthenticated(false);
     }, [disconnect]);
