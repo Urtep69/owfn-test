@@ -19,36 +19,35 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
     const { t } = useAppContext();
     const { wallets, select, connect } = useWallet();
     
-    const handleWalletSelect = (walletName: WalletName) => {
+    const handleWalletSelect = async (walletName: WalletName) => {
         const selectedWallet = wallets.find(w => w.adapter.name === walletName);
         if (!selectedWallet) {
             console.error(`Wallet ${walletName} not found.`);
             return;
         }
 
-        // For mobile wallets that are not installed, `readyState` will be `NotDetected`.
-        // Instead of attempting to connect (which throws an error), we directly redirect to the installation URL.
+        // On mobile, if a wallet is not installed, its readyState is 'NotDetected'.
+        // Redirect the user to the app store to install it.
         if (selectedWallet.readyState === 'NotDetected') {
             window.location.href = selectedWallet.adapter.url;
             return;
         }
 
+        select(walletName);
+        
         try {
-            select(walletName);
-            // Using a timeout allows the wallet adapter to process the selection before connect() is called.
-            setTimeout(() => {
-                connect().catch(error => {
-                    console.error(`Failed to connect to ${walletName}:`, error);
-                    // As a fallback, if the connection still fails with a NotInstalled error, redirect.
-                    if (error instanceof Error && error.name === 'WalletNotInstalledError') {
-                        window.location.href = selectedWallet.adapter.url;
-                    }
-                });
-            }, 100);
+            // The connect() method will trigger the mobile wallet app to open.
+            // It will reject with a WalletNotInstalledError if it's not installed.
+            await connect();
+            onClose(); // Close modal only on successful connection
         } catch (error) {
-            console.error(`Error selecting wallet ${walletName}:`, error);
-        } finally {
-            onClose();
+            console.error(`Failed to connect to ${walletName}:`, error);
+            // If the error is that the wallet is not installed, redirect to the installation URL.
+            // This is a fallback for cases where readyState might be incorrect or for other connection issues.
+            if (error instanceof Error && error.name === 'WalletNotInstalledError') {
+                window.location.href = selectedWallet.adapter.url;
+            }
+            // Do not close the modal on error, so the user can see the console error and try another wallet.
         }
     };
     
