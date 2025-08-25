@@ -42,6 +42,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
+  useEffect(() => {
+    // Automatically trigger Sign-In With Solana after wallet connection,
+    // but only if a sign-in isn't already in progress.
+    if (solana.connected && !siws.isAuthenticated && !siws.isLoading) {
+      siws.signIn();
+    }
+  }, [solana.connected, siws.isAuthenticated, siws.isLoading, siws.signIn]);
+
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
