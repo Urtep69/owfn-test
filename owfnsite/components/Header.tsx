@@ -11,12 +11,15 @@ interface HeaderProps {
 }
 
 const ConnectButton = () => {
-    const { t, setWalletModalOpen } = useAppContext();
-    const { connected, publicKey, disconnect } = useWallet();
+    const { t, setWalletModalOpen, solana, siws } = useAppContext();
+    const { connected, address } = solana;
+    const { isAuthenticated, signOut } = siws;
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
+    
+    const isAuthenticating = connected && !isAuthenticated;
 
-    if (connected && publicKey) {
+    if (isAuthenticated && address) {
         return (
              <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
                 <button
@@ -25,10 +28,10 @@ const ConnectButton = () => {
                     aria-label={t('change_wallet')}
                 >
                     <Wallet size={18} />
-                    <span className="font-semibold text-sm font-mono">{truncateAddress(publicKey.toBase58())}</span>
+                    <span className="font-semibold text-sm font-mono">{truncateAddress(address)}</span>
                 </button>
                  <button
-                    onClick={() => disconnect()}
+                    onClick={() => signOut()}
                     className="p-2 text-primary-600 dark:text-darkPrimary-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-r-lg transition-colors"
                     aria-label={t('disconnect_wallet')}
                 >
@@ -36,6 +39,26 @@ const ConnectButton = () => {
                 </button>
             </div>
         );
+    }
+    
+    if (isAuthenticating && address) {
+        return (
+            <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg animate-pulse">
+                <div
+                    className="flex items-center space-x-2 pl-3 pr-2 py-2 text-primary-700 dark:text-darkPrimary-200"
+                >
+                    <Wallet size={18} />
+                    <span className="font-semibold text-sm font-mono">{truncateAddress(address)}</span>
+                </div>
+                 <button
+                    onClick={() => signOut()}
+                    className="p-2 text-primary-600 dark:text-darkPrimary-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-r-lg transition-colors"
+                    aria-label={t('disconnect_wallet')}
+                >
+                    <LogOut size={18} />
+                </button>
+            </div>
+        )
     }
 
     return (

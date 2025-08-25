@@ -25,9 +25,9 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
 );
 
 export default function Profile() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana, siws, setWalletModalOpen } = useAppContext();
     const { connected, address, userTokens, loading, userStats } = solana;
-
+    
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
     const totalUsdValue = useMemo(() => {
@@ -37,12 +37,12 @@ export default function Profile() {
         return userTokens.reduce((sum, token) => sum + token.usdValue, 0);
     }, [userTokens]);
 
-    if (!connected) {
+    if (!siws.isAuthenticated) {
         return (
             <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
                 <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
                 <h1 className="text-2xl font-bold mb-2">{t('my_profile')}</h1>
-                <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_connect_prompt')}</p>
+                <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_sign_in_prompt')}</p>
                 <button
                     onClick={() => setWalletModalOpen(true)}
                     disabled={loading}

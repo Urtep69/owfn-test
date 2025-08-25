@@ -148,3 +148,17 @@ export interface PresaleTransaction {
   owfnAmount: number;
   time: Date;
 }
+
+// Sign-In With Solana (SIWS) Types
+export interface SiwsSession {
+  publicKey: string;
+  signedAt: number;
+}
+
+export interface SiwsReturn {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  session: SiwsSession | null;
+  signIn: () => Promise<boolean>;
+  signOut: () => Promise<void>;
+}

@@ -40,6 +40,13 @@ export const ja = {
     connect_wallet_first: `最初にウォレットを接続してください。`,
     yes: `はい`,
     no: `いいえ`,
+    authenticating: `認証中...`,
+
+    // SIWS (Sign-In With Solana)
+    siws_message_statement: `このメッセージに署名して、Official World Family Network (OWFN)で認証してください。`,
+    siws_message_uri: `ドメイン`,
+    siws_message_issued_at: `発行日時`,
+    siwS_message_no_cost: `このリクエストはブロックチェーン取引をトリガーせず、ガス料金は一切かかりません。`,
     
     // Time Units
     time_days: `日`,
@@ -109,6 +116,7 @@ export const ja = {
     presale_header_subtitle: `公式ワールドファミリーネットワーク - $OWFN`,
     presale_sold_progress: `販売済み {progress}%`,
     presale_buy_info: `購入 (最小: {min} SOL, 最大: {max} SOL)`,
+    presale_buy_info_no_min: `購入 (最大: {max} SOL)`,
     buy: `購入`,
     presale_buying_owfn: `{amount} $OWFN を購入中`,
     presale_estimate_tooltip: `これは見積もりです。最終的な金額は異なる場合があります。`,
@@ -133,6 +141,7 @@ export const ja = {
     presale_dyor_nfa_desc: `ご自身で調査してください。金融アドバイスではありません。`,
     presale_footer_copyright: `© {year} 公式ワールドファミリーネットワーク | 無断複写・転載を禁じます。`,
     presale_amount_error: `金額は{min}から{max} SOLの間でなければなりません。`,
+    presale_amount_error_no_min: `金額は0より大きく、{max} SOL以下でなければなりません。`,
     live_presale_feed: `ライブプレセールフィード`,
     wallet: `ウォレット`,
     sol_spent: `使用したSOL`,
@@ -180,6 +189,7 @@ export const ja = {
     token_types: `トークン種類`,
     profile_loading_tokens: `トークンを読み込み中...`,
     profile_connect_prompt: `プロフィールとトークン残高を表示するには、ウォレットを接続してください。`,
+    profile_sign_in_prompt: `ウォレットを接続してサインインし、プロフィールを表示してください。`,
     profile_no_tokens: `このウォレットにはトークンが見つかりません。`,
     impact_dashboard_title: `マイインパクトダッシュボード`,
     my_impact_stats: `マイインパクト統計`,

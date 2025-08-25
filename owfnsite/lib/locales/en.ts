@@ -40,6 +40,13 @@ export const en = {
     connect_wallet_first: `Please connect your wallet first.`,
     yes: `Yes`,
     no: `No`,
+    authenticating: `Authenticating...`,
+
+    // SIWS (Sign-In With Solana)
+    siws_message_statement: `Sign this message to authenticate with Official World Family Network (OWFN).`,
+    siws_message_uri: `Domain`,
+    siws_message_issued_at: `Issued At`,
+    siwS_message_no_cost: `This request will not trigger a blockchain transaction or cost any gas fees.`,
 
     // Time Units
     time_days: `Days`,
@@ -183,6 +190,7 @@ export const en = {
     token_types: `Token Types`,
     profile_loading_tokens: `Loading tokens...`,
     profile_connect_prompt: `Connect your wallet to see your profile and token balances.`,
+    profile_sign_in_prompt: `Connect and sign in with your wallet to see your profile.`,
     profile_no_tokens: `No tokens found in this wallet.`,
     impact_dashboard_title: `My Impact Dashboard`,
     my_impact_stats: `My Impact Stats`,
@@ -544,6 +552,5 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
-    contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
 };
