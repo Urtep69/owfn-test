@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
+import { useSiws } from '../hooks/useSiws.ts';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, SiwsReturn } from '../types.ts';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 
@@ -14,6 +15,7 @@ interface AppContextType {
   currentLanguage: Language;
   supportedLanguages: Language[];
   solana: ReturnType<typeof useSolana>;
+  siws: SiwsReturn;
   socialCases: SocialCase[];
   addSocialCase: (newCase: SocialCase) => void;
   vestingSchedules: VestingSchedule[];
@@ -32,12 +34,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [theme, toggleTheme] = useTheme();
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
   const solana = useSolana();
+  const siws = useSiws();
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
+
+  const signInAttempted = useRef(false);
+
+  useEffect(() => {
+    // If wallet is connected, user is not authenticated, and we haven't tried to sign them in yet
+    if (solana.connected && !siws.isAuthenticated && !siws.isLoading && !signInAttempted.current) {
+      // Mark that we are attempting to sign in to prevent re-triggering on every render
+      signInAttempted.current = true;
+      siws.signIn(); // Trigger sign-in immediately without delay
+    }
+
+    // If the wallet disconnects, reset the flag for the next connection attempt
+    if (!solana.connected) {
+      signInAttempted.current = false;
+    }
+  }, [solana.connected, siws.isAuthenticated, siws.isLoading, siws.signIn]);
+
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
@@ -67,7 +87,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         });
     } catch (error) {
         console.error("Translation failed for proposal:", error);
-        // Fallback: use English text for all languages if translation fails
         languagesToTranslate.forEach(lang => {
             newTitleTranslations[lang.code] = proposalData.title;
             newDescriptionTranslations[lang.code] = proposalData.description;
@@ -88,11 +107,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [solana.address]);
   
   const voteOnProposal = useCallback((proposalId: string, vote: 'for' | 'against') => {
-    // This is a mock implementation until a real governance program is in place.
-    // The hook function will prevent this from being called until implemented.
     setProposals(prev => prev.map(p => {
         if (p.id === proposalId) {
-            const votePower = 1000000; // Placeholder vote power
+            const votePower = 1000000;
             return {
                 ...p,
                 votesFor: vote === 'for' ? p.votesFor + votePower : p.votesFor,
@@ -111,6 +128,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     currentLanguage,
     supportedLanguages,
     solana,
+    siws,
     socialCases,
     addSocialCase,
     vestingSchedules,

@@ -242,7 +242,7 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 
 
 export default function Presale() {
-  const { t, solana, setWalletModalOpen } = useAppContext();
+  const { t, solana, siws, setWalletModalOpen } = useAppContext();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -352,7 +352,7 @@ export default function Presale() {
 
   useEffect(() => {
     const fetchUserContribution = async () => {
-        if (!solana.connected || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
+        if (!siws.isAuthenticated || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
             setUserContribution(0);
             return;
         }
@@ -393,7 +393,7 @@ export default function Presale() {
     };
 
     fetchUserContribution();
-  }, [solana.connected, solana.address]);
+  }, [siws.isAuthenticated, solana.address]);
 
   const maxAllowedBuy = Math.max(0, PRESALE_DETAILS.maxBuy - userContribution);
 
@@ -488,7 +488,7 @@ export default function Presale() {
 
 
   const handleBuy = async () => {
-        if (!solana.connected) {
+        if (!siws.isAuthenticated) {
             setWalletModalOpen(true);
             return;
         }
@@ -727,9 +727,9 @@ export default function Presale() {
                         <button 
                             onClick={handleBuy}
                             className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                            disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
+                            disabled={solana.loading || isCheckingContribution || (siws.isAuthenticated && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
                         >
-                            {solana.loading || isCheckingContribution ? t('processing') : (solana.connected ? t('buy') : t('connect_wallet'))}
+                            {solana.loading || siws.isLoading ? t('processing') : (siws.isAuthenticated ? t('buy') : t('connect_wallet'))}
                         </button>
 
                          <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center">

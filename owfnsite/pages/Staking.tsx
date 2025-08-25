@@ -19,7 +19,7 @@ const StatCard = ({ icon, title, value, subtext }: { icon: React.ReactNode, titl
 );
 
 const ConnectWalletPrompt = () => {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana, siws, setWalletModalOpen } = useAppContext();
     return (
         <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d">
             <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
@@ -30,7 +30,7 @@ const ConnectWalletPrompt = () => {
                 disabled={solana.loading}
                 className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
             >
-                {solana.loading ? t('connecting') : t('connect_wallet')}
+                {solana.loading || siws.isLoading ? t('connecting') : t('connect_wallet')}
             </button>
         </div>
     );
@@ -152,7 +152,7 @@ const StakingInterface = () => {
 }
 
 export default function Staking() {
-    const { t, solana } = useAppContext();
+    const { t, solana, siws } = useAppContext();
     const MOCK_STAKING_INFO = { totalStaked: 0, apy: 0 }; // Placeholder
 
     return (
@@ -164,7 +164,7 @@ export default function Staking() {
                 </p>
             </div>
 
-            {solana.connected ? (
+            {siws.isAuthenticated ? (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <StatCard icon={<Database size={24} />} title={t('total_staked')} value={`-- OWFN`} />

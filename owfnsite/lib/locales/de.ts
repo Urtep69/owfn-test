@@ -40,6 +40,13 @@ export const de = {
     connect_wallet_first: `Bitte verbinden Sie zuerst Ihre Wallet.`,
     yes: `Ja`,
     no: `Nein`,
+    authenticating: `Authentifizierung...`,
+
+    // SIWS (Sign-In With Solana)
+    siws_message_statement: `Unterzeichnen Sie diese Nachricht, um sich beim Official World Family Network (OWFN) zu authentifizieren.`,
+    siws_message_uri: `Domäne`,
+    siws_message_issued_at: `Ausgestellt am`,
+    siwS_message_no_cost: `Diese Anfrage löst keine Blockchain-Transaktion aus und verursacht keine Gasgebühren.`,
     
     // Time Units
     time_days: `Tage`,
@@ -183,6 +190,7 @@ export const de = {
     token_types: `Token-Arten`,
     profile_loading_tokens: `Tokens werden geladen...`,
     profile_connect_prompt: `Verbinden Sie Ihre Wallet, um Ihr Profil und Ihre Token-Guthaben zu sehen.`,
+    profile_sign_in_prompt: `Verbinden und melden Sie sich mit Ihrer Wallet an, um Ihr Profil zu sehen.`,
     profile_no_tokens: `Keine Token in dieser Wallet gefunden.`,
     impact_dashboard_title: `Mein Impact-Dashboard`,
     my_impact_stats: `Meine Impact-Statistiken`,

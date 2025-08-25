@@ -40,6 +40,13 @@ export const nl = {
     connect_wallet_first: 'Verbind alstublieft eerst uw wallet.',
     yes: 'Ja',
     no: 'Nee',
+    authenticating: 'Authenticeren...',
+
+    // SIWS (Sign-In With Solana)
+    siws_message_statement: 'Onderteken dit bericht om u te authenticeren bij het Official World Family Network (OWFN).',
+    siws_message_uri: 'Domein',
+    siws_message_issued_at: 'Uitgegeven op',
+    siwS_message_no_cost: 'Deze aanvraag zal geen blockchain-transactie veroorzaken en geen gaskosten met zich meebrengen.',
     
     // Time Units
     time_days: 'Dagen',
@@ -49,7 +56,7 @@ export const nl = {
 
     // Home Page
     home_title: 'Het Officiële Wereldfamilienetwerk',
-    home_subtitle: `Een wereldwijd netwerk verenigd door de visie om een betere wereld te bouwen door middel van technologie en menselijkheid. We bouwen een beweging die gezinnen wereldwijd verbindt via blockchain om bij te dragen aan echte sociale impact.`,
+    home_subtitle: `Een wereldwijd netwerk verenigd door de visie om een betere wereld te bouwen door middel of technologie en menselijkheid. We bouwen een beweging die gezinnen wereldwijd verbindt via blockchain om bij te dragen aan echte sociale impact.`,
     core_message_title: 'Een Beweging die we Samen Bouwen',
     home_message: `De grootse visie van dit project kan alleen worden gerealiseerd met de steun van de mensheid. Door onze token te kopen en te promoten bij vrienden, familie en collega's, word je een vitaal onderdeel van een wereldwijde beweging voor verandering. Dit is niet zomaar een project; het is een levende, ademende kracht voor het goede die we samen bouwen.`,
     home_feature_impact_title: 'Echte Impact',
@@ -109,7 +116,9 @@ export const nl = {
     presale_header_subtitle: 'Official World Family Network - $OWFN',
     presale_sold_progress: '{progress}% verkocht',
     presale_buy_info: 'Kopen (Min: {min} SOL, Max: {max} SOL)',
+    presale_buy_info_no_min: `Kopen (Max: {max} SOL)`,
     buy: 'Kopen',
+    owfn_base_amount: `OWFN Basisbedrag`,
     presale_buying_owfn: 'U koopt {amount} $OWFN',
     presale_estimate_tooltip: 'Dit is een schatting. Het uiteindelijke bedrag kan variëren.',
     presale_whitelist_finished: 'Whitelist Verkoop Voltooid:',
@@ -133,6 +142,7 @@ export const nl = {
     presale_dyor_nfa_desc: 'Doe uw eigen onderzoek. Geen financieel advies.',
     presale_footer_copyright: '© {year} Official World Family Network | Alle rechten voorbehouden.',
     presale_amount_error: 'Bedrag moet tussen {min} en {max} SOL zijn.',
+    presale_amount_error_no_min: `Bedrag moet groter zijn dan 0 en niet meer dan {max} SOL.`,
     live_presale_feed: 'Live Voorverkoop Feed',
     wallet: 'Wallet',
     sol_spent: 'Besteedde SOL',
@@ -158,6 +168,8 @@ export const nl = {
     select_token: 'Selecteer Token',
     amount: 'Bedrag',
     donations_form_title: 'Donatieformulier',
+    donations_stats_title: 'Live Donatiestatistieken (Gesimuleerd)',
+    donated: 'Gedoneerd',
     donation_success_alert: 'Donatie succesvol! Bedankt voor uw bijdrage van {amount} {tokenSymbol}.',
     donation_no_token_balance: 'U bezit geen {symbol}.',
     
@@ -178,6 +190,7 @@ export const nl = {
     token_types: 'Token Types',
     profile_loading_tokens: 'Tokens laden...',
     profile_connect_prompt: 'Verbind uw wallet om uw profiel en tokensaldi te zien.',
+    profile_sign_in_prompt: `Verbind en log in met uw portemonnee om uw profiel te zien.`,
     profile_no_tokens: 'Geen tokens gevonden in deze wallet.',
     impact_dashboard_title: 'Mijn Impact Dashboard',
     my_impact_stats: 'Mijn Impactstatistieken',

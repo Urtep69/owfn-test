@@ -90,6 +90,7 @@
             animation: {
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
               'slide-in': 'slideIn 0.5s ease-out forwards',
+              'glow': 'glow 1.5s ease-in-out infinite alternate',
             },
             keyframes: {
               fadeInUp: {
@@ -100,6 +101,10 @@
                 '0%': { transform: 'translateX(100%)' },
                 '100%': { transform: 'translateX(0)' },
               },
+              glow: {
+                'from': { 'box-shadow': '0 0 5px -5px #fbbf24' },
+                'to': { 'box-shadow': '0 0 5px 5px #fbbf24' }
+              }
             },
           },
         },
