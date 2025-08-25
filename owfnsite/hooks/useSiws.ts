@@ -90,10 +90,13 @@ export const useSiws = (): SiwsReturn => {
     const signOut = useCallback(async () => {
         localStorage.removeItem(SESSION_KEY);
         setSession(null);
-        setIsAuthenticated(false);
+        // Disconnect the wallet adapter first. This will set `connected` to false.
         if (disconnect) {
             await disconnect();
         }
+        // THEN, set isAuthenticated to false. This prevents the useEffect in AppContext
+        // from re-triggering signIn during the disconnect process.
+        setIsAuthenticated(false);
     }, [disconnect]);
     
     return { isAuthenticated, isLoading, session, signIn, signOut };
