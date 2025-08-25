@@ -43,12 +43,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
   useEffect(() => {
-    // Automatically trigger Sign-In With Solana after wallet connection,
-    // but only if a sign-in isn't already in progress and the initial session check is complete.
-    if (solana.connected && !siws.isAuthenticated && !siws.isLoading && !siws.isSessionLoading) {
+    // Automatically trigger Sign-In With Solana after the wallet is fully connected and idle.
+    // This prevents race conditions on mobile where `autoConnect` and `signIn` might conflict.
+    if (solana.connected && !solana.connecting && !solana.loading && !siws.isAuthenticated && !siws.isLoading && !siws.isSessionLoading) {
       siws.signIn();
     }
-  }, [solana.connected, siws.isAuthenticated, siws.isLoading, siws.isSessionLoading, siws.signIn]);
+  }, [solana.connected, solana.connecting, solana.loading, siws.isAuthenticated, siws.isLoading, siws.isSessionLoading, siws.signIn]);
 
 
   const addSocialCase = (newCase: SocialCase) => {
