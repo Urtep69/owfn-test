@@ -158,6 +158,7 @@ export interface SiwsSession {
 export interface SiwsReturn {
   isAuthenticated: boolean;
   isLoading: boolean;
+  isSessionLoading: boolean;
   session: SiwsSession | null;
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;

@@ -44,11 +44,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     // Automatically trigger Sign-In With Solana after wallet connection,
-    // but only if a sign-in isn't already in progress.
-    if (solana.connected && !siws.isAuthenticated && !siws.isLoading) {
+    // but only if a sign-in isn't already in progress and the initial session check is complete.
+    if (solana.connected && !siws.isAuthenticated && !siws.isLoading && !siws.isSessionLoading) {
       siws.signIn();
     }
-  }, [solana.connected, siws.isAuthenticated, siws.isLoading, siws.signIn]);
+  }, [solana.connected, siws.isAuthenticated, siws.isLoading, siws.isSessionLoading, siws.signIn]);
 
 
   const addSocialCase = (newCase: SocialCase) => {

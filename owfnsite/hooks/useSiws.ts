@@ -10,15 +10,17 @@ export const useSiws = (): SiwsReturn => {
     const [session, setSession] = useState<SiwsSession | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
 
     const checkSession = useCallback(() => {
-        if (!publicKey) {
-            setIsAuthenticated(false);
-            setSession(null);
-            return;
-        }
-
+        setIsSessionLoading(true);
         try {
+            if (!publicKey) {
+                setIsAuthenticated(false);
+                setSession(null);
+                return;
+            }
+
             const storedSessionStr = localStorage.getItem(SESSION_KEY);
             if (!storedSessionStr) {
                 setIsAuthenticated(false);
@@ -45,6 +47,8 @@ export const useSiws = (): SiwsReturn => {
             localStorage.removeItem(SESSION_KEY);
             setIsAuthenticated(false);
             setSession(null);
+        } finally {
+            setIsSessionLoading(false);
         }
     }, [publicKey]);
 
@@ -88,16 +92,16 @@ export const useSiws = (): SiwsReturn => {
     }, [publicKey, signMessage]);
 
     const signOut = useCallback(async () => {
-        localStorage.removeItem(SESSION_KEY);
-        setSession(null);
         // Disconnect the wallet adapter first. This will set `connected` to false.
         if (disconnect) {
             await disconnect();
         }
-        // THEN, set isAuthenticated to false. This prevents the useEffect in AppContext
+        // THEN, clear local session and update state. This prevents the useEffect in AppContext
         // from re-triggering signIn during the disconnect process.
+        localStorage.removeItem(SESSION_KEY);
+        setSession(null);
         setIsAuthenticated(false);
     }, [disconnect]);
     
-    return { isAuthenticated, isLoading, session, signIn, signOut };
+    return { isAuthenticated, isLoading, isSessionLoading, session, signIn, signOut };
 };
