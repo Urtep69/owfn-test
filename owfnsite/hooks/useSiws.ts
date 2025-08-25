@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import type { SiwsSession, SiwsReturn } from '../types.ts';
 
@@ -11,62 +11,7 @@ export const useSiws = (): SiwsReturn => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        // If the wallet adapter is in the middle of an auto-connect attempt,
-        // we are definitely in a loading state. We should wait for it to resolve.
-        if (connecting) {
-            setIsSessionLoading(true);
-            return;
-        }
-
-        // If the adapter is NOT connecting and we have NO public key, it means the user
-        // is definitively not connected. Session loading is complete, and there's no session.
-        if (!publicKey) {
-            setIsAuthenticated(false);
-            setSession(null);
-            setIsSessionLoading(false);
-            return;
-        }
-
-        // If we reach this point, we have a stable public key and are not in the middle of connecting.
-        // This is the correct and only time to check for a session in localStorage.
-        try {
-            const storedSessionStr = localStorage.getItem(SESSION_KEY);
-            if (!storedSessionStr) {
-                setIsAuthenticated(false);
-                setSession(null);
-                // No session found, but the check is complete.
-                setIsSessionLoading(false);
-                return;
-            }
-
-            const storedSession: SiwsSession = JSON.parse(storedSessionStr);
-            const now = Date.now();
-
-            const isSessionValid =
-                storedSession.publicKey === publicKey.toBase58() &&
-                (now - storedSession.signedAt) < SESSION_DURATION;
-
-            if (isSessionValid) {
-                setSession(storedSession);
-                setIsAuthenticated(true);
-            } else {
-                localStorage.removeItem(SESSION_KEY);
-                setIsAuthenticated(false);
-                setSession(null);
-            }
-        } catch (error) {
-            console.error("Failed to check SIWS session:", error);
-            localStorage.removeItem(SESSION_KEY);
-            setIsAuthenticated(false);
-            setSession(null);
-        } finally {
-            // Regardless of whether a session was found or not, the loading process is complete.
-            setIsSessionLoading(false);
-        }
-    }, [publicKey, connecting]);
-
+    const signInAttempted = useRef(false);
 
     const signIn = useCallback(async (): Promise<boolean> => {
         if (!publicKey || !signMessage) {
@@ -93,7 +38,6 @@ export const useSiws = (): SiwsReturn => {
             return true;
         } catch (error) {
             console.error("SIWS sign-in failed:", error);
-            // User likely rejected the request, clear any invalid session
             localStorage.removeItem(SESSION_KEY);
             setSession(null);
             setIsAuthenticated(false);
@@ -103,16 +47,79 @@ export const useSiws = (): SiwsReturn => {
         }
     }, [publicKey, signMessage]);
 
+    // Effect to check for an existing session in localStorage
+    useEffect(() => {
+        if (connecting) {
+            setIsSessionLoading(true);
+            return;
+        }
+
+        if (!publicKey) {
+            setIsAuthenticated(false);
+            setSession(null);
+            setIsSessionLoading(false);
+            signInAttempted.current = false; // Reset on disconnect
+            return;
+        }
+
+        try {
+            const storedSessionStr = localStorage.getItem(SESSION_KEY);
+            if (!storedSessionStr) {
+                setIsAuthenticated(false);
+                setSession(null);
+                setIsSessionLoading(false);
+                return;
+            }
+
+            const storedSession: SiwsSession = JSON.parse(storedSessionStr);
+            const now = Date.now();
+            const isSessionValid =
+                storedSession.publicKey === publicKey.toBase58() &&
+                (now - storedSession.signedAt) < SESSION_DURATION;
+
+            if (isSessionValid) {
+                setSession(storedSession);
+                setIsAuthenticated(true);
+            } else {
+                localStorage.removeItem(SESSION_KEY);
+                setIsAuthenticated(false);
+                setSession(null);
+            }
+        } catch (error) {
+            console.error("Failed to check SIWS session:", error);
+            localStorage.removeItem(SESSION_KEY);
+            setIsAuthenticated(false);
+            setSession(null);
+        } finally {
+            setIsSessionLoading(false);
+        }
+    }, [publicKey, connecting]);
+
+    // Effect to trigger auto sign-in if no valid session is found
+    useEffect(() => {
+        const shouldAttemptSignIn = 
+            !isSessionLoading &&
+            publicKey &&
+            !connecting &&
+            !isAuthenticated &&
+            !isLoading &&
+            !signInAttempted.current;
+
+        if (shouldAttemptSignIn) {
+            signInAttempted.current = true;
+            signIn();
+        }
+    }, [isSessionLoading, isAuthenticated, isLoading, connecting, publicKey, signIn]);
+
+
     const signOut = useCallback(async () => {
-        // Disconnect the wallet adapter first. This will set `connected` to false.
         if (disconnect) {
             await disconnect();
         }
-        // THEN, clear local session and update state. This prevents the useEffect in AppContext
-        // from re-triggering signIn during the disconnect process.
         localStorage.removeItem(SESSION_KEY);
         setSession(null);
         setIsAuthenticated(false);
+        signInAttempted.current = false; // Reset on explicit sign-out
     }, [disconnect]);
     
     return { isAuthenticated, isLoading, isSessionLoading, session, signIn, signOut };

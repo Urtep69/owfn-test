@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
@@ -41,32 +41,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
-  const signInAttempted = useRef(false);
-
-  useEffect(() => {
-    // If the wallet disconnects, reset the flag so we can attempt to auto-sign-in on the next connection.
-    if (!solana.connected) {
-      signInAttempted.current = false;
-      return;
-    }
-    
-    // Define the conditions under which an auto sign-in should be triggered.
-    const shouldAttemptSignIn = 
-      solana.connected && 
-      !solana.connecting && 
-      !solana.loading && 
-      !siws.isAuthenticated && 
-      !siws.isLoading && 
-      !siws.isSessionLoading;
-
-    // We only attempt to sign in once per connection to avoid nagging the user
-    // if they choose to reject the signature request. This also prevents the repetitive modal issue on mobile.
-    if (shouldAttemptSignIn && !signInAttempted.current) {
-      signInAttempted.current = true; // Mark that we've made an attempt for this session.
-      siws.signIn();
-    }
-  }, [solana.connected, solana.connecting, solana.loading, siws.isAuthenticated, siws.isLoading, siws.isSessionLoading, siws.signIn]);
-
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
