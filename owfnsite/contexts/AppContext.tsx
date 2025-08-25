@@ -41,11 +41,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
+  const signInAttempted = useRef(false);
 
   useEffect(() => {
-    // Automatically trigger Sign-In With Solana after the wallet is fully connected and idle.
-    // This prevents race conditions on mobile where `autoConnect` and `signIn` might conflict.
-    if (solana.connected && !solana.connecting && !solana.loading && !siws.isAuthenticated && !siws.isLoading && !siws.isSessionLoading) {
+    // If the wallet disconnects, reset the flag so we can attempt to auto-sign-in on the next connection.
+    if (!solana.connected) {
+      signInAttempted.current = false;
+      return;
+    }
+    
+    // Define the conditions under which an auto sign-in should be triggered.
+    const shouldAttemptSignIn = 
+      solana.connected && 
+      !solana.connecting && 
+      !solana.loading && 
+      !siws.isAuthenticated && 
+      !siws.isLoading && 
+      !siws.isSessionLoading;
+
+    // We only attempt to sign in once per connection to avoid nagging the user
+    // if they choose to reject the signature request. This also prevents the repetitive modal issue on mobile.
+    if (shouldAttemptSignIn && !signInAttempted.current) {
+      signInAttempted.current = true; // Mark that we've made an attempt for this session.
       siws.signIn();
     }
   }, [solana.connected, solana.connecting, solana.loading, siws.isAuthenticated, siws.isLoading, siws.isSessionLoading, siws.signIn]);
