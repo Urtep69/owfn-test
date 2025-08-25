@@ -14,7 +14,7 @@ interface HeaderProps {
 const ConnectButton = () => {
     const { t, solana, siws } = useAppContext();
     const { setVisible } = useWalletModal();
-    const { connected, address } = solana;
+    const { connected, address, connecting } = solana;
     const { isAuthenticated, isLoading: isSiwsLoading, signOut } = siws;
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -23,7 +23,7 @@ const ConnectButton = () => {
     const truncateAddress = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
     
     const isAuthenticating = connected && !isAuthenticated && !isSiwsLoading;
-    const isLoading = solana.loading || isSiwsLoading;
+    const isLoading = solana.loading || isSiwsLoading || connecting;
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -60,7 +60,9 @@ const ConnectButton = () => {
         return (
             <div className="flex items-center space-x-3 px-4 py-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg animate-pulse">
                 <Loader2 size={18} className="animate-spin text-primary-600 dark:text-darkPrimary-400" />
-                <span className="font-semibold text-sm text-primary-700 dark:text-darkPrimary-200">{t('authenticating')}</span>
+                <span className="font-semibold text-sm text-primary-700 dark:text-darkPrimary-200">
+                    {connecting ? t('connecting') : t('authenticating')}
+                </span>
             </div>
         )
     }
