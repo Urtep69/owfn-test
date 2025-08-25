@@ -1,6 +1,6 @@
 import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import type { WalletName } from '@solana/wallet-adapter-base';
+import { type WalletName } from '@solana/wallet-adapter-base';
 import { X, ExternalLink, Mail, KeyRound, Radio } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 
@@ -19,16 +19,30 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
     const { t } = useAppContext();
     const { wallets, select, connect } = useWallet();
     
-    const handleWalletSelect = async (walletName: WalletName) => {
+    const handleWalletSelect = (walletName: WalletName) => {
+        const selectedWallet = wallets.find(w => w.adapter.name === walletName);
+        if (!selectedWallet) {
+            console.error(`Wallet ${walletName} not found.`);
+            return;
+        }
+
+        // For mobile wallets that are not installed, `readyState` will be `NotDetected`.
+        // Instead of attempting to connect (which throws an error), we directly redirect to the installation URL.
+        if (selectedWallet.readyState === 'NotDetected') {
+            window.location.href = selectedWallet.adapter.url;
+            return;
+        }
+
         try {
             select(walletName);
-            // The connection is triggered by the wallet adapter's logic after selection,
-            // especially with autoConnect. A slight delay can help ensure the adapter
-            // has processed the selection before we attempt to connect.
+            // Using a timeout allows the wallet adapter to process the selection before connect() is called.
             setTimeout(() => {
                 connect().catch(error => {
                     console.error(`Failed to connect to ${walletName}:`, error);
-                    // Optionally show an error message to the user
+                    // As a fallback, if the connection still fails with a NotInstalled error, redirect.
+                    if (error instanceof Error && error.name === 'WalletNotInstalledError') {
+                        window.location.href = selectedWallet.adapter.url;
+                    }
                 });
             }, 100);
         } catch (error) {
@@ -88,7 +102,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                     <div>
                          <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">Connect with a Wallet</h3>
                          <div className="space-y-2">
-                            {wallets.filter(w => w.readyState === 'Installed' || w.readyState === 'Loadable').map(wallet => (
+                            {wallets.filter(w => w.readyState !== 'Unsupported').map(wallet => (
                                 <button
                                     key={wallet.adapter.name}
                                     onClick={() => handleWalletSelect(wallet.adapter.name as WalletName)}
