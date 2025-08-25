@@ -149,7 +149,6 @@ export interface PresaleTransaction {
   time: Date;
 }
 
-// Sign-In With Solana (SIWS) Types
 export interface SiwsSession {
   publicKey: string;
   signedAt: number;

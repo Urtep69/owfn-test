@@ -12,7 +12,7 @@ const tokens = [
 ];
 
 export default function Donations() {
-    const { t, solana, siws, setWalletModalOpen } = useAppContext();
+    const { t, solana, setWalletModalOpen } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
 
@@ -43,11 +43,6 @@ export default function Donations() {
             return;
         }
     
-        if (!siws.isAuthenticated) {
-            await siws.signIn();
-            return;
-        }
-        
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
             alert(t('invalid_amount_generic'));
@@ -65,11 +60,10 @@ export default function Donations() {
     };
     
     const buttonText = useMemo(() => {
-        if (solana.loading || siws.isLoading) return t('processing');
+        if (solana.loading) return t('processing');
         if (!solana.connected) return t('connect_wallet');
-        if (!siws.isAuthenticated) return t('sign_in_to_donate');
         return t('donate');
-    }, [solana.connected, solana.loading, siws.isAuthenticated, siws.isLoading, t]);
+    }, [solana.connected, solana.loading, t]);
 
     const percentages = [5, 10, 15, 25, 50, 75, 100];
 
@@ -144,7 +138,7 @@ export default function Donations() {
                                 <button
                                     key={p}
                                     onClick={() => handlePercentageClick(p)}
-                                    disabled={!siws.isAuthenticated || !currentUserToken || currentUserToken.balance <= 0}
+                                    disabled={!solana.connected || !currentUserToken || currentUserToken.balance <= 0}
                                     className="flex-grow text-xs bg-primary-200/50 hover:bg-primary-200 dark:bg-darkPrimary-700/50 dark:hover:bg-darkPrimary-700 py-1 px-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {p === 100 ? 'MAX' : `${p}%`}
@@ -153,7 +147,7 @@ export default function Donations() {
                         </div>
                     </div>
                     
-                    {siws.isAuthenticated && (
+                    {solana.connected && (
                         <div className="py-2 animate-fade-in-up" style={{animationDuration: '300ms'}}>
                             {currentUserToken ? (
                                  <div className="text-center">
@@ -184,7 +178,7 @@ export default function Donations() {
                             </p>
                         </div>
                     )}
-                     <button onClick={handleDonate} disabled={solana.loading || siws.isLoading || (siws.isAuthenticated && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                     <button onClick={handleDonate} disabled={solana.loading || (solana.connected && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                          {buttonText}
                     </button>
                 </div>

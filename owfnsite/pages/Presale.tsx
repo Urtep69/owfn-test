@@ -242,7 +242,7 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 
 
 export default function Presale() {
-  const { t, solana, siws, setWalletModalOpen } = useAppContext();
+  const { t, solana, setWalletModalOpen } = useAppContext();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -352,7 +352,7 @@ export default function Presale() {
 
   useEffect(() => {
     const fetchUserContribution = async () => {
-        if (!siws.isAuthenticated || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
+        if (!solana.connected || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
             setUserContribution(0);
             return;
         }
@@ -393,7 +393,7 @@ export default function Presale() {
     };
 
     fetchUserContribution();
-  }, [siws.isAuthenticated, solana.address]);
+  }, [solana.connected, solana.address]);
 
   const maxAllowedBuy = Math.max(0, PRESALE_DETAILS.maxBuy - userContribution);
 
@@ -472,11 +472,6 @@ export default function Presale() {
         return;
     }
 
-    if (!siws.isAuthenticated) {
-        await siws.signIn();
-        return;
-    }
-
     if (presaleStatus !== 'active' || isAmountInvalid || solana.loading) {
         return;
     }
@@ -506,11 +501,10 @@ export default function Presale() {
   };
 
   const buttonText = useMemo(() => {
-    if (solana.loading || siws.isLoading) return t('processing');
+    if (solana.loading) return t('processing');
     if (!solana.connected) return t('connect_wallet');
-    if (!siws.isAuthenticated) return t('sign_in_to_buy');
     return t('buy');
-  }, [solana.connected, solana.loading, siws.isAuthenticated, siws.isLoading, t]);
+  }, [solana.connected, solana.loading, t]);
 
 
   const formatSaleDate = (date: Date) => {
@@ -718,7 +712,7 @@ export default function Presale() {
                         <button 
                             onClick={handleBuy}
                             className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                            disabled={solana.loading || siws.isLoading || isCheckingContribution || (siws.isAuthenticated && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
+                            disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
                         >
                             {buttonText}
                         </button>

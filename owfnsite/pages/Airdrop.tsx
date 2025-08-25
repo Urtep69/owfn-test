@@ -5,7 +5,7 @@ import { Wallet, CheckCircle, XCircle, Gift, Loader2 } from 'lucide-react';
 const MOCK_AIRDROP_AMOUNT = 5000;
 
 const ConnectWalletPrompt = () => {
-    const { t, solana, siws, setWalletModalOpen } = useAppContext();
+    const { t, solana, setWalletModalOpen } = useAppContext();
     return (
         <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d max-w-md mx-auto">
             <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
@@ -16,7 +16,7 @@ const ConnectWalletPrompt = () => {
                 disabled={solana.loading}
                 className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
             >
-                {solana.loading || siws.isLoading ? t('connecting') : t('connect_wallet')}
+                {solana.loading ? t('connecting') : t('connect_wallet')}
             </button>
         </div>
     );
@@ -79,7 +79,7 @@ const EligibilityChecker = () => {
 };
 
 export default function Airdrop() {
-    const { t, siws } = useAppContext();
+    const { t, solana } = useAppContext();
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -90,7 +90,7 @@ export default function Airdrop() {
                 </p>
             </div>
             
-            {!siws.isAuthenticated ? <ConnectWalletPrompt /> : <EligibilityChecker />}
+            {!solana.connected ? <ConnectWalletPrompt /> : <EligibilityChecker />}
 
             <div className="max-w-2xl mx-auto mt-12 p-6 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d">
                 <h3 className="text-xl font-bold mb-2">{t('airdrop_info_box_title')}</h3>
