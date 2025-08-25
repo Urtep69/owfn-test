@@ -2,13 +2,13 @@ import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
-import { WalletConnectModal } from './components/WalletConnectModal.tsx';
 
 import Home from './pages/Home.tsx';
 import Presale from './pages/Presale.tsx';
@@ -34,7 +34,7 @@ import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana, siws, isWalletModalOpen, setWalletModalOpen } = useAppContext();
+  const { isMaintenanceActive, solana, siws } = useAppContext();
   const { address } = solana;
   const isAdmin = siws.isAuthenticated && address === ADMIN_WALLET_ADDRESS;
 
@@ -90,7 +90,6 @@ const AppContent = () => {
           <Route path="/"><Home /></Route>
         </Switch>
       </Layout>
-      <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setWalletModalOpen(false)} />
     </Router>
   );
 };
@@ -110,7 +109,9 @@ const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
      <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
-        {children}
+        <WalletModalProvider>
+            {children}
+        </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
   )

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
@@ -24,8 +25,7 @@ interface AppContextType {
   addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
   isMaintenanceActive: boolean;
-  isWalletModalOpen: boolean;
-  setWalletModalOpen: (isOpen: boolean) => void;
+  setWalletModalOpen: (open: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -35,7 +35,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
   const solana = useSolana();
   const siws = useSiws();
-  const [isWalletModalOpen, setWalletModalOpen] = useState(false);
+  const { setVisible: setWalletModalOpen } = useWalletModal();
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
@@ -120,7 +120,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   }, []);
 
-  const value = {
+  const value: AppContextType = {
     theme,
     toggleTheme,
     t,
@@ -137,7 +137,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addProposal,
     voteOnProposal,
     isMaintenanceActive,
-    isWalletModalOpen,
     setWalletModalOpen,
   };
 
