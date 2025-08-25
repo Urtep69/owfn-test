@@ -1,9 +1,9 @@
-import React from 'react';
-import { Menu, X, LogOut, Wallet } from 'lucide-react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { LogOut, Wallet, Loader2, Copy, Check, ExternalLink, ChevronDown, X, Menu } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 import { ThemeSwitcher } from './ThemeSwitcher.tsx';
 import { useAppContext } from '../contexts/AppContext.tsx';
+import { WalletAvatar } from './WalletAvatar.tsx';
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -13,54 +13,103 @@ interface HeaderProps {
 const ConnectButton = () => {
     const { t, setWalletModalOpen, solana, siws } = useAppContext();
     const { connected, address } = solana;
-    const { isAuthenticated, signOut } = siws;
+    const { isAuthenticated, isLoading: isSiwsLoading, signOut } = siws;
+    const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
     
-    const isAuthenticating = connected && !isAuthenticated;
+    const isAuthenticating = connected && !isAuthenticated && !isSiwsLoading;
+    const isLoading = solana.loading || isSiwsLoading;
 
-    if (isAuthenticated && address) {
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const copyToClipboard = () => {
+        if (!address) return;
+        navigator.clipboard.writeText(address);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    if (!connected) {
         return (
-             <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
-                <button
-                    onClick={() => setWalletModalOpen(true)}
-                    className="flex items-center space-x-2 pl-3 pr-2 py-2 text-primary-700 dark:text-darkPrimary-200 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-l-lg transition-colors"
-                    aria-label={t('change_wallet')}
-                >
-                    <Wallet size={18} />
-                    <span className="font-semibold text-sm font-mono">{truncateAddress(address)}</span>
-                </button>
-                 <button
-                    onClick={() => signOut()}
-                    className="p-2 text-primary-600 dark:text-darkPrimary-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-r-lg transition-colors"
-                    aria-label={t('disconnect_wallet')}
-                >
-                    <LogOut size={18} />
-                </button>
-            </div>
+            <button
+                onClick={() => setWalletModalOpen(true)}
+                className="group relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-md transition-transform transform hover:scale-105"
+            >
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600"></span>
+                <span className="absolute bottom-0 right-0 w-full h-full transition-all duration-500 ease-in-out transform translate-x-full translate-y-full bg-accent-500 dark:bg-darkAccent-600 group-hover:translate-x-0 group-hover:translate-y-0"></span>
+                <span className="absolute inset-0 w-full h-full duration-500 ease-in-out delay-200 opacity-0 group-hover:opacity-100 group-hover:animate-glow"></span>
+                <span className="relative">{t('connect_wallet')}</span>
+            </button>
         );
     }
     
-    if (isAuthenticating && address) {
+    if (isAuthenticating || isLoading) {
         return (
-            <div className="flex items-center space-x-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg animate-pulse">
-                <div
-                    className="flex items-center space-x-2 pl-3 pr-2 py-2 text-primary-700 dark:text-darkPrimary-200"
-                >
-                    <Wallet size={18} />
-                    <span className="font-semibold text-sm font-mono">{truncateAddress(address)}</span>
-                </div>
-                 <button
-                    onClick={() => signOut()}
-                    className="p-2 text-primary-600 dark:text-darkPrimary-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-primary-300/50 dark:hover:bg-darkPrimary-700/50 rounded-r-lg transition-colors"
-                    aria-label={t('disconnect_wallet')}
-                >
-                    <LogOut size={18} />
-                </button>
+            <div className="flex items-center space-x-3 px-4 py-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg animate-pulse">
+                <Loader2 size={18} className="animate-spin text-primary-600 dark:text-darkPrimary-400" />
+                <span className="font-semibold text-sm text-primary-700 dark:text-darkPrimary-200">{t('authenticating')}</span>
             </div>
         )
     }
 
+    if (isAuthenticated && address) {
+        return (
+             <div className="relative" ref={dropdownRef}>
+                <button
+                    onClick={() => setDropdownOpen(prev => !prev)}
+                    className="flex items-center space-x-2.5 pl-2 pr-3 py-1.5 bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-full hover:bg-white/20 dark:hover:bg-white/10 transition-colors"
+                >
+                    <WalletAvatar address={address} />
+                    <span className="font-semibold text-sm font-mono text-primary-800 dark:text-darkPrimary-100">{truncateAddress(address)}</span>
+                    <ChevronDown size={16} className={`text-primary-600 dark:text-darkPrimary-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white/80 dark:bg-darkPrimary-800/80 backdrop-blur-xl border border-primary-200/50 dark:border-darkPrimary-700/50 rounded-lg shadow-3d-lg animate-fade-in-up" style={{animationDuration: '200ms'}}>
+                        <div className="p-2 space-y-1">
+                             <button
+                                onClick={copyToClipboard}
+                                className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
+                            >
+                                <span>{t('copy_address', {defaultValue: 'Copy Address'})}</span>
+                                {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+                            </button>
+                            <a
+                                href={`https://solscan.io/account/${address}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
+                            >
+                                <span>{t('view_on_solscan', {defaultValue: 'View on Solscan'})}</span>
+                                <ExternalLink size={16} />
+                            </a>
+                        </div>
+                        <div className="p-2 border-t border-primary-200 dark:border-darkPrimary-700">
+                             <button
+                                onClick={() => signOut()}
+                                className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-red-600 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10 font-semibold transition-colors"
+                            >
+                                <span>{t('disconnect_wallet')}</span>
+                                <LogOut size={16} />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    // Fallback case (should ideally not be reached if logic is sound)
     return (
         <button
             onClick={() => setWalletModalOpen(true)}
