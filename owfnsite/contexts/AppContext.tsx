@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
@@ -42,23 +42,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
-  const [signInTriggered, setSignInTriggered] = useState(false);
+  const signInAttempted = useRef(false);
 
   useEffect(() => {
-    if (solana.connected && !siws.isAuthenticated && !siws.isLoading && !signInTriggered) {
-      setSignInTriggered(true);
-      const timer = setTimeout(() => {
-        siws.signIn().finally(() => {
-          setSignInTriggered(false);
-        });
-      }, 2500);
+    // If wallet is connected, user is not authenticated, and we haven't tried to sign them in yet
+    if (solana.connected && !siws.isAuthenticated && !siws.isLoading && !signInAttempted.current) {
+      // Mark that we are attempting to sign in to prevent re-triggering on every render
+      signInAttempted.current = true;
+      siws.signIn(); // Trigger sign-in immediately without delay
+    }
 
-      return () => clearTimeout(timer);
-    }
+    // If the wallet disconnects, reset the flag for the next connection attempt
     if (!solana.connected) {
-      setSignInTriggered(false);
+      signInAttempted.current = false;
     }
-  }, [solana.connected, siws.isAuthenticated, siws.isLoading, siws.signIn, signInTriggered]);
+  }, [solana.connected, siws.isAuthenticated, siws.isLoading, siws.signIn]);
 
 
   const addSocialCase = (newCase: SocialCase) => {
