@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LogOut, Wallet, Loader2, Copy, Check, ExternalLink, ChevronDown, X, Menu } from 'lucide-react';
+import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 import { ThemeSwitcher } from './ThemeSwitcher.tsx';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { WalletAvatar } from './WalletAvatar.tsx';
+import { WalletManagerIcon } from './IconComponents.tsx';
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -68,15 +68,27 @@ const ConnectButton = () => {
              <div className="relative" ref={dropdownRef}>
                 <button
                     onClick={() => setDropdownOpen(prev => !prev)}
-                    className="flex items-center space-x-2.5 pl-2 pr-3 py-1.5 bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-full hover:bg-white/20 dark:hover:bg-white/10 transition-colors"
+                    className="flex items-center bg-[#22252A] dark:bg-darkPrimary-800 border border-green-400/30 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:border-green-400/70 shadow-lg"
                 >
-                    <WalletAvatar address={address} />
-                    <span className="font-semibold text-sm font-mono text-primary-800 dark:text-darkPrimary-100">{truncateAddress(address)}</span>
-                    <ChevronDown size={16} className={`text-primary-600 dark:text-darkPrimary-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                    <div 
+                        className="bg-green-500 text-white font-bold py-[7px] pl-4 pr-5 text-xs rounded-l-full"
+                        style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)' }}
+                    >
+                        NEW
+                    </div>
+                    <div className="flex items-center space-x-2 pl-2 pr-3">
+                        <WalletManagerIcon className="w-5 h-5" />
+                        <span className="text-green-400 text-xs tracking-wider">Wallet Manager</span>
+                        <ChevronRight size={16} className="text-green-400/70" />
+                    </div>
                 </button>
+
                 {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-56 bg-white/80 dark:bg-darkPrimary-800/80 backdrop-blur-xl border border-primary-200/50 dark:border-darkPrimary-700/50 rounded-lg shadow-3d-lg animate-fade-in-up" style={{animationDuration: '200ms'}}>
-                        <div className="p-2 space-y-1">
+                        <div className="p-3">
+                             <span className="font-semibold text-sm font-mono text-primary-800 dark:text-darkPrimary-100">{truncateAddress(address)}</span>
+                        </div>
+                        <div className="p-2 space-y-1 border-t border-primary-200 dark:border-darkPrimary-700">
                              <button
                                 onClick={copyToClipboard}
                                 className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
