@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 
 export default async function handler(req: any, res: any) {
@@ -127,7 +126,7 @@ ${message}
                 'Authorization': `Bearer ${resendApiKey}`
             },
             body: JSON.stringify({
-                from: 'Contact Form OWFN <onboarding@resend.dev>',
+                from: 'Contact Form OWFN <contact@email.owfn.org>',
                 to: recipientEmail,
                 subject: emailContent.subject,
                 html: emailContent.htmlBody,
