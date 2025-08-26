@@ -1,12 +1,10 @@
 
 
 import React from 'react';
-import { useLocation } from 'wouter';
 import { AllocationChart } from '../components/AllocationChart.tsx';
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS } from '../constants.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from '../components/IconComponents.tsx';
-import { MetaTags } from '../components/MetaTags.tsx';
 
 const DetailItem = ({ label, value }: { label: string, value: React.ReactNode }) => (
     <div className="flex justify-between items-center py-3 border-b border-primary-200 dark:border-darkPrimary-700">
@@ -17,17 +15,9 @@ const DetailItem = ({ label, value }: { label: string, value: React.ReactNode })
 
 export default function Tokenomics() {
     const { t } = useAppContext();
-    const [location] = useLocation();
-    const pageUrl = `https://www.owfn.org${location}`;
 
     return (
         <div className="animate-fade-in-up">
-            <MetaTags
-                title="OWFN Tokenomics | A Balanced Economy for Growth"
-                description="Discover the tokenomics of the $OWFN token, including total supply, token allocation, and features like the 0.5% transfer fee that perpetually funds our Impact Treasury."
-                keywords="OWFN tokenomics, token allocation, crypto economy, total supply, impact treasury, SPL token"
-                url={pageUrl}
-            />
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('tokenomics_title')}</h1>
                 <p className="mt-4 text-lg text-primary-600 dark:text-darkPrimary-400">

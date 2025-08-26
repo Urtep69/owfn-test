@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -347,6 +346,7 @@ export const ro = {
     pair_address: `Adresă Pereche`,
     mint_authority: `Autoritate Mint`,
     freeze_authority: `Autoritate Înghețare`,
+    update_authority: `Autoritate de Actualizare`,
     fully_diluted_valuation: `Valoare Complet Diluată (FDV)`,
     market_stats: `Statistici Piață`,
     trading_stats: `Statistici Tranzacționare`,
@@ -373,6 +373,7 @@ export const ro = {
     risk_factors_found: `Riscuri potențiale detectate. Vă rugăm să procedați cu prudență.`,
     swap: `Schimbă`,
     revoked: `Revocat`,
+    price_sol: `Preț (SOL)`,
     
     // Staking & Vesting
     staking_title: `Depune OWFN, Câștigă Recompense`,

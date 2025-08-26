@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { SocialCase } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 import { SUPPORTED_LANGUAGES } from '../constants.ts';
 import { HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
-import { MetaTags } from '../components/MetaTags.tsx';
 
 const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }) => {
     const { t } = useAppContext();
@@ -100,8 +99,6 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
 export default function ImpactPortal() {
     const { t, solana, socialCases, addSocialCase } = useAppContext();
     const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
-    const [location] = useLocation();
-    const pageUrl = `https://www.owfn.org${location}`;
     
     const categories = [
         { 
@@ -129,12 +126,6 @@ export default function ImpactPortal() {
 
     return (
         <div className="animate-fade-in-up space-y-8">
-            <MetaTags
-                title="Impact Portal | See Your Contribution at Work"
-                description="Explore the real-world social cases funded by the OWFN community. See transparent updates on projects in health, education, and basic needs, and discover how you can help."
-                keywords="social impact portal, funded projects, charity cases, transparent aid, OWFN impact"
-                url={pageUrl}
-            />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('about_impact_areas_title')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">

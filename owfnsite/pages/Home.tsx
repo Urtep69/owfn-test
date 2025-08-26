@@ -1,11 +1,10 @@
 
 
 import React from 'react';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import { Target, Users, Zap } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OWFN_LOGO_URL } from '../constants.ts';
-import { MetaTags } from '../components/MetaTags.tsx';
 
 const FeatureCard = ({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform">
@@ -19,17 +18,9 @@ const FeatureCard = ({ icon, title, children }: { icon: React.ReactNode, title: 
 
 export default function Home() {
     const { t } = useAppContext();
-    const [location] = useLocation();
-    const pageUrl = `https://www.owfn.org${location}`;
 
     return (
         <div className="space-y-16 animate-fade-in-up">
-            <MetaTags 
-                title="Home | Official World Family Network (OWFN)"
-                description="Welcome to OWFN, a global family united to build a better world through technology and humanity. Learn about our mission for real impact, powered by community and the Solana blockchain."
-                keywords="OWFN, blockchain for good, social impact, Solana, community driven, humanitarian aid, global network"
-                url={pageUrl}
-            />
             <section className="text-center bg-gradient-to-br from-white to-primary-200 dark:from-darkPrimary-800 dark:to-darkPrimary-950 rounded-3xl p-8 md:p-16 shadow-3d-lg -mt-8 -mx-8">
                 <div className="relative z-10 flex flex-col items-center">
                     <div className="mb-6 bg-white/20 dark:bg-darkPrimary-950/20 rounded-full w-48 h-48 p-3 shadow-lg backdrop-blur-sm border-2 border-primary-300/30 dark:border-darkPrimary-100/30">

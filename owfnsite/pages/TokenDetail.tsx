@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2, TrendingUp, Users, Droplets, Info } from 'lucide-react';
+import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2, TrendingUp, Users, Droplets, Info, HelpCircle } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
@@ -9,7 +9,7 @@ import { DualProgressBar } from '../components/DualProgressBar.tsx';
 import { MOCK_TOKEN_DETAILS } from '../constants.ts';
 
 const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 dark:text-darkPrimary-100' }: { title: string, value: string, subtext?: string, icon: React.ReactNode, valueColor?: string }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
+    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d h-full">
         <div className="flex items-center space-x-3">
             <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">{icon}</div>
             <div>
@@ -17,7 +17,7 @@ const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 
                 <div className="flex items-baseline gap-2">
                     <p className={`text-2xl font-bold ${valueColor}`}>{value}</p>
                 </div>
-                 {subtext && <p className="text-xs font-semibold text-primary-500 dark:text-darkPrimary-500">{subtext}</p>}
+                 {subtext && <p className={`text-xs font-semibold ${subtext.startsWith('-') ? 'text-red-500' : 'text-green-500'}`}>{subtext}</p>}
             </div>
         </div>
     </div>
@@ -36,7 +36,6 @@ const InfoRow = ({ label, children }: { label: string, children: React.ReactNode
         <div className="text-sm font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
     </div>
 );
-
 
 export default function TokenDetail() {
     const { t } = useAppContext();
@@ -74,25 +73,17 @@ export default function TokenDetail() {
 
                 if (!response.ok) {
                     let errorMsg = `Error: ${response.status} ${response.statusText}`;
-                    const errorText = await response.text(); // Read body once as text
                     try {
-                        // Try parsing it as JSON
-                        const errorData = JSON.parse(errorText);
+                        const errorData = await response.json();
                         errorMsg = errorData.error || errorMsg;
                     } catch (e) {
-                         // If it's not JSON, use the raw text (or a snippet)
-                        errorMsg = errorText.substring(0, 200) || errorMsg;
+                         const errorText = await response.text();
+                         errorMsg = errorText.substring(0, 200) || errorMsg;
                     }
                     throw new Error(errorMsg);
                 }
                 
                 const data: TokenDetails = await response.json();
-
-                const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
-                if (mockDetailsKey) {
-                    const mock = MOCK_TOKEN_DETAILS[mockDetailsKey];
-                    data.description = data.description || mock.description;
-                }
                 setToken(data);
             } catch (err) {
                 console.error("Failed to fetch token details:", err);
@@ -128,8 +119,7 @@ export default function TokenDetail() {
             : token.pricePerToken.toPrecision(4))
         : 'N/A';
     const priceChange = token.price24hChange ?? 0;
-    const priceChangeColor = priceChange >= 0 ? 'text-green-500' : 'text-red-500';
-
+    
     return (
         <div className="space-y-8 animate-fade-in-up">
             <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
@@ -140,25 +130,30 @@ export default function TokenDetail() {
                 <GenericTokenIcon uri={token.logo as string} className="w-16 h-16 flex-shrink-0" />
                 <div className="flex-grow">
                     <h1 className="text-3xl font-bold">{token.name}</h1>
-                    <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
+                    <div className="flex items-center gap-4">
+                        <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
+                        {isPriceAvailable && (
+                            <div className="flex items-baseline gap-2">
+                                <p className="text-3xl font-bold">${priceString}</p>
+                                <p className={`font-semibold ${priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    ({priceChange > 0 ? '+' : ''}{priceChange.toFixed(2)}%)
+                                </p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <StatCard title={t('pricePerToken')} value={isPriceAvailable ? `$${priceString}`: 'N/A'} icon={<DollarSign />} subtext={`${priceChange.toFixed(2)}% (24h)`} />
-                <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<BarChart2 />} />
-                <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<TrendingUp />} />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap).toLocaleString(undefined, { maximumFractionDigits: 0, notation: 'compact' })}` : 'N/A'} icon={<BarChart2 />} />
+                <StatCard title={t('fully_diluted_valuation')} value={token.fdv ? `$${(token.fdv).toLocaleString(undefined, { maximumFractionDigits: 0, notation: 'compact' })}` : 'N/A'} icon={<HelpCircle />} />
+                <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h).toLocaleString(undefined, { maximumFractionDigits: 0, notation: 'compact' })}` : 'N/A'} icon={<TrendingUp />} />
+                <StatCard title={t('liquidity')} value={token.liquidity ? `$${(token.liquidity).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<Droplets />} />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8 items-start">
                 <div className="lg:col-span-2 space-y-8">
-                    <InfoCard title={t('market_stats')} icon={<Info />}>
-                        <InfoRow label={t('fully_diluted_valuation')}>{token.fdv ? `$${token.fdv.toLocaleString(undefined, {maximumFractionDigits: 0})}` : 'N/A'}</InfoRow>
-                        <InfoRow label={t('liquidity')}>{token.liquidity ? `$${token.liquidity.toLocaleString(undefined, {maximumFractionDigits: 0})}` : 'N/A'}</InfoRow>
-                        <InfoRow label={t('holders')}>{token.holders ? token.holders.toLocaleString() : 'N/A'}</InfoRow>
-                    </InfoCard>
-
-                    {token.txns && (
+                    {token.txns?.h24 && (token.txns.h24.buys > 0 || token.txns.h24.sells > 0) && (
                         <InfoCard title={t('trading_stats')} icon={<BarChart2 />}>
                              <DualProgressBar 
                                 label1={t('buys')}
@@ -169,6 +164,11 @@ export default function TokenDetail() {
                              <InfoRow label={t('total_transactions_24h')}>{ (token.txns.h24.buys + token.txns.h24.sells).toLocaleString() }</InfoRow>
                         </InfoCard>
                     )}
+                    
+                    <InfoCard title={t('market_stats')} icon={<Info />}>
+                        <InfoRow label={t('holders')}>{token.holders ? token.holders.toLocaleString() : 'N/A'}</InfoRow>
+                        <InfoRow label={t('price_sol', {defaultValue: 'Price (SOL)'})}>{token.priceSol ? `${token.priceSol.toPrecision(4)} SOL` : 'N/A'}</InfoRow>
+                    </InfoCard>
                 </div>
                 
                 <div className="lg:col-span-1 space-y-8">
@@ -177,7 +177,7 @@ export default function TokenDetail() {
                         <InfoRow label={t('token_standard')}>{token.tokenStandard || 'N/A'}</InfoRow>
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
-                        <AuthorityRow label="Update Authority" address={token.updateAuthority} />
+                        <AuthorityRow label={t('update_authority', {defaultValue: 'Update Authority'})} address={token.updateAuthority} />
                     </InfoCard>
 
                     {token.description && (
