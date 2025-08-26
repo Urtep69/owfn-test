@@ -49,7 +49,6 @@ export default async function handler(req: any, res: any) {
         const content = asset.content || {};
         const metadata = content.metadata || {};
         const links = content.links || {};
-        const ownership = asset.ownership || {};
         const decimals = tokenInfo.decimals ?? 9;
         const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
         
@@ -58,9 +57,13 @@ export default async function handler(req: any, res: any) {
         let updateAuthority: string | null = null;
 
         if (Array.isArray(asset.authorities)) {
-            mintAuthority = asset.authorities.find(a => a.scopes.includes('mint'))?.address || null;
-            freezeAuthority = asset.authorities.find(a => a.scopes.includes('freeze'))?.address || null;
-            updateAuthority = asset.authorities.find(a => a.scopes.includes('metadata_update'))?.address || null;
+            const findAuthority = (scope: string): string | null => {
+                const authority = asset.authorities.find((a: any) => a && Array.isArray(a.scopes) && a.scopes.includes(scope));
+                return authority ? authority.address : null;
+            };
+            mintAuthority = findAuthority('mint');
+            freezeAuthority = findAuthority('freeze');
+            updateAuthority = findAuthority('metadata_update');
         }
         
         const onChainData = {
@@ -70,7 +73,7 @@ export default async function handler(req: any, res: any) {
             logo: links.image || null,
             decimals,
             totalSupply: supply,
-            holders: ownership.owner_count || 0,
+            holders: asset.ownership?.owner_count || 0,
             mintAuthority,
             freezeAuthority,
             updateAuthority,
@@ -95,8 +98,7 @@ export default async function handler(req: any, res: any) {
              console.warn(`CoinGecko API call failed for ${mintAddress}. Market data will be incomplete.`);
         }
         
-        // If market cap is missing from coingecko, calculate it as a fallback
-        if (marketData.marketCap === 0 && marketData.pricePerToken && onChainData.totalSupply) {
+        if (!marketData.marketCap && marketData.pricePerToken && onChainData.totalSupply) {
             marketData.marketCap = calculateMarketCap(marketData.pricePerToken, onChainData.totalSupply);
         }
         
@@ -115,7 +117,6 @@ export default async function handler(req: any, res: any) {
             txns: mockTxns,
         };
 
-        // Populate description from mock if available
         const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
         if (mockDetailsKey) {
             responseData.description = MOCK_TOKEN_DETAILS[mockDetailsKey].description;
@@ -125,6 +126,6 @@ export default async function handler(req: any, res: any) {
 
     } catch (error) {
         console.error(`[FATAL] Unhandled error in token-info API for mint ${mintAddress}:`, error);
-        return res.status(500).json({ error: "An unexpected server error occurred." });
+        return res.status(500).json({ error: error instanceof Error ? error.message : "An unexpected server error occurred." });
     }
 }
