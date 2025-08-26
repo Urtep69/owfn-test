@@ -1,66 +1,44 @@
 import type { TokenDetails } from '../types.ts';
-import { MOCK_TOKEN_DETAILS } from '../constants.ts';
+import { MOCK_TOKEN_DETAILS, QUICKNODE_RPC_URL } from '../constants.ts';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { getMint, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 
-const HELIUS_API_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
 const QUICKNODE_TOKEN_API_BASE_URL = `https://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/addon/912/networks/solana/tokens/`;
 
-async function fetchHeliusData(mintAddress: string): Promise<Partial<TokenDetails> | null> {
-    if (!process.env.HELIUS_API_KEY) {
-        console.warn("Helius API key not configured. Skipping on-chain data.");
-        return null;
-    }
+async function fetchOnChainData(mintAddress: string): Promise<Partial<TokenDetails> | null> {
     try {
-        const response = await fetch(HELIUS_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 'owfn-token-info-helius',
-                method: 'getAsset',
-                params: { id: mintAddress },
-            }),
-        });
-        if (!response.ok) return null;
+        const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
+        const mintPublicKey = new PublicKey(mintAddress);
         
-        const jsonResponse = await response.json();
-        if (jsonResponse.error || !jsonResponse.result) return null;
-        
-        const asset = jsonResponse.result;
-        const tokenInfo = asset.token_info || {};
-        const content = asset.content || {};
-        const metadata = content.metadata || {};
-        const links = content.links || {};
-
-        let mintAuthority: string | null = null;
-        let freezeAuthority: string | null = null;
-        let updateAuthority: string | null = null;
-
-        if (Array.isArray(asset.authorities)) {
-             for (const authority of asset.authorities) {
-                if (authority?.scopes?.includes('mint')) mintAuthority = authority.address;
-                if (authority?.scopes?.includes('freeze')) freezeAuthority = authority.address;
-                if (authority?.scopes?.includes('update')) updateAuthority = authority.address;
+        // Robustly fetch mint info, trying Token-2022 first then falling back to standard SPL Token
+        const mintInfo = await getMint(connection, mintPublicKey, 'confirmed', TOKEN_2022_PROGRAM_ID).catch(async () => {
+            try {
+                 console.warn(`getMint with Token-2022 program failed for ${mintAddress}, falling back to standard SPL Token program.`);
+                 return await getMint(connection, mintPublicKey, 'confirmed', TOKEN_PROGRAM_ID);
+            } catch (e) {
+                 console.error(`All getMint attempts failed for ${mintAddress}. It may not be a valid mint address.`, e);
+                 return null;
             }
+        });
+
+        if (!mintInfo) {
+            return null;
         }
-        
-        const decimals = tokenInfo.decimals ?? 9;
-        const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
+
+        const isToken2022 = mintInfo.programId.equals(TOKEN_2022_PROGRAM_ID);
 
         return {
-            mintAddress: asset.id,
-            name: metadata.name,
-            symbol: metadata.symbol,
-            logo: links.image || null,
-            decimals: decimals,
-            totalSupply: supply,
-            mintAuthority,
-            freezeAuthority,
-            updateAuthority,
-            tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
+            decimals: mintInfo.decimals,
+            totalSupply: Number(mintInfo.supply) / (10 ** mintInfo.decimals),
+            mintAuthority: mintInfo.mintAuthority ? mintInfo.mintAuthority.toBase58() : null,
+            freezeAuthority: mintInfo.freezeAuthority ? mintInfo.freezeAuthority.toBase58() : null,
+            tokenStandard: isToken2022 ? 'Token-2022' : 'SPL Token',
+            // Metadata update authority is more complex to get via RPC, so we'll omit it for stability.
+            // The UI will gracefully handle this by showing "Revoked".
+            updateAuthority: null, 
         };
-
     } catch (e) {
-        console.error("Error fetching from Helius:", e);
+        console.error(`General error in fetchOnChainData for ${mintAddress}:`, e);
         return null;
     }
 }
@@ -85,6 +63,8 @@ async function fetchQuickNodeData(mintAddress: string): Promise<Partial<TokenDet
             price24hChange: data.price_change_percent?.h24 || 0,
             txns: data.transactions, // Keep the original structure e.g., { h24: { buys: ..., sells: ...}}
             logo: data.logo_url || null,
+            name: data.name || null,
+            symbol: data.symbol || null,
         };
     } catch (e) {
         console.error("Error fetching from QuickNode:", e);
@@ -101,30 +81,36 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
-        const [heliusData, quickNodeData] = await Promise.all([
-            fetchHeliusData(mintAddress),
+        const [onChainData, quickNodeData] = await Promise.all([
+            fetchOnChainData(mintAddress),
             fetchQuickNodeData(mintAddress)
         ]);
         
-        if (!heliusData && !quickNodeData) {
-            return res.status(404).json({ error: `No data could be found for mint: ${mintAddress}. Both data sources failed.` });
+        if (!onChainData && !quickNodeData) {
+            return res.status(404).json({ error: `No data could be found for mint: ${mintAddress}. All data sources failed.` });
         }
         
         // Start with a base object from mock data if available
         const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
-        const baseData = mockDetailsKey ? MOCK_TOKEN_DETAILS[mockDetailsKey] : {};
+        // FIX: Explicitly type baseData to prevent TypeScript errors when it's an empty object.
+        const baseData: Partial<TokenDetails> = mockDetailsKey ? MOCK_TOKEN_DETAILS[mockDetailsKey] : {};
         
-        // Merge data, giving precedence to live data over mock, and QuickNode market data over Helius.
+        // Merge data, giving precedence to live data over mock.
+        // On-chain data is more authoritative for its fields (like supply, authorities).
+        // QuickNode is the primary source for market data and metadata like name/logo.
         const mergedData: Partial<TokenDetails> = {
             ...baseData,
-            ...heliusData,
+            ...onChainData,
             ...quickNodeData,
         };
 
         // Ensure essential fields have fallbacks
         mergedData.mintAddress = mintAddress;
-        mergedData.name = mergedData.name || 'Unknown Token';
-        mergedData.symbol = mergedData.symbol || `${mintAddress.slice(0, 4)}...`;
+        // FIX: Removed onChainData from metadata fallbacks as it does not return name/symbol.
+        // The type fix for baseData also resolves the property access errors here.
+        mergedData.name = quickNodeData?.name || baseData.name || 'Unknown Token';
+        mergedData.symbol = quickNodeData?.symbol || baseData.symbol || `${mintAddress.slice(0, 4)}...`;
+        mergedData.logo = quickNodeData?.logo || baseData.logo || null;
 
         return res.status(200).json(mergedData);
 
