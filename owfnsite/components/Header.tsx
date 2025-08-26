@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat } from 'lucide-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 import { ThemeSwitcher } from './ThemeSwitcher.tsx';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -11,7 +12,8 @@ interface HeaderProps {
 }
 
 const ConnectButton = () => {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana } = useAppContext();
+    const { setVisible } = useWalletModal();
     const { connected, address, connecting, disconnectWallet } = solana;
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -50,7 +52,7 @@ const ConnectButton = () => {
     if (!connected || !address) {
         return (
             <button
-                onClick={() => setWalletModalOpen(true)}
+                onClick={() => setVisible(true)}
                 className="group relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-md transition-transform transform hover:scale-105"
             >
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600"></span>
@@ -94,7 +96,7 @@ const ConnectButton = () => {
                             {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
                         </button>
                         <button
-                            onClick={() => setWalletModalOpen(true)}
+                            onClick={() => setVisible(true)}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
                             <span>{t('change_wallet', {defaultValue: 'Change Wallet'})}</span>

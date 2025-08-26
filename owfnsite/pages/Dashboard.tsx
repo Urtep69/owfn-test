@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import type { Wallet, Token } from '../types.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { formatNumber } from '../lib/utils.ts';
+import { MetaTags } from '../components/MetaTags.tsx';
 
 const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'> }) => {
     const { t, solana } = useAppContext();
@@ -88,6 +89,9 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
 
 export default function Dashboard() {
     const { t } = useAppContext();
+    const [location] = useLocation();
+    const pageUrl = `https://www.owfn.org${location}`;
+    
     const wallets: Omit<Wallet, 'balances' | 'totalUsdValue'>[] = [
         { name: t('wallet_name_presale'), address: DISTRIBUTION_WALLETS.presale },
         { name: t('wallet_name_impact_treasury'), address: DISTRIBUTION_WALLETS.impactTreasury },
@@ -99,6 +103,12 @@ export default function Dashboard() {
 
     return (
         <div className="animate-fade-in-up space-y-8">
+            <MetaTags
+                title="Transparency Dashboard | Official World Family Network"
+                description="Monitor the official project wallets of OWFN in real-time. We provide full transparency into our funds, including the Impact Treasury, marketing, and community wallets."
+                keywords="OWFN dashboard, wallet transparency, crypto transparency, project wallets, on-chain data"
+                url={pageUrl}
+            />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('wallet_monitor')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">

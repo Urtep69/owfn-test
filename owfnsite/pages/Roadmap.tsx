@@ -1,13 +1,23 @@
 
 import React from 'react';
+import { useLocation } from 'wouter';
 import { ROADMAP_DATA } from '../constants.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
+import { MetaTags } from '../components/MetaTags.tsx';
 
 export default function Roadmap() {
   const { t } = useAppContext();
+  const [location] = useLocation();
+  const pageUrl = `https://www.owfn.org${location}`;
 
   return (
     <div className="animate-fade-in-up">
+      <MetaTags
+        title="Roadmap | The Future of OWFN"
+        description="View the official roadmap for the Official World Family Network. Follow our journey from foundation and launch to global expansion and sustained, community-driven impact."
+        keywords="OWFN roadmap, project timeline, crypto roadmap, future plans, global expansion, DAO implementation"
+        url={pageUrl}
+      />
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('roadmap_title')}</h1>
         <p className="mt-4 text-lg text-primary-600 dark:text-darkPrimary-400">

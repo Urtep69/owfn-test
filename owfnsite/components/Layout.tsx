@@ -5,12 +5,9 @@ import { Header } from './Header.tsx';
 import { Footer } from './Footer.tsx';
 import { Chatbot } from './Chatbot.tsx';
 import { Sidebar } from './Sidebar.tsx';
-import { WalletConnectModal } from './WalletConnectModal.tsx';
-import { useAppContext } from '../contexts/AppContext.tsx';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const { isWalletModalOpen, setWalletModalOpen } = useAppContext();
 
   return (
     <div className="min-h-screen bg-primary-100 text-darkPrimary-800 dark:bg-darkPrimary-900 dark:text-darkPrimary-200 font-sans transition-colors duration-300">
@@ -25,7 +22,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </div>
       </div>
       <Chatbot />
-      <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setWalletModalOpen(false)} />
     </div>
   );
 };

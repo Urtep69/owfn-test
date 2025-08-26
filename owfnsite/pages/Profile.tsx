@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
@@ -7,6 +7,7 @@ import type { ImpactBadge, ImpactNFT } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
 import { formatNumber } from '../lib/utils.ts';
+import { MetaTags } from '../components/MetaTags.tsx';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -27,6 +28,8 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
     const { connected, address, userTokens, loading, userStats } = solana;
+    const [location] = useLocation();
+    const pageUrl = `https://www.owfn.org${location}`;
     
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
@@ -40,6 +43,12 @@ export default function Profile() {
     if (!connected) {
         return (
             <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
+                 <MetaTags
+                    title="My Profile | Official World Family Network (OWFN)"
+                    description="Connect your wallet to view your personal impact dashboard. Track your token balances, donations, and earned impact badges as a member of the OWFN global family."
+                    keywords="OWFN profile, my crypto portfolio, impact dashboard, track donations, user profile"
+                    url={pageUrl}
+                />
                 <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
                 <h1 className="text-2xl font-bold mb-2">{t('my_profile')}</h1>
                 <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_connect_prompt')}</p>
@@ -56,6 +65,12 @@ export default function Profile() {
     
     return (
         <div className="animate-fade-in-up space-y-8">
+            <MetaTags
+                title="My Profile | Official World Family Network (OWFN)"
+                description="Connect your wallet to view your personal impact dashboard. Track your token balances, donations, and earned impact badges as a member of the OWFN global family."
+                keywords="OWFN profile, my crypto portfolio, impact dashboard, track donations, user profile"
+                url={pageUrl}
+            />
             <div>
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('impact_dashboard_title')}</h1>
                 <div className="flex items-center space-x-2 mt-2">

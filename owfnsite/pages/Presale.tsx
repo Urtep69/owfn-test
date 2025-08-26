@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
@@ -19,6 +19,7 @@ import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { PresaleTransaction } from '../types.ts';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
+import { MetaTags } from '../components/MetaTags.tsx';
 
 const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransaction | null }) => {
     const { t } = useAppContext();
@@ -253,6 +254,8 @@ export default function Presale() {
   const [presaleStatus, setPresaleStatus] = useState<'pending' | 'active' | 'ended'>('pending');
   const [endReason, setEndReason] = useState<'date' | 'hardcap' | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [location] = useLocation();
+  const pageUrl = `https://www.owfn.org${location}`;
 
   const fetchPresaleProgress = useCallback(async () => {
         if (new Date() < PRESALE_DETAILS.startDate) {
@@ -515,6 +518,12 @@ export default function Presale() {
 
   return (
     <div className="bg-primary-50 dark:bg-darkPrimary-950 text-primary-700 dark:text-darkPrimary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
+      <MetaTags
+        title="Join the OWFN Presale | Official World Family Network"
+        description="Participate in the OWFN token presale and become a foundational member of a global movement for transparent social impact. Your contribution directly funds real-world humanitarian projects."
+        keywords="OWFN presale, crypto presale, Solana presale, invest in social good, buy OWFN, token sale"
+        url={pageUrl}
+      />
       <div className="w-full max-w-screen-2xl">
         <div className="mb-4">
             <Link to="/" className="text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400 transition-colors">

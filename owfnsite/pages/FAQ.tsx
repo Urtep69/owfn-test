@@ -1,8 +1,10 @@
 
 
 import React, { useState, useMemo } from 'react';
+import { useLocation } from 'wouter';
 import { ChevronDown, HelpCircle, Search } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
+import { MetaTags } from '../components/MetaTags.tsx';
 
 const FaqItem = ({ question, answer, isOpen, onClick }: { question: string, answer: string, isOpen: boolean, onClick: () => void }) => {
     return (
@@ -30,6 +32,8 @@ export default function FAQ() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('all');
+    const [location] = useLocation();
+    const pageUrl = `https://www.owfn.org${location}`;
 
     const handleToggle = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);
@@ -87,6 +91,12 @@ export default function FAQ() {
 
     return (
         <div className="animate-fade-in-up max-w-4xl mx-auto space-y-8">
+            <MetaTags
+                title="FAQ | Official World Family Network"
+                description="Find answers to frequently asked questions about the OWFN project, presale, tokenomics, security, and our mission for global social impact."
+                keywords="OWFN FAQ, frequently asked questions, crypto questions, presale info"
+                url={pageUrl}
+            />
             <div className="text-center">
                 <HelpCircle className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('faq_title')}</h1>

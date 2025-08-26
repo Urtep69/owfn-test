@@ -2,12 +2,9 @@ import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
-import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack';
-import { TrustWalletAdapter } from '@solana/wallet-adapter-trust';
-import { LedgerWalletAdapter } from '@solana/wallet-adapter-ledger';
-import { CoinbaseWalletAdapter } from '@solana/wallet-adapter-coinbase';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './constants.ts';
@@ -105,10 +102,6 @@ const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     () => [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
-      new BackpackWalletAdapter(),
-      new TrustWalletAdapter(),
-      new LedgerWalletAdapter(),
-      new CoinbaseWalletAdapter(),
     ],
     []
   );
@@ -116,7 +109,9 @@ const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
      <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
-        {children}
+        <WalletModalProvider>
+            {children}
+        </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
   )
