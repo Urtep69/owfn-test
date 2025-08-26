@@ -29,7 +29,9 @@ async function fetchOnChainData(mintAddress: string): Promise<Partial<TokenDetai
 
         return {
             decimals: mintInfo.decimals,
-            totalSupply: Number(mintInfo.supply) / (10 ** mintInfo.decimals),
+            // FIX: Safely convert BigInt to Number to avoid runtime crashes with very large supply values.
+            // Convert to string first, then use floating-point math.
+            totalSupply: parseFloat(mintInfo.supply.toString()) / Math.pow(10, mintInfo.decimals),
             mintAuthority: mintInfo.mintAuthority ? mintInfo.mintAuthority.toBase58() : null,
             freezeAuthority: mintInfo.freezeAuthority ? mintInfo.freezeAuthority.toBase58() : null,
             tokenStandard: isToken2022 ? 'Token-2022' : 'SPL Token',
