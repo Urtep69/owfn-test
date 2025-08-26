@@ -1,3 +1,4 @@
+
 export const en = {
     // Navigation
     home: `Home`,
@@ -346,7 +347,6 @@ export const en = {
     pair_address: `Pair Address`,
     mint_authority: `Mint Authority`,
     freeze_authority: `Freeze Authority`,
-    update_authority: `Update Authority`,
     fully_diluted_valuation: `Fully Diluted Valuation (FDV)`,
     market_stats: `Market Stats`,
     trading_stats: `Trading Stats`,
@@ -373,7 +373,6 @@ export const en = {
     risk_factors_found: `Potential risks detected. Please proceed with caution.`,
     swap: `Swap`,
     revoked: `Revoked`,
-    price_sol: `Price (SOL)`,
     
     // Staking & Vesting
     staking_title: `Stake OWFN, Earn Rewards`,

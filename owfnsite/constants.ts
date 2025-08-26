@@ -9,8 +9,11 @@ export const OWFN_LOGO_URL: string = owfnLogo;
 export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenance mode globally
 
-export const QUICKNODE_RPC_URL = 'https://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/';
-export const QUICKNODE_WSS_URL = 'wss://evocative-falling-frost.solana-mainnet.quiknode.pro/ba8af81f043571b8761a7155b2b40d4487ab1c4c/';
+// Use environment variable for the QuickNode API key
+const QUICKNODE_API_KEY = process.env.QUICKNODE_API_KEY;
+
+export const QUICKNODE_RPC_URL = `https://evocative-falling-frost.solana-mainnet.quiknode.pro/${QUICKNODE_API_KEY}/`;
+export const QUICKNODE_WSS_URL = `wss://evocative-falling-frost.solana-mainnet.quiknode.pro/${QUICKNODE_API_KEY}/`;
 
 
 export const TOKEN_DETAILS = {
