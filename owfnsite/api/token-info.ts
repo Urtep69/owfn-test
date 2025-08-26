@@ -62,11 +62,7 @@ export default async function handler(req: any, res: any) {
 
         const decimals = tokenInfo.decimals ?? 9;
         const price = priceInfo.price_per_token || 0;
-        const totalSupply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
-        
-        // Helius provides circulating_supply in lamports as a string, similar to supply.
-        // It might not be available for all tokens, so we fall back to total supply.
-        const circulatingSupply = tokenInfo.circulating_supply ? Number(BigInt(tokenInfo.circulating_supply)) / (10 ** decimals) : totalSupply;
+        const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
         
         let mintAuthority: string | null = null;
         let freezeAuthority: string | null = null;
@@ -95,11 +91,8 @@ export default async function handler(req: any, res: any) {
             logo: links.image || null,
             decimals: decimals,
             pricePerToken: price,
-            totalSupply: totalSupply,
-            circulatingSupply: circulatingSupply,
-            marketCap: calculateMarketCap(price, circulatingSupply), // Based on circulating supply
-            volume24h: priceInfo.volume_24hr || 0,
-            price24hChange: (priceInfo.price_change_24hr || 0) * 100, // Convert decimal to percentage
+            totalSupply: supply,
+            marketCap: calculateMarketCap(price, supply),
             
             mintAuthority: mintAuthority,
             freezeAuthority: freezeAuthority,

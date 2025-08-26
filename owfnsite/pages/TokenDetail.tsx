@@ -8,7 +8,7 @@ import { GenericTokenIcon } from '../components/IconComponents.tsx';
 import { DualProgressBar } from '../components/DualProgressBar.tsx';
 import { MOCK_TOKEN_DETAILS } from '../constants.ts';
 
-const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 dark:text-darkPrimary-100' }: { title: string, value: string, subtext?: React.ReactNode, icon: React.ReactNode, valueColor?: string }) => (
+const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 dark:text-darkPrimary-100' }: { title: string, value: string, subtext?: string, icon: React.ReactNode, valueColor?: string }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
         <div className="flex items-center space-x-3">
             <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">{icon}</div>
@@ -17,7 +17,7 @@ const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 
                 <div className="flex items-baseline gap-2">
                     <p className={`text-2xl font-bold ${valueColor}`}>{value}</p>
                 </div>
-                 {subtext && <div className="text-xs font-semibold">{subtext}</div>}
+                 {subtext && <p className="text-xs font-semibold text-primary-500 dark:text-darkPrimary-500">{subtext}</p>}
             </div>
         </div>
     </div>
@@ -145,12 +145,7 @@ export default function TokenDetail() {
             </header>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <StatCard 
-                    title={t('pricePerToken')} 
-                    value={isPriceAvailable ? `$${priceString}`: 'N/A'} 
-                    icon={<DollarSign />} 
-                    subtext={isPriceAvailable ? <span className={priceChangeColor}>{`${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)}% (24h)`}</span> : undefined}
-                />
+                <StatCard title={t('pricePerToken')} value={isPriceAvailable ? `$${priceString}`: 'N/A'} icon={<DollarSign />} subtext={`${priceChange.toFixed(2)}% (24h)`} />
                 <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<BarChart2 />} />
                 <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<TrendingUp />} />
             </div>
@@ -179,7 +174,6 @@ export default function TokenDetail() {
                 <div className="lg:col-span-1 space-y-8">
                      <InfoCard title={t('on_chain_security')} icon={<Shield />}>
                         <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
-                        <InfoRow label={t('circulating_supply')}>{token.circulatingSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
                         <InfoRow label={t('token_standard')}>{token.tokenStandard || 'N/A'}</InfoRow>
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
