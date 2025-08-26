@@ -130,48 +130,46 @@ export default function Contact() {
                 </div>
             </section>
 
-            {isAdmin && (
-                <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d-lg">
-                    <h2 className="text-3xl font-bold text-center mb-8">{t('contact_form_title')}</h2>
-                    {status === 'success' ? (
-                        <div className="text-center p-8 bg-green-500/10 dark:bg-green-500/20 rounded-lg animate-fade-in-up">
-                            <CheckCircle className="mx-auto w-16 h-16 text-green-500 mb-4" />
-                            <h3 className="text-2xl font-bold text-green-700 dark:text-green-300">{t('contact_success_title')}</h3>
-                            <p className="text-primary-700 dark:text-darkPrimary-300 mt-2">{t('contact_success_message')}</p>
+            <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d-lg">
+                <h2 className="text-3xl font-bold text-center mb-8">{t('contact_form_title')}</h2>
+                {status === 'success' ? (
+                    <div className="text-center p-8 bg-green-500/10 dark:bg-green-500/20 rounded-lg animate-fade-in-up">
+                        <CheckCircle className="mx-auto w-16 h-16 text-green-500 mb-4" />
+                        <h3 className="text-2xl font-bold text-green-700 dark:text-green-300">{t('contact_success_title')}</h3>
+                        <p className="text-primary-700 dark:text-darkPrimary-300 mt-2">{t('contact_success_message')}</p>
+                    </div>
+                ) : (
+                    <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
+                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400 -mb-2">{t('contact_required_fields')}</p>
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_name')} <span className="text-red-500">*</span></label>
+                            <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500" />
                         </div>
-                    ) : (
-                        <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
-                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400 -mb-2">{t('contact_required_fields')}</p>
-                            <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_name')} <span className="text-red-500">*</span></label>
-                                <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500" />
-                            </div>
-                            <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_email')} <span className="text-red-500">*</span></label>
-                                <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500" />
-                            </div>
-                             <div>
-                                <label htmlFor="reason" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_reason')} <span className="text-red-500">*</span></label>
-                                <select id="reason" value={reason} onChange={e => setReason(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500">
-                                    {reasonOptions.map(opt => <option key={opt.key} value={opt.key}>{t(opt.labelKey)}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="message" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_message')} <span className="text-red-500">*</span></label>
-                                <textarea id="message" value={message} onChange={e => setMessage(e.target.value)} required rows={5} className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500"></textarea>
-                            </div>
-                            {status === 'error' && (
-                                <p className="text-red-500 text-sm text-center">{t('contact_error_message')}</p>
-                            )}
-                            <div>
-                                <button type="submit" disabled={status === 'loading'} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-accent-950 bg-accent-400 hover:bg-accent-500 dark:text-darkPrimary-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 disabled:opacity-50 disabled:cursor-not-allowed">
-                                    {status === 'loading' ? <><Loader2 className="animate-spin mr-2" /> {t('contact_sending')}</> : t('contact_send_message')}
-                                </button>
-                            </div>
-                        </form>
-                    )}
-                </section>
-            )}
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_email')} <span className="text-red-500">*</span></label>
+                            <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500" />
+                        </div>
+                         <div>
+                            <label htmlFor="reason" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_reason')} <span className="text-red-500">*</span></label>
+                            <select id="reason" value={reason} onChange={e => setReason(e.target.value)} required className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500">
+                                {reasonOptions.map(opt => <option key={opt.key} value={opt.key}>{t(opt.labelKey)}</option>)}
+                            </select>
+                        </div>
+                        <div>
+                            <label htmlFor="message" className="block text-sm font-medium text-primary-700 dark:text-darkPrimary-300">{t('contact_form_message')} <span className="text-red-500">*</span></label>
+                            <textarea id="message" value={message} onChange={e => setMessage(e.target.value)} required rows={5} className="mt-1 block w-full px-3 py-2 bg-primary-100 dark:bg-darkPrimary-700 border border-primary-300 dark:border-darkPrimary-600 rounded-md shadow-sm focus:outline-none focus:ring-accent-500 focus:border-accent-500"></textarea>
+                        </div>
+                        {status === 'error' && (
+                            <p className="text-red-500 text-sm text-center">{t('contact_error_message')}</p>
+                        )}
+                        <div>
+                            <button type="submit" disabled={status === 'loading'} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-bold text-accent-950 bg-accent-400 hover:bg-accent-500 dark:text-darkPrimary-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                                {status === 'loading' ? <><Loader2 className="animate-spin mr-2" /> {t('contact_sending')}</> : t('contact_send_message')}
+                            </button>
+                        </div>
+                    </form>
+                )}
+            </section>
             
             <section>
                 <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-6 rounded-lg shadow-md flex items-start gap-4 border border-primary-200 dark:border-darkPrimary-700">
