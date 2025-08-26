@@ -1,4 +1,3 @@
-
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
@@ -12,7 +11,11 @@ export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenan
 // Use environment variable for the QuickNode API key
 const QUICKNODE_API_KEY = process.env.QUICKNODE_API_KEY;
 
+// IMPORTANT: The QUICKNODE_API_KEY environment variable MUST be set in your deployment environment (e.g., Vercel).
+// If it is not set, the URLs below will be invalid and the application will fail to connect to the Solana network,
+// which may result in a blank or non-functional website.
 export const QUICKNODE_RPC_URL = `https://evocative-falling-frost.solana-mainnet.quiknode.pro/${QUICKNODE_API_KEY}/`;
+  
 export const QUICKNODE_WSS_URL = `wss://evocative-falling-frost.solana-mainnet.quiknode.pro/${QUICKNODE_API_KEY}/`;
 
 
