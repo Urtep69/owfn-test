@@ -1,4 +1,5 @@
 
+
 export const en = {
     // Navigation
     home: `Home`,
@@ -19,11 +20,15 @@ export const en = {
     governance: `Governance`,
     maintenance_mode: `Maintenance Mode`,
     contact: `Contact`,
+    news: `News`,
+    community_polls: `Community Polls`,
+    impact_journal: `Impact Journal`,
 
     // Sidebar Groups
     sidebar_explore: `Explore`,
     sidebar_finance: `Finance`,
     sidebar_engage: `Engage`,
+    sidebar_impact: `Impact`,
 
     // General
     connect_wallet: `Connect Wallet`,
@@ -40,6 +45,9 @@ export const en = {
     connect_wallet_first: `Please connect your wallet first.`,
     yes: `Yes`,
     no: `No`,
+    read_more: `Read More`,
+    by: `By`,
+    all_categories: `All Categories`,
 
     // Time Units
     time_days: `Days`,
@@ -199,9 +207,13 @@ export const en = {
     badge_diverse_donor_desc: `Awarded for donating to projects in 3 different categories.`,
     asset: `Asset`,
     value_usd: `Value (USD)`,
+    my_favorite_projects: `My Favorite Projects`,
+    my_favorite_articles: `My Favorite Articles`,
+    no_favorite_projects: `You haven't favorited any projects yet.`,
+    no_favorite_articles: `You haven't favorited any articles yet.`,
 
-    // Impact Portal
-    social_cases: `Social Cases`,
+    // Impact Portal & News
+    social_projects: `Social Projects`,
     social_cases_desc: `Explore and support the social impact cases funded by the OWFN community.`,
     category: `Category`,
     goal: `Goal`,
@@ -235,6 +247,26 @@ export const en = {
     case_update_1: `Materials have arrived on site. Construction is set to begin next week!`,
     case_update_2: `Architectural plans have been finalized and approved by local authorities.`,
     case_update_3: `Project funding has officially begun. We are grateful for the first wave of support from the OWFN community.`,
+    filter_status_all: `All Statuses`,
+    filter_status_ongoing: `Ongoing`,
+    filter_status_future: `Future`,
+    filter_status_completed: `Completed`,
+    favorite: `Favorite`,
+    favorited: `Favorited`,
+    add_to_favorites: `Add to favorites`,
+    remove_from_favorites: `Remove from favorites`,
+    impact_journal_subtitle: `Stay informed with the latest news, updates, and stories from the OWFN ecosystem.`,
+    article_not_found: `Article not found.`,
+    back_to_all_articles: `Back to all articles`,
+    category_owfn_updates: `OWFN Updates`,
+    category_impact_stories: `Impact Stories`,
+    category_crypto_news: `Crypto News`,
+    
+    // Community Polls
+    community_polls_subtitle: `Your voice matters. Participate in community polls to help shape the future of OWFN.`,
+    poll_ended: `Poll Ended`,
+    connect_wallet_to_vote: `Connect your wallet to vote.`,
+    connect_wallet_to_vote_desc: `Only connected wallets can participate in community polls.`,
     
     // Partnerships Page
     partnerships_title: `Partnerships & Future Collaborations`,
@@ -329,6 +361,8 @@ export const en = {
     translation_error_alert: `An error occurred during translation. The case was not created. Please try again.`,
     invalid_amount_generic: `Please enter a valid amount.`,
     vote_success_alert: `Your vote has been successfully cast!`,
+    vote_thank_you: `Thank you for voting!`,
+    you_have_voted: `You have already voted in this poll.`,
 
     // Footer
     footer_copyright: `© {year} Official World Family Network. All rights reserved.`,

@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2, Star, BookOpen } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { ImpactBadge, ImpactNFT } from '../types.ts';
+import type { ImpactBadge, ImpactNFT, Article, SocialCase } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
 import { formatNumber } from '../lib/utils.ts';
@@ -24,8 +24,32 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
     </div>
 );
 
+const FavoriteItemCard = ({ item }: { item: Article | SocialCase }) => {
+    const { t, currentLanguage } = useAppContext();
+    const isArticle = 'author' in item;
+    
+    const title = item.title[currentLanguage.code] || item.title['en'];
+    const summary = 'summary' in item ? (item.summary[currentLanguage.code] || item.summary['en']) : (item.description[currentLanguage.code] || item.description['en']);
+    const link = isArticle ? `/news/article/${item.id}` : `/impact/case/${item.id}`;
+
+    return (
+        <Link href={link}>
+            <a className="block bg-primary-50 dark:bg-darkPrimary-700/50 p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-all duration-200 group">
+                <div className="flex items-start space-x-4">
+                    <img src={item.imageUrl} alt={title} className="w-20 h-20 rounded-md object-cover flex-shrink-0" />
+                    <div>
+                        <h4 className="font-bold text-primary-800 dark:text-darkPrimary-100 group-hover:text-accent-600 dark:group-hover:text-darkAccent-400 transition-colors">{title}</h4>
+                        <p className="text-xs text-primary-600 dark:text-darkPrimary-400 mt-1 line-clamp-2">{summary}</p>
+                    </div>
+                </div>
+            </a>
+        </Link>
+    );
+};
+
+
 export default function Profile() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana, setWalletModalOpen, articles, socialCases, articleFavorites, projectFavorites } = useAppContext();
     const { connected, address, userTokens, loading, userStats } = solana;
     
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
@@ -36,6 +60,14 @@ export default function Profile() {
         }
         return userTokens.reduce((sum, token) => sum + token.usdValue, 0);
     }, [userTokens]);
+
+    const favoriteArticles = useMemo(() => {
+        return articles.filter(article => articleFavorites.isFavorite(article.id));
+    }, [articles, articleFavorites]);
+
+    const favoriteProjects = useMemo(() => {
+        return socialCases.filter(project => projectFavorites.isFavorite(project.id));
+    }, [socialCases, projectFavorites]);
 
     if (!connected) {
         return (
@@ -126,6 +158,29 @@ export default function Profile() {
                         <p>{t('profile_no_tokens')}</p>
                     </div>
                 )}
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+                 <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h2 className="text-2xl font-bold mb-4 flex items-center gap-3"><Star className="text-accent-500 dark:text-darkAccent-400"/>{t('my_favorite_projects')}</h2>
+                     {favoriteProjects.length > 0 ? (
+                        <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                           {favoriteProjects.map(item => <FavoriteItemCard key={item.id} item={item} />)}
+                        </div>
+                     ) : (
+                        <p className="text-primary-600 dark:text-darkPrimary-400 text-center py-4">{t('no_favorite_projects')}</p>
+                     )}
+                </div>
+                 <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h2 className="text-2xl font-bold mb-4 flex items-center gap-3"><BookOpen className="text-accent-500 dark:text-darkAccent-400"/>{t('my_favorite_articles')}</h2>
+                     {favoriteArticles.length > 0 ? (
+                        <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                           {favoriteArticles.map(item => <FavoriteItemCard key={item.id} item={item} />)}
+                        </div>
+                     ) : (
+                        <p className="text-primary-600 dark:text-darkPrimary-400 text-center py-4">{t('no_favorite_articles')}</p>
+                     )}
+                </div>
             </div>
             
             <ComingSoonWrapper>

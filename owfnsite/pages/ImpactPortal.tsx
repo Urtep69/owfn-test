@@ -1,3 +1,5 @@
+
+
 import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -45,6 +47,7 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
                 imageUrl: imageUrl || `https://picsum.photos/seed/${Date.now()}/400/300`,
                 goal: parseFloat(goal),
                 donated: 0,
+                status: 'future',
             };
             
             languagesToTranslate.forEach((lang, index) => {

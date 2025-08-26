@@ -1,4 +1,5 @@
 
+
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -19,11 +20,15 @@ export const ro = {
     governance: `Guvernanță`,
     maintenance_mode: `Mod Mentenanță`,
     contact: `Contact`,
+    news: `Știri`,
+    community_polls: `Sondaje Comunitare`,
+    impact_journal: `Jurnal de Impact`,
 
     // Sidebar Groups
     sidebar_explore: `Explorare`,
     sidebar_finance: `Finanțe`,
     sidebar_engage: `Interacțiune`,
+    sidebar_impact: `Impact`,
 
     // General
     connect_wallet: `Conectare Portofel`,
@@ -40,6 +45,9 @@ export const ro = {
     connect_wallet_first: `Vă rugăm să vă conectați mai întâi portofelul.`,
     yes: `Da`,
     no: `Nu`,
+    read_more: `Citește mai mult`,
+    by: `De`,
+    all_categories: `Toate Categoriile`,
 
     // Time Units
     time_days: `Zile`,
@@ -199,9 +207,13 @@ export const ro = {
     badge_diverse_donor_desc: `Acordat pentru donații la proiecte din 3 categorii diferite.`,
     asset: `Activ`,
     value_usd: `Valoare (USD)`,
+    my_favorite_projects: `Proiectele Mele Favorite`,
+    my_favorite_articles: `Articolele Mele Favorite`,
+    no_favorite_projects: `Încă nu ai adăugat niciun proiect la favorite.`,
+    no_favorite_articles: `Încă nu ai adăugat niciun articol la favorite.`,
 
-    // Impact Portal
-    social_cases: `Cazuri Sociale`,
+    // Impact Portal & News
+    social_projects: `Proiecte Sociale`,
     social_cases_desc: `Explorează și susține cazurile de impact social finanțate de comunitatea OWFN.`,
     category: `Categorie`,
     goal: `Obiectiv`,
@@ -235,6 +247,26 @@ export const ro = {
     case_update_1: `Materialele au sosit la fața locului. Construcția va începe săptămâna viitoare!`,
     case_update_2: `Planurile arhitecturale au fost finalizate și aprobate de autoritățile locale.`,
     case_update_3: `Finanțarea proiectului a început oficial. Suntem recunoscători pentru primul val de sprijin din partea comunității OWFN.`,
+    filter_status_all: `Toate Statusurile`,
+    filter_status_ongoing: `În Desfășurare`,
+    filter_status_future: `Viitoare`,
+    filter_status_completed: `Finalizate`,
+    favorite: `Favorit`,
+    favorited: `Salvat`,
+    add_to_favorites: `Adaugă la favorite`,
+    remove_from_favorites: `Șterge de la favorite`,
+    impact_journal_subtitle: `Rămâneți informat cu cele mai recente știri, actualizări și povești din ecosistemul OWFN.`,
+    article_not_found: `Articol negăsit.`,
+    back_to_all_articles: `Înapoi la toate articolele`,
+    category_owfn_updates: `Actualizări OWFN`,
+    category_impact_stories: `Povești de Impact`,
+    category_crypto_news: `Știri Crypto`,
+
+    // Community Polls
+    community_polls_subtitle: `Vocea ta contează. Participă la sondajele comunitare pentru a ajuta la modelarea viitorului OWFN.`,
+    poll_ended: `Sondaj Încheiat`,
+    connect_wallet_to_vote: `Conectează-ți portofelul pentru a vota.`,
+    connect_wallet_to_vote_desc: `Doar portofelele conectate pot participa la sondajele comunitare.`,
     
     // Partnerships Page
     partnerships_title: `Parteneriate și Colaborări Viitoare`,
@@ -329,6 +361,8 @@ export const ro = {
     translation_error_alert: `A apărut o eroare în timpul traducerii. Cazul nu a fost creat. Vă rugăm să încercați din nou.`,
     invalid_amount_generic: `Vă rugăm să introduceți o sumă validă.`,
     vote_success_alert: `Votul dumneavoastră a fost înregistrat cu succes!`,
+    vote_thank_you: `Vă mulțumim pentru vot!`,
+    you_have_voted: `Ați votat deja la acest sondaj.`,
 
     // Footer
     footer_copyright: `© {year} Official World Family Network. Toate drepturile rezervate.`,

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { CaseCard } from '../components/CaseCard.tsx';
 import { ArrowLeft, HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
+import type { SocialCase } from '../types.ts';
 
 const categoryDetails: { [key: string]: { icon: React.ReactNode, titleKey: string, descKey: string } } = {
     'Health': {
@@ -22,18 +23,28 @@ const categoryDetails: { [key: string]: { icon: React.ReactNode, titleKey: strin
     }
 };
 
+type StatusFilter = 'all' | SocialCase['status'];
+
 export default function ImpactCategory() {
     const { t, socialCases } = useAppContext();
     const params = useParams();
-    // Normalize category name from URL to match data (e.g., 'basic-needs' -> 'Basic Needs')
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+    
     const categoryParam = params['category'];
     const categoryName = categoryParam
         ? categoryParam.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
         : '';
         
-    const filteredCases = socialCases.filter(c => c.category === categoryName);
     const details = categoryDetails[categoryName];
-    
+
+    const filteredCases = useMemo(() => {
+        return socialCases.filter(c => {
+            const isInCategory = c.category === categoryName;
+            const isInStatus = statusFilter === 'all' || c.status === statusFilter;
+            return isInCategory && isInStatus;
+        });
+    }, [socialCases, categoryName, statusFilter]);
+
     if (!details) {
         return (
             <div className="text-center py-10 animate-fade-in-up">
@@ -42,6 +53,13 @@ export default function ImpactCategory() {
             </div>
         );
     }
+    
+    const filterOptions: { key: StatusFilter, nameKey: string }[] = [
+        { key: 'all', nameKey: 'filter_status_all' },
+        { key: 'ongoing', nameKey: 'filter_status_ongoing' },
+        { key: 'future', nameKey: 'filter_status_future' },
+        { key: 'completed', nameKey: 'filter_status_completed' },
+    ];
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -56,6 +74,22 @@ export default function ImpactCategory() {
                 </p>
             </div>
             
+            <div className="bg-white/50 dark:bg-darkPrimary-800/50 p-4 rounded-lg shadow-inner-3d flex flex-wrap items-center justify-center gap-3">
+                 {filterOptions.map(opt => (
+                    <button
+                        key={opt.key}
+                        onClick={() => setStatusFilter(opt.key)}
+                        className={`px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200 ${
+                            statusFilter === opt.key
+                                ? 'bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 shadow-md'
+                                : 'bg-primary-100 text-primary-700 hover:bg-primary-200 dark:bg-darkPrimary-700 dark:text-darkPrimary-300 dark:hover:bg-darkPrimary-600'
+                        }`}
+                    >
+                        {t(opt.nameKey)}
+                    </button>
+                ))}
+            </div>
+
             {filteredCases.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredCases.map(c => (

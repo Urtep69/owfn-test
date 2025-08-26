@@ -1,10 +1,11 @@
 
+
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
     Home, Info, FileText, Map, Handshake, HelpCircle, Mail,
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
-    Heart, TrendingUp, Lock, Award, User, Vote, Shield
+    Heart, TrendingUp, Lock, Award, User, Vote, Shield, BookCopy, BarChartHorizontal
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
@@ -58,8 +59,6 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 { to: '/about', label: t('about'), icon: <Info size={20} /> },
                 { to: '/whitepaper', label: t('whitepaper'), icon: <FileText size={20} /> },
                 { to: '/roadmap', label: t('roadmap'), icon: <Map size={20} /> },
-                { to: '/partnerships', label: t('partnerships'), icon: <Handshake size={20} /> },
-                { to: '/faq', label: t('faq'), icon: <HelpCircle size={20} /> },
             ]
         },
         {
@@ -72,13 +71,22 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             ]
         },
         {
+            title: t('sidebar_impact'),
+            links: [
+                 { to: '/impact', label: t('social_projects'), icon: <Heart size={20} /> },
+                 { to: '/news', label: t('impact_journal'), icon: <BookCopy size={20} /> },
+            ]
+        },
+        {
             title: t('sidebar_engage'),
             links: [
                 { to: '/staking', label: t('staking'), icon: <TrendingUp size={20} /> },
                 { to: '/vesting', label: t('vesting'), icon: <Lock size={20} /> },
                 { to: '/airdrop', label: t('airdrop'), icon: <Award size={20} /> },
-                { to: '/impact', label: t('impact_portal'), icon: <Heart size={20} /> },
                 { to: '/governance', label: t('governance'), icon: <Vote size={20} /> },
+                { to: '/polls', label: t('community_polls'), icon: <BarChartHorizontal size={20} /> },
+                { to: '/partnerships', label: t('partnerships'), icon: <Handshake size={20} /> },
+                { to: '/faq', label: t('faq'), icon: <HelpCircle size={20} /> },
                 { to: '/contact', label: t('contact'), icon: <Mail size={20} /> },
             ]
         }

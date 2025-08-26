@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { ProgressBar } from '../components/ProgressBar.tsx';
-import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle, Star } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 
@@ -20,7 +20,7 @@ const mockUpdates = [
 ];
 
 export default function ImpactCaseDetail() {
-    const { t, solana, currentLanguage, socialCases, setWalletModalOpen } = useAppContext();
+    const { t, solana, currentLanguage, socialCases, setWalletModalOpen, projectFavorites } = useAppContext();
     const params = useParams();
     const id = params?.['id'];
     const socialCase = socialCases.find(c => c.id === id);
@@ -56,6 +56,9 @@ export default function ImpactCaseDetail() {
             </div>
         );
     }
+
+    const { isFavorite, toggleFavorite } = projectFavorites;
+    const isProjectFavorite = isFavorite(socialCase.id);
     
     const title = socialCase.title[currentLanguage.code] || socialCase.title['en'];
     const description = socialCase.description[currentLanguage.code] || socialCase.description['en'];
@@ -97,9 +100,19 @@ export default function ImpactCaseDetail() {
 
     return (
         <div className="animate-fade-in-up space-y-8">
-            <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
-                <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
-            </Link>
+            <div className="flex justify-between items-center">
+                <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
+                    <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
+                </Link>
+                <button 
+                    onClick={() => toggleFavorite(socialCase.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 border-2 ${isProjectFavorite ? 'bg-amber-400/20 border-amber-500 text-amber-600 dark:text-amber-400' : 'bg-primary-100 dark:bg-darkPrimary-700 border-transparent hover:border-amber-400'}`}
+                    aria-label={t(isProjectFavorite ? 'remove_from_favorites' : 'add_to_favorites')}
+                >
+                    <Star size={16} className={`${isProjectFavorite ? 'fill-current' : ''}`} />
+                    <span>{t(isProjectFavorite ? 'favorited' : 'favorite')}</span>
+                </button>
+            </div>
             <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden">
                 <img src={socialCase.imageUrl} alt={title} className="w-full h-64 md:h-96 object-cover" />
                 <div className="p-6 md:p-10">
