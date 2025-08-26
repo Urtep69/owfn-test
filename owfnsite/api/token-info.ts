@@ -97,22 +97,28 @@ export default async function handler(req: any, res: any) {
             mintAuthority,
             freezeAuthority,
             updateAuthority,
-            tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
+            tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : (asset.interface || 'N/A')),
         };
 
         // --- CoinGecko Data Processing ---
         let marketData: Partial<TokenDetails> = { pricePerToken: 0, marketCap: 0, volume24h: 0, price24hChange: 0, fdv: 0 };
         if (coingeckoResponse.ok) {
-            const coingeckoJson = await coingeckoResponse.json();
-            const cgData = coingeckoJson[mintAddress.toLowerCase()];
-            if (cgData) {
-                marketData = {
-                    pricePerToken: cgData.usd || 0,
-                    marketCap: cgData.usd_market_cap || 0,
-                    volume24h: cgData.usd_24h_vol || 0,
-                    price24hChange: cgData.usd_24h_change || 0,
-                    fdv: calculateMarketCap(cgData.usd || 0, supply),
-                };
+            try {
+                const coingeckoJson = await coingeckoResponse.json();
+                if (coingeckoJson && typeof coingeckoJson === 'object') {
+                    const cgData = coingeckoJson[mintAddress.toLowerCase()];
+                    if (cgData) {
+                        marketData = {
+                            pricePerToken: cgData.usd || 0,
+                            marketCap: cgData.usd_market_cap || 0,
+                            volume24h: cgData.usd_24h_vol || 0,
+                            price24hChange: cgData.usd_24h_change || 0,
+                            fdv: calculateMarketCap(cgData.usd || 0, supply),
+                        };
+                    }
+                }
+            } catch (e) {
+                console.warn(`CoinGecko response was not valid JSON for ${mintAddress}. Market data will be incomplete.`);
             }
         } else {
              console.warn(`CoinGecko API call failed for ${mintAddress}. Market data will be incomplete.`);
