@@ -73,12 +73,15 @@ export default function TokenDetail() {
 
                 if (!response.ok) {
                     let errorMsg = `Error: ${response.status} ${response.statusText}`;
+                    // Safely read the response body only ONCE.
+                    const errorText = await response.text();
                     try {
-                        const errorData = await response.json();
+                        // Attempt to parse it as JSON.
+                        const errorData = JSON.parse(errorText);
                         errorMsg = errorData.error || errorMsg;
                     } catch (e) {
-                         const errorText = await response.text();
-                         errorMsg = errorText.substring(0, 200) || errorMsg;
+                        // If it's not JSON, use the raw text.
+                        errorMsg = errorText.substring(0, 200) || errorMsg;
                     }
                     throw new Error(errorMsg);
                 }
