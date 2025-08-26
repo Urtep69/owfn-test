@@ -95,8 +95,29 @@ ${message}
             },
         });
         
-        const jsonStr = response.text.trim();
-        const emailContent = JSON.parse(jsonStr);
+        let emailContent;
+        try {
+            const jsonStr = response.text.trim();
+            emailContent = JSON.parse(jsonStr);
+        } catch(e) {
+            console.error("Gemini did not return valid JSON.", e);
+            console.error("Gemini response text:", response.text);
+            // Fallback to a simple email if AI processing fails
+            emailContent = {
+                subject: `[OWFN Contact] ${reasonForPrompt} from ${name}`,
+                htmlBody: `
+                    <h1>New Contact Form Submission (AI Processing Failed)</h1>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Reason:</strong> ${reasonForPrompt}</p>
+                    <p><strong>Submission Time (UTC):</strong> ${submissionDate}</p>
+                    <p><strong>Sender Country:</strong> ${country}</p>
+                    <hr>
+                    <h2>Original Message</h2>
+                    <p style="white-space: pre-wrap;">${message}</p>
+                `
+            };
+        }
 
         // Step 2: Send the formatted email using Resend
         const sendEmailResponse = await fetch('https://api.resend.com/emails', {
@@ -106,7 +127,7 @@ ${message}
                 'Authorization': `Bearer ${resendApiKey}`
             },
             body: JSON.stringify({
-                from: 'Contact Form OWFN <contact@owfn.org>',
+                from: 'Contact Form OWFN <onboarding@resend.dev>',
                 to: recipientEmail,
                 subject: emailContent.subject,
                 html: emailContent.htmlBody,
