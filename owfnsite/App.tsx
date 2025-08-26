@@ -5,10 +5,6 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
-import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack';
-import { CoinbaseWalletAdapter } from '@solana/wallet-adapter-coinbase';
-import { GlowWalletAdapter } from '@solana/wallet-adapter-glow';
-import { LedgerWalletAdapter } from '@solana/wallet-adapter-ledger';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './constants.ts';
@@ -71,7 +67,11 @@ const AppContent = () => {
             </ComingSoonWrapper>
           </Route>
           <Route path="/donations"><Donations /></Route>
-          <Route path="/dashboard/token/:mint"><TokenDetail /></Route>
+          <Route path="/dashboard/token/:mint">
+            <ComingSoonWrapper>
+              <TokenDetail />
+            </ComingSoonWrapper>
+          </Route>
           <Route path="/dashboard"><Dashboard /></Route>
           <Route path="/profile"><Profile /></Route>
           <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
@@ -102,10 +102,6 @@ const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     () => [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
-      new BackpackWalletAdapter(),
-      new CoinbaseWalletAdapter(),
-      new GlowWalletAdapter(),
-      new LedgerWalletAdapter(),
     ],
     []
   );
