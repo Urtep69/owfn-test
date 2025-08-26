@@ -68,7 +68,11 @@ export default async function handler(req: any, res: any) {
         const heliusJson = await heliusResponse.json();
         if (heliusJson.error) throw new Error(`Helius Error: ${heliusJson.error.message}`);
         const asset = heliusJson.result;
-        if (!asset) return res.status(404).json({ error: `No data found for mint: ${mintAddress}.` });
+        
+        // **CRITICAL FIX**: Ensure asset is a valid object before proceeding.
+        if (!asset || typeof asset !== 'object') {
+             return res.status(404).json({ error: `No valid data found for mint: ${mintAddress}.` });
+        }
 
         const tokenInfo = asset.token_info || {};
         const content = asset.content || {};

@@ -5,6 +5,10 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
+import { BackpackWalletAdapter } from '@solana/wallet-adapter-backpack';
+import { CoinbaseWalletAdapter } from '@solana/wallet-adapter-coinbase';
+import { GlowWalletAdapter } from '@solana/wallet-adapter-glow';
+import { LedgerWalletAdapter } from '@solana/wallet-adapter-ledger';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './constants.ts';
@@ -98,6 +102,10 @@ const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     () => [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
+      new BackpackWalletAdapter(),
+      new CoinbaseWalletAdapter(),
+      new GlowWalletAdapter(),
+      new LedgerWalletAdapter(),
     ],
     []
   );
