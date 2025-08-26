@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
+import { useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { AlertTriangle, Info } from 'lucide-react';
+import { MetaTags } from '../components/MetaTags.tsx';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -15,6 +17,8 @@ export default function Donations() {
     const { t, solana, setWalletModalOpen } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
+    const [location] = useLocation();
+    const pageUrl = `https://www.owfn.org${location}`;
 
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
 
@@ -69,6 +73,12 @@ export default function Donations() {
 
     return (
         <div className="animate-fade-in-up space-y-12">
+            <MetaTags
+                title="Make a Donation | Support the OWFN Mission"
+                description="Support our social impact initiatives by donating crypto directly to the Impact Treasury. Your contribution helps fund transparent, real-world aid in health, education, and basic needs."
+                keywords="donate crypto, crypto charity, support social causes, OWFN donations, humanitarian donation"
+                url={pageUrl}
+            />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('make_donation')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">

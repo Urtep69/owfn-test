@@ -1,14 +1,24 @@
 
 
 import React from 'react';
+import { useLocation } from 'wouter';
 import { Handshake, Building, CheckCircle } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
+import { MetaTags } from '../components/MetaTags.tsx';
 
 export default function Partnerships() {
     const { t } = useAppContext();
+    const [location] = useLocation();
+    const pageUrl = `https://www.owfn.org${location}`;
 
     return (
         <div className="animate-fade-in-up text-center py-8 max-w-4xl mx-auto space-y-12">
+            <MetaTags
+                title="Partnerships | Collaborate with OWFN"
+                description="Learn about our vision for future collaborations. OWFN is seeking strategic partners who share our commitment to creating real, transparent, and lasting social good."
+                keywords="OWFN partnerships, collaborate with crypto, social good partnership, NGO collaboration"
+                url={pageUrl}
+            />
             <div>
                 <Handshake className="mx-auto w-24 h-24 text-accent-500 dark:text-darkAccent-400 mb-6" />
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-300">{t('partnerships_title')}</h1>

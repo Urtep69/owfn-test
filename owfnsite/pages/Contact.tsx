@@ -1,10 +1,12 @@
 
+
 import React, { useState } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Info, Handshake, Newspaper, Wrench, Loader2, CheckCircle, HelpCircle, MessageSquareWarning, Twitter, Send } from 'lucide-react';
 import { DiscordIcon } from '../components/IconComponents.tsx';
 import { PROJECT_LINKS, ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import { MetaTags } from '../components/MetaTags.tsx';
 
 const ContactCard = ({ icon, title, email, description }: { icon: React.ReactNode, title: string, email: string, description: string }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform">
@@ -40,6 +42,8 @@ const SocialLinkCard = ({ icon, title, description, href }: { icon: React.ReactN
 export default function Contact() {
     const { t, solana } = useAppContext();
     const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
+    const [location] = useLocation();
+    const pageUrl = `https://www.owfn.org${location}`;
 
     const reasonOptions = [
         { key: 'general', labelKey: 'contact_reason_general' },
@@ -93,6 +97,12 @@ export default function Contact() {
 
     return (
         <div className="animate-fade-in-up space-y-12">
+            <MetaTags
+                title="Contact Us | Official World Family Network (OWFN)"
+                description="Get in touch with the OWFN team for partnerships, press inquiries, or technical support. Join our community on X, Telegram, and Discord to be part of the conversation."
+                keywords="contact OWFN, OWFN support, partnership inquiry, OWFN community, get in touch"
+                url={pageUrl}
+            />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('contact_title')}</h1>
                 <p className="mt-4 text-lg text-primary-600 dark:text-darkPrimary-400 max-w-2xl mx-auto">
