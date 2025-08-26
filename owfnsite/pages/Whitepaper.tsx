@@ -1,13 +1,11 @@
 
 import React from 'react';
-import { useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, ROADMAP_DATA, PROJECT_LINKS } from '../constants.ts';
 import { AllocationChart } from '../components/AllocationChart.tsx';
 import { OwfnIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { CheckCircle, Users, BarChart2, Map as MapIcon, Star, Link as LinkIcon, FileText } from 'lucide-react';
-import { MetaTags } from '../components/MetaTags.tsx';
 
 const Section = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
     <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-xl shadow-3d-lg mb-12">
@@ -32,17 +30,9 @@ const DetailItem = ({ label, value }: { label: string, value: React.ReactNode })
 
 export default function Whitepaper() {
     const { t } = useAppContext();
-    const [location] = useLocation();
-    const pageUrl = `https://www.owfn.org${location}`;
 
     return (
         <div className="animate-fade-in-up">
-            <MetaTags
-                title="OWFN Whitepaper | Official World Family Network"
-                description="Explore the official OWFN Whitepaper for a detailed overview of our project's mission, tokenomics, roadmap, and the technology powering our global movement for social good."
-                keywords="OWFN whitepaper, crypto whitepaper, blockchain project, tokenomics, roadmap, Solana project details"
-                url={pageUrl}
-            />
             <header className="text-center mb-16">
                 <FileText className="mx-auto w-20 h-20 text-accent-500 dark:text-darkAccent-500 mb-4" />
                 <h1 className="text-5xl font-extrabold text-accent-600 dark:text-darkAccent-400">{t('whitepaper_title')}</h1>
