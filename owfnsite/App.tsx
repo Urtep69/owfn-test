@@ -32,9 +32,6 @@ import Governance from './pages/Governance.tsx';
 import Maintenance from './pages/Maintenance.tsx';
 import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
-import News from './pages/News.tsx';
-import ArticleDetail from './pages/ArticleDetail.tsx';
-import CommunityPolls from './pages/CommunityPolls.tsx';
 
 const AppContent = () => {
   const { isMaintenanceActive, solana } = useAppContext();
@@ -70,19 +67,12 @@ const AppContent = () => {
             </ComingSoonWrapper>
           </Route>
           <Route path="/donations"><Donations /></Route>
-          <Route path="/dashboard/token/:mint">
-            <ComingSoonWrapper>
-              <TokenDetail />
-            </ComingSoonWrapper>
-          </Route>
+          <Route path="/dashboard/token/:mint"><TokenDetail /></Route>
           <Route path="/dashboard"><Dashboard /></Route>
           <Route path="/profile"><Profile /></Route>
           <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
           <Route path="/impact/category/:category"><ImpactCategory /></Route>
           <Route path="/impact"><ImpactPortal /></Route>
-          <Route path="/news/article/:id"><ArticleDetail /></Route>
-          <Route path="/news"><News /></Route>
-          <Route path="/polls"><CommunityPolls /></Route>
           <Route path="/partnerships"><Partnerships /></Route>
           <Route path="/faq"><FAQ /></Route>
           <Route path="/contact"><Contact /></Route>

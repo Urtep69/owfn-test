@@ -39,32 +39,7 @@ export interface SocialCase {
   goal: number;
   donated: number;
   details: Record<string, string>;
-  status: 'future' | 'ongoing' | 'completed';
 }
-
-export interface Article {
-  id: string;
-  title: Record<string, string>;
-  summary: Record<string, string>;
-  content: Record<string, string>;
-  imageUrl: string;
-  category: 'Crypto News' | 'OWFN Updates' | 'Impact Stories';
-  date: string; // ISO 8601 format
-  author: string;
-}
-
-export interface PollOption {
-  id: string;
-  text: Record<string, string>;
-}
-
-export interface Poll {
-  id: string;
-  question: Record<string, string>;
-  options: PollOption[];
-  endDate: Date;
-}
-
 
 export interface Language {
   code: string;

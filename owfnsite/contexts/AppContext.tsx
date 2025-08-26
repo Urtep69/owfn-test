@@ -3,11 +3,9 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, Article, Poll } from '../types.ts';
-import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, MOCK_ARTICLES, MOCK_POLLS } from '../constants.ts';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
+import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
-import useFavorites from '../hooks/useFavorites.ts';
-import { usePolls } from '../hooks/usePolls.ts';
 
 interface AppContextType {
   theme: Theme;
@@ -17,24 +15,13 @@ interface AppContextType {
   currentLanguage: Language;
   supportedLanguages: Language[];
   solana: ReturnType<typeof useSolana>;
-  
   socialCases: SocialCase[];
   addSocialCase: (newCase: SocialCase) => void;
-  
-  articles: Article[];
-  polls: Poll[];
-  
-  articleFavorites: ReturnType<typeof useFavorites>;
-  projectFavorites: ReturnType<typeof useFavorites>;
-  
-  pollController: ReturnType<typeof usePolls>;
-
   vestingSchedules: VestingSchedule[];
   addVestingSchedule: (schedule: VestingSchedule) => void;
   proposals: GovernanceProposal[];
   addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
-  
   isMaintenanceActive: boolean;
   setWalletModalOpen: (open: boolean) => void;
 }
@@ -48,13 +35,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { setVisible: setWalletModalOpen } = useWalletModal();
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
-  const [articles, setArticles] = useState<Article[]>(MOCK_ARTICLES);
-  const [polls, setPolls] = useState<Poll[]>(MOCK_POLLS);
-
-  const articleFavorites = useFavorites('owfn-article-favorites');
-  const projectFavorites = useFavorites('owfn-project-favorites');
-  const pollController = usePolls(MOCK_POLLS);
-
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
@@ -128,17 +108,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     currentLanguage,
     supportedLanguages,
     solana,
-    
     socialCases,
     addSocialCase,
-    
-    articles,
-    polls,
-    
-    articleFavorites,
-    projectFavorites,
-    pollController,
-
     vestingSchedules,
     addVestingSchedule,
     proposals,
