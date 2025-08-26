@@ -75,7 +75,14 @@ export default async function handler(req: any, res: any) {
         const metadata = content.metadata || {};
         const links = content.links || {};
         const decimals = tokenInfo.decimals ?? 9;
-        const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
+        
+        let supply: number;
+        try {
+            supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
+        } catch (e) {
+            console.warn(`Could not parse supply for mint ${mintAddress}. Raw value: '${tokenInfo.supply}'. Falling back to 0. Error:`, e);
+            supply = 0;
+        }
         
         const { mintAuthority, freezeAuthority, updateAuthority } = safeParseAuthorities(asset.authorities);
         
