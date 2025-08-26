@@ -30,7 +30,8 @@ export const MetaTags: React.FC<MetaTagsProps> = ({ title, description, keywords
         // Update document title
         document.title = title;
 
-        const imageUrl = 'https://i.ibb.co/L8yX5zv/owfn-social-preview.png'; // Use the new, larger image
+        // Use the absolute URL to the locally hosted image for reliability
+        const imageUrl = 'https://www.owfn.org/assets/owfn-social-preview.png';
         const siteName = 'Official World Family Network (OWFN)';
         const twitterSite = '@OWFN_Official';
 
@@ -43,8 +44,9 @@ export const MetaTags: React.FC<MetaTagsProps> = ({ title, description, keywords
         updateMetaTag('og:description', description);
         updateMetaTag('og:url', url);
         updateMetaTag('og:image', imageUrl);
-        updateMetaTag('og:image:width', '1200'); // Add image width
-        updateMetaTag('og:image:height', '630'); // Add image height
+        updateMetaTag('og:image:secure_url', imageUrl); // Good practice for HTTPS
+        updateMetaTag('og:image:width', '1200');
+        updateMetaTag('og:image:height', '630');
         updateMetaTag('og:type', 'website');
         updateMetaTag('og:site_name', siteName);
 
