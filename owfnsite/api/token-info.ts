@@ -9,6 +9,31 @@ function calculateMarketCap(price: number, supply: number): number {
     return price * supply;
 }
 
+const safeParseAuthorities = (authorities: any[] | undefined) => {
+    let mint: string | null = null;
+    let freeze: string | null = null;
+    let update: string | null = null;
+
+    if (!Array.isArray(authorities)) {
+        return { mintAuthority: null, freezeAuthority: null, updateAuthority: null };
+    }
+
+    const findAuthority = (scope: string): string | null => {
+        const authority = authorities.find((a: any) =>
+            a && typeof a === 'object' && Array.isArray(a.scopes) && a.scopes.includes(scope)
+        );
+        return authority?.address || null;
+    };
+
+    mint = findAuthority('mint');
+    freeze = findAuthority('freeze');
+    // A token can have 'update' (SPL) or 'metadata_update' (Metaplex). Check for both.
+    update = findAuthority('update') || findAuthority('metadata_update');
+    
+    return { mintAuthority: mint, freezeAuthority: freeze, updateAuthority: update };
+};
+
+
 export default async function handler(req: any, res: any) {
     const mintAddress = req.query?.mint;
 
@@ -52,19 +77,7 @@ export default async function handler(req: any, res: any) {
         const decimals = tokenInfo.decimals ?? 9;
         const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
         
-        let mintAuthority: string | null = null;
-        let freezeAuthority: string | null = null;
-        let updateAuthority: string | null = null;
-
-        if (Array.isArray(asset.authorities)) {
-            const findAuthority = (scope: string): string | null => {
-                const authority = asset.authorities.find((a: any) => a && Array.isArray(a.scopes) && a.scopes.includes(scope));
-                return authority ? authority.address : null;
-            };
-            mintAuthority = findAuthority('mint');
-            freezeAuthority = findAuthority('freeze');
-            updateAuthority = findAuthority('metadata_update');
-        }
+        const { mintAuthority, freezeAuthority, updateAuthority } = safeParseAuthorities(asset.authorities);
         
         const onChainData = {
             mintAddress: asset.id,
