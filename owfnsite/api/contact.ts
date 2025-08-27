@@ -26,7 +26,31 @@ export default async function handler(req: any, res: any) {
         }
 
         const submissionDate = new Date().toUTCString();
-        const country = req.headers['x-vercel-ip-country'] || 'N/A';
+        
+        // Enhanced location details from Vercel headers
+        const countryCode = req.headers['x-vercel-ip-country'] || 'N/A';
+        const city = req.headers['x-vercel-ip-city'] ? decodeURIComponent(req.headers['x-vercel-ip-city']) : 'N/A';
+        const region = req.headers['x-vercel-ip-country-region'] || 'N/A';
+        
+        let countryName = 'N/A';
+        if (countryCode !== 'N/A') {
+            try {
+                // Get the full country name in English from the country code
+                // FIX: The correct type for country codes is 'region'.
+                countryName = new Intl.DisplayNames(['en'], { type: 'region' }).of(countryCode) || countryCode;
+            } catch (e) {
+                console.warn(`Could not get country name for code: ${countryCode}`);
+                countryName = countryCode;
+            }
+        }
+        
+        const locationParts = [
+            countryCode !== 'N/A' ? countryCode : null,
+            city !== 'N/A' ? city : null,
+            countryName !== 'N/A' && countryName !== countryCode ? countryName : null,
+        ].filter(Boolean); // Filter out null values
+        
+        const senderLocation = locationParts.length > 0 ? locationParts.join(', ') : 'N/A';
         
         const emailRecipientMap: Record<string, string> = {
             general: 'info@owfn.org',
@@ -48,14 +72,14 @@ export default async function handler(req: any, res: any) {
         const recipientEmail = emailRecipientMap[reason as string] || 'info@owfn.org';
         const reasonForPrompt = reasonTextMap[reason as string] || 'Other';
         
-        // Step 1: Use Gemini to analyze, translate, and format the email content
+        // Step 1: Use Gemini to analyze, translate to ROMANIAN, and format the email content
         const ai = new GoogleGenAI({ apiKey: geminiApiKey });
         
         const prompt = `A user has submitted a contact form on the OWFN (Official World Family Network) website. Your task is to process this information and generate a structured email for an administrator.
 
 First, analyze the user's message provided below to detect its original language.
-Then, create a concise summary of the message IN ENGLISH.
-Finally, create a full translation of the message IN ENGLISH.
+Then, create a concise summary of the message IN ROMANIAN.
+Finally, create a full translation of the message IN ROMANIAN.
 
 Use this analysis to format a professional email subject and a well-structured HTML body.
 
@@ -64,7 +88,7 @@ Submission Details to include:
 - Sender Email: ${email}
 - Reason for Contact: ${reasonForPrompt}
 - Submission Time (UTC): ${submissionDate}
-- Sender Country: ${country}
+- Sender Location: ${senderLocation}
 - Detected Language: [The language you detected]
 
 User's Original Message:
@@ -86,7 +110,7 @@ ${message}
                         },
                         htmlBody: {
                             type: Type.STRING,
-                            description: "The full, formatted body of the email in HTML. It MUST contain the following sections in this exact order: 1. A styled 'Submission Details' block with all provided metadata including the detected language. 2. A section titled 'AI Summary (English)' with your concise summary. 3. A section titled 'AI Translation (English)' with your full translation. 4. A horizontal rule (<hr>). 5. The 'Original Message' section with the user's verbatim message."
+                            description: "The full, formatted body of the email in HTML. It MUST contain the following sections in this exact order: 1. A styled 'Submission Details' block with all provided metadata including the detected language. 2. A section titled 'AI Summary (Romanian)' with your concise summary. 3. A section titled 'AI Translation (Romanian)' with your full translation. 4. A horizontal rule (<hr>). 5. The 'Original Message' section with the user's verbatim message."
                         }
                     },
                     propertyOrdering: ["subject", "htmlBody"],
@@ -110,7 +134,7 @@ ${message}
                     <p><strong>Email:</strong> ${email}</p>
                     <p><strong>Reason:</strong> ${reasonForPrompt}</p>
                     <p><strong>Submission Time (UTC):</strong> ${submissionDate}</p>
-                    <p><strong>Sender Country:</strong> ${country}</p>
+                    <p><strong>Sender Location:</strong> ${senderLocation}</p>
                     <hr>
                     <h2>Original Message</h2>
                     <p style="white-space: pre-wrap;">${message}</p>
