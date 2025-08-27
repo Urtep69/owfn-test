@@ -40,13 +40,6 @@ export const tr = {
     connect_wallet_first: `Lütfen önce cüzdanınızı bağlayın.`,
     yes: `Evet`,
     no: `Hayır`,
-    authenticating: `Doğrulanıyor...`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `Resmi Dünya Aile Ağı (OWFN) ile kimlik doğrulamak için bu mesajı imzalayın.`,
-    siws_message_uri: `Alan Adı`,
-    siws_message_issued_at: `Yayınlanma Tarihi`,
-    siwS_message_no_cost: `Bu istek bir blok zinciri işlemi tetiklemeyecek ve herhangi bir gaz ücreti gerektirmeyecektir.`,
 
     // Time Units
     time_days: `Gün`,
@@ -116,9 +109,7 @@ export const tr = {
     presale_header_subtitle: `Resmi Dünya Aile Ağı - $OWFN`,
     presale_sold_progress: `{progress}% satıldı`,
     presale_buy_info: `Satın Al (Min: {min} SOL, Maks: {max} SOL)`,
-    presale_buy_info_no_min: `Satın Al (Maks: {max} SOL)`,
     buy: `Satın Al`,
-    owfn_base_amount: `OWFN Temel Miktarı`,
     presale_buying_owfn: `{amount} $OWFN satın alınıyor`,
     presale_estimate_tooltip: `Bu bir tahmindir. Nihai miktar değişebilir.`,
     presale_whitelist_finished: `Beyaz Liste Satışı Bitti:`,
@@ -142,7 +133,6 @@ export const tr = {
     presale_dyor_nfa_desc: `Kendi Araştırmanızı Yapın. Finansal Tavsiye Değildir.`,
     presale_footer_copyright: `© {year} Resmi Dünya Aile Ağı | Tüm hakları saklıdır.`,
     presale_amount_error: `Miktar {min} ile {max} SOL arasında olmalıdır.`,
-    presale_amount_error_no_min: `Miktar 0'dan büyük ve {max} SOL'den fazla olmamalıdır.`,
     live_presale_feed: `Canlı Ön Satış Akışı`,
     wallet: `Cüzdan`,
     sol_spent: `Harcanan SOL`,
@@ -168,8 +158,6 @@ export const tr = {
     select_token: `Token Seçin`,
     amount: `Miktar`,
     donations_form_title: `Bağış Formu`,
-    donations_stats_title: `Canlı Bağış İstatistikleri (Simüle Edilmiş)`,
-    donated: `Bağışlandı`,
     donation_success_alert: `{amount} {tokenSymbol} bağışınız için teşekkür ederiz.`,
     donation_no_token_balance: `Hiç {symbol} sahibi değilsiniz.`,
     
@@ -190,7 +178,6 @@ export const tr = {
     token_types: `Token Türleri`,
     profile_loading_tokens: `Tokenler yükleniyor...`,
     profile_connect_prompt: `Profilinizi ve token bakiyelerinizi görmek için cüzdanınızı bağlayın.`,
-    profile_sign_in_prompt: `Profilinizi görmek için cüzdanınızla bağlanın ve oturum açın.`,
     profile_no_tokens: `Bu cüzdanda token bulunamadı.`,
     impact_dashboard_title: `Etki Panelim`,
     my_impact_stats: `Etki İstatistiklerim`,
@@ -439,7 +426,6 @@ export const tr = {
     airdrop_eligible_message: `Cüzdanınız uygun! Yaklaşan dağıtımda {amount} OWFN tokeni alacaksınız.`,
     airdrop_not_eligible: `Uygun Değil`,
     airdrop_not_eligible_message: `Üzgünüz, bu cüzdan adresi mevcut airdrop için uygun değil. Gelecekteki fırsatlar için topluluğumuzda aktif olmaya devam edin!`,
-    airdrop_info_box_title: `Bu Airdrop Hakkında`,
     airdrop_info_box_desc: `Bu airdrop, erken destekçileri ve aktif topluluk üyelerini ödüllendirmek için tasarlanmıştır. Uygunluk, ön satışa katılım ve topluluk etkinliklerine katılım gibi faktörlere dayanmaktadır.`,
     
     // Governance
@@ -552,6 +538,5 @@ export const tr = {
     contact_social_telegram_channel_desc: `Önemli duyurular ve resmi haberler için abone olun.`,
     contact_social_telegram_group_title: `Telegram Grubu`,
     contact_social_telegram_group_desc: `Diğer üyelerle tartışmak ve etkileşimde bulunmak için topluluk grubumuza katılın.`,
-    contact_social_discord_title: `Discord Sunucusu`,
     contact_social_discord_desc: `Tartışmalar ve destek için aktif topluluğumuzun bir parçası olun.`,
 };

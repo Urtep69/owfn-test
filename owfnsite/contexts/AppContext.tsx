@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
@@ -23,7 +22,10 @@ interface AppContextType {
   addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
   isMaintenanceActive: boolean;
-  setWalletModalOpen: (open: boolean) => void;
+  isWalletModalOpen: boolean;
+  setWalletModalOpen: (isOpen: boolean) => void;
+  isWelcomeModalOpen: boolean;
+  setWelcomeModalOpen: (isOpen: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -32,7 +34,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [theme, toggleTheme] = useTheme();
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
   const solana = useSolana();
-  const { setVisible: setWalletModalOpen } = useWalletModal();
+  const [isWalletModalOpen, setWalletModalOpen] = useState(false);
+  const [isWelcomeModalOpen, setWelcomeModalOpen] = useState(false);
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
@@ -67,6 +70,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         });
     } catch (error) {
         console.error("Translation failed for proposal:", error);
+        // Fallback: use English text for all languages if translation fails
         languagesToTranslate.forEach(lang => {
             newTitleTranslations[lang.code] = proposalData.title;
             newDescriptionTranslations[lang.code] = proposalData.description;
@@ -87,9 +91,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [solana.address]);
   
   const voteOnProposal = useCallback((proposalId: string, vote: 'for' | 'against') => {
+    // This is a mock implementation until a real governance program is in place.
+    // The hook function will prevent this from being called until implemented.
     setProposals(prev => prev.map(p => {
         if (p.id === proposalId) {
-            const votePower = 1000000;
+            const votePower = 1000000; // Placeholder vote power
             return {
                 ...p,
                 votesFor: vote === 'for' ? p.votesFor + votePower : p.votesFor,
@@ -100,7 +106,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   }, []);
 
-  const value: AppContextType = {
+  const value = {
     theme,
     toggleTheme,
     t,
@@ -116,7 +122,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addProposal,
     voteOnProposal,
     isMaintenanceActive,
+    isWalletModalOpen,
     setWalletModalOpen,
+    isWelcomeModalOpen,
+    setWelcomeModalOpen,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

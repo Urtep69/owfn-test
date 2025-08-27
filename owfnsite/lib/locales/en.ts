@@ -73,6 +73,7 @@ export const en = {
     about_impact_education_desc: `Building and modernizing schools and kindergartens to provide quality education for future generations.`,
     about_impact_needs_title: `Basic Needs`,
     about_impact_needs_desc: `Providing food, shelter, and clothing for the homeless, and building dignified homes for the elderly.`,
+    about_owfn_collage_alt: `A collage representing OWFN's impact: helping hands, education, and community building.`,
     
     // Roadmap Page
     roadmap_title: `Roadmap to Global Impact`,
@@ -109,9 +110,7 @@ export const en = {
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Sold {progress}%`,
     presale_buy_info: `Buy (Min: {min} SOL, Max: {max} SOL)`,
-    presale_buy_info_no_min: `Buy (Max: {max} SOL)`,
     buy: `Buy`,
-    owfn_base_amount: `OWFN Base Amount`,
     presale_buying_owfn: `You're buying {amount} $OWFN`,
     presale_estimate_tooltip: `This is an estimate. Final amount may vary.`,
     presale_whitelist_finished: `Whitelist Sale Finished:`,
@@ -135,7 +134,6 @@ export const en = {
     presale_dyor_nfa_desc: `Do Your Own Research. Not Financial Advice.`,
     presale_footer_copyright: `© {year} Official World Family Network | All rights reserved.`,
     presale_amount_error: `Amount must be between {min} and {max} SOL.`,
-    presale_amount_error_no_min: `Amount must be greater than 0 and no more than {max} SOL.`,
     live_presale_feed: `Live Presale Feed`,
     wallet: `Wallet`,
     sol_spent: `SOL Spent`,
@@ -299,7 +297,6 @@ export const en = {
     faq_q18: 'Can I propose a social case or a cause to be funded by OWFN?',
     faq_a18: 'In the initial phase, projects are selected by our team based on strict criteria of impact and feasibility. As the project progresses, we will implement a governance system (DAO) that will allow community members to propose and vote on future initiatives, giving you a direct role in directing the funds.',
     faq_q19: 'Who is behind the OWFN project? Is the team anonymous?',
-    // FIX: Changed faq_a20 to faq_a19 to fix duplicate key error.
     faq_a19: 'Details about our team\'s vision and values are presented on the website. As we get closer to the public launch, we will provide more transparency regarding the key members and advisors who contribute to the project\'s success, while respecting their safety and privacy.',
     faq_q20: 'What security measures have you taken to protect the project\'s and investors\' funds?',
     faq_a20: 'Security is our top priority. We use multi-signature wallets for managing critical funds, which means no single transaction can be approved by one person. The token\'s smart contract will be audited by reputable security firms to identify and correct any potential vulnerabilities before launch.',
@@ -432,6 +429,8 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
+    airdrop_info_box_title: `About this Airdrop`,
+    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors such as presale participation and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -471,7 +470,7 @@ export const en = {
     // Coming Soon
     coming_soon_title: `Coming Soon`,
     coming_soon_desc: `This feature is currently under development. We are working hard to bring it to you soon. Thank you for your patience and support.`,
-    
+
     // Admin Presale
     presale_admin_title: `Presale Admin`,
     presale_admin_subtitle: `Monitor transactions and manage the post-presale token airdrop.`,
@@ -503,7 +502,7 @@ export const en = {
     airdrop_log: `Airdrop Log`,
 
     // Contact Page
-    contact_title: `Contact Us`,
+    contact_title: `Get in Touch`,
     contact_subtitle: `We'd love to hear from you. Choose the best way to connect with us below.`,
     contact_how_can_we_help: `How can we help?`,
     contact_general_inquiries: `General Inquiries`,
@@ -543,7 +542,14 @@ export const en = {
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
-    contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
-    send_direct_message: `Send a Direct Message`,
+
+    // Welcome Modal
+    welcome_modal_title: 'Be Part of the Change',
+    welcome_modal_subtitle: 'Build the Future with Us.',
+    welcome_modal_text: 'Welcome to the World Family Network! You are not just on a site, but at the beginning of a global movement. Every action here contributes to a real and transparent impact. Explore, connect, and help us build a better world.',
+    welcome_modal_button_presale: 'Join the Presale',
+    welcome_modal_button_whitepaper: 'Read the Whitepaper',
+    welcome_modal_button_impact: 'See Our Impact',
+    welcome_modal_button_explore: 'Explore the Site',
 };

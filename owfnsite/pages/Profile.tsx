@@ -6,7 +6,6 @@ import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { ImpactBadge, ImpactNFT } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
-import { formatNumber } from '../lib/utils.ts';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -27,7 +26,7 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
     const { connected, address, userTokens, loading, userStats } = solana;
-    
+
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
     const totalUsdValue = useMemo(() => {
@@ -109,7 +108,7 @@ export default function Profile() {
 
                                     {/* Column 2: Balance */}
                                     <div className="text-right font-mono">
-                                        <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
+                                        <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{token.balance.toLocaleString(undefined, {maximumFractionDigits: 4})}</p>
                                         <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
                                     </div>
 

@@ -90,7 +90,7 @@
             animation: {
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
               'slide-in': 'slideIn 0.5s ease-out forwards',
-              'glow': 'glow 1.5s ease-in-out infinite alternate',
+              'pulse-slow': 'pulseSlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               fadeInUp: {
@@ -101,10 +101,10 @@
                 '0%': { transform: 'translateX(100%)' },
                 '100%': { transform: 'translateX(0)' },
               },
-              glow: {
-                'from': { 'box-shadow': '0 0 5px -5px #fbbf24' },
-                'to': { 'box-shadow': '0 0 5px 5px #fbbf24' }
-              }
+              pulseSlow: {
+                '0%, 100%': { opacity: '0.2' },
+                '50%': { opacity: '0.4' },
+              },
             },
           },
         },
@@ -116,7 +116,6 @@
             font-size: 15px;
         }
     </style>
-    <link rel="stylesheet" href="https://esm.sh/@solana/wallet-adapter-react-ui@^0.9.39/styles.css" />
 <script type="importmap">
 {
   "imports": {

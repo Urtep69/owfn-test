@@ -40,13 +40,6 @@ export const ko = {
     connect_wallet_first: '먼저 지갑을 연결해주세요.',
     yes: '예',
     no: '아니요',
-    authenticating: `인증 중...`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `이 메시지에 서명하여 공식 세계 가족 네트워크(OWFN)로 인증하세요.`,
-    siws_message_uri: `도메인`,
-    siws_message_issued_at: `발행 시간`,
-    siwS_message_no_cost: `이 요청은 블록체인 거래를 발생시키지 않으며 가스 비용도 들지 않습니다.`,
     
     // Time Units
     time_days: '일',
@@ -116,9 +109,7 @@ export const ko = {
     presale_header_subtitle: `공식 세계 가족 네트워크 - $OWFN`,
     presale_sold_progress: `{progress}% 판매 완료`,
     presale_buy_info: `구매 (최소: {min} SOL, 최대: {max} SOL)`,
-    presale_buy_info_no_min: `구매 (최대: {max} SOL)`,
     buy: `구매`,
-    owfn_base_amount: `OWFN 기본 수량`,
     presale_buying_owfn: `{amount} $OWFN 구매 중`,
     presale_estimate_tooltip: `이것은 추정치이며 최종 금액은 달라질 수 있습니다.`,
     presale_whitelist_finished: `화이트리스트 판매 종료:`,
@@ -142,7 +133,6 @@ export const ko = {
     presale_dyor_nfa_desc: `스스로 조사하십시오. 재정적 조언이 아닙니다.`,
     presale_footer_copyright: `© {year} 공식 세계 가족 네트워크 | 모든 권리 보유.`,
     presale_amount_error: `금액은 {min}에서 {max} SOL 사이여야 합니다.`,
-    presale_amount_error_no_min: `금액은 0보다 크고 {max} SOL 이하여야 합니다.`,
     live_presale_feed: `실시간 프리세일 피드`,
     wallet: `지갑`,
     sol_spent: `사용한 SOL`,
@@ -168,8 +158,6 @@ export const ko = {
     select_token: `토큰 선택`,
     amount: `금액`,
     donations_form_title: `기부 양식`,
-    donations_stats_title: `실시간 기부 통계 (시뮬레이션)`,
-    donated: `기부됨`,
     donation_success_alert: `{amount} {tokenSymbol} 기부에 감사드립니다!`,
     donation_no_token_balance: `보유하고 있는 {symbol}이 없습니다.`,
     
@@ -190,7 +178,6 @@ export const ko = {
     token_types: `토큰 종류`,
     profile_loading_tokens: `토큰 로딩 중...`,
     profile_connect_prompt: `프로필과 토큰 잔액을 보려면 지갑을 연결하세요.`,
-    profile_sign_in_prompt: `프로필을 보려면 지갑으로 연결하고 로그인하세요.`,
     profile_no_tokens: `이 지갑에서 토큰을 찾을 수 없습니다.`,
     impact_dashboard_title: `내 임팩트 대시보드`,
     my_impact_stats: `내 임팩트 통계`,
@@ -542,6 +529,7 @@ export const ko = {
     contact_error_message: `오류가 발생했습니다. 나중에 다시 시도해주세요.`,
     contact_faq_title: `빠른 질문이 있으신가요?`,
     contact_faq_desc: `많은 답변은 이미 저희 FAQ 섹션에서 찾을 수 있습니다. 시간을 절약하고 지금 확인해보세요!`,
+    contact_faq_button: `FAQ 보기`,
     contact_required_fields: `별표(*)가 표시된 필드는 필수입니다.`,
     contact_disclaimer_title: `커뮤니케이션 정책에 대한 참고 사항`,
     contact_disclaimer_message: `저희 팀이 커뮤니티를 효과적으로 지원하고 프로젝트를 발전시킬 수 있도록, 공식 세계 가족 네트워크와 직접 관련된 문의에 우선순위를 둡니다. 주제와 관련 없거나, 스팸이거나, 원치 않는 메시지는 답변을 받지 못할 수 있습니다. 이해해 주시고 저희가 사명에 집중할 수 있도록 도와주셔서 감사합니다.`,
@@ -551,6 +539,5 @@ export const ko = {
     contact_social_telegram_channel_desc: `중요한 공지사항과 공식 뉴스를 구독하세요.`,
     contact_social_telegram_group_title: `텔레그램 그룹`,
     contact_social_telegram_group_desc: `다른 회원들과 토론하고 교류하려면 저희 커뮤니티 그룹에 가입하세요.`,
-    contact_social_discord_title: `디스코드 서버`,
     contact_social_discord_desc: `토론과 지원을 위해 활발한 커뮤니티의 일원이 되세요.`,
 };
