@@ -546,4 +546,5 @@ export const ro = {
     contact_social_telegram_group_desc: `Alăturați-vă grupului nostru comunitar pentru a discuta și interacționa cu alți membri.`,
     contact_social_discord_title: `Server Discord`,
     contact_social_discord_desc: `Deveniți parte a comunității noastre active pentru discuții și suport.`,
+    send_direct_message: 'Trimite un Mesaj Direct',
 };
