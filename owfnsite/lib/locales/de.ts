@@ -299,7 +299,9 @@ export const de = {
     faq_q18: 'Kann ich einen sozialen Fall oder einen Zweck vorschlagen, der von OWFN finanziert werden soll?',
     faq_a18: 'In der Anfangsphase werden die Projekte von unserem Team nach strengen Kriterien für Impact und Machbarkeit ausgewählt. Im weiteren Verlauf des Projekts werden wir ein Governance-System (DAO) implementieren, das es den Community-Mitgliedern ermöglicht, zukünftige Initiativen vorzuschlagen und darüber abzustimmen, wodurch Sie eine direkte Rolle bei der Steuerung der Mittel erhalten.',
     faq_q19: 'Wer steckt hinter dem OWFN-Projekt? Ist das Team anonym?',
-    faq_a20: 'Details zur Vision und den Werten unseres Teams werden auf der Website vorgestellt. Wenn wir uns dem öffentlichen Start nähern, werden wir mehr Transparenz über die Schlüsselmitglieder und Berater schaffen, die zum Erfolg des Projekts beitragen, während wir ihre Sicherheit und Privatsphäre respektieren.',
+    faq_a19: 'Details zur Vision und den Werten unseres Teams werden auf der Website vorgestellt. Wenn wir uns dem öffentlichen Start nähern, werden wir mehr Transparenz über die Schlüsselmitglieder und Berater schaffen, die zum Erfolg des Projekts beitragen, während wir ihre Sicherheit und Privatsphäre respektieren.',
+    faq_q20: 'Welche Sicherheitsmaßnahmen haben Sie getroffen, um die Gelder des Projekts und der Investoren zu schützen?',
+    faq_a20: 'Sicherheit hat für uns oberste Priorität. Wir verwenden Multi-Signatur-Wallets zur Verwaltung kritischer Mittel, was bedeutet, dass keine einzelne Transaktion von einer Person genehmigt werden kann. Der Smart Contract des Tokens wird von renommierten Sicherheitsfirmen geprüft, um potenzielle Schwachstellen vor dem Start zu identifizieren und zu beheben.',
 
     // Chatbot
     chatbot_title: `OWFN-Assistent`,
@@ -367,7 +369,7 @@ export const de = {
     risk_warnings: `Sicherheitswarnungen`,
     risk_passed: `Sicherheitsprüfungen bestanden`,
     verified_by_owfn: `Verifiziert durch OWFN-Analyse`,
-    no_risk_factors_found: `Keine kritischen Risikofactoren wie veränderbare Metadaten oder nicht widerrufene Berechtigungen gefunden.`,
+    no_risk_factors_found: `Keine kritischen Risikofaktoren wie veränderbare Metadaten oder nicht widerrufene Berechtigungen gefunden.`,
     risk_factors_found: `Potenzielle Risiken erkannt. Bitte gehen Sie mit Vorsicht vor.`,
     swap: `Tauschen`,
     revoked: `Widerrufen`,
@@ -544,5 +546,4 @@ export const de = {
     contact_social_telegram_group_desc: `Treten Sie unserer Community-Gruppe bei, um mit anderen Mitgliedern zu diskutieren und sich auszutauschen.`,
     contact_social_discord_title: `Discord-Server`,
     contact_social_discord_desc: `Werden Sie Teil unserer aktiven Community für Diskussionen und Unterstützung.`,
-    send_direct_message: `Direktnachricht Senden`,
 };

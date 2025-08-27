@@ -439,6 +439,8 @@ export const es = {
     airdrop_eligible_message: `¡Tu billetera es elegible! Recibirás {amount} tokens OWFN en la próxima distribución.`,
     airdrop_not_eligible: `No Elegible`,
     airdrop_not_eligible_message: `Lo sentimos, esta dirección de billetera no es elegible para el airdrop actual. ¡Mantente activo en nuestra comunidad para futuras oportunidades!`,
+    airdrop_info_box_title: `Acerca de este Airdrop`,
+    airdrop_info_box_desc: `Este airdrop está diseñado para recompensar a los primeros partidarios y a los miembros activos de la comunidad. La elegibilidad se basa en factores como la participación en la preventa y el compromiso en los eventos de la comunidad.`,
     
     // Governance
     governance_title: `Gobernanza`,
@@ -552,5 +554,4 @@ export const es = {
     contact_social_telegram_group_desc: `Únete a nuestro grupo comunitario para discutir e interactuar con otros miembros.`,
     contact_social_discord_title: `Servidor de Discord`,
     contact_social_discord_desc: `Forma parte de nuestra comunidad activa para discusiones y soporte.`,
-    send_direct_message: `Enviar Mensaje Directo`,
 };

@@ -556,5 +556,4 @@ export const pt = {
     contact_social_telegram_group_desc: `Junte-se ao nosso grupo da comunidade para discutir e interagir com outros membros.`,
     contact_social_discord_title: `Servidor do Discord`,
     contact_social_discord_desc: `Faça parte de nossa comunidade ativa para discussões e suporte.`,
-    send_direct_message: 'Enviar uma Mensagem Direta',
 };
