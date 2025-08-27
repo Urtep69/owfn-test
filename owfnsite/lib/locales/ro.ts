@@ -40,15 +40,6 @@ export const ro = {
     connect_wallet_first: `Vă rugăm să vă conectați mai întâi portofelul.`,
     yes: `Da`,
     no: `Nu`,
-    authenticating: `Autentificare...`,
-    sign_in_to_buy: `Autentifică-te pentru a Cumpăra`,
-    sign_in_to_donate: `Autentifică-te pentru a Dona`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `Semnați acest mesaj pentru a vă autentifica la Official World Family Network (OWFN).`,
-    siws_message_uri: `Domeniu`,
-    siws_message_issued_at: `Emis la`,
-    siwS_message_no_cost: `Această solicitare nu va declanșa o tranzacție pe blockchain și nu va costa nicio taxă de gaz.`,
 
     // Time Units
     time_days: `Zile`,
@@ -192,7 +183,6 @@ export const ro = {
     token_types: `Tipuri de Tokenuri`,
     profile_loading_tokens: `Se încarcă tokenurile...`,
     profile_connect_prompt: `Conectează-ți portofelul pentru a vedea profilul și soldurile tokenurilor.`,
-    profile_sign_in_prompt: `Conectați-vă și autentificați-vă cu portofelul pentru a vă vedea profilul.`,
     profile_no_tokens: `Nu s-au găsit tokenuri în acest portofel.`,
     impact_dashboard_title: `Panoul Meu de Impact`,
     my_impact_stats: `Statisticile Mele de Impact`,
@@ -556,4 +546,5 @@ export const ro = {
     contact_social_telegram_group_desc: `Alăturați-vă grupului nostru comunitar pentru a discuta și interacționa cu alți membri.`,
     contact_social_discord_title: `Server Discord`,
     contact_social_discord_desc: `Deveniți parte a comunității noastre active pentru discuții și suport.`,
+    send_direct_message: 'Trimite un Mesaj Direct',
 };

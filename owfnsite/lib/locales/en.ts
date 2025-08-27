@@ -40,15 +40,6 @@ export const en = {
     connect_wallet_first: `Please connect your wallet first.`,
     yes: `Yes`,
     no: `No`,
-    authenticating: `Authenticating...`,
-    sign_in_to_buy: `Sign In to Buy`,
-    sign_in_to_donate: `Sign In to Donate`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `Sign this message to authenticate with Official World Family Network (OWFN).`,
-    siws_message_uri: `Domain`,
-    siws_message_issued_at: `Issued At`,
-    siwS_message_no_cost: `This request will not trigger a blockchain transaction or cost any gas fees.`,
 
     // Time Units
     time_days: `Days`,
@@ -192,7 +183,6 @@ export const en = {
     token_types: `Token Types`,
     profile_loading_tokens: `Loading tokens...`,
     profile_connect_prompt: `Connect your wallet to see your profile and token balances.`,
-    profile_sign_in_prompt: `Connect and sign in with your wallet to see your profile.`,
     profile_no_tokens: `No tokens found in this wallet.`,
     impact_dashboard_title: `My Impact Dashboard`,
     my_impact_stats: `My Impact Stats`,
@@ -309,6 +299,7 @@ export const en = {
     faq_q18: 'Can I propose a social case or a cause to be funded by OWFN?',
     faq_a18: 'In the initial phase, projects are selected by our team based on strict criteria of impact and feasibility. As the project progresses, we will implement a governance system (DAO) that will allow community members to propose and vote on future initiatives, giving you a direct role in directing the funds.',
     faq_q19: 'Who is behind the OWFN project? Is the team anonymous?',
+    // FIX: Changed faq_a20 to faq_a19 to fix duplicate key error.
     faq_a19: 'Details about our team\'s vision and values are presented on the website. As we get closer to the public launch, we will provide more transparency regarding the key members and advisors who contribute to the project\'s success, while respecting their safety and privacy.',
     faq_q20: 'What security measures have you taken to protect the project\'s and investors\' funds?',
     faq_a20: 'Security is our top priority. We use multi-signature wallets for managing critical funds, which means no single transaction can be approved by one person. The token\'s smart contract will be audited by reputable security firms to identify and correct any potential vulnerabilities before launch.',
@@ -441,8 +432,6 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
-    airdrop_info_box_title: `About this Airdrop`,
-    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors such as presale participation and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -514,7 +503,7 @@ export const en = {
     airdrop_log: `Airdrop Log`,
 
     // Contact Page
-    contact_title: `Get in Touch`,
+    contact_title: `Contact Us`,
     contact_subtitle: `We'd love to hear from you. Choose the best way to connect with us below.`,
     contact_how_can_we_help: `How can we help?`,
     contact_general_inquiries: `General Inquiries`,
@@ -556,4 +545,5 @@ export const en = {
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
     contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
+    send_direct_message: `Send a Direct Message`,
 };

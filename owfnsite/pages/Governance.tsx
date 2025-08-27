@@ -36,8 +36,8 @@ const Countdown = ({ endDate }: { endDate: Date }) => {
 };
 
 const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
-    const { t, solana, siws, voteOnProposal: contextVote, currentLanguage } = useAppContext();
-    const { userStats, loading, voteOnProposal: hookVote } = solana;
+    const { t, solana, voteOnProposal: contextVote, currentLanguage } = useAppContext();
+    const { userStats, loading, voteOnProposal: hookVote, connected } = solana;
     
     const totalVotes = proposal.votesFor + proposal.votesAgainst;
     const forPercentage = totalVotes > 0 ? (proposal.votesFor / totalVotes) * 100 : 0;
@@ -87,7 +87,7 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
             {proposal.status === 'active' && (
                 <div className="flex justify-between items-center border-t border-primary-200 dark:border-darkPrimary-700 pt-4">
                     <div className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('ends_in')}: <Countdown endDate={proposal.endDate} /></div>
-                    {siws.isAuthenticated && (
+                    {connected && (
                         hasVoted ? (
                              <div className="flex items-center gap-2 text-accent-600 dark:text-darkAccent-500 font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
                         ) : (
@@ -104,7 +104,7 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
 };
 
 export default function Governance() {
-    const { t, proposals, addProposal, siws } = useAppContext();
+    const { t, proposals, addProposal, solana } = useAppContext();
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
     
     const activeProposals = useMemo(() => proposals.filter(p => p.status === 'active'), [proposals]);
@@ -140,7 +140,7 @@ export default function Governance() {
                     <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('governance_title')}</h1>
                     <p className="mt-2 text-lg text-primary-600 dark:text-darkPrimary-400">{t('governance_subtitle')}</p>
                 </div>
-                {siws.isAuthenticated && (
+                {solana.connected && (
                     <button 
                         onClick={() => setCreateModalOpen(true)}
                         className="flex items-center gap-2 bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors"

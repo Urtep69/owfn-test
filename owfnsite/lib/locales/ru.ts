@@ -556,4 +556,5 @@ export const ru = {
     contact_social_telegram_group_desc: 'Присоединяйтесь к нашей группе сообщества для обсуждения и взаимодействия с другими участниками.',
     contact_social_discord_title: 'Сервер в Discord',
     contact_social_discord_desc: 'Станьте частью нашего активного сообщества для обсуждений и поддержки.',
+    send_direct_message: 'Отправить прямое сообщение',
 };

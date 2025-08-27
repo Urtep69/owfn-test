@@ -149,7 +149,6 @@ export interface PresaleTransaction {
   time: Date;
 }
 
-// Sign-In With Solana (SIWS) Types
 export interface SiwsSession {
   publicKey: string;
   signedAt: number;
@@ -158,6 +157,7 @@ export interface SiwsSession {
 export interface SiwsReturn {
   isAuthenticated: boolean;
   isLoading: boolean;
+  isSessionLoading: boolean;
   session: SiwsSession | null;
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
