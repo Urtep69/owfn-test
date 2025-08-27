@@ -2,14 +2,13 @@ import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
-import { ADMIN_WALLET_ADDRESS, HELIUS_RPC_URL } from './constants.ts';
+import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
-import { WalletConnectModal } from './components/WalletConnectModal.tsx';
-import { WelcomeModal } from './components/WelcomeModal.tsx';
 
 import Home from './pages/Home.tsx';
 import Presale from './pages/Presale.tsx';
@@ -35,24 +34,9 @@ import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana, isWalletModalOpen, setWalletModalOpen, isWelcomeModalOpen, setWelcomeModalOpen } = useAppContext();
-  const { connected, address } = solana;
-  const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
-
-  useEffect(() => {
-    // Show the welcome modal only once to new users.
-    try {
-      const hasSeenWelcome = window.localStorage.getItem('owfn-welcome-seen');
-      if (!hasSeenWelcome) {
-        setTimeout(() => {
-          setWelcomeModalOpen(true);
-          window.localStorage.setItem('owfn-welcome-seen', 'true');
-        }, 1000); // Small delay to let the page settle
-      }
-    } catch (error) {
-        console.warn("Could not access localStorage to check for welcome modal.", error);
-    }
-  }, [setWelcomeModalOpen]);
+  const { isMaintenanceActive, solana } = useAppContext();
+  const { address } = solana;
+  const isAdmin = address === ADMIN_WALLET_ADDRESS;
 
   if (isMaintenanceActive && !isAdmin) {
     return <Maintenance />;
@@ -106,15 +90,13 @@ const AppContent = () => {
           <Route path="/"><Home /></Route>
         </Switch>
       </Layout>
-      <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setWalletModalOpen(false)} />
-      <WelcomeModal isOpen={isWelcomeModalOpen} onClose={() => setWelcomeModalOpen(false)} />
     </Router>
   );
 };
 
 const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const network = WalletAdapterNetwork.Mainnet;
-  const endpoint = useMemo(() => HELIUS_RPC_URL, []);
+  const endpoint = useMemo(() => QUICKNODE_RPC_URL, []);
   
   const wallets = useMemo(
     () => [
@@ -127,7 +109,9 @@ const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
      <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
-        {children}
+        <WalletModalProvider>
+            {children}
+        </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
   )

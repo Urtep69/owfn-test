@@ -40,6 +40,15 @@ export const pt = {
     connect_wallet_first: `Por favor, conecte sua carteira primeiro.`,
     yes: `Sim`,
     no: `Não`,
+    authenticating: `Autenticando...`,
+    sign_in_to_buy: `Entrar para Comprar`,
+    sign_in_to_donate: `Entrar para Doar`,
+
+    // SIWS (Sign-In With Solana)
+    siws_message_statement: `Assine esta mensagem para se autenticar com a Official World Family Network (OWFN).`,
+    siws_message_uri: `Domínio`,
+    siws_message_issued_at: `Emitido em`,
+    siwS_message_no_cost: `Este pedido não acionará uma transação na blockchain nem custará taxas de gás.`,
     
     // Time Units
     time_days: `Dias`,
@@ -109,7 +118,9 @@ export const pt = {
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `{progress}% vendido`,
     presale_buy_info: `Comprar (Mín: {min} SOL, Máx: {max} SOL)`,
+    presale_buy_info_no_min: `Comprar (Máx: {max} SOL)`,
     buy: `Comprar`,
+    owfn_base_amount: `Valor Base de OWFN`,
     presale_buying_owfn: `Comprando {amount} $OWFN`,
     presale_estimate_tooltip: `Esta é uma estimativa. O valor final pode variar.`,
     presale_whitelist_finished: `Venda Whitelist Terminada:`,
@@ -133,6 +144,7 @@ export const pt = {
     presale_dyor_nfa_desc: `Faça Sua Própria Pesquisa. Não é Aconselhamento Financeiro.`,
     presale_footer_copyright: `© {year} Official World Family Network | Todos os direitos reservados.`,
     presale_amount_error: `O valor deve estar entre {min} e {max} SOL.`,
+    presale_amount_error_no_min: `O valor deve ser maior que 0 e não superior a {max} SOL.`,
     live_presale_feed: `Feed da Pré-venda ao Vivo`,
     wallet: `Carteira`,
     sol_spent: `SOL Gasto`,
@@ -180,6 +192,7 @@ export const pt = {
     token_types: `Tipos de Token`,
     profile_loading_tokens: `Carregando tokens...`,
     profile_connect_prompt: `Conecte sua carteira para ver seu perfil e saldos de tokens.`,
+    profile_sign_in_prompt: `Conecte e entre com sua carteira para ver seu perfil.`,
     profile_no_tokens: `Nenhum token encontrado nesta carteira.`,
     impact_dashboard_title: `Meu Painel de Impacto`,
     my_impact_stats: `Minhas Estatísticas de Impacto`,
@@ -543,4 +556,5 @@ export const pt = {
     contact_social_telegram_group_desc: `Junte-se ao nosso grupo da comunidade para discutir e interagir com outros membros.`,
     contact_social_discord_title: `Servidor do Discord`,
     contact_social_discord_desc: `Faça parte de nossa comunidade ativa para discussões e suporte.`,
+    send_direct_message: 'Enviar uma Mensagem Direta',
 };
