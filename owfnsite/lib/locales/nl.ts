@@ -556,4 +556,5 @@ export const nl = {
     contact_social_telegram_group_desc: `Word lid van onze communitygroep om te discussiëren en met andere leden in contact te komen.`,
     contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Word lid van onze actieve community voor discussies en ondersteuning.`,
+    send_direct_message: 'Stuur een Direct Bericht',
 };

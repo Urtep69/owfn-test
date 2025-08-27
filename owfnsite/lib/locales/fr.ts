@@ -309,9 +309,7 @@ export const fr = {
     faq_q18: `Puis-je proposer un cas social ou une cause à financer par l'OWFN ?`,
     faq_a18: `Dans la phase initiale, les projets sont sélectionnés par notre équipe sur la base de critères stricts d'impact et de faisabilité. Au fur et à mesure que le projet avance, nous mettrons en place un système de gouvernance (DAO) qui permettra aux membres de la communauté de proposer et de voter sur les futures initiatives, vous donnant un rôle direct dans l'orientation des fonds.`,
     faq_q19: `Qui est derrière le projet OWFN ? L'équipe est-elle anonyme ?`,
-    faq_a19: `Les détails sur la vision et les valeurs de notre équipe sont présentés sur le site web. À l'approche du lancement public, nous fournirons plus de transparence sur les membres clés et les conseillers qui contribuent au succès du projet, tout en respectant leur sécurité et leur vie privée.`,
-    faq_q20: `Quelles mesures de sécurité avez-vous prises pour protéger les fonds du projet et des investisseurs ?`,
-    faq_a20: `La sécurité est notre priorité absolue. Nous utilisons des portefeuilles multi-signatures pour gérer les fonds critiques, ce qui signifie qu'aucune transaction ne peut être approuvée par une seule personne. Le contrat intelligent du jeton sera audité par des entreprises de sécurité réputées pour identifier et corriger toute vulnérabilité potentielle avant le lancement.`,
+    faq_a20: `Les détails sur la vision et les valeurs de notre équipe sont présentés sur le site web. À l'approche du lancement public, nous fournirons plus de transparence sur les membres clés et les conseillers qui contribuent au succès du projet, tout en respectant leur sécurité et leur vie privée.`,
 
     // Chatbot
     chatbot_title: `Assistant OWFN`,
@@ -441,8 +439,6 @@ export const fr = {
     airdrop_eligible_message: `Votre portefeuille est éligible ! Vous recevrez {amount} jetons OWFN lors de la prochaine distribution.`,
     airdrop_not_eligible: `Non Éligible`,
     airdrop_not_eligible_message: `Désolé, cette adresse de portefeuille n'est pas éligible for l'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !`,
-    airdrop_info_box_title: `À propos de cet Airdrop`,
-    airdrop_info_box_desc: `Cet airdrop est conçu pour récompenser les premiers supporters et les membres actifs de la communauté. L'éligibilité est basée sur des facteurs tels que la participation à la prévente et l'engagement dans les événements communautaires.`,
 
     // Governance
     governance_title: `Gouvernance`,
@@ -556,4 +552,5 @@ export const fr = {
     contact_social_telegram_group_desc: `Rejoignez notre groupe communautaire pour discuter et échanger avec d'autres membres.`,
     contact_social_discord_title: `Serveur Discord`,
     contact_social_discord_desc: `Devenez membre de notre communauté active pour des discussions et du soutien.`,
+    send_direct_message: `Envoyer un Message Direct`,
 };
