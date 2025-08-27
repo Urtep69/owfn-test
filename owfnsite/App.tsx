@@ -34,9 +34,9 @@ import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana } = useAppContext();
+  const { isMaintenanceActive, solana, siws } = useAppContext();
   const { address } = solana;
-  const isAdmin = address === ADMIN_WALLET_ADDRESS;
+  const isAdmin = siws.isAuthenticated && address === ADMIN_WALLET_ADDRESS;
 
   if (isMaintenanceActive && !isAdmin) {
     return <Maintenance />;

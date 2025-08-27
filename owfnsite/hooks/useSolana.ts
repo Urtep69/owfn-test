@@ -9,7 +9,6 @@ import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../comp
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
 export interface UseSolanaReturn {
   connected: boolean;
-  connecting: boolean;
   address: string | null;
   userTokens: Token[];
   loading: boolean;
@@ -48,7 +47,7 @@ const isValidSolanaAddress = (address: any): boolean => {
 
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
-  const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
+  const { publicKey, connected, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -307,7 +306,6 @@ export const useSolana = (): UseSolanaReturn => {
 
   return {
     connected,
-    connecting,
     address,
     userTokens,
     loading,
