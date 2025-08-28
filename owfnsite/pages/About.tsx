@@ -51,12 +51,12 @@ export default function About() {
 
                     <div>
                         <h4 className="text-xl font-semibold text-primary-800 dark:text-darkPrimary-200">Help Without Conditions. Pure Human Connection.</h4>
-                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">Official World Family Network was created with a single truth at its core: to stand by people when they feel alone in this world. Each token is not just a digital asset—it's a symbol of hope, a gesture of support, a spark of dignity.</p>
+                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">Official World Family Network was created with a single truth at its core: to stand by people when they feel alone in this world. Each token is not just a digital asset it's a symbol of hope, a gesture of support, a spark of dignity.</p>
                     </div>
 
                     <div>
                          <h4 className="text-xl font-semibold text-primary-800 dark:text-darkPrimary-200">Simple, Fast, and Accessible</h4>
-                         <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">OWFN is designed to be sent directly to anyone in need—with no red tape, no paperwork, no waiting. Whether for food, medicine, or shelter, the value of OWFN can be used instantly, offering real impact in real time.</p>
+                         <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">OWFN is designed to be sent directly to anyone in need with no red tape, no paperwork, no waiting. Whether for food, medicine, or shelter, the value of OWFN can be used instantly, offering real impact in real time.</p>
                     </div>
 
                     <div>
