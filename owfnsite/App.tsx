@@ -32,6 +32,7 @@ import Governance from './pages/Governance.tsx';
 import Maintenance from './pages/Maintenance.tsx';
 import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
+import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
   const { isMaintenanceActive, solana } = useAppContext();
@@ -123,6 +124,7 @@ function App() {
     <WalletWrapper>
       <AppProvider>
         <AppContent />
+        <Analytics />
       </AppProvider>
     </WalletWrapper>
   );
