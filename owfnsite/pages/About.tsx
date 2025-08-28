@@ -1,7 +1,8 @@
 
+
 import React from 'react';
 import { Link } from 'wouter';
-import { HeartHandshake, BookOpen, HomeIcon, CheckCircle } from 'lucide-react';
+import { HeartHandshake, BookOpen, HomeIcon, Globe, Handshake as HandshakeIcon, Heart, Zap, ShieldCheck, Link as LinkIcon, CheckCircle } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 
 export default function About() {
@@ -23,55 +24,52 @@ export default function About() {
                 </p>
             </div>
 
-            <div className="p-8 bg-primary-50/50 dark:bg-darkPrimary-800/50 rounded-lg shadow-inner-3d border border-primary-200 dark:border-darkPrimary-700 space-y-8">
-                <div className="text-center">
-                    <h2 className="text-2xl md:text-3xl font-bold text-accent-600 dark:text-darkAccent-400">
-                        🌍 Official World Family Network (OWFN)
-                    </h2>
-                    <p className="text-xl md:text-2xl text-primary-700 dark:text-darkPrimary-300 mt-2">
-                        A Token Created to Support Humanity, Not Profit
-                    </p>
+            <div className="p-8 bg-primary-50 dark:bg-darkPrimary-800/50 rounded-lg shadow-3d border border-primary-200 dark:border-darkPrimary-700">
+                <div className="text-center mb-10">
+                    <Globe className="mx-auto w-12 h-12 text-accent-500 dark:text-darkAccent-400 mb-4" />
+                    <h2 className="text-3xl font-bold text-primary-900 dark:text-darkPrimary-100">{t('about_new_section_title')}</h2>
+                    <p className="mt-4 text-primary-700 dark:text-darkPrimary-300 leading-relaxed max-w-3xl mx-auto">{t('about_new_section_subtitle')}</p>
                 </div>
-                
-                <p className="text-lg text-center text-primary-700 dark:text-darkPrimary-300 leading-relaxed max-w-4xl mx-auto">
-                    Official World Family Network (OWFN) is a token born from compassion, designed with a single mission: to bring real help to real people in times of true need. This is not a speculative project. This is a movement built on empathy, solidarity, and humanity.
-                </p>
-
-                <div className="max-w-4xl mx-auto space-y-6">
-                    <div>
-                        <h4 className="text-xl font-semibold text-primary-800 dark:text-darkPrimary-200">The Mission of OWFN</h4>
-                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">The primary purpose of OWFN is to serve as a bridge between human kindness and real action. The token will be used to:</p>
-                        <ul className="mt-3 space-y-2 text-primary-600 dark:text-darkPrimary-400">
-                            <li className="flex items-start"><CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-1" /><span>Support people living in extreme poverty or homelessness.</span></li>
-                            <li className="flex items-start"><CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-1" /><span>Aid victims of natural disasters like earthquakes, floods, and fires.</span></li>
-                            <li className="flex items-start"><CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-1" /><span>Fund urgent medical treatments, surgeries, transplants, or cancer therapies.</span></li>
-                            <li className="flex items-start"><CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-1" /><span>Assist children, the elderly, and all vulnerable souls left behind by the system.</span></li>
-                        </ul>
+                <div className="grid md:grid-cols-2 gap-x-10 gap-y-8">
+                    <div className="space-y-6">
+                        <div>
+                            <h3 className="flex items-center text-xl font-bold mb-3"><HandshakeIcon className="w-6 h-6 mr-3 text-accent-500 dark:text-darkAccent-500 flex-shrink-0" />{t('about_new_section_mission_title')}</h3>
+                            <p className="text-primary-600 dark:text-darkPrimary-400 mb-2">{t('about_new_section_mission_desc')}</p>
+                            <ul className="space-y-2 text-primary-700 dark:text-darkPrimary-300">
+                                <li className="flex items-start"><CheckCircle className="w-4 h-4 mr-2.5 mt-1 text-green-500 flex-shrink-0" /><span>{t('about_new_section_mission_item1')}</span></li>
+                                <li className="flex items-start"><CheckCircle className="w-4 h-4 mr-2.5 mt-1 text-green-500 flex-shrink-0" /><span>{t('about_new_section_mission_item2')}</span></li>
+                                <li className="flex items-start"><CheckCircle className="w-4 h-4 mr-2.5 mt-1 text-green-500 flex-shrink-0" /><span>{t('about_new_section_mission_item3')}</span></li>
+                                <li className="flex items-start"><CheckCircle className="w-4 h-4 mr-2.5 mt-1 text-green-500 flex-shrink-0" /><span>{t('about_new_section_mission_item4')}</span></li>
+                            </ul>
+                        </div>
+                         <div>
+                            <h3 className="flex items-center text-xl font-bold mb-3"><Heart className="w-6 h-6 mr-3 text-rose-500 flex-shrink-0" />{t('about_new_section_connection_title')}</h3>
+                            <p className="text-primary-600 dark:text-darkPrimary-400">{t('about_new_section_connection_desc')}</p>
+                        </div>
                     </div>
-
-                    <div>
-                        <h4 className="text-xl font-semibold text-primary-800 dark:text-darkPrimary-200">Help Without Conditions. Pure Human Connection.</h4>
-                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">Official World Family Network was created with a single truth at its core: to stand by people when they feel alone in this world. Each token is not just a digital asset it's a symbol of hope, a gesture of support, a spark of dignity.</p>
-                    </div>
-
-                    <div>
-                         <h4 className="text-xl font-semibold text-primary-800 dark:text-darkPrimary-200">Simple, Fast, and Accessible</h4>
-                         <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">OWFN is designed to be sent directly to anyone in need with no red tape, no paperwork, no waiting. Whether for food, medicine, or shelter, the value of OWFN can be used instantly, offering real impact in real time.</p>
-                    </div>
-
-                    <div>
-                        <h4 className="text-xl font-semibold text-primary-800 dark:text-darkPrimary-200">Full Transparency. A Lifelong Commitment.</h4>
-                        <p className="mt-2 text-primary-600 dark:text-darkPrimary-400">A significant portion of the total supply will be allocated to a public wallet, known as the Impact Treasury & Social Initiatives Wallet, used exclusively for: Verified humanitarian aid, Emergency response, and Transparent social initiatives that truly make a difference.</p>
-                    </div>
-
-                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md border border-primary-200 dark:border-darkPrimary-700">
-                         <h4 className="text-xl font-semibold text-primary-800 dark:text-darkPrimary-200 mb-4">Basic Information</h4>
-                         <div className="space-y-2 text-sm">
-                             <div className="flex justify-between"><span className="font-medium text-primary-600 dark:text-darkPrimary-400">Symbol:</span><span className="font-mono font-bold">OWFN</span></div>
-                             <div className="flex justify-between"><span className="font-medium text-primary-600 dark:text-darkPrimary-400">Total Supply:</span><span className="font-mono font-bold">18,000,000,000</span></div>
-                             <div className="flex justify-between"><span className="font-medium text-primary-600 dark:text-darkPrimary-400">Purpose:</span><span className="font-bold text-right">Humanitarian, Social, Community Oriented</span></div>
-                         </div>
-                         <p className="mt-4 pt-3 border-t border-primary-200 dark:border-darkPrimary-600 text-center font-bold text-accent-700 dark:text-darkAccent-300">Not a speculative asset. No profit promises. Just real help.</p>
+                    <div className="space-y-6">
+                         <div>
+                            <h3 className="flex items-center text-xl font-bold mb-3"><Zap className="w-6 h-6 mr-3 text-yellow-500 flex-shrink-0" />{t('about_new_section_access_title')}</h3>
+                            <p className="text-primary-600 dark:text-darkPrimary-400">{t('about_new_section_access_desc')}</p>
+                        </div>
+                        <div>
+                            <h3 className="flex items-center text-xl font-bold mb-3"><ShieldCheck className="w-6 h-6 mr-3 text-blue-500 flex-shrink-0" />{t('about_new_section_transparency_title')}</h3>
+                            <p className="text-primary-600 dark:text-darkPrimary-400 mb-2">{t('about_new_section_transparency_desc')}</p>
+                            <ul className="space-y-2 text-primary-700 dark:text-darkPrimary-300">
+                                <li className="flex items-start"><CheckCircle className="w-4 h-4 mr-2.5 mt-1 text-green-500 flex-shrink-0" /><span>{t('about_new_section_transparency_item1')}</span></li>
+                                <li className="flex items-start"><CheckCircle className="w-4 h-4 mr-2.5 mt-1 text-green-500 flex-shrink-0" /><span>{t('about_new_section_transparency_item2')}</span></li>
+                                <li className="flex items-start"><CheckCircle className="w-4 h-4 mr-2.5 mt-1 text-green-500 flex-shrink-0" /><span>{t('about_new_section_transparency_item3')}</span></li>
+                            </ul>
+                        </div>
+                        <div className="bg-primary-100 dark:bg-darkPrimary-700 p-4 rounded-lg">
+                            <h3 className="flex items-center text-xl font-bold mb-3"><LinkIcon className="w-6 h-6 mr-3 text-primary-600 dark:text-darkPrimary-400 flex-shrink-0" />{t('about_new_section_info_title')}</h3>
+                            <ul className="space-y-1.5 text-sm text-primary-800 dark:text-darkPrimary-200">
+                                <li><strong>{t('about_new_section_info_symbol')}</strong></li>
+                                <li><strong>{t('about_new_section_info_supply')}</strong></li>
+                                <li><strong>{t('about_new_section_info_purpose')}</strong></li>
+                            </ul>
+                            <p className="mt-4 text-xs font-bold uppercase text-accent-700 dark:text-darkAccent-300 tracking-wider">{t('about_new_section_info_disclaimer')}</p>
+                        </div>
                     </div>
                 </div>
             </div>
