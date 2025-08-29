@@ -25,10 +25,16 @@ export const en = {
     sidebar_finance: `Finance`,
     sidebar_engage: `Engage`,
 
+    // Header
+    header_new: `NEW`,
+    header_wallet_manager: `Wallet Manager`,
+
     // General
     connect_wallet: `Connect Wallet`,
     disconnect_wallet: `Disconnect Wallet`,
+    copy_address: `Copy Address`,
     change_wallet: `Change Wallet`,
+    view_on_solscan: `View on Solscan`,
     connected_as: `Connected as`,
     buy_now: `Buy Now!`,
     donate: `Donate`,
@@ -73,6 +79,28 @@ export const en = {
     about_impact_education_desc: `Building and modernizing schools and kindergartens to provide quality education for future generations.`,
     about_impact_needs_title: `Basic Needs`,
     about_impact_needs_desc: `Providing food, shelter, and clothing for the homeless, and building dignified homes for the elderly.`,
+    about_new_section_title: `A Token Created to Support Humanity, Not Profit`,
+    about_new_section_subtitle: `Official World Family Network (OWFN) is a token born from compassion, designed with a single mission: to bring real help to real people in times of true need. This is not a speculative project. This is a movement built on empathy, solidarity, and humanity.`,
+    about_new_section_mission_title: `The Mission of OWFN`,
+    about_new_section_mission_desc: `The primary purpose of OWFN is to serve as a bridge between human kindness and real action. The token will be used to:`,
+    about_new_section_mission_item1: `Support people living in extreme poverty or homelessness.`,
+    about_new_section_mission_item2: `Aid victims of natural disasters like earthquakes, floods, and fires.`,
+    about_new_section_mission_item3: `Fund urgent medical treatments, surgeries, transplants, or cancer therapies.`,
+    about_new_section_mission_item4: `Assist children, the elderly, and all vulnerable souls left behind by the system.`,
+    about_new_section_connection_title: `Help Without Conditions. Pure Human Connection.`,
+    about_new_section_connection_desc: `Official World Family Network was created with a single truth at its core: to stand by people when they feel alone in this world. Each token is not just a digital asset—it's a symbol of hope, a gesture of support, a spark of dignity.`,
+    about_new_section_access_title: `Simple, Fast, and Accessible`,
+    about_new_section_access_desc: `OWFN is designed to be sent directly to anyone in need—with no red tape, no paperwork, no waiting. Whether for food, medicine, or shelter, the value of OWFN can be used instantly, offering real impact in real time.`,
+    about_new_section_transparency_title: `Full Transparency. A Lifelong Commitment.`,
+    about_new_section_transparency_desc: `A significant portion of the total supply will be allocated to a public wallet, known as the Impact Treasury & Social Initiatives Wallet, used exclusively for:`,
+    about_new_section_transparency_item1: `Verified humanitarian aid.`,
+    about_new_section_transparency_item2: `Emergency response.`,
+    about_new_section_transparency_item3: `Transparent social initiatives that truly make a difference.`,
+    about_new_section_info_title: `Basic Information`,
+    about_new_section_info_symbol: `Symbol: OWFN`,
+    about_new_section_info_supply: `Total Supply: 18,000,000,000 (18B)`,
+    about_new_section_info_purpose: `Purpose: Humanitarian, Social, Community Oriented`,
+    about_new_section_info_disclaimer: `Not a speculative asset. No profit promises. Just real help.`,
     
     // Roadmap Page
     roadmap_title: `Roadmap to Global Impact`,
@@ -145,6 +173,7 @@ export const en = {
     presale_you_contributed: `You have already contributed: {amount} SOL.`,
     presale_you_can_buy: `You can contribute up to {amount} more SOL.`,
     presale_bonus_offer: `{percentage}% BONUS on purchases of {threshold} SOL or more!`,
+    presale_checking_contribution: `Checking your contribution...`,
 
     // Donations Page
     make_donation: `Make a Donation`,
@@ -299,7 +328,6 @@ export const en = {
     faq_q18: 'Can I propose a social case or a cause to be funded by OWFN?',
     faq_a18: 'In the initial phase, projects are selected by our team based on strict criteria of impact and feasibility. As the project progresses, we will implement a governance system (DAO) that will allow community members to propose and vote on future initiatives, giving you a direct role in directing the funds.',
     faq_q19: 'Who is behind the OWFN project? Is the team anonymous?',
-    // FIX: Changed faq_a20 to faq_a19 to fix duplicate key error.
     faq_a19: 'Details about our team\'s vision and values are presented on the website. As we get closer to the public launch, we will provide more transparency regarding the key members and advisors who contribute to the project\'s success, while respecting their safety and privacy.',
     faq_q20: 'What security measures have you taken to protect the project\'s and investors\' funds?',
     faq_a20: 'Security is our top priority. We use multi-signature wallets for managing critical funds, which means no single transaction can be approved by one person. The token\'s smart contract will be audited by reputable security firms to identify and correct any potential vulnerabilities before launch.',
@@ -340,6 +368,7 @@ export const en = {
     back_to_profile: `Back to Profile`,
     token_not_found: `Token data not found.`,
     token_description_title: `TOKEN DESCRIPTION`,
+    price_per_token: `Price`,
     sell: `Sell`,
     sells: `Sells`,
     market_cap: `Market Cap`,
@@ -348,6 +377,7 @@ export const en = {
     pair_address: `Pair Address`,
     mint_authority: `Mint Authority`,
     freeze_authority: `Freeze Authority`,
+    update_authority: `Update Authority`,
     fully_diluted_valuation: `Fully Diluted Valuation (FDV)`,
     market_stats: `Market Stats`,
     trading_stats: `Trading Stats`,
@@ -432,6 +462,8 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
+    airdrop_info_box_title: `About this Airdrop`,
+    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -459,13 +491,12 @@ export const en = {
     maintenance_heading: `We're making things better!`,
     maintenance_message: `Our platform is currently undergoing scheduled maintenance to improve your experience. We appreciate your patience and understanding. We will be back online shortly.`,
     maintenance_stay_tuned: `Stay tuned for updates on our social channels:`,
-    admin_controls: `Admin Controls`,
+    admin_login: `Admin Login`,
     maintenance_status: `Status`,
     maintenance_status_active: `ACTIVE`,
     maintenance_status_inactive: `INACTIVE`,
     activate_maintenance_mode: `Activate Maintenance`,
     deactivate_maintenance_mode: `Deactivate Maintenance`,
-    admin_login: `Admin Login`,
     maintenance_login_denied: `Connection denied. The platform is in maintenance mode. Only administrators can log in.`,
 
     // Coming Soon

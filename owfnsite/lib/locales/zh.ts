@@ -25,10 +25,16 @@ export const zh = {
     sidebar_finance: `金融`,
     sidebar_engage: `参与`,
 
+    // Header
+    header_new: `新`,
+    header_wallet_manager: `钱包管理器`,
+
     // General
     connect_wallet: `连接钱包`,
     disconnect_wallet: `断开钱包`,
+    copy_address: `复制地址`,
     change_wallet: `更换钱包`,
+    view_on_solscan: `在 Solscan 上查看`,
     connected_as: `已连接为`,
     buy_now: `立即购买！`,
     donate: `捐赠`,
@@ -40,14 +46,7 @@ export const zh = {
     connect_wallet_first: `请先连接您的钱包。`,
     yes: `是`,
     no: `否`,
-    authenticating: `验证中...`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `签署此消息以通过官方世界家庭网络 (OWFN) 进行身份验证。`,
-    siws_message_uri: `域`,
-    siws_message_issued_at: `签发于`,
-    siwS_message_no_cost: `此请求不会触发区块链交易，也不会产生任何燃料费。`,
-
+    
     // Time Units
     time_days: `天`,
     time_hours: `小时`,
@@ -80,7 +79,29 @@ export const zh = {
     about_impact_education_desc: `建设和现代化学校和幼儿园，为后代提供优质教育。`,
     about_impact_needs_title: `基本需求`,
     about_impact_needs_desc: `为无家可归者提供食物、住所和衣物，并为老年人建造有尊严的家园。`,
-    
+    about_new_section_title: `一个为支持人类而非盈利而生的代币`,
+    about_new_section_subtitle: `官方世界家庭网络 (OWFN) 是一个源于同情心的代币，其唯一使命是在真正需要的时候为真正的人们带来真正的帮助。这不是一个投机项目。这是一个建立在同理心、团结和人性之上的运动。`,
+    about_new_section_mission_title: `OWFN 的使命`,
+    about_new_section_mission_desc: `OWFN 的主要目的是在人类的善意与实际行动之间架起一座桥梁。该代币将用于：`,
+    about_new_section_mission_item1: `支持生活在极端贫困或无家可归的人们。`,
+    about_new_section_mission_item2: `援助地震、洪水和火灾等自然灾害的受害者。`,
+    about_new_section_mission_item3: `资助紧急医疗、手术、移植或癌症治疗。`,
+    about_new_section_mission_item4: `帮助被社会体系遗忘的儿童、老人和所有弱势群体。`,
+    about_new_section_connection_title: `无条件的帮助。纯粹的人类连接。`,
+    about_new_section_connection_desc: `官方世界家庭网络的核心信念是：当人们在这个世界上感到孤独时，与他们站在一起。每一个代币不仅仅是一个数字资产——它是希望的象征，是支持的表示，是尊严的火花。`,
+    about_new_section_access_title: `简单、快速、便捷`,
+    about_new_section_access_desc: `OWFN 设计为可以直接发送给任何需要帮助的人——无需繁琐的手续、文件或等待。无论是食物、药品还是住所，OWFN 的价值都可以立即使用，实现实时、真正的帮助。`,
+    about_new_section_transparency_title: `完全透明。终身承诺。`,
+    about_new_section_transparency_desc: `总供应量的很大一部分将被分配到一个公共钱包，即影响力金库和社会倡议钱包，专门用于：`,
+    about_new_section_transparency_item1: `经过验证的人道主义援助。`,
+    about_new_section_transparency_item2: `紧急响应。`,
+    about_new_section_transparency_item3: `真正能带来改变的透明社会倡议。`,
+    about_new_section_info_title: `基本信息`,
+    about_new_section_info_symbol: `符号：OWFN`,
+    about_new_section_info_supply: `总供应量：18,000,000,000（180亿）`,
+    about_new_section_info_purpose: `目的：人道主义、社会、社区导向`,
+    about_new_section_info_disclaimer: `非投机性资产。无盈利承诺。只有真正的帮助。`,
+
     // Roadmap Page
     roadmap_title: `通往全球影响力的路线图`,
     roadmap_subtitle: `我们创造持久全球影响力的旅程。`,
@@ -152,6 +173,7 @@ export const zh = {
     presale_you_contributed: `您已贡献：{amount} SOL。`,
     presale_you_can_buy: `您最多还可以贡献 {amount} SOL。`,
     presale_bonus_offer: `购买 {threshold} SOL 或以上可获得 {percentage}% 奖励！`,
+    presale_checking_contribution: `正在检查您的贡献...`,
 
     // Donations Page
     make_donation: `进行捐赠`,
@@ -190,7 +212,6 @@ export const zh = {
     token_types: `代币类型`,
     profile_loading_tokens: `正在加载代币...`,
     profile_connect_prompt: `连接您的钱包以查看您的个人资料和代币余额。`,
-    profile_sign_in_prompt: `连接并使用您的钱包登录以查看您的个人资料。`,
     profile_no_tokens: `此钱包中未找到任何代币。`,
     impact_dashboard_title: `我的影响力仪表板`,
     my_impact_stats: `我的影响力统计`,
@@ -297,9 +318,8 @@ export const zh = {
     faq_q13: `为什么预售中有最大购买限额（Max Buy）？`,
     faq_a13: `最大购买限额是确保代币尽可能公平分配并防止少数大型投资者（“鲸鱼”）控制大量供应的重要措施。这有助于促进长期更健康、更去中心化的社区。`,
     faq_q14: `代币是“计息”的，年利率为 2%，这是什么意思？它是如何运作的？`,
-    faq_a14: `这意味着 OWFN 代币被编程为自动产生利息。只需将代币保存在与 Solana 兼容的钱包中，您的代币数量就会随着时间的推移而增加，年化收益率（APY）为 2%。您无需进行质押或采取任何额外行动；奖励会自动累积。`,
-    faq_q15: `0.5% 的转账费是什么？何时会激活？`,
     faq_a15: `这笔费用是我们使命长期资金的关键机制。在预售期结束后，所有 OWFN 代币交易都将收取 0.5% 的费用。从这笔费用中收取的资金会自动转入影响金库，以持续资助我们的社会项目。因此，每笔交易都为共同利益做出了贡献。`,
+
     faq_q16: `为什么您选择 Solana 区块链来开展这个项目？`,
     faq_a16: `我们选择 Solana 是因为其卓越的速度、非常低的交易成本和高可扩展性。这些功能对于像我们这样的全球项目至关重要，可以实现高效的微交易，并确保所有用户（无论是捐赠、购买还是交易代币）都能获得快速、便捷的体验。`,
     faq_q17: `我如何确定我的捐款能够到达您支持的事业？`,
@@ -347,6 +367,7 @@ export const zh = {
     back_to_profile: `返回个人资料`,
     token_not_found: `未找到代币数据。`,
     token_description_title: `代币描述`,
+    price_per_token: `价格`,
     sell: `卖出`,
     sells: `卖出`,
     market_cap: `市值`,
@@ -355,6 +376,7 @@ export const zh = {
     pair_address: `交易对地址`,
     mint_authority: `铸造权限`,
     freeze_authority: `冻结权限`,
+    update_authority: `更新权限`,
     fully_diluted_valuation: `完全稀释估值 (FDV)`,
     market_stats: `市场统计`,
     trading_stats: `交易统计`,
@@ -468,13 +490,12 @@ export const zh = {
     maintenance_heading: `我们正在改进！`,
     maintenance_message: `我们的平台目前正在进行计划性维护，以改善您的体验。感谢您的耐心和理解。我们将很快恢复在线。`,
     maintenance_stay_tuned: `请关注我们社交渠道的更新：`,
-    admin_controls: `管理员控制`,
+    admin_login: `管理员登录`,
     maintenance_status: `状态`,
     maintenance_status_active: `有效`,
     maintenance_status_inactive: `无效`,
     activate_maintenance_mode: `激活维护`,
     deactivate_maintenance_mode: `停用维护`,
-    admin_login: `管理员登录`,
     maintenance_login_denied: `连接被拒绝。平台处于维护模式。只有管理员可以登录。`,
 
     // Coming Soon
@@ -552,5 +573,7 @@ export const zh = {
     contact_social_telegram_channel_desc: `订阅重要公告和官方新闻。`,
     contact_social_telegram_group_title: `电报群组`,
     contact_social_telegram_group_desc: `加入我们的社区群组，与其他成员讨论和互动。`,
+    contact_social_discord_title: `Discord 服务器`,
     contact_social_discord_desc: `成为我们活跃社区的一员，参与讨论和获得支持。`,
+    send_direct_message: `发送私信`,
 };

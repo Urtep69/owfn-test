@@ -25,10 +25,16 @@ export const es = {
     sidebar_finance: `Finanzas`,
     sidebar_engage: `Participar`,
 
+    // Header
+    header_new: `NUEVO`,
+    header_wallet_manager: `Gestor de Billetera`,
+
     // General
     connect_wallet: `Conectar Billetera`,
     disconnect_wallet: `Desconectar Billetera`,
+    copy_address: `Copiar Dirección`,
     change_wallet: `Cambiar Billetera`,
+    view_on_solscan: `Ver en Solscan`,
     connected_as: `Conectado como`,
     buy_now: `¡Comprar ahora!`,
     donate: `Donar`,
@@ -40,15 +46,6 @@ export const es = {
     connect_wallet_first: `Por favor, conecte su billetera primero.`,
     yes: `Sí`,
     no: `No`,
-    authenticating: `Autenticando...`,
-    sign_in_to_buy: `Iniciar Sesión para Comprar`,
-    sign_in_to_donate: `Iniciar Sesión para Donar`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `Firme este mensaje para autenticarse con Official World Family Network (OWFN).`,
-    siws_message_uri: `Dominio`,
-    siws_message_issued_at: `Emitido en`,
-    siwS_message_no_cost: `Esta solicitud no activará una transacción en la blockchain ni costará ninguna tarifa de gas.`,
 
     // Time Units
     time_days: `Días`,
@@ -82,6 +79,28 @@ export const es = {
     about_impact_education_desc: `Construyendo y modernizando escuelas y jardines de infancia para proporcionar educación de calidad a las generaciones futuras.`,
     about_impact_needs_title: `Necesidades Básicas`,
     about_impact_needs_desc: `Proporcionando alimentos, refugio y ropa para personas sin hogar, y construyendo viviendas dignas para los ancianos.`,
+    about_new_section_title: `Un Token Creado para Apoyar a la Humanidad, no para el Lucro`,
+    about_new_section_subtitle: `Official World Family Network (OWFN) es un token nacido de la compasión, diseñado con una única misión: llevar ayuda real a personas reales en momentos de verdadera necesidad. Este no es un proyecto especulativo. Es un movimiento construido sobre la empatía, la solidaridad y la humanidad.`,
+    about_new_section_mission_title: `La Misión de OWFN`,
+    about_new_section_mission_desc: `El propósito principal de OWFN es servir como un puente entre la bondad humana y la acción real. El token se utilizará para:`,
+    about_new_section_mission_item1: `Apoyar a personas que viven en pobreza extrema o sin hogar.`,
+    about_new_section_mission_item2: `Ayudar a las víctimas de desastres naturales como terremotos, inundaciones e incendios.`,
+    about_new_section_mission_item3: `Financiar tratamientos médicos urgentes, cirugías, trasplantes o terapias contra el cáncer.`,
+    about_new_section_mission_item4: `Asistir a niños, ancianos y todas las almas vulnerables abandonadas por el sistema.`,
+    about_new_section_connection_title: `Ayuda sin Condiciones. Conexión Humana Pura.`,
+    about_new_section_connection_desc: `Official World Family Network fue creado con una única verdad en su núcleo: estar al lado de las personas cuando se sienten solas en este mundo. Cada token no es solo un activo digital, es un símbolo de esperanza, un gesto de apoyo, una chispa de dignidad.`,
+    about_new_section_access_title: `Simple, Rápido y Accesible`,
+    about_new_section_access_desc: `OWFN está diseñado para ser enviado directamente a cualquier persona necesitada, sin burocracia, sin papeleo, sin esperas. Ya sea para comida, medicinas o refugio, el valor de OWFN se puede usar al instante, ofreciendo un impacto real en tiempo real.`,
+    about_new_section_transparency_title: `Transparencia Total. Un Compromiso de por Vida.`,
+    about_new_section_transparency_desc: `Una parte significativa del suministro total se asignará a una billetera pública, conocida como la Billetera del Tesoro de Impacto e Iniciativas Sociales, utilizada exclusivamente para:`,
+    about_new_section_transparency_item1: `Ayuda humanitaria verificada.`,
+    about_new_section_transparency_item2: `Respuesta a emergencias.`,
+    about_new_section_transparency_item3: `Iniciativas sociales transparentes que realmente marcan la diferencia.`,
+    about_new_section_info_title: `Información Básica`,
+    about_new_section_info_symbol: `Símbolo: OWFN`,
+    about_new_section_info_supply: `Suministro Total: 18,000,000,000 (18B)`,
+    about_new_section_info_purpose: `Propósito: Humanitario, Social, Orientado a la Comunidad`,
+    about_new_section_info_disclaimer: `No es un activo especulativo. Sin promesas de ganancias. Solo ayuda real.`,
     
     // Roadmap Page
     roadmap_title: `Hoja de Ruta hacia el Impacto Global`,
@@ -154,6 +173,7 @@ export const es = {
     presale_you_contributed: `Ya has contribuido con: {amount} SOL.`,
     presale_you_can_buy: `Puedes contribuir con hasta {amount} SOL más.`,
     presale_bonus_offer: `¡BONUS del {percentage}% en compras de {threshold} SOL o más!`,
+    presale_checking_contribution: `Verificando su contribución...`,
     
     // Donations Page
     make_donation: `Hacer una Donación`,
@@ -192,7 +212,6 @@ export const es = {
     token_types: `Tipos de Token`,
     profile_loading_tokens: `Cargando tokens...`,
     profile_connect_prompt: `Conecte su billetera para ver su perfil y saldos de tokens.`,
-    profile_sign_in_prompt: `Conecte e inicie sesión con su billetera para ver su perfil.`,
     profile_no_tokens: `No se encontraron tokens en esta billetera.`,
     impact_dashboard_title: `Mi Dashboard de Impacto`,
     my_impact_stats: `Mis Estadísticas de Impacto`,
@@ -299,18 +318,20 @@ export const es = {
     faq_q13: `¿Por qué hay un límite máximo de compra (Max Buy) en la preventa?`,
     faq_a13: `El límite máximo de compra es una medida importante para garantizar la distribución más justa posible de los tokens y para evitar que un pequeño número de grandes inversores ("ballenas") controle una parte significativa del suministro. Esto promueve una comunidad más sana y descentralizada a largo plazo.`,
     faq_q14: `¿Qué significa que el token es "Portador de Intereses" con un 2% de APY? ¿Cómo funciona?`,
-    faq_a14: `Significa que el token OWFN está programado para generar intereses automáticamente. Solo con mantener los tokens en su billetera compatible con Solana, la cantidad de sus tokens aumentará con el tiempo, con un Rendimiento Porcentual Anual (APY) del 2%. No necesita ponerlos en staking ni realizar ninguna acción adicional; las recompensas se acumulan automáticamente.`,
+    faq_a14: `Significa que el token OWFN está programado para generar intereses automáticamente. Simplemente manteniendo los tokens en su billetera compatible con Solana, la cantidad de sus tokens aumentará con el tiempo, con un Rendimiento Porcentual Anual (APY) del 2%. No necesita hacer staking ni realizar ninguna acción adicional; las recompensas se acumulan automáticamente.`,
     faq_q15: `¿Qué es la tarifa de transferencia del 0.5% y cuándo se activará?`,
     faq_a15: `Esta tarifa es un mecanismo clave para la financiación a largo plazo de nuestra misión. Se aplicará una tarifa del 0.5% a todas las transacciones con el token OWFN *después* de que concluya el período de preventa. Los fondos recaudados de esta tarifa se dirigen automáticamente a la Tesorería de Impacto para financiar continuamente nuestros proyectos sociales. Por lo tanto, cada transacción contribuye al bien común.`,
     faq_q16: `¿Por qué eligieron la blockchain de Solana para este proyecto?`,
     faq_a16: `Elegimos Solana por su velocidad excepcional, costos de transacción muy bajos y alta escalabilidad. Estas características son esenciales para un proyecto global como el nuestro, permitiendo micro-transacciones eficientes y asegurando una experiencia rápida y accesible para todos los usuarios, ya sea que estén donando, comprando o comerciando tokens.`,
     faq_q17: `¿Cómo puedo estar seguro de que mis donaciones llegan a las causas que apoyan?`,
-    faq_a17: `La transparencia es fundamental para nosotros. Todos los fondos destinados a causas sociales se gestionan a través de la Tesorería de Impacto, cuya dirección de billetera es pública. Puede monitorear todas las transacciones entrantes y salientes en un explorador de bloques de Solana, como Solscan. Además, en el Portal de Impacto, proporcionaremos actualizaciones periódicas e informes detallados sobre los proyectos financiados.`,
+    faq_a17: `La transparencia es fundamental для нас. Todos los fondos destinados a causas sociales se gestionan a través de la Tesorería de Impacto, cuya dirección de billetera es pública. Puede monitorear todas las transacciones entrantes y salientes en un explorador de bloques de Solana, como Solscan. Además, en el Portal de Impacto, proporcionaremos actualizaciones periódicas e informes detallados sobre los proyectos financiados.`,
     faq_q18: `¿Puedo proponer un caso social o una causa para que sea financiada por OWFN?`,
-    faq_a18: `En la fase inicial, los proyectos son seleccionados por nuestro equipo en base a estrictos criterios de impacto y viabilidad. A medida que el proyecto avanza, implementaremos un sistema de gobernanza (DAO) que permitirá a los miembros de la comunidad proponer y votar sobre futuras iniciativas, dándole un papel directo en la dirección de los fondos.`,
+    faq_a18: `En la fase inicial, los proyectos son seleccionados por nuestro equipo en base a criterios estrictos de impacto y viabilidad. A medida que el proyecto avance, implementaremos un sistema de gobernanza (DAO) que permitirá a los miembros de la comunidad proponer y votar sobre futuras iniciativas, dándole un papel directo en la dirección de los fondos.`,
     faq_q19: `¿Quién está detrás del proyecto OWFN? ¿El equipo es anónimo?`,
-    faq_a20: `Los detalles sobre la visión y los valores de nuestro equipo se presentan en el sitio web. A medida que nos acerquemos al lanzamiento público, proporcionaremos más transparencia sobre los miembros clave y asesores que contribuyen al éxito del proyecto, respetando al mismo tiempo su seguridad y privacidad.`,
-    
+    faq_a19: `Los detalles sobre la visión y los valores de nuestro equipo se presentan en el sitio web. A medida que nos acerquemos al lanzamiento público, proporcionaremos más transparencia sobre los miembros clave y asesores que contribuyen al éxito del proyecto, respetando al mismo tiempo su seguridad y privacidad.`,
+    faq_q20: `¿Qué medidas de seguridad han tomado para proteger los fondos del proyecto y de los inversores?`,
+    faq_a20: `La seguridad es nuestra máxima prioridad. Usamos billeteras de múltiples firmas para administrar fondos críticos, lo que significa que ninguna transacción puede ser aprobada por una sola persona. El contrato inteligente del token será auditado por firmas de seguridad de renombre para identificar y corregir cualquier vulnerabilidad potencial antes del lanzamiento.`,
+
     // Chatbot
     chatbot_title: `Asistente de OWFN`,
     chatbot_placeholder: `Haz una pregunta...`,
@@ -347,6 +368,7 @@ export const es = {
     back_to_profile: `Volver al Perfil`,
     token_not_found: `Datos del token no encontrados.`,
     token_description_title: `DESCRIPCIÓN DEL TOKEN`,
+    price_per_token: `Precio`,
     sell: `Vender`,
     sells: `Ventas`,
     market_cap: `Capitalización de Mercado`,
@@ -355,6 +377,7 @@ export const es = {
     pair_address: `Dirección del Par`,
     mint_authority: `Autoridad de Acuñación`,
     freeze_authority: `Autoridad de Congelación`,
+    update_authority: `Autoridad de Actualización`,
     fully_diluted_valuation: `Valoración Totalmente Diluida (FDV)`,
     market_stats: `Estadísticas de Mercado`,
     trading_stats: `Estadísticas de Trading`,
@@ -439,6 +462,8 @@ export const es = {
     airdrop_eligible_message: `¡Tu billetera es elegible! Recibirás {amount} tokens OWFN en la próxima distribución.`,
     airdrop_not_eligible: `No Elegible`,
     airdrop_not_eligible_message: `Lo sentimos, esta dirección de billetera no es elegible para el airdrop actual. ¡Mantente activo en nuestra comunidad para futuras oportunidades!`,
+    airdrop_info_box_title: `Acerca de este Airdrop`,
+    airdrop_info_box_desc: `Este airdrop está diseñado para recompensar a los primeros partidarios y a los miembros activos de la comunidad. La elegibilidad se basa en factores como la participación en la preventa y el compromiso en los eventos de la comunidad.`,
     
     // Governance
     governance_title: `Gobernanza`,
@@ -466,13 +491,12 @@ export const es = {
     maintenance_heading: `¡Estamos mejorando las cosas!`,
     maintenance_message: `Nuestra plataforma está actualmente en mantenimiento programado para mejorar tu experiencia. Agradecemos tu paciencia y comprensión. Volveremos a estar en línea en breve.`,
     maintenance_stay_tuned: `Mantente atento a las actualizaciones en nuestros canales sociales:`,
-    admin_controls: `Controles de Administrador`,
+    admin_login: `Inicio de Sesión de Administrador`,
     maintenance_status: `Estado`,
     maintenance_status_active: `ACTIVO`,
     maintenance_status_inactive: `INACTIVO`,
     activate_maintenance_mode: `Activar Mantenimiento`,
     deactivate_maintenance_mode: `Desactivar Mantenimiento`,
-    admin_login: `Inicio de Sesión de Administrador`,
     maintenance_login_denied: `Conexión denegada. La plataforma está en modo de mantenimiento. Solo los administradores pueden iniciar sesión.`,
 
     // Coming Soon

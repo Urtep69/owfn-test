@@ -25,10 +25,16 @@ export const ro = {
     sidebar_finance: `Finanțe`,
     sidebar_engage: `Interacțiune`,
 
+    // Header
+    header_new: `NOU`,
+    header_wallet_manager: `Manager Portofel`,
+
     // General
     connect_wallet: `Conectare Portofel`,
     disconnect_wallet: `Deconectare Portofel`,
+    copy_address: `Copiază Adresa`,
     change_wallet: `Schimbă Portofelul`,
+    view_on_solscan: `Vezi pe Solscan`,
     connected_as: `Conectat ca`,
     buy_now: `Cumpără Acum!`,
     donate: `Donează`,
@@ -73,6 +79,28 @@ export const ro = {
     about_impact_education_desc: `Construirea și modernizarea școlilor și grădinițelor pentru a oferi educație de calitate generațiilor viitoare.`,
     about_impact_needs_title: `Nevoi de Bază`,
     about_impact_needs_desc: `Furnizarea de hrană, adăpost și îmbrăcăminte pentru persoanele fără adăpost și construirea de locuințe demne pentru vârstnici.`,
+    about_new_section_title: `Un Token Creat pentru a Sprijini Umanitatea, Nu Profitul`,
+    about_new_section_subtitle: `Official World Family Network (OWFN) este un token născut din compasiune, conceput cu o singură misiune: să aducă ajutor real oamenilor reali în momente de reală nevoie. Acesta nu este un proiect speculativ. Aceasta este o mișcare construită pe empatie, solidaritate și umanitate.`,
+    about_new_section_mission_title: `Misiunea OWFN`,
+    about_new_section_mission_desc: `Scopul principal al OWFN este de a servi drept punte între bunătatea umană și acțiunea reală. Tokenul va fi folosit pentru a:`,
+    about_new_section_mission_item1: `Sprijini persoanele care trăiesc în sărăcie extremă sau fără adăpost.`,
+    about_new_section_mission_item2: `Ajuta victimele dezastrelor naturale precum cutremure, inundații și incendii.`,
+    about_new_section_mission_item3: `Finanța tratamente medicale urgente, intervenții chirurgicale, transplanturi sau terapii oncologice.`,
+    about_new_section_mission_item4: `Asista copiii, bătrânii și toate sufletele vulnerabile lăsate în urmă de sistem.`,
+    about_new_section_connection_title: `Ajutor Fără Condiții. Conexiune Umană Pură.`,
+    about_new_section_connection_desc: `Official World Family Network a fost creat cu un singur adevăr la bază: să fie alături de oameni atunci când se simt singuri pe această lume. Fiecare token nu este doar un activ digital — este un simbol al speranței, un gest de sprijin, o scânteie de demnitate.`,
+    about_new_section_access_title: `Simplu, Rapid și Accesibil`,
+    about_new_section_access_desc: `OWFN este conceput pentru a fi trimis direct oricui are nevoie — fără birocrație, fără acte, fără așteptare. Fie că este vorba de mâncare, medicamente sau adăpost, valoarea OWFN poate fi folosită instantaneu, oferind un impact real în timp real.`,
+    about_new_section_transparency_title: `Transparență Totală. Un Angajament pe Viață.`,
+    about_new_section_transparency_desc: `O parte semnificativă din oferta totală va fi alocată unui portofel public, cunoscut sub numele de Portofelul Trezoreriei de Impact și Inițiativelor Sociale, folosit exclusiv pentru:`,
+    about_new_section_transparency_item1: `Ajutor umanitar verificat.`,
+    about_new_section_transparency_item2: `Răspuns la situații de urgență.`,
+    about_new_section_transparency_item3: `Inițiative sociale transparente care fac cu adevărat o diferență.`,
+    about_new_section_info_title: `Informații de Bază`,
+    about_new_section_info_symbol: `Simbol: OWFN`,
+    about_new_section_info_supply: `Ofertă Totală: 18.000.000.000 (18 Miliarde)`,
+    about_new_section_info_purpose: `Scop: Umanitar, Social, Orientat spre Comunitate`,
+    about_new_section_info_disclaimer: `Nu este un activ speculativ. Fără promisiuni de profit. Doar ajutor real.`,
     
     // Roadmap Page
     roadmap_title: `Foaie de Parcurs către Impact Global`,
@@ -145,6 +173,7 @@ export const ro = {
     presale_you_contributed: `Ați contribuit deja cu: {amount} SOL.`,
     presale_you_can_buy: `Puteți contribui cu până la încă {amount} SOL.`,
     presale_bonus_offer: `BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!`,
+    presale_checking_contribution: `Se verifică contribuția...`,
 
     // Donations Page
     make_donation: `Fă o Donație`,
@@ -339,6 +368,7 @@ export const ro = {
     back_to_profile: `Înapoi la Profil`,
     token_not_found: `Datele tokenului nu au fost găsite.`,
     token_description_title: `DESCRIERE TOKEN`,
+    price_per_token: `Preț`,
     sell: `Vânzare`,
     sells: `Vânzări`,
     market_cap: `Capitalizare de Piață`,
@@ -347,6 +377,7 @@ export const ro = {
     pair_address: `Adresă Pereche`,
     mint_authority: `Autoritate Mint`,
     freeze_authority: `Autoritate Înghețare`,
+    update_authority: `Autoritate Actualizare`,
     fully_diluted_valuation: `Valoare Complet Diluată (FDV)`,
     market_stats: `Statistici Piață`,
     trading_stats: `Statistici Tranzacționare`,
@@ -433,7 +464,7 @@ export const ro = {
     airdrop_not_eligible_message: `Ne pare rău, această adresă de portofel nu este eligibilă pentru airdrop-ul curent. Fii activ în comunitatea noastră pentru oportunități viitoare!`,
     airdrop_info_box_title: `Despre acest Airdrop`,
     airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
-
+    
     // Governance
     governance_title: `Guvernanță`,
     governance_subtitle: `Participă la viitorul OWFN votând propuneri.`,
@@ -455,18 +486,17 @@ export const ro = {
     no_active_proposals: `Momentan nu există propuneri active.`,
     no_past_proposals: `Nu există propuneri anterioare de afișat.`,
     no_active_cases_in_category: `Nu există cazuri active în această categorie în acest moment.`,
-
+    
     // Maintenance
     maintenance_heading: `Facem lucrurile mai bune!`,
     maintenance_message: `Platforma noastră este în prezent în mentenanță programată pentru a vă îmbunătăți experiența. Apreciem răbdarea și înțelegerea dumneavoastră. Vom reveni online în scurt timp.`,
     maintenance_stay_tuned: `Rămâneți la curent cu noutățile pe canalele noastre sociale:`,
-    admin_controls: `Controale Admin`,
+    admin_login: `Autentificare Admin`,
     maintenance_status: `Stare`,
     maintenance_status_active: `ACTIV`,
     maintenance_status_inactive: `INACTIV`,
     activate_maintenance_mode: `Activează Mentenanța`,
     deactivate_maintenance_mode: `Dezactivează Mentenanța`,
-    admin_login: `Autentificare Admin`,
     maintenance_login_denied: `Conectare refuzată. Platforma este în modul de întreținere. Doar administratorii se pot autentifica.`,
 
     // Coming Soon
