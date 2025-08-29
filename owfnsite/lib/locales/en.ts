@@ -25,10 +25,16 @@ export const en = {
     sidebar_finance: `Finance`,
     sidebar_engage: `Engage`,
 
+    // Header
+    header_new: `NEW`,
+    header_wallet_manager: `Wallet Manager`,
+
     // General
     connect_wallet: `Connect Wallet`,
     disconnect_wallet: `Disconnect Wallet`,
+    copy_address: `Copy Address`,
     change_wallet: `Change Wallet`,
+    view_on_solscan: `View on Solscan`,
     connected_as: `Connected as`,
     buy_now: `Buy Now!`,
     donate: `Donate`,
@@ -167,6 +173,7 @@ export const en = {
     presale_you_contributed: `You have already contributed: {amount} SOL.`,
     presale_you_can_buy: `You can contribute up to {amount} more SOL.`,
     presale_bonus_offer: `{percentage}% BONUS on purchases of {threshold} SOL or more!`,
+    presale_checking_contribution: `Checking your contribution...`,
 
     // Donations Page
     make_donation: `Make a Donation`,
@@ -321,7 +328,6 @@ export const en = {
     faq_q18: 'Can I propose a social case or a cause to be funded by OWFN?',
     faq_a18: 'In the initial phase, projects are selected by our team based on strict criteria of impact and feasibility. As the project progresses, we will implement a governance system (DAO) that will allow community members to propose and vote on future initiatives, giving you a direct role in directing the funds.',
     faq_q19: 'Who is behind the OWFN project? Is the team anonymous?',
-    // FIX: Changed faq_a20 to faq_a19 to fix duplicate key error.
     faq_a19: 'Details about our team\'s vision and values are presented on the website. As we get closer to the public launch, we will provide more transparency regarding the key members and advisors who contribute to the project\'s success, while respecting their safety and privacy.',
     faq_q20: 'What security measures have you taken to protect the project\'s and investors\' funds?',
     faq_a20: 'Security is our top priority. We use multi-signature wallets for managing critical funds, which means no single transaction can be approved by one person. The token\'s smart contract will be audited by reputable security firms to identify and correct any potential vulnerabilities before launch.',
@@ -362,6 +368,7 @@ export const en = {
     back_to_profile: `Back to Profile`,
     token_not_found: `Token data not found.`,
     token_description_title: `TOKEN DESCRIPTION`,
+    price_per_token: `Price`,
     sell: `Sell`,
     sells: `Sells`,
     market_cap: `Market Cap`,
@@ -370,6 +377,7 @@ export const en = {
     pair_address: `Pair Address`,
     mint_authority: `Mint Authority`,
     freeze_authority: `Freeze Authority`,
+    update_authority: `Update Authority`,
     fully_diluted_valuation: `Fully Diluted Valuation (FDV)`,
     market_stats: `Market Stats`,
     trading_stats: `Trading Stats`,
@@ -454,6 +462,8 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
+    airdrop_info_box_title: `About this Airdrop`,
+    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -481,13 +491,12 @@ export const en = {
     maintenance_heading: `We're making things better!`,
     maintenance_message: `Our platform is currently undergoing scheduled maintenance to improve your experience. We appreciate your patience and understanding. We will be back online shortly.`,
     maintenance_stay_tuned: `Stay tuned for updates on our social channels:`,
-    admin_controls: `Admin Controls`,
+    admin_login: `Admin Login`,
     maintenance_status: `Status`,
     maintenance_status_active: `ACTIVE`,
     maintenance_status_inactive: `INACTIVE`,
     activate_maintenance_mode: `Activate Maintenance`,
     deactivate_maintenance_mode: `Deactivate Maintenance`,
-    admin_login: `Admin Login`,
     maintenance_login_denied: `Connection denied. The platform is in maintenance mode. Only administrators can log in.`,
 
     // Coming Soon
@@ -567,5 +576,5 @@ export const en = {
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
     contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
-    send_direct_message: 'Send a Direct Message',
+    send_direct_message: `Send a Direct Message`,
 };

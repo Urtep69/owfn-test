@@ -25,10 +25,16 @@ export const hu = {
     sidebar_finance: `Pénzügyek`,
     sidebar_engage: `Részvétel`,
 
+    // Header
+    header_new: `ÚJ`,
+    header_wallet_manager: `Pénztárca Kezelő`,
+
     // General
     connect_wallet: `Pénztárca Csatlakoztatása`,
     disconnect_wallet: `Pénztárca Leválasztása`,
+    copy_address: `Cím Másolása`,
     change_wallet: `Pénztárca Váltása`,
+    view_on_solscan: `Megtekintés a Solscan-en`,
     connected_as: `Csatlakozva mint`,
     buy_now: `Vásárolj most!`,
     donate: `Adományozz`,
@@ -73,7 +79,29 @@ export const hu = {
     about_impact_education_desc: `Iskolák és óvodák építése és modernizálása a jövő generációi számára nyújtott minőségi oktatás érdekében.`,
     about_impact_needs_title: `Alapvető Szükségletek`,
     about_impact_needs_desc: `Élelem, menedék és ruházat biztosítása hajléktalanok számára, valamint méltó otthonok építése időseknek.`,
-    
+    about_new_section_title: `Egy Token, Amely az Emberiséget Támogatja, Nem a Profitot`,
+    about_new_section_subtitle: `Az Official World Family Network (OWFN) egy könyörületből született token, amelynek egyetlen küldetése van: valódi segítséget nyújtani valódi embereknek valódi szükség idején. Ez nem egy spekulatív projekt. Ez egy empátiára, szolidaritásra és emberségre épülő mozgalom.`,
+    about_new_section_mission_title: `Az OWFN Küldetése`,
+    about_new_section_mission_desc: `Az OWFN elsődleges célja, hogy hidat képezzen az emberi kedvesség és a valódi cselekvés között. A tokent a következőkre használják:`,
+    about_new_section_mission_item1: `Extrém szegénységben vagy hajléktalanságban élő emberek támogatása.`,
+    about_new_section_mission_item2: `Természeti katasztrófák, például földrengések, árvizek és tüzek áldozatainak segítése.`,
+    about_new_section_mission_item3: `Sürgős orvosi kezelések, műtétek, transzplantációk vagy rákterápiák finanszírozása.`,
+    about_new_section_mission_item4: `A rendszer által hátrahagyott gyermekek, idősek és minden sebezhető lélek segítése.`,
+    about_new_section_connection_title: `Segítség Feltételek Nélkül. Tiszta Emberi Kapcsolat.`,
+    about_new_section_connection_desc: `Az Official World Family Network egyetlen igazság köré épült: ott lenni az emberek mellett, amikor egyedül érzik magukat ezen a világon. Minden token nem csupán egy digitális eszköz – ez a remény szimbóluma, a támogatás gesztusa, a méltóság szikrája.`,
+    about_new_section_access_title: `Egyszerű, Gyors és Hozzáférhető`,
+    about_new_section_access_desc: `Az OWFN-t úgy tervezték, hogy közvetlenül elküldhető legyen bárkinek, akinek szüksége van rá – bürokrácia, papírmunka és várakozás nélkül. Legyen szó élelemről, gyógyszerről vagy menedékről, az OWFN értéke azonnal felhasználható, valós időben nyújtva valós hatást.`,
+    about_new_section_transparency_title: `Teljes Átláthatóság. Egy Életre Szóló Elkötelezettség.`,
+    about_new_section_transparency_desc: `A teljes kínálat jelentős részét egy nyilvános pénztárcába helyezik, amelyet Hatás Kincstár és Társadalmi Kezdeményezések Pénztárcájának neveznek, és kizárólag a következőkre használják:`,
+    about_new_section_transparency_item1: `Ellenőrzött humanitárius segély.`,
+    about_new_section_transparency_item2: `Vészhelyzeti reagálás.`,
+    about_new_section_transparency_item3: `Valódi változást hozó átlátható társadalmi kezdeményezések.`,
+    about_new_section_info_title: `Alapinformációk`,
+    about_new_section_info_symbol: `Szimbólum: OWFN`,
+    about_new_section_info_supply: `Teljes kínálat: 18.000.000.000 (18 milliárd)`,
+    about_new_section_info_purpose: `Cél: Humanitárius, Társadalmi, Közösségorientált`,
+    about_new_section_info_disclaimer: `Nem spekulatív eszköz. Nincs profitígéret. Csak valódi segítség.`,
+
     // Roadmap Page
     roadmap_title: `Útiterv a Globális Hatáshoz`,
     roadmap_subtitle: `Utazásunk egy tartós globális hatás megteremtése felé.`,
@@ -145,6 +173,7 @@ export const hu = {
     presale_you_contributed: `Ön már hozzájárult: {amount} SOL.`,
     presale_you_can_buy: `Még legfeljebb {amount} SOL-t vásárolhat.`,
     presale_bonus_offer: `{percentage}% BÓNUSZ {threshold} SOL vagy annál nagyobb vásárlások esetén!`,
+    presale_checking_contribution: `A hozzájárulás ellenőrzése...`,
     
     // Donations Page
     make_donation: `Adományozz`,
@@ -339,6 +368,7 @@ export const hu = {
     back_to_profile: `Vissza a Profilhoz`,
     token_not_found: `Token adatok nem találhatók.`,
     token_description_title: `TOKEN LEÍRÁS`,
+    price_per_token: `Ár`,
     sell: `Eladás`,
     sells: `Eladások`,
     market_cap: `Piaci Kapitalizáció`,
@@ -347,6 +377,7 @@ export const hu = {
     pair_address: `Pár Címe`,
     mint_authority: `Kibocsátási Jogosultság`,
     freeze_authority: `Befagyasztási Jogosultság`,
+    update_authority: `Frissítési Jogosultság`,
     fully_diluted_valuation: `Teljesen Hígított Értékelés (FDV)`,
     market_stats: `Piaci Statisztikák`,
     trading_stats: `Kereskedési Statisztikák`,
@@ -431,6 +462,8 @@ export const hu = {
     airdrop_eligible_message: `A pénztárcád jogosult! A következő kiosztáskor {amount} OWFN tokent fogsz kapni.`,
     airdrop_not_eligible: `Nem Jogosult`,
     airdrop_not_eligible_message: `Sajnáljuk, ez a pénztárca cím nem jogosult a jelenlegi airdropra. Maradj aktív a közösségünkben a jövőbeli lehetőségekért!`,
+    airdrop_info_box_title: `Erről az Airdropról`,
+    airdrop_info_box_desc: `Ez az airdrop a korai támogatók és az aktív közösségi tagok jutalmazására szolgál. A jogosultság olyan tényezőkön alapul, mint az elővásárlásban való részvétel és a közösségi eseményeken való részvétel.`,
     
     // Governance
     governance_title: `Irányítás`,
@@ -458,13 +491,12 @@ export const hu = {
     maintenance_heading: `Fejlesztjük a dolgokat!`,
     maintenance_message: `Platformunk jelenleg tervezett karbantartás alatt áll az élmény javítása érdekében. Türelmét és megértését köszönjük. Hamarosan újra online leszünk.`,
     maintenance_stay_tuned: `Maradjon naprakész a közösségi csatornáinkon:`,
-    admin_controls: `Admin Vezérlők`,
+    admin_login: `Admin Bejelentkezés`,
     maintenance_status: `Állapot`,
     maintenance_status_active: `AKTÍV`,
     maintenance_status_inactive: `INAKTÍV`,
     activate_maintenance_mode: `Karbantartás Aktiválása`,
     deactivate_maintenance_mode: `Karbantartás Deaktiválása`,
-    admin_login: `Admin Bejelentkezés`,
     maintenance_login_denied: `Csatlakozás megtagadva. A platform karbantartási módban van. Csak adminisztrátorok jelentkezhetnek be.`,
 
     // Coming Soon

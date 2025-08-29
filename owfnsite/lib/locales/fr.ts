@@ -25,10 +25,16 @@ export const fr = {
     sidebar_finance: `Finance`,
     sidebar_engage: `S'engager`,
 
+    // Header
+    header_new: `NOUVEAU`,
+    header_wallet_manager: `Gestionnaire de Portefeuille`,
+
     // General
     connect_wallet: `Connecter le portefeuille`,
     disconnect_wallet: `Déconnecter le portefeuille`,
+    copy_address: `Copier l'Adresse`,
     change_wallet: `Changer de portefeuille`,
+    view_on_solscan: `Voir sur Solscan`,
     connected_as: `Connecté en tant que`,
     buy_now: `Acheter maintenant !`,
     donate: `Faire un don`,
@@ -40,15 +46,6 @@ export const fr = {
     connect_wallet_first: `Veuillez d'abord connecter votre portefeuille.`,
     yes: `Oui`,
     no: `Non`,
-    authenticating: `Authentification...`,
-    sign_in_to_buy: `Se connecter pour acheter`,
-    sign_in_to_donate: `Se connecter pour donner`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `Signez ce message pour vous authentifier auprès de l'Official World Family Network (OWFN).`,
-    siws_message_uri: `Domaine`,
-    siws_message_issued_at: `Émis le`,
-    siwS_message_no_cost: `Cette demande ne déclenchera pas de transaction sur la blockchain et n'entraînera aucun frais de gaz.`,
     
     // Time Units
     time_days: `Jours`,
@@ -95,7 +92,7 @@ export const fr = {
     about_new_section_access_title: `Simple, Rapide et Accessible`,
     about_new_section_access_desc: `L'OWFN est conçu pour être envoyé directement à toute personne dans le besoin, sans paperasserie, sans formalités, sans attente. Que ce soit pour de la nourriture, des médicaments ou un abri, la valeur de l'OWFN peut être utilisée instantanément, offrant un impact réel en temps réel.`,
     about_new_section_transparency_title: `Transparence Totale. Un Engagement à Vie.`,
-    about_new_section_transparency_desc: `Une partie importante de l'offre totale sera allouée à un portefeuille public, connu sous le nom de Portefeuille du Trésor d'Impact et des Initiatives Sociales, utilisé exclusively pour :`,
+    about_new_section_transparency_desc: `Une partie importante de l'offre totale sera allouée à un portefeuille public, connu sous le nom de Portefeuille du Trésor d'Impact et des Initiatives Sociales, utilisé exclusivement pour :`,
     about_new_section_transparency_item1: `Aide humanitaire vérifiée.`,
     about_new_section_transparency_item2: `Intervention d'urgence.`,
     about_new_section_transparency_item3: `Initiatives sociales transparentes qui font vraiment la différence.`,
@@ -176,6 +173,7 @@ export const fr = {
     presale_you_contributed: `Vous avez déjà contribué : {amount} SOL.`,
     presale_you_can_buy: `Vous pouvez encore contribuer jusqu'à {amount} SOL.`,
     presale_bonus_offer: `{percentage}% DE BONUS pour les achats de {threshold} SOL ou plus !`,
+    presale_checking_contribution: `Vérification de votre contribution...`,
     
     // Donations Page
     make_donation: `Faire un Don`,
@@ -214,7 +212,6 @@ export const fr = {
     token_types: `Types de Jetons`,
     profile_loading_tokens: `Chargement des jetons...`,
     profile_connect_prompt: `Connectez votre portefeuille pour voir votre profil et vos soldes de jetons.`,
-    profile_sign_in_prompt: `Connectez-vous et identifiez-vous avec votre portefeuille pour voir votre profil.`,
     profile_no_tokens: `Aucun jeton trouvé dans ce portefeuille.`,
     impact_dashboard_title: `Mon Tableau de Bord d'Impact`,
     my_impact_stats: `Mes Statistiques d'Impact`,
@@ -321,12 +318,19 @@ export const fr = {
     faq_q13: `Pourquoi y a-t-il une limite d'achat maximale (Max Buy) lors de la prévente ?`,
     faq_a13: `La limite d'achat maximale est une mesure importante pour assurer une distribution aussi équitable que possible des jetons et pour empêcher qu'un petit nombre de grands investisseurs ("baleines") ne contrôle une part importante de l'offre. Cela favorise une communauté plus saine et plus décentralisée à long terme.`,
     faq_q14: `Que signifie que le jeton est "porteur d'intérêts" avec un APY de 2% ? Comment cela fonctionne-t-il ?`,
+    faq_a14: `Cela signifie que le jeton OWFN est programmé pour générer automatiquement des intérêts. Simplement en gardant les jetons dans votre portefeuille compatible Solana, votre quantité de jetons augmentera avec le temps, avec un rendement annuel en pourcentage (APY) de 2%. Vous n'avez pas besoin de les staker ou de prendre des mesures supplémentaires ; les récompenses s'accumulent automatiquement.`,
+    faq_q15: `Qu'est-ce que les frais de transfert de 0,5% et quand seront-ils activés ?`,
     faq_a15: `Ces frais sont un mécanisme clé pour le financement à long terme de notre mission. Des frais de 0,5% s'appliqueront à toutes les transactions avec le jeton OWFN *après* la fin de la période de prévente. Les fonds collectés grâce à ces frais sont automatiquement dirigés vers la Trésorerie d'Impact pour financer continuellement nos projets sociaux. Ainsi, chaque transaction contribue au bien commun.`,
     faq_q16: `Pourquoi avez-vous choisi la blockchain Solana pour ce projet ?`,
-    faq_a17: `Nous avons choisi Solana pour sa vitesse exceptionnelle, ses coûts de transaction très bas et sa grande évolutivité. Ces caractéristiques sont essentielles pour un projet mondial comme le nôtre, permettant des micro-transactions efficaces et garantissant une expérience rapide et accessible à tous les utilisateurs, qu'ils fassent des dons, achètent ou échangent des jetons.`,
-    faq_q18: `Comment puis-je être sûr que mes dons atteignent les causes que vous soutenez ?`,
-    faq_a19: `La transparence est fondamentale pour nous. Tous les fonds destinés à des causes sociales sont gérés par la Trésorerie d'Impact, dont l'adresse de portefeuille est publique. Vous pouvez suivre toutes les transactions entrantes et sortantes sur un explorateur de blocs Solana, tel que Solscan. De plus, sur le Portail d'Impact, nous fournirons des mises à jour régulières et des rapports détaillés sur les projets financés.`,
-    faq_q20: `Puis-je proposer un cas social ou une cause à financer par l'OWFN ?`,
+    faq_a16: `Nous avons choisi Solana pour sa vitesse exceptionnelle, ses coûts de transaction très bas et sa grande évolutivité. Ces caractéristiques sont essentielles pour un projet mondial comme le nôtre, permettant des micro-transactions efficaces et garantissant une expérience rapide et accessible à tous les utilisateurs, qu'ils fassent des dons, achètent ou échangent des jetons.`,
+    faq_q17: `Comment puis-je être sûr que mes dons atteignent les causes que vous soutenez ?`,
+    faq_a17: `La transparence est fondamentale pour nous. Tous les fonds destinés à des causes sociales sont gérés par la Trésorerie d'Impact, dont l'adresse de portefeuille est publique. Vous pouvez suivre toutes les transactions entrantes et sortantes sur un explorateur de blocs Solana, tel que Solscan. De plus, sur le Portail d'Impact, nous fournirons des mises à jour régulières et des rapports détaillés sur les projets financés.`,
+    faq_q18: `Puis-je proposer un cas social ou une cause à financer par l'OWFN ?`,
+    faq_a18: `Dans la phase initiale, les projets sont sélectionnés par notre équipe sur la base de critères stricts d'impact et de faisabilité. Au fur et à mesure de l'avancement du projet, nous mettrons en œuvre un système de gouvernance (DAO) qui permettra aux membres de la communauté de proposer et de voter sur les futures initiatives, vous donnant ainsi un rôle direct dans l'orientation des fonds.`,
+    faq_q19: `Qui est derrière le projet OWFN ? L'équipe est-elle anonyme ?`,
+    faq_a19: `Les détails sur la vision et les valeurs de notre équipe sont présentés sur le site web. À l'approche du lancement public, nous fournirons plus de transparence sur les membres clés et les conseillers qui contribuent au succès du projet, tout en respectant leur sécurité et leur vie privée.`,
+    faq_q20: `Quelles mesures de sécurité avez-vous prises pour protéger les fonds du projet et des investisseurs ?`,
+    faq_a20: `La sécurité est notre priorité absolue. Nous utilisons des portefeuilles multi-signatures pour gérer les fonds critiques, ce qui signifie qu'aucune transaction ne peut être approuvée par une seule personne. Le contrat intelligent du jeton sera audité par des sociétés de sécurité réputées pour identifier et corriger toute vulnérabilité potentielle avant le lancement.`,
 
     // Chatbot
     chatbot_title: `Assistant OWFN`,
@@ -335,7 +339,7 @@ export const fr = {
     chatbot_loading_1: `Connexion à mes circuits...`,
     chatbot_loading_2: `Analyse de votre question...`,
     chatbot_loading_3: `Formulation d'une réponse...`,
-
+    
     // Whitepaper
     whitepaper_title: `Livre Blanc de l'OWFN`,
     whitepaper_subtitle: `Un Aperçu Détaillé du Projet Official World Family Network`,
@@ -364,6 +368,7 @@ export const fr = {
     back_to_profile: `Retour au Profil`,
     token_not_found: `Données du jeton non trouvées.`,
     token_description_title: `DESCRIPTION DU JETON`,
+    price_per_token: `Prix`,
     sell: `Vendre`,
     sells: `Ventes`,
     market_cap: `Capitalisation Boursière`,
@@ -372,6 +377,7 @@ export const fr = {
     pair_address: `Adresse de la Paire`,
     mint_authority: `Autorité de Création`,
     freeze_authority: `Autorité de Gel`,
+    update_authority: `Autorité de Mise à Jour`,
     fully_diluted_valuation: `Valorisation Entièrement Diluée (FDV)`,
     market_stats: `Statistiques du Marché`,
     trading_stats: `Statistiques de Trading`,
@@ -398,7 +404,7 @@ export const fr = {
     risk_factors_found: `Risques potentiels détectés. Veuillez procéder avec prudence.`,
     swap: `Échanger`,
     revoked: `Révoqué`,
-
+    
     // Staking & Vesting
     staking_title: `Stakez OWFN, Gagnez des Récompenses`,
     staking_subtitle: `Bloquez vos jetons OWFN pour gagner des récompenses et soutenir le réseau.`,
@@ -456,7 +462,9 @@ export const fr = {
     airdrop_eligible_message: `Votre portefeuille est éligible ! Vous recevrez {amount} jetons OWFN lors de la prochaine distribution.`,
     airdrop_not_eligible: `Non Éligible`,
     airdrop_not_eligible_message: `Désolé, cette adresse de portefeuille n'est pas éligible for l'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !`,
-
+    airdrop_info_box_title: `À propos de cet Airdrop`,
+    airdrop_info_box_desc: `Cet airdrop est conçu pour récompenser les premiers supporters et les membres actifs de la communauté. L'éligibilité est basée sur des facteurs tels que la participation à la prévente et l'engagement dans les événements communautaires.`,
+    
     // Governance
     governance_title: `Gouvernance`,
     governance_subtitle: `Participez à l'avenir de l'OWFN en votant sur les propositions.`,
@@ -483,13 +491,12 @@ export const fr = {
     maintenance_heading: `Nous améliorons les choses !`,
     maintenance_message: `Notre plateforme est actuellement en maintenance programmée pour améliorer votre expérience. Nous apprécions votre patience et votre compréhension. Nous serons de retour en ligne sous peu.`,
     maintenance_stay_tuned: `Restez à l'écoute des mises à jour sur nos canaux sociaux :`,
-    admin_controls: `Contrôles Admin`,
+    admin_login: `Connexion Admin`,
     maintenance_status: `Statut`,
     maintenance_status_active: `ACTIF`,
     maintenance_status_inactive: `INACTIF`,
     activate_maintenance_mode: `Activer la Maintenance`,
     deactivate_maintenance_mode: `Désactiver la Maintenance`,
-    admin_login: `Connexion Admin`,
     maintenance_login_denied: `Connexion refusée. La plateforme est en mode maintenance. Seuls les administrateurs peuvent se connecter.`,
 
     // Coming Soon

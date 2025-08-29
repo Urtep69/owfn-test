@@ -1,3 +1,4 @@
+
 export const tr = {
     // Navigation
     home: `Anasayfa`,
@@ -40,6 +41,8 @@ export const tr = {
     yes: `Evet`,
     no: `Hayır`,
     authenticating: `Doğrulanıyor...`,
+    sign_in_to_buy: `Satın Almak için Giriş Yap`,
+    sign_in_to_donate: `Bağış Yapmak için Giriş Yap`,
 
     // SIWS (Sign-In With Solana)
     siws_message_statement: `Resmi Dünya Aile Ağı (OWFN) ile kimlik doğrulamak için bu mesajı imzalayın.`,
@@ -79,6 +82,28 @@ export const tr = {
     about_impact_education_desc: `Gelecek nesillere kaliteli eğitim sağlamak için okullar ve anaokulları inşa etme ve modernize etme.`,
     about_impact_needs_title: `Temel İhtiyaçlar`,
     about_impact_needs_desc: `Evsizlere yiyecek, barınak ve giysi sağlama ve yaşlılar için onurlu evler inşa etme.`,
+    about_new_section_title: `Kâr için Değil, İnsanlığı Desteklemek için Yaratılmış Bir Token`,
+    about_new_section_subtitle: `Resmi Dünya Aile Ağı (OWFN), şefkatten doğmuş bir tokendir ve tek bir misyonla tasarlanmıştır: gerçek ihtiyaç anlarında gerçek insanlara gerçek yardım ulaştırmak. Bu spekülatif bir proje değildir. Bu, empati, dayanışma ve insanlık üzerine inşa edilmiş bir harekettir.`,
+    about_new_section_mission_title: `OWFN'nin Misyonu`,
+    about_new_section_mission_desc: `OWFN'nin temel amacı, insan nezaketi ile gerçek eylem arasında bir köprü görevi görmektir. Token şu amaçlarla kullanılacaktır:`,
+    about_new_section_mission_item1: `Aşırı yoksulluk veya evsizlik içinde yaşayan insanları desteklemek.`,
+    about_new_section_mission_item2: `Deprem, sel ve yangın gibi doğal afet kurbanlarına yardım etmek.`,
+    about_new_section_mission_item3: `Acil tıbbi tedavileri, ameliyatları, nakilleri veya kanser tedavilerini finanse etmek.`,
+    about_new_section_mission_item4: `Sistem tarafından geride bırakılan çocuklara, yaşlılara ve tüm savunmasız ruhlara yardım etmek.`,
+    about_new_section_connection_title: `Koşulsuz Yardım. Saf İnsan Bağlantısı.`,
+    about_new_section_connection_desc: `Resmi Dünya Aile Ağı, temelinde tek bir gerçekle yaratıldı: bu dünyada yalnız hissettiklerinde insanların yanında olmak. Her token sadece bir dijital varlık değildir - bir umut sembolü, bir destek jesti, bir onur kıvılcımıdır.`,
+    about_new_section_access_title: `Basit, Hızlı ve Erişilebilir`,
+    about_new_section_access_desc: `OWFN, ihtiyacı olan herkese doğrudan gönderilmek üzere tasarlanmıştır - bürokrasi, evrak işi, bekleme olmadan. Yiyecek, ilaç veya barınak için olsun, OWFN'nin değeri anında kullanılabilir ve gerçek zamanlı olarak gerçek etki sunar.`,
+    about_new_section_transparency_title: `Tam Şeffaflık. Ömür Boyu Bir Taahhüt.`,
+    about_new_section_transparency_desc: `Toplam arzın önemli bir kısmı, Etki Hazinesi ve Sosyal Girişimler Cüzdanı olarak bilinen halka açık bir cüzdana tahsis edilecek ve yalnızca şu amaçlarla kullanılacaktır:`,
+    about_new_section_transparency_item1: `Doğrulanmış insani yardım.`,
+    about_new_section_transparency_item2: `Acil durum müdahalesi.`,
+    about_new_section_transparency_item3: `Gerçekten fark yaratan şeffaf sosyal girişimler.`,
+    about_new_section_info_title: `Temel Bilgiler`,
+    about_new_section_info_symbol: `Sembol: OWFN`,
+    about_new_section_info_supply: `Toplam Arz: 18.000.000.000 (18 Milyar)`,
+    about_new_section_info_purpose: `Amaç: İnsani, Sosyal, Topluluk Odaklı`,
+    about_new_section_info_disclaimer: `Spekülatif bir varlık değildir. Kâr vaadi yoktur. Sadece gerçek yardım.`,
 
     // Roadmap Page
     roadmap_title: `Küresel Etkiye Giden Yol Haritası`,
@@ -544,4 +569,5 @@ export const tr = {
     contact_social_telegram_group_desc: `Diğer üyelerle tartışmak ve etkileşimde bulunmak için topluluk grubumuza katılın.`,
     contact_social_discord_title: `Discord Sunucusu`,
     contact_social_discord_desc: `Tartışmalar ve destek için aktif topluluğumuzun bir parçası olun.`,
+    send_direct_message: `Doğrudan Mesaj Gönder`,
 };

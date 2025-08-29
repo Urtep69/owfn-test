@@ -25,10 +25,16 @@ export const nl = {
     sidebar_finance: `Financiën`,
     sidebar_engage: `Betrekken`,
 
+    // Header
+    header_new: `NIEUW`,
+    header_wallet_manager: `Wallet Beheerder`,
+
     // General
     connect_wallet: `Wallet verbinden`,
     disconnect_wallet: `Wallet loskoppelen`,
+    copy_address: `Adres Kopiëren`,
     change_wallet: `Wallet wijzigen`,
+    view_on_solscan: `Bekijk op Solscan`,
     connected_as: `Verbonden als`,
     buy_now: `Koop nu!`,
     donate: `Doneer`,
@@ -40,15 +46,6 @@ export const nl = {
     connect_wallet_first: `Verbind alstublieft eerst uw wallet.`,
     yes: `Ja`,
     no: `Nee`,
-    authenticating: `Authenticeren...`,
-    sign_in_to_buy: `Inloggen om te Kopen`,
-    sign_in_to_donate: `Inloggen om te Doneren`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `Onderteken dit bericht om u te authenticeren bij het Official World Family Network (OWFN).`,
-    siws_message_uri: `Domein`,
-    siws_message_issued_at: `Uitgegeven op`,
-    siwS_message_no_cost: `Deze aanvraag zal geen blockchain-transactie veroorzaken en geen gaskosten met zich meebrengen.`,
     
     // Time Units
     time_days: `Dagen`,
@@ -71,6 +68,7 @@ export const nl = {
     // About Page
     about_title: `Over OWFN`,
     about_subtitle: `Een wereldwijde familie bouwen, verenigd voor sociaal welzijn.`,
+    about_mission_title: `Onze Missie`,
     about_mission_desc: `Het Official World Family Network (OWFN) heeft als missie een wereldwijd netwerk op te bouwen dat echte, 100% transparante ondersteuning biedt aan de mensheid. We helpen mensen overal en altijd met essentiële behoeften door gebruik te maken van de kracht van blockchain-technologie. Ons doel is om een gedecentraliseerd hulpsysteem te creëren dat efficiënt, verantwoordelijk en toegankelijk is voor iedereen. Wij geloven dat door mensen rechtstreeks met doelen te verbinden, we inefficiënties kunnen elimineren en ervoor kunnen zorgen dat hulp degenen bereikt die het het hardst nodig hebben.`,
     about_vision_title: `Onze Visie`,
     about_vision_desc: `Wij zien een wereld voor ons waarin grenzen geen beperking vormen voor medeleven en steun. Een wereld waarin technologie ons verenigt om kritieke wereldwijde problemen zoals armoede, gebrek aan toegang tot gezondheidszorg en onderwijsverschillen op te lossen. OWFN wil meer zijn dan alleen een project; het is een beweging. Een levende, ademende kracht voor het goede, gebouwd en onderhouden door een wereldwijde gemeenschap van individuen die geloven in een betere, rechtvaardigere toekomst voor iedereen. Deze visie kan alleen worden bereikt door collectieve actie en de onwankelbare steun van onze gemeenschap.`,
@@ -175,6 +173,7 @@ export const nl = {
     presale_you_contributed: `U heeft al bijgedragen: {amount} SOL.`,
     presale_you_can_buy: `U kunt nog tot {amount} SOL bijdragen.`,
     presale_bonus_offer: `{percentage}% BONUS bij aankopen van {threshold} SOL of meer!`,
+    presale_checking_contribution: `Uw bijdrage wordt gecontroleerd...`,
     
     // Donations Page
     make_donation: `Doe een Donatie`,
@@ -213,7 +212,6 @@ export const nl = {
     token_types: `Token Types`,
     profile_loading_tokens: `Tokens laden...`,
     profile_connect_prompt: `Verbind uw wallet om uw profiel en tokensaldi te zien.`,
-    profile_sign_in_prompt: `Verbind en log in met uw portemonnee om uw profiel te zien.`,
     profile_no_tokens: `Geen tokens gevonden in deze wallet.`,
     impact_dashboard_title: `Mijn Impact Dashboard`,
     my_impact_stats: `Mijn Impactstatistieken`,
@@ -320,8 +318,6 @@ export const nl = {
     faq_q13: `Waarom is er een maximale aankooplimiet (Max Buy) in de voorverkoop?`,
     faq_a13: `De maximale aankooplimiet is een belangrijke maatregel om een zo eerlijk mogelijke distributie van tokens te garanderen en te voorkomen dat een klein aantal grote investeerders ("whales") een aanzienlijk deel van het aanbod controleert. Dit bevordert op lange termijn een gezondere en meer gedecentraliseerde gemeenschap.`,
     faq_q14: `Wat betekent het dat de token "rentegevend" is met 2% APY? Hoe werkt dat?`,
-    faq_a14: `Dit betekent dat de OWFN-token is geprogrammeerd om automatisch rente te genereren. Door simpelweg de tokens in uw Solana-compatibele wallet te bewaren, zal uw hoeveelheid tokens in de loop van de tijd toenemen met een jaarlijks percentage rendement (APY) van 2%. U hoeft ze niet te staken of enige aanvullende actie te ondernemen; de beloningen worden automatisch opgebouwd.`,
-    faq_q15: `Wat is de 0,5% overdrachtskosten en wanneer wordt deze geactiveerd?`,
     faq_a15: `Deze vergoeding is een belangrijk mechanisme voor de langetermijnfinanciering van onze missie. Na afloop van de voorverkoopperiode wordt een vergoeding van 0,5% toegepast op alle transacties met de OWFN-token. De fondsen die uit deze vergoeding worden verzameld, worden automatisch naar de Impact Treasury geleid om onze sociale projecten continu te financieren. Zo draagt elke transactie bij aan het algemeen welzijn.`,
     faq_q16: `Waarom heeft u de Solana-blockchain voor dit project gekozen?`,
     faq_a16: `We hebben voor Solana gekozen vanwege de uitzonderlijke snelheid, zeer lage transactiekosten en hoge schaalbaarheid. Deze kenmerken zijn essentieel voor een wereldwijd project als het onze, waardoor efficiënte microtransacties mogelijk zijn en een snelle en toegankelijke ervaring voor alle gebruikers wordt gegarandeerd, of ze nu doneren, kopen of tokens verhandelen.`,
@@ -370,6 +366,7 @@ export const nl = {
     back_to_profile: `Terug naar Profiel`,
     token_not_found: `Tokengegevens niet gevonden.`,
     token_description_title: `TOKENBESCHRIJVING`,
+    price_per_token: `Prijs`,
     sell: `Verkopen`,
     sells: `Verkopen`,
     market_cap: `Marktkapitalisatie`,
@@ -378,6 +375,7 @@ export const nl = {
     pair_address: `Paar Adres`,
     mint_authority: `Mint Autoriteit`,
     freeze_authority: `Vries Autoriteit`,
+    update_authority: `Update Autoriteit`,
     fully_diluted_valuation: `Volledig Verwaterde Waardering (FDV)`,
     market_stats: `Marktstatistieken`,
     trading_stats: `Handelsstatistieken`,
@@ -462,6 +460,8 @@ export const nl = {
     airdrop_eligible_message: `Uw wallet komt in aanmerking! U ontvangt {amount} OWFN-tokens in de komende distributie.`,
     airdrop_not_eligible: `Niet Geschikt`,
     airdrop_not_eligible_message: `Sorry, dit wallet-adres komt niet in aanmerking voor de huidige airdrop. Blijf actief in onze gemeenschap voor toekomstige kansen!`,
+    airdrop_info_box_title: `Over deze Airdrop`,
+    airdrop_info_box_desc: `Deze airdrop is ontworpen om vroege supporters en actieve gemeenschapsleden te belonen. De geschiktheid is gebaseerd op factoren zoals deelname aan de voorverkoop en betrokkenheid bij gemeenschapsevenementen.`,
     
     // Governance
     governance_title: `Bestuur`,
@@ -489,13 +489,12 @@ export const nl = {
     maintenance_heading: `We maken dingen beter!`,
     maintenance_message: `Ons platform ondergaat momenteel gepland onderhoud om uw ervaring te verbeteren. We waarderen uw geduld en begrip. We zijn snel weer online.`,
     maintenance_stay_tuned: `Blijf op de hoogte van updates via onze sociale kanalen:`,
-    admin_controls: `Beheerderscontroles`,
+    admin_login: `Beheerderslogin`,
     maintenance_status: `Status`,
     maintenance_status_active: `ACTIEF`,
     maintenance_status_inactive: `INACTIEF`,
     activate_maintenance_mode: `Onderhoud Activeren`,
     deactivate_maintenance_mode: `Onderhoud Deactiveren`,
-    admin_login: `Beheerderslogin`,
     maintenance_login_denied: `Verbinding geweigerd. Het platform is in onderhoudsmodus. Alleen beheerders kunnen inloggen.`,
 
     // Coming Soon

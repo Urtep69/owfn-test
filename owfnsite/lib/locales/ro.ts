@@ -25,10 +25,16 @@ export const ro = {
     sidebar_finance: `Finanțe`,
     sidebar_engage: `Interacțiune`,
 
+    // Header
+    header_new: `NOU`,
+    header_wallet_manager: `Manager Portofel`,
+
     // General
     connect_wallet: `Conectare Portofel`,
     disconnect_wallet: `Deconectare Portofel`,
+    copy_address: `Copiază Adresa`,
     change_wallet: `Schimbă Portofelul`,
+    view_on_solscan: `Vezi pe Solscan`,
     connected_as: `Conectat ca`,
     buy_now: `Cumpără Acum!`,
     donate: `Donează`,
@@ -167,6 +173,7 @@ export const ro = {
     presale_you_contributed: `Ați contribuit deja cu: {amount} SOL.`,
     presale_you_can_buy: `Puteți contribui cu până la încă {amount} SOL.`,
     presale_bonus_offer: `BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!`,
+    presale_checking_contribution: `Se verifică contribuția...`,
 
     // Donations Page
     make_donation: `Fă o Donație`,
@@ -361,6 +368,7 @@ export const ro = {
     back_to_profile: `Înapoi la Profil`,
     token_not_found: `Datele tokenului nu au fost găsite.`,
     token_description_title: `DESCRIERE TOKEN`,
+    price_per_token: `Preț`,
     sell: `Vânzare`,
     sells: `Vânzări`,
     market_cap: `Capitalizare de Piață`,
@@ -369,6 +377,7 @@ export const ro = {
     pair_address: `Adresă Pereche`,
     mint_authority: `Autoritate Mint`,
     freeze_authority: `Autoritate Înghețare`,
+    update_authority: `Autoritate Actualizare`,
     fully_diluted_valuation: `Valoare Complet Diluată (FDV)`,
     market_stats: `Statistici Piață`,
     trading_stats: `Statistici Tranzacționare`,
@@ -455,7 +464,7 @@ export const ro = {
     airdrop_not_eligible_message: `Ne pare rău, această adresă de portofel nu este eligibilă pentru airdrop-ul curent. Fii activ în comunitatea noastră pentru oportunități viitoare!`,
     airdrop_info_box_title: `Despre acest Airdrop`,
     airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
-
+    
     // Governance
     governance_title: `Guvernanță`,
     governance_subtitle: `Participă la viitorul OWFN votând propuneri.`,
@@ -477,18 +486,17 @@ export const ro = {
     no_active_proposals: `Momentan nu există propuneri active.`,
     no_past_proposals: `Nu există propuneri anterioare de afișat.`,
     no_active_cases_in_category: `Nu există cazuri active în această categorie în acest moment.`,
-
+    
     // Maintenance
     maintenance_heading: `Facem lucrurile mai bune!`,
     maintenance_message: `Platforma noastră este în prezent în mentenanță programată pentru a vă îmbunătăți experiența. Apreciem răbdarea și înțelegerea dumneavoastră. Vom reveni online în scurt timp.`,
     maintenance_stay_tuned: `Rămâneți la curent cu noutățile pe canalele noastre sociale:`,
-    admin_controls: `Controale Admin`,
+    admin_login: `Autentificare Admin`,
     maintenance_status: `Stare`,
     maintenance_status_active: `ACTIV`,
     maintenance_status_inactive: `INACTIV`,
     activate_maintenance_mode: `Activează Mentenanța`,
     deactivate_maintenance_mode: `Dezactivează Mentenanța`,
-    admin_login: `Autentificare Admin`,
     maintenance_login_denied: `Conectare refuzată. Platforma este în modul de întreținere. Doar administratorii se pot autentifica.`,
 
     // Coming Soon
