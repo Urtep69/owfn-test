@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Copy, Check, ExternalLink } from 'lucide-react';
 
@@ -37,12 +38,12 @@ export const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, type = 
   const solscanUrl = `https://solscan.io/${getPath()}/${address}`;
 
   return (
-    <div className={`flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 ${className}`}>
+    <div className={`flex items-center space-x-2 text-sm text-foreground-muted ${className}`}>
       <span className="font-mono">{truncateAddress(address)}</span>
-      <button onClick={copyToClipboard} className="hover:text-primary-700 dark:hover:text-darkPrimary-300 transition-colors" aria-label="Copy address">
+      <button onClick={copyToClipboard} className="hover:text-primary transition-colors" aria-label="Copy address">
         {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
       </button>
-      <a href={solscanUrl} target="_blank" rel="noopener noreferrer" className="hover:text-primary-700 dark:hover:text-darkPrimary-300 transition-colors" aria-label="View on Solscan">
+      <a href={solscanUrl} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors" aria-label="View on Solscan">
         <ExternalLink className="w-4 h-4" />
       </a>
     </div>

@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
 import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2, TrendingUp, Users, Droplets, Info } from 'lucide-react';
@@ -8,32 +10,32 @@ import { GenericTokenIcon } from '../components/IconComponents.tsx';
 import { DualProgressBar } from '../components/DualProgressBar.tsx';
 import { MOCK_TOKEN_DETAILS } from '../constants.ts';
 
-const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 dark:text-darkPrimary-100' }: { title: string, value: string, subtext?: string, icon: React.ReactNode, valueColor?: string }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
+const StatCard = ({ title, value, subtext, icon }: { title: string, value: string, subtext?: string, icon: React.ReactNode }) => (
+    <div className="bg-surface border border-border p-4 rounded-xl shadow-lg">
         <div className="flex items-center space-x-3">
-            <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">{icon}</div>
+            <div className="bg-background text-primary rounded-lg p-3">{icon}</div>
             <div>
-                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+                <p className="text-sm text-foreground-muted">{title}</p>
                 <div className="flex items-baseline gap-2">
-                    <p className={`text-2xl font-bold ${valueColor}`}>{value}</p>
+                    <p className="text-2xl font-bold text-foreground">{value}</p>
                 </div>
-                 {subtext && <p className="text-xs font-semibold text-primary-500 dark:text-darkPrimary-500">{subtext}</p>}
+                 {subtext && <p className={`text-xs font-semibold ${subtext.startsWith('-') ? 'text-red-400' : 'text-green-400'}`}>{subtext}</p>}
             </div>
         </div>
     </div>
 );
 
 const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d h-full">
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-primary-800 dark:text-darkPrimary-200">{icon}{title}</h3>
+    <div className="bg-surface border border-border p-6 rounded-lg shadow-lg h-full">
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-foreground">{icon}{title}</h3>
         <div className="space-y-3">{children}</div>
     </div>
 );
 
 const InfoRow = ({ label, children }: { label: string, children: React.ReactNode }) => (
-    <div className="flex justify-between items-center py-2 border-b border-primary-200/50 dark:border-darkPrimary-700/50 last:border-b-0">
-        <span className="text-sm text-primary-600 dark:text-darkPrimary-400">{label}</span>
-        <div className="text-sm font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
+    <div className="flex justify-between items-center py-2 border-b border-border/50 last:border-b-0">
+        <span className="text-sm text-foreground-muted">{label}</span>
+        <div className="text-sm font-semibold text-foreground text-right break-all">{children}</div>
     </div>
 );
 
@@ -54,7 +56,7 @@ export default function TokenDetail() {
     
     const AuthorityRow = ({ label, address }: { label: string, address?: string | null }) => (
         <InfoRow label={label}>
-            {address ? <AddressDisplay address={address} /> : <span className="text-green-500 font-bold flex items-center justify-end gap-1.5"><Shield size={14}/> {t('revoked')}</span>}
+            {address ? <AddressDisplay address={address} /> : <span className="text-green-400 font-bold flex items-center justify-end gap-1.5"><Shield size={14}/> {t('revoked')}</span>}
         </InfoRow>
     );
 
@@ -106,15 +108,15 @@ export default function TokenDetail() {
     }, [mintAddress]);
 
     if (loading) {
-        return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>;
+        return <div className="flex justify-center items-center h-96"><Loader2 className="w-12 h-12 animate-spin text-primary"/></div>;
     }
 
     if (error || !token) {
         return (
-            <div className="text-center py-10 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner">
-                <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">{t('token_not_found')}</h2>
-                {error && <p className="text-primary-600 dark:text-darkPrimary-400 mt-2 p-4 bg-primary-100 dark:bg-darkPrimary-700 rounded-md font-mono text-sm break-all">{error}</p>}
-                <Link to={fromPath} className="text-accent-500 dark:text-darkAccent-400 hover:underline mt-4 inline-flex items-center gap-2">
+            <div className="text-center py-10 bg-surface border border-border rounded-lg shadow-inner">
+                <h2 className="text-2xl font-bold text-red-400">{t('token_not_found')}</h2>
+                {error && <p className="text-foreground-muted mt-2 p-4 bg-background rounded-md font-mono text-sm break-all">{error}</p>}
+                <Link to={fromPath} className="text-primary hover:underline mt-4 inline-flex items-center gap-2">
                     <ArrowLeft size={16} /> {backLinkText}
                 </Link>
             </div>
@@ -128,11 +130,10 @@ export default function TokenDetail() {
             : token.pricePerToken.toPrecision(4))
         : 'N/A';
     const priceChange = token.price24hChange ?? 0;
-    const priceChangeColor = priceChange >= 0 ? 'text-green-500' : 'text-red-500';
 
     return (
         <div className="space-y-8 animate-fade-in-up">
-            <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
+            <Link to={fromPath} className="inline-flex items-center gap-2 text-primary hover:underline">
                 <ArrowLeft size={16} /> {backLinkText}
             </Link>
 
@@ -140,7 +141,7 @@ export default function TokenDetail() {
                 <GenericTokenIcon uri={token.logo as string} className="w-16 h-16 flex-shrink-0" />
                 <div className="flex-grow">
                     <h1 className="text-3xl font-bold">{token.name}</h1>
-                    <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
+                    <p className="text-foreground-muted font-semibold text-lg">${token.symbol}</p>
                 </div>
             </header>
 
@@ -182,7 +183,7 @@ export default function TokenDetail() {
 
                     {token.description && (
                         <InfoCard title={t('token_description_title')} icon={<FileText />}>
-                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{token.description}</p>
+                            <p className="text-sm text-foreground-muted leading-relaxed">{token.description}</p>
                         </InfoCard>
                     )}
                 </div>
