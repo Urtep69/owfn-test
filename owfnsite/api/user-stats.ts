@@ -1,12 +1,8 @@
 import { sql } from '../lib/db.ts';
 import type { UserStats } from '../types.ts';
 
-export const config = {
-  runtime: 'edge',
-};
-
 export default async function handler(req: any, res: any) {
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
     const wallet = searchParams.get('wallet');
 
     if (!wallet) {

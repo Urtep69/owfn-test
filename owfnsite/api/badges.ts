@@ -1,10 +1,6 @@
 import { sql } from '../lib/db.ts';
 import type { ImpactBadge } from '../types.ts';
 
-export const config = {
-  runtime: 'edge',
-};
-
 const ALL_BADGES: Omit<ImpactBadge, 'unlocked'>[] = [
     { id: 'first_donor', titleKey: 'badge_first_donor_title', descriptionKey: 'badge_first_donor_desc', icon: 'Heart' },
     { id: 'health_hero', titleKey: 'badge_health_hero_title', descriptionKey: 'badge_health_hero_desc', icon: 'HeartHandshake' },
@@ -12,7 +8,7 @@ const ALL_BADGES: Omit<ImpactBadge, 'unlocked'>[] = [
 ];
 
 export default async function handler(req: any, res: any) {
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
     const wallet = searchParams.get('wallet');
 
     if (!wallet) {

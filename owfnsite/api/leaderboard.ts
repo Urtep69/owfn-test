@@ -1,10 +1,6 @@
 import { sql } from '../lib/db.ts';
 import type { LeaderboardEntry } from '../types.ts';
 
-export const config = {
-  runtime: 'edge',
-};
-
 export default async function handler(req: any, res: any) {
     try {
         // In a real app, you would use the 'period' query parameter to change the query
