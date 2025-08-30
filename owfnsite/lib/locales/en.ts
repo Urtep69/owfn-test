@@ -249,6 +249,10 @@ export const en = {
     weekly: `Weekly`,
     monthly: `Monthly`,
     all_time: `All-Time`,
+    leaderboard_3_months: "3 Months",
+    leaderboard_6_months: "6 Months",
+    leaderboard_9_months: "9 Months",
+    leaderboard_1_year: "1 Year",
 
     // Impact Portal
     social_cases: `Social Cases`,
@@ -595,5 +599,5 @@ export const en = {
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
     contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
-    send_direct_message: `Send a Direct Message`,
+    send_direct_message: 'Send a Direct Message',
 };

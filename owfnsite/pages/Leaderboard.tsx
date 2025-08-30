@@ -8,16 +8,25 @@ import { Trophy, Loader2 } from 'lucide-react';
 
 export default function Leaderboard() {
     const { t } = useAppContext();
-    const [activeTab, setActiveTab] = useState<'weekly' | 'monthly' | 'all-time'>('all-time');
+    const [activePeriod, setActivePeriod] = useState('all-time');
     const [loading, setLoading] = useState(true);
     const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
     
+    const periods = [
+        { key: 'weekly', label: t('weekly') },
+        { key: 'monthly', label: t('monthly') },
+        { key: '3months', label: t('leaderboard_3_months') },
+        { key: '6months', label: t('leaderboard_6_months') },
+        { key: '9months', label: t('leaderboard_9_months') },
+        { key: '1year', label: t('leaderboard_1_year') },
+        { key: 'all-time', label: t('all_time') },
+    ];
+
     useEffect(() => {
         const fetchLeaderboard = async () => {
             setLoading(true);
             try {
-                // In a real app, you would pass the activeTab to the API
-                const response = await fetch(`/api/leaderboard?period=${activeTab}`);
+                const response = await fetch(`/api/leaderboard?period=${activePeriod}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch leaderboard data');
                 }
@@ -32,7 +41,7 @@ export default function Leaderboard() {
         };
 
         fetchLeaderboard();
-    }, [activeTab]);
+    }, [activePeriod]);
     
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -45,10 +54,18 @@ export default function Leaderboard() {
             </div>
             
             <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                <div className="border-b border-primary-200 dark:border-darkPrimary-700 mb-4 flex">
-                    <button onClick={() => setActiveTab('weekly')} disabled className="py-2 px-4 font-semibold text-primary-500 dark:text-darkPrimary-500 disabled:opacity-50">{t('weekly')}</button>
-                    <button onClick={() => setActiveTab('monthly')} disabled className="py-2 px-4 font-semibold text-primary-500 dark:text-darkPrimary-500 disabled:opacity-50">{t('monthly')}</button>
-                    <button onClick={() => setActiveTab('all-time')} className={`py-2 px-4 font-semibold ${activeTab === 'all-time' ? 'border-b-2 border-accent-500 text-accent-600 dark:border-darkAccent-500 dark:text-darkAccent-400' : 'text-primary-500 dark:text-darkPrimary-500'}`}>{t('all_time')}</button>
+                <div className="border-b border-primary-200 dark:border-darkPrimary-700 mb-4 flex flex-wrap">
+                    {periods.map(period => (
+                         <button 
+                            key={period.key}
+                            onClick={() => setActivePeriod(period.key)} 
+                            className={`py-2 px-4 font-semibold transition-colors duration-200 ${activePeriod === period.key 
+                                ? 'border-b-2 border-accent-500 text-accent-600 dark:border-darkAccent-500 dark:text-darkAccent-400' 
+                                : 'text-primary-500 dark:text-darkPrimary-500 hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50'}`}
+                        >
+                            {period.label}
+                        </button>
+                    ))}
                 </div>
                 
                 {loading ? (
@@ -66,7 +83,7 @@ export default function Leaderboard() {
                                 </tr>
                             </thead>
                              <tbody>
-                                {leaderboardData.map((entry) => (
+                                {leaderboardData.length > 0 ? leaderboardData.map((entry) => (
                                     <tr key={entry.rank} className="border-b dark:border-darkPrimary-700 hover:bg-primary-50 dark:hover:bg-darkPrimary-700/50">
                                         <td className="px-6 py-4 font-bold text-lg text-center">{entry.rank}</td>
                                         <td className="px-6 py-4 flex items-center gap-4">
@@ -77,7 +94,11 @@ export default function Leaderboard() {
                                             ${entry.totalDonatedUSD.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </td>
                                     </tr>
-                                ))}
+                                )) : (
+                                    <tr>
+                                        <td colSpan={3} className="text-center py-10 text-primary-500 dark:text-darkPrimary-400">No donations found for this period.</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

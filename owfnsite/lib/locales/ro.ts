@@ -249,6 +249,10 @@ export const ro = {
     weekly: `Săptămânal`,
     monthly: `Lunar`,
     all_time: `Total`,
+    leaderboard_3_months: "3 Luni",
+    leaderboard_6_months: "6 Luni",
+    leaderboard_9_months: "9 Luni",
+    leaderboard_1_year: "1 An",
 
     // Impact Portal
     social_cases: `Cazuri Sociale`,

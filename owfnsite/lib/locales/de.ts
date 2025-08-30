@@ -19,6 +19,7 @@ export const de = {
     governance: `Governance`,
     maintenance_mode: `Wartungsmodus`,
     contact: `Kontakt`,
+    leaderboards: `Ranglisten`,
 
     // Sidebar Groups
     sidebar_explore: `Erkunden`,
@@ -228,6 +229,30 @@ export const de = {
     badge_diverse_donor_desc: `Wird für Spenden an Projekte in 3 verschiedenen Kategorien verliehen.`,
     asset: `Vermögenswert`,
     value_usd: `Wert (USD)`,
+    my_impact_dashboard: `Mein Impact-Dashboard`,
+    total_donated_usd: `Insgesamt gespendet (USD)`,
+    causes_supported: `Unterstützte Anliegen`,
+    number_of_donations: `Anzahl der Spenden`,
+    unlocked_badges: `Freigeschaltete Abzeichen`,
+    badge_first_donor_title: `Erster Spender`,
+    badge_first_donor_desc: `Verliehen für Ihre erste Spende für irgendeinen Zweck.`,
+    badge_health_hero_title: `Gesundheitsheld`,
+    badge_health_hero_desc: `Verliehen für bedeutende Beiträge zu gesundheitsbezogenen Anliegen.`,
+    badge_active_voter_title: `Aktiver Wähler`,
+    badge_active_voter_desc: `Verliehen für die Teilnahme an 5 oder mehr Governance-Abstimmungen.`,
+    
+    // Leaderboards
+    leaderboards_desc: `Sehen Sie, wer die größten Beitragszahler zu unserer Bewegung sind.`,
+    leaderboard_rank: `Rang`,
+    leaderboard_donor: `Spender`,
+    leaderboard_total_donated: `Insgesamt gespendet (USD)`,
+    weekly: `Wöchentlich`,
+    monthly: `Monatlich`,
+    all_time: `Gesamt`,
+    leaderboard_3_months: "3 Monate",
+    leaderboard_6_months: "6 Monate",
+    leaderboard_9_months: "9 Monate",
+    leaderboard_1_year: "1 Jahr",
 
     // Impact Portal
     social_cases: `Soziale Fälle`,
@@ -318,8 +343,6 @@ export const de = {
     faq_q13: `Warum gibt es im Vorverkauf ein maximales Kauflimit (Max Buy)?`,
     faq_a13: `Das maximale Kauflimit ist eine wichtige Maßnahme, um eine möglichst faire Verteilung der Token zu gewährleisten und zu verhindern, dass eine kleine Anzahl großer Investoren ("Wale") einen erheblichen Teil des Angebots kontrolliert. Dies fördert langfristig eine gesündere und dezentralere Gemeinschaft.`,
     faq_q14: `Was bedeutet es, dass der Token "zinstragend" mit 2% APY ist? Wie funktioniert das?`,
-    faq_a14: `Das bedeutet, dass der OWFN-Token so programmiert ist, dass er automatisch Zinsen generiert. Indem Sie die Token einfach in Ihrer Solana-kompatiblen Wallet halten, wird sich die Anzahl Ihrer Token im Laufe der Zeit mit einer jährlichen prozentualen Rendite (APY) von 2% erhöhen. Sie müssen sie nicht staken oder zusätzliche Maßnahmen ergreifen; die Belohnungen sammeln sich automatisch an.`,
-    faq_q15: `Was ist die Überweisungsgebühr von 0,5% und wann wird sie aktiviert?`,
     faq_a15: `Diese Gebühr ist ein Schlüsselmechanismus für die langfristige Finanzierung unserer Mission. Eine Gebühr von 0,5% wird auf alle Transaktionen mit dem OWFN-Token *nach* Abschluss des Vorverkaufszeitraums erhoben. Die aus dieser Gebühr gesammelten Mittel werden automatisch an die Impact Treasury weitergeleitet, um unsere sozialen Projekte kontinuierlich zu finanzieren. So trägt jede Transaktion zum Gemeinwohl bei.`,
     faq_q16: `Warum haben Sie die Solana-Blockchain für dieses Projekt gewählt?`,
     faq_a16: `Wir haben uns für Solana wegen seiner außergewöhnlichen Geschwindigkeit, sehr niedrigen Transaktionskosten und hohen Skalierbarkeit entschieden. Diese Eigenschaften sind für ein globales Projekt wie unseres unerlässlich und ermöglichen effiziente Mikrotransaktionen und eine schnelle und zugängliche Erfahrung für alle Benutzer, egal ob sie spenden, kaufen oder Token handeln.`,

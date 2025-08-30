@@ -19,6 +19,7 @@ export const es = {
     governance: `Gobernanza`,
     maintenance_mode: `Modo de Mantenimiento`,
     contact: `Contacto`,
+    leaderboards: `Clasificaciones`,
 
     // Sidebar Groups
     sidebar_explore: `Explorar`,
@@ -228,6 +229,30 @@ export const es = {
     badge_diverse_donor_desc: `Otorgado por donar a proyectos en 3 categorías diferentes.`,
     asset: `Activo`,
     value_usd: `Valor (USD)`,
+    my_impact_dashboard: `Mi Panel de Impacto`,
+    total_donated_usd: `Total Donado (USD)`,
+    causes_supported: `Causas Apoyadas`,
+    number_of_donations: `Número de Donaciones`,
+    unlocked_badges: `Insignias Desbloqueadas`,
+    badge_first_donor_title: `Primer Donante`,
+    badge_first_donor_desc: `Otorgado por realizar tu primera donación a cualquier causa.`,
+    badge_health_hero_title: `Héroe de la Salud`,
+    badge_health_hero_desc: `Otorgado por contribuciones significativas a causas relacionadas con la salud.`,
+    badge_active_voter_title: `Votante Activo`,
+    badge_active_voter_desc: `Otorgado por participar en 5 o más votaciones de gobernanza.`,
+
+    // Leaderboards
+    leaderboards_desc: `Vea quiénes son los principales contribuyentes a nuestro movimiento.`,
+    leaderboard_rank: `Rango`,
+    leaderboard_donor: `Donante`,
+    leaderboard_total_donated: `Total Donado (USD)`,
+    weekly: `Semanal`,
+    monthly: `Mensual`,
+    all_time: `Total`,
+    leaderboard_3_months: "3 Meses",
+    leaderboard_6_months: "6 Meses",
+    leaderboard_9_months: "9 Meses",
+    leaderboard_1_year: "1 Año",
 
     // Impact Portal
     social_cases: `Casos Sociales`,
@@ -318,13 +343,11 @@ export const es = {
     faq_q13: `¿Por qué hay un límite máximo de compra (Max Buy) en la preventa?`,
     faq_a13: `El límite máximo de compra es una medida importante para garantizar la distribución más justa posible de los tokens y para evitar que un pequeño número de grandes inversores ("ballenas") controle una parte significativa del suministro. Esto promueve una comunidad más sana y descentralizada a largo plazo.`,
     faq_q14: `¿Qué significa que el token es "Portador de Intereses" con un 2% de APY? ¿Cómo funciona?`,
-    faq_a14: `Significa que el token OWFN está programado para generar intereses automáticamente. Simplemente manteniendo los tokens en su billetera compatible con Solana, la cantidad de sus tokens aumentará con el tiempo, con un Rendimiento Porcentual Anual (APY) del 2%. No necesita hacer staking ni realizar ninguna acción adicional; las recompensas se acumulan automáticamente.`,
-    faq_q15: `¿Qué es la tarifa de transferencia del 0.5% y cuándo se activará?`,
     faq_a15: `Esta tarifa es un mecanismo clave para la financiación a largo plazo de nuestra misión. Se aplicará una tarifa del 0.5% a todas las transacciones con el token OWFN *después* de que concluya el período de preventa. Los fondos recaudados de esta tarifa se dirigen automáticamente a la Tesorería de Impacto para financiar continuamente nuestros proyectos sociales. Por lo tanto, cada transacción contribuye al bien común.`,
     faq_q16: `¿Por qué eligieron la blockchain de Solana para este proyecto?`,
     faq_a16: `Elegimos Solana por su velocidad excepcional, costos de transacción muy bajos y alta escalabilidad. Estas características son esenciales para un proyecto global como el nuestro, permitiendo micro-transacciones eficientes y asegurando una experiencia rápida y accesible para todos los usuarios, ya sea que estén donando, comprando o comerciando tokens.`,
     faq_q17: `¿Cómo puedo estar seguro de que mis donaciones llegan a las causas que apoyan?`,
-    faq_a17: `La transparencia es fundamental для нас. Todos los fondos destinados a causas sociales se gestionan a través de la Tesorería de Impacto, cuya dirección de billetera es pública. Puede monitorear todas las transacciones entrantes y salientes en un explorador de bloques de Solana, como Solscan. Además, en el Portal de Impacto, proporcionaremos actualizaciones periódicas e informes detallados sobre los proyectos financiados.`,
+    faq_a17: `La transparencia es fundamental para nosotros. Todos los fondos destinados a causas sociales se gestionan a través de la Tesorería de Impacto, cuya dirección de billetera es pública. Puede monitorear todas las transacciones entrantes y salientes en un explorador de bloques de Solana, como Solscan. Además, en el Portal de Impacto, proporcionaremos actualizaciones periódicas e informes detallados sobre los proyectos financiados.`,
     faq_q18: `¿Puedo proponer un caso social o una causa para que sea financiada por OWFN?`,
     faq_a18: `En la fase inicial, los proyectos son seleccionados por nuestro equipo en base a criterios estrictos de impacto y viabilidad. A medida que el proyecto avance, implementaremos un sistema de gobernanza (DAO) que permitirá a los miembros de la comunidad proponer y votar sobre futuras iniciativas, dándole un papel directo en la dirección de los fondos.`,
     faq_q19: `¿Quién está detrás del proyecto OWFN? ¿El equipo es anónimo?`,
@@ -462,8 +485,6 @@ export const es = {
     airdrop_eligible_message: `¡Tu billetera es elegible! Recibirás {amount} tokens OWFN en la próxima distribución.`,
     airdrop_not_eligible: `No Elegible`,
     airdrop_not_eligible_message: `Lo sentimos, esta dirección de billetera no es elegible para el airdrop actual. ¡Mantente activo en nuestra comunidad para futuras oportunidades!`,
-    airdrop_info_box_title: `Acerca de este Airdrop`,
-    airdrop_info_box_desc: `Este airdrop está diseñado para recompensar a los primeros partidarios y a los miembros activos de la comunidad. La elegibilidad se basa en factores como la participación en la preventa y el compromiso en los eventos de la comunidad.`,
     
     // Governance
     governance_title: `Gobernanza`,
