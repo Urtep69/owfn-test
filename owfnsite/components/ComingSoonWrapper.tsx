@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
@@ -24,7 +25,7 @@ export const ComingSoonWrapper: React.FC<ComingSoonWrapperProps> = ({ children, 
             {showMessage ? (
                 <ComingSoon />
             ) : (
-                <div className="absolute inset-0 bg-primary-100/60 dark:bg-darkPrimary-900/60 z-10"></div>
+                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10"></div>
             )}
         </div>
     );

@@ -7,7 +7,7 @@ export const OwfnIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 
     src={owfnLogo} 
     alt="OWFN Logo" 
-    className={`${className} rounded-full border-2 border-accent-600 dark:border-darkAccent-700 object-cover`} 
+    className={`${className} rounded-full border-2 border-primary object-cover`} 
   />
 );
 
@@ -43,14 +43,14 @@ export const GenericTokenIcon = ({ uri, className = 'w-6 h-6' }: { uri?: string,
             <img 
                 src={uri} 
                 alt="Token Logo" 
-                className={`${className} rounded-full object-cover bg-primary-200 dark:bg-darkPrimary-700`} 
+                className={`${className} rounded-full object-cover bg-surface`} 
                 onError={() => setHasError(true)}
             />
         );
     }
     return (
-        <div className={`${className} rounded-full bg-primary-200 dark:bg-darkPrimary-700 flex items-center justify-center`}>
-            <Image className="w-4/6 h-4/6 text-primary-400 dark:text-darkPrimary-500" />
+        <div className={`${className} rounded-full bg-surface flex items-center justify-center`}>
+            <Image className="w-4/6 h-4/6 text-foreground-muted" />
         </div>
     );
 };
