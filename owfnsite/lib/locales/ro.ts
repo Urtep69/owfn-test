@@ -451,6 +451,7 @@ export const ro = {
     create_schedule: `Creează Program`,
     vesting_schedule_created: `Program de vesting creat cu succes!`,
     all_vesting_schedules: `Toate Programele de Vesting`,
+    go_to_staking: `Mergi la Staking`,
 
     // Airdrop
     airdrop_title: `Airdrop Token OWFN`,
