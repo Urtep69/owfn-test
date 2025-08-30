@@ -1,19 +1,29 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-// Fix: Import `HeartHandshake` and remove unused icons.
 import { Wallet, DollarSign, Vote, Loader2, Heart, Trophy, HeartHandshake } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { ImpactBadge } from '../types.ts';
+import type { ImpactBadge, UserStats } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { formatNumber } from '../lib/utils.ts';
 
-const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => (
+const iconMap: { [key: string]: React.ReactNode } = {
+    Heart: <Heart size={32} />,
+    HeartHandshake: <HeartHandshake size={32} />,
+    Vote: <Vote size={32} />,
+    Trophy: <Trophy size={32} />, // Fallback icon
+};
+
+const StatCard = ({ icon, title, value, isLoading }: { icon: React.ReactNode, title: string, value: string | number, isLoading: boolean }) => (
     <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg flex items-center space-x-4">
         <div className="text-accent-500 dark:text-darkAccent-400">{icon}</div>
         <div>
             <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
-            <p className="text-xl font-bold">{value}</p>
+            {isLoading ? (
+                <div className="h-7 w-24 bg-primary-200 dark:bg-darkPrimary-600 rounded-md animate-pulse mt-1"></div>
+            ) : (
+                <p className="text-xl font-bold">{value}</p>
+            )}
         </div>
     </div>
 );
@@ -22,11 +32,12 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
 const BadgeDisplay = ({ badge }: { badge: ImpactBadge }) => {
     const { t } = useAppContext();
     const isUnlocked = badge.unlocked;
+    const iconNode = iconMap[badge.icon] || iconMap['Trophy'];
 
     return (
         <div className="group relative flex flex-col items-center text-center w-24">
             <div className={`rounded-full p-4 transition-all duration-300 ${isUnlocked ? 'bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 group-hover:scale-110' : 'bg-primary-200 dark:bg-darkPrimary-600 text-primary-400 dark:text-darkPrimary-500 grayscale'}`}>
-                {React.cloneElement(badge.icon as React.ReactElement<{ size: number }>, { size: 32 })}
+                {iconNode}
             </div>
             <p className={`text-sm font-semibold mt-2 ${isUnlocked ? 'text-primary-800 dark:text-darkPrimary-200' : 'text-primary-400 dark:text-darkPrimary-500'}`}>{t(badge.titleKey)}</p>
             <div className="absolute bottom-full mb-2 w-48 bg-primary-900 text-white dark:bg-darkPrimary-950 text-xs rounded py-1 px-2 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
@@ -37,12 +48,52 @@ const BadgeDisplay = ({ badge }: { badge: ImpactBadge }) => {
     );
 };
 
+const defaultStats: UserStats = { totalDonatedUSD: 0, causesSupported: 0, donationCount: 0, votedProposalIds: [] };
 
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, loading, userStats } = solana;
+    const { connected, address, userTokens, loading: walletLoading } = solana;
     
-    const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
+    const [stats, setStats] = useState<UserStats>(defaultStats);
+    const [badges, setBadges] = useState<ImpactBadge[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (!connected || !address) {
+            setIsLoading(false);
+            return;
+        }
+
+        const fetchProfileData = async () => {
+            setIsLoading(true);
+            try {
+                const [statsRes, badgesRes] = await Promise.all([
+                    fetch(`/api/user-stats?wallet=${address}`),
+                    fetch(`/api/badges?wallet=${address}`)
+                ]);
+
+                if (!statsRes.ok || !badgesRes.ok) {
+                    throw new Error('Failed to fetch profile data');
+                }
+
+                const statsData = await statsRes.json();
+                const badgesData = await badgesRes.json();
+
+                setStats(statsData);
+                setBadges(badgesData);
+
+            } catch (error) {
+                console.error("Error fetching profile data:", error);
+                setStats(defaultStats);
+                setBadges([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfileData();
+    }, [connected, address]);
+
     
     const totalUsdValue = useMemo(() => {
         if (!userTokens || userTokens.length === 0) {
@@ -51,11 +102,6 @@ export default function Profile() {
         return userTokens.reduce((sum, token) => sum + token.usdValue, 0);
     }, [userTokens]);
 
-    const badges: ImpactBadge[] = useMemo(() => [
-        { id: 'first_donor', titleKey: 'badge_first_donor_title', descriptionKey: 'badge_first_donor_desc', icon: <Heart />, unlocked: userStats.donationCount > 0 },
-        { id: 'health_hero', titleKey: 'badge_health_hero_title', descriptionKey: 'badge_health_hero_desc', icon: <HeartHandshake />, unlocked: true }, // Mocked as unlocked
-        { id: 'active_voter', titleKey: 'badge_active_voter_title', descriptionKey: 'badge_active_voter_desc', icon: <Vote />, unlocked: userStats.votedProposalIds.length >= 5 },
-    ], [userStats]);
 
     if (!connected) {
         return (
@@ -65,10 +111,10 @@ export default function Profile() {
                 <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_connect_prompt')}</p>
                 <button
                     onClick={() => setWalletModalOpen(true)}
-                    disabled={loading}
+                    disabled={walletLoading}
                     className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
                 >
-                    {loading ? t('connecting') : t('connect_wallet')}
+                    {walletLoading ? t('connecting') : t('connect_wallet')}
                 </button>
             </div>
         );
@@ -87,19 +133,30 @@ export default function Profile() {
             <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                 <h2 className="text-2xl font-bold mb-4">{t('my_impact_dashboard')}</h2>
                 <div className="grid md:grid-cols-3 gap-4">
-                    <StatCard icon={<DollarSign size={24} />} title={t('total_donated_usd')} value={`$${userStats.totalDonatedUSD.toFixed(2)}`} />
-                    <StatCard icon={<Trophy size={24} />} title={t('causes_supported')} value={userStats.causesSupported} />
-                    <StatCard icon={<Heart size={24} />} title={t('number_of_donations')} value={userStats.donationCount} />
+                    <StatCard icon={<DollarSign size={24} />} title={t('total_donated_usd')} value={`$${stats.totalDonatedUSD.toFixed(2)}`} isLoading={isLoading} />
+                    <StatCard icon={<Trophy size={24} />} title={t('causes_supported')} value={stats.causesSupported} isLoading={isLoading} />
+                    <StatCard icon={<Heart size={24} />} title={t('number_of_donations')} value={stats.donationCount} isLoading={isLoading} />
                 </div>
             </div>
             
              <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                 <h2 className="text-2xl font-bold mb-4">{t('unlocked_badges')}</h2>
-                 <div className="flex flex-wrap gap-4">
-                    {badges.map(badge => (
-                        <BadgeDisplay key={badge.id} badge={badge} />
-                    ))}
-                </div>
+                 {isLoading ? (
+                    <div className="flex flex-wrap gap-4">
+                        {[...Array(3)].map((_, i) => (
+                             <div key={i} className="flex flex-col items-center w-24">
+                                <div className="w-20 h-20 bg-primary-200 dark:bg-darkPrimary-600 rounded-full animate-pulse"></div>
+                                <div className="h-4 w-16 bg-primary-200 dark:bg-darkPrimary-600 rounded-md animate-pulse mt-2"></div>
+                            </div>
+                        ))}
+                    </div>
+                 ) : (
+                    <div className="flex flex-wrap gap-4">
+                        {badges.map(badge => (
+                            <BadgeDisplay key={badge.id} badge={badge} />
+                        ))}
+                    </div>
+                 )}
             </div>
 
             <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
@@ -107,17 +164,17 @@ export default function Profile() {
                 <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
                     <div>
                         <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('token_types')}</p>
-                        <p className="text-2xl font-bold">{loading ? '-' : userTokens.length}</p>
+                        <p className="text-2xl font-bold">{walletLoading ? '-' : userTokens.length}</p>
                     </div>
                     <div className="text-right">
                         <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
                         <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                            {loading ? '-' : `$${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                            {walletLoading ? '-' : `$${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                         </p>
                     </div>
                 </div>
                 
-                {loading ? (
+                {walletLoading ? (
                     <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
                         <Loader2 className="w-6 h-6 animate-spin" />
                         <span>{t('profile_loading_tokens')}</span>

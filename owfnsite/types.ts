@@ -138,7 +138,7 @@ export interface ImpactBadge {
     id: string;
     titleKey: string;
     descriptionKey: string;
-    icon: React.ReactNode;
+    icon: string; // Changed from React.ReactNode to string for API serialization
     unlocked: boolean;
 }
 

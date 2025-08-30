@@ -37,6 +37,7 @@ const Countdown = ({ endDate }: { endDate: Date }) => {
 
 const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
     const { t, solana, voteOnProposal: contextVote, currentLanguage } = useAppContext();
+    // FIX: Correctly destructure userStats from the solana hook provided by useAppContext.
     const { userStats, loading, voteOnProposal: hookVote, connected } = solana;
     
     const totalVotes = proposal.votesFor + proposal.votesAgainst;
