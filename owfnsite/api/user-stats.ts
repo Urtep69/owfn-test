@@ -1,18 +1,56 @@
+import { sql } from '../lib/db.ts';
 import type { UserStats } from '../types.ts';
 
-const MOCK_USER_STATS: UserStats = { 
-    totalDonatedUSD: 125.50,
-    causesSupported: 3,
-    donationCount: 8,
-    votedProposalIds: ['prop1', 'prop2', 'prop3', 'prop4', 'prop5']
+export const config = {
+  runtime: 'edge',
 };
 
 export default async function handler(req: any, res: any) {
-    // In a real app, you would use the wallet query parameter to fetch data for a specific user.
-    // const { wallet } = req.query;
+    const { searchParams } = new URL(req.url);
+    const wallet = searchParams.get('wallet');
 
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    res.status(200).json(MOCK_USER_STATS);
+    if (!wallet) {
+        return new Response(JSON.stringify({ error: 'Wallet address is required' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
+
+    try {
+        const { rows } = await sql`
+            SELECT 
+                SUM(amount_usd) AS total_donated,
+                COUNT(*) AS donation_count,
+                COUNT(DISTINCT cause_id) AS causes_supported
+            FROM 
+                donations 
+            WHERE 
+                wallet_address = ${wallet};
+        `;
+
+        const stats = rows[0];
+
+        const userStats: UserStats = {
+            totalDonatedUSD: parseFloat(stats.total_donated) || 0,
+            causesSupported: parseInt(stats.causes_supported, 10) || 0,
+            donationCount: parseInt(stats.donation_count, 10) || 0,
+            // Assuming votedProposalIds would come from another table or system
+            votedProposalIds: ['prop1', 'prop2', 'prop3', 'prop4', 'prop5'] // Keep mock data for this
+        };
+        
+        return new Response(JSON.stringify(userStats), {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 's-maxage=300, stale-while-revalidate=3600', // Cache for 5 mins
+            },
+        });
+
+    } catch (error) {
+        console.error(`Error fetching user stats for ${wallet}:`, error);
+        return new Response(JSON.stringify({ error: 'Failed to fetch user statistics' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    }
 }
