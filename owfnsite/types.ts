@@ -107,6 +107,8 @@ export interface LiveTransaction {
 }
 
 export interface VestingSchedule {
+  id: number;
+  recipientName: string;
   recipientAddress: string;
   totalAmount: number;
   claimedAmount: number;
