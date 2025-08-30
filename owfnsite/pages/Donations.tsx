@@ -51,7 +51,25 @@ export default function Donations() {
         
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
 
-        if (result.success) {
+        if (result.success && result.signature) {
+             try {
+                await fetch('/api/donations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        wallet_address: solana.address,
+                        token_symbol: selectedToken,
+                        token_amount: numAmount,
+                        amount_usd: usdValue,
+                        transaction_signature: result.signature,
+                        cause_id: null,
+                    }),
+                });
+            } catch (dbError) {
+                console.error("Failed to record donation in DB:", dbError);
+                // Non-critical error, the on-chain tx succeeded.
+            }
+
             alert(t('donation_success_alert', result.params));
             setAmount('');
         } else {

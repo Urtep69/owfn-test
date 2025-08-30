@@ -171,8 +171,16 @@ export interface UserStats {
     votedProposalIds: string[];
 }
 
+export interface TokenDonationDetail {
+    symbol: 'OWFN' | 'SOL' | 'USDC' | 'USDT';
+    totalAmount: number;
+    totalUSD: number;
+    lastDonationDate: string; // ISO string date
+}
+
 export interface LeaderboardEntry {
     rank: number;
     address: string;
     totalDonatedUSD: number;
+    donationsByToken: TokenDonationDetail[];
 }

@@ -23,44 +23,55 @@ export default async function handler(req: any, res: any) {
                 headers: { 'Content-Type': 'application/json' },
             });
         }
+        
+        const baseQuery = `
+            SELECT
+                wallet_address,
+                SUM(amount_usd) AS total_donated,
+                json_agg(
+                    json_build_object(
+                        'symbol', token_symbol,
+                        'totalAmount', total_token_amount,
+                        'totalUSD', total_token_usd,
+                        'lastDonationDate', last_donation
+                    )
+                ) as donations_by_token
+            FROM (
+                SELECT
+                    wallet_address,
+                    token_symbol,
+                    SUM(token_amount) as total_token_amount,
+                    SUM(amount_usd) as total_token_usd,
+                    MAX(created_at) as last_donation
+                FROM donations
+        `;
 
-        let query;
+        const endQuery = `
+                GROUP BY wallet_address, token_symbol
+            ) as user_token_summary
+            GROUP BY wallet_address
+            ORDER BY total_donated DESC
+            LIMIT 100;
+        `;
+        
+        let result;
         if (period === 'all-time') {
-            query = sql`
-                SELECT 
-                    wallet_address, 
-                    SUM(amount_usd) as total_donated
-                FROM 
-                    donations
-                GROUP BY 
-                    wallet_address
-                ORDER BY 
-                    total_donated DESC
-                LIMIT 10;
-            `;
+             result = await sql.query(baseQuery + endQuery);
         } else {
-            query = sql`
-                SELECT 
-                    wallet_address, 
-                    SUM(amount_usd) as total_donated
-                FROM 
-                    donations
-                WHERE 
-                    created_at >= NOW() - INTERVAL ${interval}
-                GROUP BY 
-                    wallet_address
-                ORDER BY 
-                    total_donated DESC
-                LIMIT 10;
-            `;
+             result = await sql.query(baseQuery + ` WHERE created_at >= NOW() - INTERVAL '${interval}'` + endQuery);
         }
 
-        const { rows } = await query;
-        
+        const { rows } = result;
+
         const leaderboardData: LeaderboardEntry[] = rows.map((row, index) => ({
             rank: index + 1,
             address: row.wallet_address,
-            totalDonatedUSD: parseFloat(row.total_donated)
+            totalDonatedUSD: parseFloat(row.total_donated),
+            donationsByToken: row.donations_by_token.map((d: any) => ({
+                ...d,
+                totalAmount: parseFloat(d.totalamount),
+                totalUSD: parseFloat(d.totalusd)
+            }))
         }));
 
         return new Response(JSON.stringify(leaderboardData), {
