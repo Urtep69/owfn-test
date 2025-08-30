@@ -29,41 +29,81 @@
         theme: {
           extend: {
             colors: {
-              // New "AuraWeb3" Dark Theme (default)
-              'background': '#020617', // slate-950
-              'surface': '#0f172a',    // slate-900
-              'border': '#1e293b',      // slate-800
-              'ring': '#22d3ee',        // cyan-400 for focus rings
-              
-              'primary': {
-                DEFAULT: '#22d3ee', // cyan-400
-                foreground: '#020617',
+              'primary': { // Light Theme
+                '50': '#fafafa',
+                '100': '#f4f4f5',
+                '200': '#e4e4e7',
+                '300': '#d4d4d8',
+                '400': '#a1a1aa',
+                '500': '#71717a',
+                '600': '#52525b',
+                '700': '#3f3f46',
+                '800': '#27272a',
+                '900': '#18181b',
+                '950': '#09090b',
               },
-              'secondary': {
-                DEFAULT: '#fbbf24', // amber-400
-                foreground: '#020617',
+              'accent': { // Light Theme
+                '50': '#fffbeb',
+                '100': '#fef3c7',
+                '200': '#fde68a',
+                '300': '#fcd34d',
+                '400': '#fbbf24',
+                '500': '#f59e0b',
+                '600': '#d97706',
+                '700': '#b45309',
+                '800': '#92400e',
+                '900': '#78350f',
+                '950': '#451a03',
               },
-
-              'foreground': {
-                DEFAULT: '#f8fafc', // slate-50 (primary text)
-                muted: '#94a3b8',   // slate-400 (secondary text)
+              'darkPrimary': { // Dark Theme
+                '50': '#fafaf9',
+                '100': '#f5f5f4',
+                '200': '#e7e5e4',
+                '300': '#d6d3d1',
+                '400': '#a8a29e',
+                '500': '#78716c',
+                '600': '#57534e',
+                '700': '#44403c',
+                '800': '#292524',
+                '900': '#1c1917',
+                '950': '#0c0a09',
               },
+              'darkAccent': { // Dark Theme
+                '50': '#fdf8f0',
+                '100': '#fbf0dc',
+                '200': '#f6e0b6',
+                '300': '#f0d090',
+                '400': '#eac06a',
+                '500': '#d2b48c',
+                '600': '#b89b74',
+                '700': '#9e825c',
+                '800': '#846944',
+                '900': '#6a502c',
+                '950': '#503814',
+              }
             },
             boxShadow: {
-              'card-glow': '0px 0px 25px -8px rgba(34, 211, 238, 0.2)',
+              '3d': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+              '3d-lg': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              'inner-3d': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
             },
             animation: {
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
-              'card-entry': 'cardEntry 0.6s ease-out forwards',
+              'slide-in': 'slideIn 0.5s ease-out forwards',
+              'glow': 'glow 1.5s ease-in-out infinite alternate',
             },
             keyframes: {
               fadeInUp: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               },
-              cardEntry: {
-                '0%': { opacity: '0', transform: 'translateY(10px) scale(0.98)' },
-                '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+              slideIn: {
+                '0%': { transform: 'translateX(100%)' },
+                '100%': { transform: 'translateX(0)' },
+              },
+              glow: {
+                'from': { 'box-shadow': '0 0 5px -5px #fbbf24' },
+                'to': { 'box-shadow': '0 0 5px 5px #fbbf24' }
               }
             },
           },
@@ -101,7 +141,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-background text-foreground">
+  <body class="bg-primary-100 dark:bg-darkPrimary-900">
     <div id="root"></div>
     <script type="module" src="/bundle.js"></script>
   <script type="module" src="/index.tsx"></script>

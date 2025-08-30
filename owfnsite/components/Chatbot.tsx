@@ -56,7 +56,7 @@ const renderMessageContent = (text: string) => {
             const path = pageNameToPath[pageName];
             if (path) {
                 result.push(
-                    <Link key={match.index} href={path} className="text-primary font-bold underline hover:opacity-80">
+                    <Link key={match.index} href={path} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
                         {pageName}
                     </Link>
                 );
@@ -69,7 +69,7 @@ const renderMessageContent = (text: string) => {
             const icon = socialIconMap[platformName];
             if (url && platformName) {
                  result.push(
-                    <a key={match.index} href={url} target="_blank" rel="noopener noreferrer" className="text-primary font-bold underline hover:opacity-80 inline-flex items-center gap-1.5">
+                    <a key={match.index} href={url} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80 inline-flex items-center gap-1.5">
                         {icon} {platformName}
                     </a>
                 );
@@ -225,7 +225,7 @@ export const Chatbot = () => {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-5 right-5 bg-primary text-primary-foreground p-4 rounded-full shadow-lg hover:bg-primary/90 transition-transform transform hover:scale-110"
+                className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
                 aria-label="Open Chatbot"
             >
                 <MessageCircle size={28} />
@@ -234,24 +234,24 @@ export const Chatbot = () => {
     }
 
     const containerClasses = isMaximized
-        ? "fixed inset-0 flex flex-col bg-surface z-50 animate-fade-in-up"
-        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-surface rounded-lg shadow-2xl border border-border animate-slide-in z-50";
+        ? "fixed inset-0 flex flex-col bg-white dark:bg-darkPrimary-800 z-50 animate-fade-in-up"
+        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50";
 
     return (
         <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
-            <header className="flex items-center justify-between p-4 bg-primary text-primary-foreground rounded-t-lg">
+            <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
                 <div className="flex items-center space-x-2">
                     <OwfnIcon className="w-6 h-6" />
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-black/20 rounded-full transition-colors" aria-label="Minimize Chat">
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Minimize Chat">
                         <Minus size={20} />
                     </button>
-                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-black/20 rounded-full transition-colors" aria-label={isMaximized ? "Restore Chat" : "Maximize Chat"}>
+                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={isMaximized ? "Restore Chat" : "Maximize Chat"}>
                         {isMaximized ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-black/20 rounded-full transition-colors" aria-label="Close Chat">
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Close Chat">
                         <X size={20} />
                     </button>
                 </div>
@@ -264,25 +264,25 @@ export const Chatbot = () => {
                                 {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
                                 <div className="flex flex-col">
                                     {msg.timestamp && (
-                                        <p className={`text-xs text-foreground-muted mb-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                                        <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mb-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                                             {formatTimestamp(msg.timestamp)}
                                         </p>
                                     )}
-                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-border text-foreground rounded-bl-none'}`}>
+                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
                                        <div className="text-sm whitespace-pre-wrap">
                                            {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
                                        </div>
                                     </div>
                                 </div>
-                                {msg.role === 'user' && <User className="w-6 h-6 text-primary flex-shrink-0 mt-1" />}
+                                {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                             </div>
                         </div>
                     ))}
                     {isLoading && (
                          <div className="flex items-start gap-3 justify-start">
                             <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />
-                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-border text-foreground rounded-bl-none">
-                                <div className="flex items-center space-x-2 text-sm text-foreground-muted">
+                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none">
+                                <div className="flex items-center space-x-2 text-sm text-primary-600 dark:text-darkPrimary-300">
                                     <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
                                     <span>{loadingText}</span>
                                 </div>
@@ -292,7 +292,7 @@ export const Chatbot = () => {
                     <div ref={messagesEndRef} />
                 </div>
             </div>
-            <div className="p-4 border-t border-border">
+            <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
                 <div className="relative">
                     <input
                         ref={inputRef}
@@ -301,16 +301,16 @@ export const Chatbot = () => {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={handleKeyPress}
                         placeholder={t('chatbot_placeholder')}
-                        className="w-full p-3 pr-20 bg-background rounded-lg focus:ring-2 focus:ring-ring focus:outline-none"
+                        className="w-full p-3 pr-20 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
                         disabled={isLoading}
                     />
                     <button
                         onClick={handleSend}
                         disabled={isLoading || input.trim() === ''}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-primary-foreground p-2 rounded-md hover:bg-primary/90 disabled:bg-border disabled:cursor-not-allowed"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
                         aria-label="Send message"
                     >
-                       {isLoading ? <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }
+                       {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }
                     </button>
                 </div>
             </div>

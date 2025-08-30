@@ -1,3 +1,4 @@
+
 export const en = {
     // Navigation
     home: `Home`,
@@ -18,6 +19,7 @@ export const en = {
     governance: `Governance`,
     maintenance_mode: `Maintenance Mode`,
     contact: `Contact`,
+    leaderboards: `Leaderboards`,
 
     // Sidebar Groups
     sidebar_explore: `Explore`,
@@ -227,6 +229,26 @@ export const en = {
     badge_diverse_donor_desc: `Awarded for donating to projects in 3 different categories.`,
     asset: `Asset`,
     value_usd: `Value (USD)`,
+    my_impact_dashboard: `My Impact Dashboard`,
+    total_donated_usd: `Total Donated (USD)`,
+    causes_supported: `Causes Supported`,
+    number_of_donations: `Number of Donations`,
+    unlocked_badges: `Unlocked Badges`,
+    badge_first_donor_title: `First Donor`,
+    badge_first_donor_desc: `Awarded for making your first donation to any cause.`,
+    badge_health_hero_title: `Health Hero`,
+    badge_health_hero_desc: `Awarded for significant contributions to health-related causes.`,
+    badge_active_voter_title: `Active Voter`,
+    badge_active_voter_desc: `Awarded for participating in 5 or more governance votes.`,
+
+    // Leaderboards
+    leaderboards_desc: `See who are the top contributors to our movement.`,
+    leaderboard_rank: `Rank`,
+    leaderboard_donor: `Donor`,
+    leaderboard_total_donated: `Total Donated (USD)`,
+    weekly: `Weekly`,
+    monthly: `Monthly`,
+    all_time: `All-Time`,
 
     // Impact Portal
     social_cases: `Social Cases`,

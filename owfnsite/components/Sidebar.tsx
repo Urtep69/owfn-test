@@ -5,7 +5,7 @@ import { Link, useRoute } from 'wouter';
 import { 
     Home, Info, FileText, Map, Handshake, HelpCircle, Mail,
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
-    Heart, TrendingUp, Lock, Award, User, Vote, Shield
+    Heart, TrendingUp, Lock, Award, User, Vote, Shield, Trophy
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
@@ -20,8 +20,8 @@ const NavItem = ({ to, icon, label, isOpen, onClick }: { to: string, icon: React
     const [isActive] = useRoute(to);
     const navLinkClasses = `flex items-center py-3 px-4 my-1 rounded-lg transition-colors duration-200 ${
         isActive 
-            ? 'bg-primary/10 text-primary font-semibold' 
-            : 'text-foreground-muted hover:bg-surface hover:text-foreground'
+            ? 'bg-accent-400/10 text-accent-600 dark:bg-darkAccent-500/10 dark:text-darkAccent-400 font-semibold' 
+            : 'text-primary-600 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700'
         }`;
 
     return (
@@ -34,7 +34,7 @@ const NavItem = ({ to, icon, label, isOpen, onClick }: { to: string, icon: React
 
 const NavGroup = ({ title, isOpen, children }: { title: string, isOpen: boolean, children: React.ReactNode }) => (
     <div>
-        <h3 className={`px-4 pt-4 pb-2 text-xs font-semibold uppercase text-foreground-muted/50 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
+        <h3 className={`px-4 pt-4 pb-2 text-xs font-semibold uppercase text-primary-500 dark:text-darkPrimary-500 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
             {title}
         </h3>
         {children}
@@ -80,17 +80,18 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 { to: '/airdrop', label: t('airdrop'), icon: <Award size={20} /> },
                 { to: '/impact', label: t('impact_portal'), icon: <Heart size={20} /> },
                 { to: '/governance', label: t('governance'), icon: <Vote size={20} /> },
+                { to: '/leaderboard', label: t('leaderboards'), icon: <Trophy size={20} /> },
                 { to: '/contact', label: t('contact'), icon: <Mail size={20} /> },
             ]
         }
     ];
 
     return (
-        <aside className={`fixed top-0 left-0 h-full bg-background border-r border-border shadow-lg z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-             <div className="flex items-center justify-between h-16 px-4 border-b border-border flex-shrink-0">
+        <aside className={`fixed top-0 left-0 h-full bg-primary-50 dark:bg-darkPrimary-800 shadow-lg z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+             <div className="flex items-center justify-between h-16 px-4 border-b border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
                 <Link to="/" onClick={handleLinkClick} className={`flex items-center space-x-3 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
                     <OwfnIcon className="h-9 w-9" />
-                    <span className={`font-bold text-xl text-foreground ${isOpen ? 'inline' : 'hidden'}`}>OWFN</span>
+                    <span className={`font-bold text-xl text-primary-900 dark:text-darkPrimary-100 ${isOpen ? 'inline' : 'hidden'}`}>OWFN</span>
                 </Link>
              </div>
 
@@ -115,7 +116,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 )}
             </nav>
             
-            <div className="px-2 py-4 border-t border-border flex-shrink-0">
+            <div className="px-2 py-4 border-t border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
                  <NavItem to="/profile" icon={<User size={20} />} label={t('profile')} isOpen={isOpen} onClick={handleLinkClick} />
             </div>
         </aside>

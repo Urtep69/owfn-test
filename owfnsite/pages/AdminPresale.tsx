@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -33,13 +32,13 @@ interface AggregatedContributor {
 }
 
 const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
-    <div className="bg-surface border border-border p-6 rounded-lg shadow-lg flex items-center space-x-4">
-        <div className="bg-background text-primary rounded-full p-3">
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md flex items-center space-x-4">
+        <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-full p-3">
             {icon}
         </div>
         <div>
-            <p className="text-sm text-foreground-muted">{title}</p>
-            <p className="text-2xl font-bold text-foreground">{value}</p>
+            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+            <p className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">{value}</p>
         </div>
     </div>
 );
@@ -334,16 +333,16 @@ export default function AdminPresale() {
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold">{t('presale_admin_title')}</h1>
-                    <p className="text-foreground-muted mt-1">{t('presale_admin_subtitle')}</p>
+                    <p className="text-primary-600 dark:text-darkPrimary-400 mt-1">{t('presale_admin_subtitle')}</p>
                 </div>
-                <button onClick={fetchAllTransactions} disabled={loading} className="flex items-center gap-2 bg-surface px-4 py-2 rounded-lg font-semibold hover:bg-border disabled:opacity-50">
+                <button onClick={fetchAllTransactions} disabled={loading} className="flex items-center gap-2 bg-primary-200 dark:bg-darkPrimary-700 px-4 py-2 rounded-lg font-semibold hover:bg-primary-300 dark:hover:bg-darkPrimary-600 disabled:opacity-50">
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
                     {t('refresh_data')}
                 </button>
             </div>
             
             {loading ? (
-                <div className="flex justify-center items-center py-20"><Loader2 className="w-12 h-12 animate-spin text-primary"/></div>
+                <div className="flex justify-center items-center py-20"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>
             ) : (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -353,16 +352,16 @@ export default function AdminPresale() {
                         <StatCard title={t('total_owfn_to_distribute')} value={totalOwfnToDistribute.toLocaleString(undefined, { maximumFractionDigits: 0 })} icon={<PieChart />} />
                     </div>
 
-                    <div className="bg-surface border border-border p-6 rounded-lg shadow-lg">
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-bold">{t('presale_purchases')}</h2>
-                            <button onClick={exportToCsv} className="flex items-center gap-2 bg-background px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-border">
+                            <button onClick={exportToCsv} className="flex items-center gap-2 bg-primary-200 dark:bg-darkPrimary-700 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary-300 dark:hover:bg-darkPrimary-600">
                                 <Download size={16} /> {t('export_csv')}
                             </button>
                         </div>
                         <div className="overflow-x-auto max-h-[50vh] relative">
                             <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-foreground-muted uppercase bg-background sticky top-0">
+                                <thead className="text-xs text-primary-700 dark:text-darkPrimary-300 uppercase bg-primary-100 dark:bg-darkPrimary-700 sticky top-0">
                                     <tr>
                                         <th scope="col" className="px-6 py-3">{t('contributor')}</th>
                                         <th scope="col" className="px-6 py-3 text-right">{t('sol_amount')}</th>
@@ -373,7 +372,7 @@ export default function AdminPresale() {
                                 </thead>
                                 <tbody>
                                     {transactions.map(tx => (
-                                        <tr key={tx.signature} className="border-b border-border hover:bg-border/50">
+                                        <tr key={tx.signature} className="border-b dark:border-darkPrimary-700 hover:bg-primary-50 dark:hover:bg-darkPrimary-700/50">
                                             <td className="px-6 py-4"><AddressDisplay address={tx.from} /></td>
                                             <td className="px-6 py-4 text-right font-mono">{tx.solAmount.toFixed(4)}</td>
                                             <td className="px-6 py-4 text-right font-mono">{tx.owfnAmount.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
@@ -386,32 +385,32 @@ export default function AdminPresale() {
                         </div>
                     </div>
 
-                    <div className="bg-surface border border-border p-6 rounded-lg shadow-lg space-y-4">
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md space-y-4">
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold">{t('airdrop_tool_title')}</h2>
-                            <button onClick={handleClearProgress} disabled={isAirdropping} className="flex items-center gap-2 text-xs bg-red-900/50 text-red-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-red-900 disabled:opacity-50">
+                            <button onClick={handleClearProgress} disabled={isAirdropping} className="flex items-center gap-2 text-xs bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-red-200 dark:hover:bg-red-900 disabled:opacity-50">
                                 <RotateCcw size={14} /> Clear Progress & Logs
                             </button>
                         </div>
-                         <div className="bg-red-500/10 border-l-4 border-red-500 text-red-300 p-4 rounded-r-lg flex items-start gap-3">
+                         <div className="bg-red-500/10 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-r-lg flex items-start gap-3">
                             <AlertTriangle className="w-8 h-8 flex-shrink-0"/>
                             <p className="text-sm font-semibold">{t('airdrop_warning')}</p>
                          </div>
 
                          <div className="grid md:grid-cols-2 gap-4">
-                            <div className="bg-background p-4 rounded-lg">
-                                <p className="text-sm text-foreground-muted">{t('total_owfn_to_distribute')}</p>
+                            <div className="bg-primary-100 dark:bg-darkPrimary-700 p-4 rounded-lg">
+                                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_owfn_to_distribute')}</p>
                                 <p className="text-lg font-bold font-mono">{totalOwfnToDistribute.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
                             </div>
-                             <div className={`bg-background p-4 rounded-lg ${adminOwfnBalance < totalOwfnToDistribute ? 'border border-red-500' : ''}`}>
-                                <p className="text-sm text-foreground-muted">{t('your_owfn_balance')}</p>
+                             <div className={`bg-primary-100 dark:bg-darkPrimary-700 p-4 rounded-lg ${adminOwfnBalance < totalOwfnToDistribute ? 'border border-red-500' : ''}`}>
+                                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('your_owfn_balance')}</p>
                                 <p className="text-lg font-bold font-mono">{adminOwfnBalance.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
                                 {adminOwfnBalance < totalOwfnToDistribute && <p className="text-xs text-red-500 mt-1">{t('insufficient_owfn_balance')}</p>}
                             </div>
-                             <div className={`bg-background p-4 rounded-lg ${adminSolBalance < estimatedFees.total ? 'border border-red-500' : ''}`}>
-                                <p className="text-sm text-foreground-muted">{t('your_sol_balance')}</p>
+                             <div className={`bg-primary-100 dark:bg-darkPrimary-700 p-4 rounded-lg ${adminSolBalance < estimatedFees.total ? 'border border-red-500' : ''}`}>
+                                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('your_sol_balance')}</p>
                                 <p className="text-lg font-bold font-mono">{adminSolBalance.toFixed(6)}</p>
-                                <p className="text-xs text-foreground-muted/80 mt-1">
+                                <p className="text-xs text-primary-500 dark:text-darkPrimary-500 mt-1">
                                     {t('estimated_tx_fees')} (for remaining): ~{estimatedFees.total.toFixed(6)} SOL
                                 </p>
                                 {adminSolBalance < estimatedFees.total && <p className="text-xs text-red-500 mt-1">{t('insufficient_sol_balance')}</p>}
@@ -421,7 +420,7 @@ export default function AdminPresale() {
                          <button 
                             onClick={handleAirdrop}
                             disabled={isAirdropping || loading || adminOwfnBalance < totalOwfnToDistribute || adminSolBalance < estimatedFees.total || aggregatedContributors.length === 0}
-                            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold py-3 px-6 rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full flex items-center justify-center gap-2 bg-accent-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed"
                          >
                             {isAirdropping ? <Loader2 className="w-6 h-6 animate-spin"/> : <Send className="w-6 h-6" />}
                             {airdropButtonText}
@@ -433,14 +432,14 @@ export default function AdminPresale() {
                                     <span>Airdrop Progress</span>
                                     <span>{airdropProgress.current} / {airdropProgress.total}</span>
                                  </div>
-                                 <div className="w-full bg-border rounded-full h-4">
+                                 <div className="w-full bg-primary-200 dark:bg-darkPrimary-700 rounded-full h-4">
                                     <div className="bg-green-500 h-4 rounded-full transition-all duration-300" style={{width: `${(airdropProgress.current / (airdropProgress.total || 1)) * 100}%`}}></div>
                                  </div>
                              </div>
                          )}
 
                          {airdropLogs.length > 0 && (
-                             <div className="bg-background p-4 rounded-lg max-h-64 overflow-y-auto">
+                             <div className="bg-primary-50 dark:bg-darkPrimary-950 p-4 rounded-lg max-h-64 overflow-y-auto">
                                 <h3 className="font-bold mb-2">{t('airdrop_log')}</h3>
                                 <div className="space-y-1 text-xs font-mono">
                                     {airdropLogs.map((log, i) => (

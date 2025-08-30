@@ -1,3 +1,4 @@
+
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -18,6 +19,7 @@ export const ro = {
     governance: `Guvernanță`,
     maintenance_mode: `Mod Mentenanță`,
     contact: `Contact`,
+    leaderboards: `Clasamente`,
 
     // Sidebar Groups
     sidebar_explore: `Explorare`,
@@ -227,6 +229,26 @@ export const ro = {
     badge_diverse_donor_desc: `Acordat pentru donații la proiecte din 3 categorii diferite.`,
     asset: `Activ`,
     value_usd: `Valoare (USD)`,
+    my_impact_dashboard: `Panoul Meu de Impact`,
+    total_donated_usd: `Total Donat (USD)`,
+    causes_supported: `Cauze Susținute`,
+    number_of_donations: `Număr de Donații`,
+    unlocked_badges: `Insigne Deblocate`,
+    badge_first_donor_title: `Primul Donator`,
+    badge_first_donor_desc: `Acordat pentru efectuarea primei donații către orice cauză.`,
+    badge_health_hero_title: `Erou al Sănătății`,
+    badge_health_hero_desc: `Acordat pentru contribuții semnificative la cauzele din domeniul sănătății.`,
+    badge_active_voter_title: `Votant Activ`,
+    badge_active_voter_desc: `Acordat pentru participarea la 5 sau mai multe voturi de guvernanță.`,
+    
+    // Leaderboards
+    leaderboards_desc: `Vezi cine sunt cei mai mari contribuitori la mișcarea noastră.`,
+    leaderboard_rank: `Rang`,
+    leaderboard_donor: `Donator`,
+    leaderboard_total_donated: `Total Donat (USD)`,
+    weekly: `Săptămânal`,
+    monthly: `Lunar`,
+    all_time: `Total`,
 
     // Impact Portal
     social_cases: `Cazuri Sociale`,
@@ -450,7 +472,6 @@ export const ro = {
     create_schedule: `Creează Program`,
     vesting_schedule_created: `Program de vesting creat cu succes!`,
     all_vesting_schedules: `Toate Programele de Vesting`,
-    go_to_staking: `Mergi la Staking`,
 
     // Airdrop
     airdrop_title: `Airdrop Token OWFN`,
@@ -466,8 +487,8 @@ export const ro = {
     airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
     
     // Governance
-    governance_title: `Vocea Comunității`,
-    governance_subtitle: `Participă la viitorul OWFN votând propuneri consultative.`,
+    governance_title: `Guvernanță`,
+    governance_subtitle: `Participă la viitorul OWFN votând propuneri.`,
     active_proposals: `Propuneri Active`,
     past_proposals: `Propuneri Anterioare`,
     create_proposal: `Creează Propunere`,

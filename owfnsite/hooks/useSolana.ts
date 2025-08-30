@@ -2,8 +2,8 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
-import type { Token, VestingSchedule } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS, ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import type { Token, UserStats } from '../types.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -11,28 +11,20 @@ export interface UseSolanaReturn {
   connected: boolean;
   connecting: boolean;
   address: string | null;
-  isAdmin: boolean;
   userTokens: Token[];
   loading: boolean;
-  userStats: {
-    totalDonated: number;
-    projectsSupported: number;
-    votesCast: number;
-    donations: any[]; 
-    votedProposalIds: string[];
-    vestingSchedule: VestingSchedule | null;
-  };
+  userStats: UserStats;
   stakedBalance: number;
   earnedRewards: number;
   connection: Connection;
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
   sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
-  stakeTokens: (amount: number) => Promise<{ success: boolean; messageKey: string; params?: { amount: number } }>;
-  unstakeTokens: (amount: number) => Promise<{ success: boolean; messageKey: string; params?: { amount: number } }>;
-  claimRewards: (impactPercentage: number) => Promise<{ success: boolean; messageKey: string; params?: { amount: number } }>;
+  stakeTokens: (amount: number) => Promise<any>;
+  unstakeTokens: (amount: number) => Promise<any>;
+  claimRewards: () => Promise<any>;
   claimVestedTokens: (amount: number) => Promise<any>;
-  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<{ success: boolean; messageKey: string }>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
@@ -53,49 +45,10 @@ export const useSolana = (): UseSolanaReturn => {
   const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
-  const [votedProposalIds, setVotedProposalIds] = useState<string[]>([]);
-
-  // --- NEW STAKING STATE ---
-  const [stakedBalance, setStakedBalance] = useState(0);
-  const [earnedRewards, setEarnedRewards] = useState(0);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
-  const isAdmin = useMemo(() => connected && address === ADMIN_WALLET_ADDRESS, [connected, address]);
 
-
-  // --- NEW: Real-time reward accrual effect ---
-  useEffect(() => {
-    if (connected && stakedBalance > 0) {
-        // Simulate an 8% APR for staking
-        const APR = 0.08;
-        const rewardsPerSecond = (stakedBalance * APR) / (365 * 24 * 60 * 60);
-
-        const interval = setInterval(() => {
-            setEarnedRewards(prev => prev + rewardsPerSecond);
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }
-  }, [connected, stakedBalance]);
-
-  const updateUserTokenBalance = useCallback((symbol: string, change: number) => {
-    setUserTokens(prevTokens => {
-        return prevTokens.map(token => {
-            if (token.symbol === symbol) {
-                const newBalance = token.balance + change;
-                return {
-                    ...token,
-                    balance: newBalance,
-                    usdValue: newBalance * token.pricePerToken,
-                };
-            }
-            return token;
-        });
-    });
-  }, []);
-
-
-    const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
+  const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
     const cached = balanceCache.get(walletAddress);
     if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
         return cached.data;
@@ -237,12 +190,8 @@ export const useSolana = (): UseSolanaReturn => {
   useEffect(() => {
     if (connected && address) {
       getWalletBalances(address).then(setUserTokens);
-      setVotedProposalIds([]); // Reset on new connection
     } else {
       setUserTokens([]);
-      setStakedBalance(0);
-      setEarnedRewards(0);
-      setVotedProposalIds([]);
       balanceCache.clear();
     }
   }, [connected, address, getWalletBalances]);
@@ -344,74 +293,6 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
-  const stakeTokens = useCallback(async (amount: number): Promise<{ success: boolean; messageKey: string; params?: { amount: number }}> => {
-      setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
-      
-      const owfnToken = userTokens.find(t => t.symbol === 'OWFN');
-      if (!owfnToken || owfnToken.balance < amount) {
-          setLoading(false);
-          return { success: false, messageKey: 'insufficient_owfn_balance' };
-      }
-      
-      updateUserTokenBalance('OWFN', -amount);
-      setStakedBalance(prev => prev + amount);
-      
-      setLoading(false);
-      return { success: true, messageKey: 'stake_success_alert', params: { amount } };
-  }, [userTokens, updateUserTokenBalance]);
-
-  const unstakeTokens = useCallback(async (amount: number): Promise<{ success: boolean; messageKey: string; params?: { amount: number }}> => {
-      setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
-
-      if (stakedBalance < amount) {
-          setLoading(false);
-          return { success: false, messageKey: 'transaction_failed_alert' }; // Generic error
-      }
-      
-      setStakedBalance(prev => prev - amount);
-      updateUserTokenBalance('OWFN', +amount);
-      
-      setLoading(false);
-      return { success: true, messageKey: 'unstake_success_alert', params: { amount } };
-  }, [stakedBalance, updateUserTokenBalance]);
-
-  const claimRewards = useCallback(async (impactPercentage: number): Promise<{ success: boolean; messageKey: string; params?: { amount: number }}> => {
-      setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
-
-      const rewardsToClaim = earnedRewards;
-      if (rewardsToClaim <= 0) {
-          setLoading(false);
-          return { success: false, messageKey: 'transaction_failed_alert' }; // Generic error for no rewards
-      }
-      
-      const userPortion = rewardsToClaim * (1 - (impactPercentage / 100));
-      // In a real scenario, the treasuryPortion would be sent to the treasury wallet.
-      // const treasuryPortion = rewardsToClaim * (impactPercentage / 100); 
-      
-      updateUserTokenBalance('OWFN', +userPortion);
-      setEarnedRewards(0);
-      
-      setLoading(false);
-      if (impactPercentage > 0) {
-        alert(`Simulated donation of ${impactPercentage}% of your rewards to the Impact Treasury!`);
-      }
-      return { success: true, messageKey: 'claim_success_alert', params: { amount: rewardsToClaim } };
-  }, [earnedRewards, updateUserTokenBalance]);
-
-    const voteOnProposal = useCallback(async (proposalId: string, vote: 'for' | 'against'): Promise<{ success: boolean; messageKey: string }> => {
-        if (votedProposalIds.includes(proposalId)) {
-            return { success: false, messageKey: 'already_voted' };
-        }
-        setLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate async
-        setVotedProposalIds(prev => [...prev, proposalId]);
-        setLoading(false);
-        return { success: true, messageKey: 'vote_success_alert' };
-    }, [votedProposalIds]);
-
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
       alert("This feature is coming soon and requires on-chain programs to be deployed.");
@@ -422,27 +303,24 @@ export const useSolana = (): UseSolanaReturn => {
     connected,
     connecting,
     address,
-    isAdmin,
     userTokens,
     loading,
     connection,
     userStats: { 
-        totalDonated: 125.50, // Mock data
-        projectsSupported: 3, // Mock data
-        votesCast: votedProposalIds.length,
-        donations: [],
-        votedProposalIds: votedProposalIds,
-        vestingSchedule: null
+        totalDonatedUSD: 125.50,
+        causesSupported: 3,
+        donationCount: 8,
+        votedProposalIds: ['prop1', 'prop2', 'prop3', 'prop4', 'prop5']
     },
-    stakedBalance: stakedBalance,
-    earnedRewards: earnedRewards,
+    stakedBalance: 0,
+    earnedRewards: 0,
     disconnectWallet: disconnect,
     getWalletBalances,
     sendTransaction,
-    stakeTokens,
-    unstakeTokens,
-    claimRewards,
+    stakeTokens: notImplemented,
+    unstakeTokens: notImplemented,
+    claimRewards: notImplemented,
     claimVestedTokens: notImplemented,
-    voteOnProposal,
+    voteOnProposal: notImplemented,
   };
 };

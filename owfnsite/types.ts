@@ -139,6 +139,7 @@ export interface ImpactBadge {
     titleKey: string;
     descriptionKey: string;
     icon: React.ReactNode;
+    unlocked: boolean;
 }
 
 export interface PresaleTransaction {
@@ -161,4 +162,17 @@ export interface SiwsReturn {
   session: SiwsSession | null;
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
+}
+
+export interface UserStats {
+    totalDonatedUSD: number;
+    causesSupported: number;
+    donationCount: number;
+    votedProposalIds: string[];
+}
+
+export interface LeaderboardEntry {
+    rank: number;
+    address: string;
+    totalDonatedUSD: number;
 }
