@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -467,8 +466,8 @@ export const ro = {
     airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
     
     // Governance
-    governance_title: `Guvernanță`,
-    governance_subtitle: `Participă la viitorul OWFN votând propuneri.`,
+    governance_title: `Vocea Comunității`,
+    governance_subtitle: `Participă la viitorul OWFN votând propuneri consultative.`,
     active_proposals: `Propuneri Active`,
     past_proposals: `Propuneri Anterioare`,
     create_proposal: `Creează Propunere`,

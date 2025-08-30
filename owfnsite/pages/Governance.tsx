@@ -1,10 +1,9 @@
-
-
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Vote, PlusCircle, CheckCircle, ThumbsUp, ThumbsDown, X } from 'lucide-react';
+import { Vote, PlusCircle, CheckCircle, ThumbsUp, ThumbsDown, X, Loader2 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { GovernanceProposal } from '../types.ts';
+import { DualProgressBar } from '../components/DualProgressBar.tsx';
 
 const Countdown = ({ endDate }: { endDate: Date }) => {
     const { t } = useAppContext();
@@ -39,20 +38,15 @@ const Countdown = ({ endDate }: { endDate: Date }) => {
 
 const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
     const { t, solana, voteOnProposal: contextVote, currentLanguage } = useAppContext();
-    const { userStats, loading, voteOnProposal: hookVote, connected } = solana;
-    
-    const totalVotes = proposal.votesFor + proposal.votesAgainst;
-    const forPercentage = totalVotes > 0 ? (proposal.votesFor / totalVotes) * 100 : 0;
-    const againstPercentage = totalVotes > 0 ? (proposal.votesAgainst / totalVotes) * 100 : 0;
+    const { userStats, loading, connected } = solana;
     
     const hasVoted = userStats.votedProposalIds.includes(proposal.id);
 
     const handleVote = async (vote: 'for' | 'against') => {
-        const result = await hookVote(proposal.id, vote);
-        if (result.success) {
-            contextVote(proposal.id, vote);
-            alert(t(result.messageKey));
-        }
+        // This is now an off-chain action, so we don't need to call the hook.
+        // We directly call the context function to update the app's state.
+        contextVote(proposal.id, vote);
+        alert(t('vote_success_alert'));
     }
 
     const getStatusChip = () => {
@@ -67,35 +61,31 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
     const description = proposal.description[currentLanguage.code] || proposal.description['en'];
 
     return (
-        <div className="bg-surface border border-border p-6 rounded-lg shadow-lg space-y-4">
+        <div className="bg-surface border border-border p-6 rounded-lg shadow-lg space-y-4 animate-card-entry flex flex-col">
             <div className="flex justify-between items-start">
                 <h3 className="text-xl font-bold">{title}</h3>
                 {getStatusChip()}
             </div>
-            <p className="text-foreground-muted text-sm">{description}</p>
+            <p className="text-foreground-muted text-sm flex-grow">{description}</p>
             <div className="text-xs text-foreground-muted/80">Proposed by: <AddressDisplay address={proposal.proposer} /></div>
             
-            <div className="space-y-2">
-                <div className="w-full bg-border rounded-full h-4 flex overflow-hidden">
-                    <div className="bg-green-500 h-full" style={{ width: `${forPercentage}%` }}></div>
-                    <div className="bg-red-500 h-full" style={{ width: `${againstPercentage}%` }}></div>
-                </div>
-                <div className="flex justify-between text-sm font-semibold">
-                    <span className="text-green-400">{t('votes_for')}: {forPercentage.toFixed(2)}%</span>
-                    <span className="text-red-400">{t('votes_against')}: {againstPercentage.toFixed(2)}%</span>
-                </div>
-            </div>
+            <DualProgressBar
+                label1={t('votes_for')}
+                value1={proposal.votesFor}
+                label2={t('votes_against')}
+                value2={proposal.votesAgainst}
+            />
             
             {proposal.status === 'active' && (
-                <div className="flex justify-between items-center border-t border-border pt-4">
+                <div className="flex justify-between items-center border-t border-border pt-4 mt-auto">
                     <div className="text-sm text-foreground-muted">{t('ends_in')}: <Countdown endDate={proposal.endDate} /></div>
                     {connected && (
                         hasVoted ? (
                              <div className="flex items-center gap-2 text-primary font-bold"><CheckCircle size={16}/> {t('you_voted')}</div>
                         ) : (
                             <div className="flex gap-2">
-                                <button onClick={() => handleVote('for')} disabled={loading} className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 disabled:opacity-50"><ThumbsUp size={16}/></button>
-                                <button onClick={() => handleVote('against')} disabled={loading} className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 disabled:opacity-50"><ThumbsDown size={16}/></button>
+                                <button onClick={() => handleVote('for')} disabled={loading} className="flex items-center gap-2 bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"><ThumbsUp size={16}/> {t('vote_for')}</button>
+                                <button onClick={() => handleVote('against')} disabled={loading} className="flex items-center gap-2 bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors"><ThumbsDown size={16}/> {t('vote_against')}</button>
                             </div>
                         )
                     )}
@@ -109,10 +99,9 @@ export default function Governance() {
     const { t, proposals, addProposal, solana } = useAppContext();
     const [isCreateModalOpen, setCreateModalOpen] = useState(false);
     
-    const activeProposals = useMemo(() => proposals.filter(p => p.status === 'active'), [proposals]);
-    const pastProposals = useMemo(() => proposals.filter(p => p.status !== 'active'), [proposals]);
+    const activeProposals = useMemo(() => proposals.filter(p => p.status === 'active').sort((a,b) => b.endDate.getTime() - a.endDate.getTime()), [proposals]);
+    const pastProposals = useMemo(() => proposals.filter(p => p.status !== 'active').sort((a,b) => b.endDate.getTime() - a.endDate.getTime()), [proposals]);
     
-    // Create Proposal Form State
     const [newTitle, setNewTitle] = useState('');
     const [newDescription, setNewDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -121,7 +110,7 @@ export default function Governance() {
         e.preventDefault();
         if (!newTitle || !newDescription) return;
         setIsSubmitting(true);
-        const endDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000); // 14 days from now
+        const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
         try {
             await addProposal({ title: newTitle, description: newDescription, endDate });
             setNewTitle('');
@@ -129,7 +118,6 @@ export default function Governance() {
             setCreateModalOpen(false);
         } catch (error) {
             console.error("Failed to create proposal:", error);
-            // Optionally show an error to the user
         } finally {
             setIsSubmitting(false);
         }
@@ -144,7 +132,7 @@ export default function Governance() {
                     <h1 className="text-4xl font-bold text-primary">{t('governance_title')}</h1>
                     <p className="mt-2 text-lg text-foreground-muted">{t('governance_subtitle')}</p>
                 </div>
-                {solana.connected && (
+                {solana.isAdmin && (
                     <button 
                         onClick={() => setCreateModalOpen(true)}
                         className="flex items-center gap-2 bg-primary text-primary-foreground font-bold py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors"
@@ -161,7 +149,9 @@ export default function Governance() {
                         {activeProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
                     </div>
                 ) : (
-                    <p className="text-foreground-muted">{t('no_active_proposals')}</p> 
+                    <div className="text-center p-12 bg-surface border border-border rounded-lg">
+                        <p className="text-foreground-muted">{t('no_active_proposals')}</p> 
+                    </div>
                 )}
             </div>
 
@@ -172,7 +162,9 @@ export default function Governance() {
                         {pastProposals.map(p => <ProposalCard key={p.id} proposal={p} />)}
                     </div>
                 ) : (
-                    <p className="text-foreground-muted">{t('no_past_proposals')}</p>
+                    <div className="text-center p-12 bg-surface border border-border rounded-lg">
+                        <p className="text-foreground-muted">{t('no_past_proposals')}</p>
+                    </div>
                 )}
             </div>
 
@@ -209,9 +201,9 @@ export default function Governance() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold hover:bg-primary/90 disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-lg font-bold hover:bg-primary/90 disabled:opacity-50"
                             >
-                                {isSubmitting ? t('processing') : t('submit_proposal')}
+                                {isSubmitting ? <><Loader2 className="animate-spin" /> {t('processing')}</> : t('submit_proposal')}
                             </button>
                         </form>
                     </div>

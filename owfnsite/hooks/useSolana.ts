@@ -3,7 +3,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
 import type { Token, VestingSchedule } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS, ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -11,6 +11,7 @@ export interface UseSolanaReturn {
   connected: boolean;
   connecting: boolean;
   address: string | null;
+  isAdmin: boolean;
   userTokens: Token[];
   loading: boolean;
   userStats: {
@@ -31,7 +32,7 @@ export interface UseSolanaReturn {
   unstakeTokens: (amount: number) => Promise<{ success: boolean; messageKey: string; params?: { amount: number } }>;
   claimRewards: (impactPercentage: number) => Promise<{ success: boolean; messageKey: string; params?: { amount: number } }>;
   claimVestedTokens: (amount: number) => Promise<any>;
-  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<{ success: boolean; messageKey: string }>;
 }
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
@@ -52,12 +53,15 @@ export const useSolana = (): UseSolanaReturn => {
   const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
+  const [votedProposalIds, setVotedProposalIds] = useState<string[]>([]);
 
   // --- NEW STAKING STATE ---
   const [stakedBalance, setStakedBalance] = useState(0);
   const [earnedRewards, setEarnedRewards] = useState(0);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
+  const isAdmin = useMemo(() => connected && address === ADMIN_WALLET_ADDRESS, [connected, address]);
+
 
   // --- NEW: Real-time reward accrual effect ---
   useEffect(() => {
@@ -233,10 +237,12 @@ export const useSolana = (): UseSolanaReturn => {
   useEffect(() => {
     if (connected && address) {
       getWalletBalances(address).then(setUserTokens);
+      setVotedProposalIds([]); // Reset on new connection
     } else {
       setUserTokens([]);
       setStakedBalance(0);
       setEarnedRewards(0);
+      setVotedProposalIds([]);
       balanceCache.clear();
     }
   }, [connected, address, getWalletBalances]);
@@ -395,6 +401,16 @@ export const useSolana = (): UseSolanaReturn => {
       return { success: true, messageKey: 'claim_success_alert', params: { amount: rewardsToClaim } };
   }, [earnedRewards, updateUserTokenBalance]);
 
+    const voteOnProposal = useCallback(async (proposalId: string, vote: 'for' | 'against'): Promise<{ success: boolean; messageKey: string }> => {
+        if (votedProposalIds.includes(proposalId)) {
+            return { success: false, messageKey: 'already_voted' };
+        }
+        setLoading(true);
+        await new Promise(resolve => setTimeout(resolve, 300)); // Simulate async
+        setVotedProposalIds(prev => [...prev, proposalId]);
+        setLoading(false);
+        return { success: true, messageKey: 'vote_success_alert' };
+    }, [votedProposalIds]);
 
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
@@ -406,24 +422,17 @@ export const useSolana = (): UseSolanaReturn => {
     connected,
     connecting,
     address,
+    isAdmin,
     userTokens,
     loading,
     connection,
     userStats: { 
         totalDonated: 125.50, // Mock data
         projectsSupported: 3, // Mock data
-        votesCast: 8, // Mock data
+        votesCast: votedProposalIds.length,
         donations: [],
-        votedProposalIds: [],
-        // Mock vesting schedule for UI demonstration
-        vestingSchedule: {
-          recipientAddress: address || '',
-          totalAmount: 500000,
-          claimedAmount: 150000,
-          startDate: new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000), // 6 months ago
-          endDate: new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000), // 6 months from now
-          cliffDate: new Date(Date.now() - 3 * 30 * 24 * 60 * 60 * 1000), // 3 months ago
-        }
+        votedProposalIds: votedProposalIds,
+        vestingSchedule: null
     },
     stakedBalance: stakedBalance,
     earnedRewards: earnedRewards,
@@ -434,6 +443,6 @@ export const useSolana = (): UseSolanaReturn => {
     unstakeTokens,
     claimRewards,
     claimVestedTokens: notImplemented,
-    voteOnProposal: notImplemented,
+    voteOnProposal,
   };
 };

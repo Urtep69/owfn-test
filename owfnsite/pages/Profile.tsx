@@ -152,24 +152,28 @@ export default function Profile() {
                 
                 {/* --- Right Column: Stats & Actions --- */}
                 <div className="space-y-8">
-                    <DashboardCard title={t('my_impact_stats')} animDelay="100ms">
-                         <div className="space-y-4">
-                            <StatItem icon={<DollarSign size={20} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
-                            <StatItem icon={<HandHeart size={20} />} title={t('projects_supported')} value={userStats.projectsSupported} />
-                            <StatItem icon={<Vote size={20} />} title={t('votes_cast')} value={userStats.votesCast} />
-                        </div>
+                     <DashboardCard title={t('my_impact_stats')} animDelay="100ms">
+                        <ComingSoonWrapper>
+                            <div className="space-y-4">
+                                <StatItem icon={<DollarSign size={20} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
+                                <StatItem icon={<HandHeart size={20} />} title={t('projects_supported')} value={userStats.projectsSupported} />
+                                <StatItem icon={<Vote size={20} />} title={t('votes_cast')} value={userStats.votesCast} />
+                            </div>
+                        </ComingSoonWrapper>
                     </DashboardCard>
                     
                      <DashboardCard title={t('staking')} icon={<TrendingUp size={20}/>} animDelay="200ms">
-                        <div className="space-y-4">
-                            <StatItem icon={<TrendingUp size={20} />} title={t('my_staked_balance')} value={`${stakedBalance.toLocaleString(undefined, {maximumFractionDigits: 2})} OWFN`} />
-                            <StatItem icon={<Gift size={20} />} title={t('claim_rewards')} value={`${earnedRewards.toLocaleString(undefined, {maximumFractionDigits: 4})} OWFN`} />
-                            <Link to="/staking">
-                                <a className="block w-full text-center bg-primary text-primary-foreground font-bold py-2.5 rounded-lg hover:bg-primary/90 transition-colors mt-2">
-                                    {t('go_to_staking', { defaultValue: 'Go to Staking' })}
-                                </a>
-                            </Link>
-                        </div>
+                        <ComingSoonWrapper>
+                            <div className="space-y-4">
+                                <StatItem icon={<TrendingUp size={20} />} title={t('my_staked_balance')} value={`${stakedBalance.toLocaleString(undefined, {maximumFractionDigits: 2})} OWFN`} />
+                                <StatItem icon={<Gift size={20} />} title={t('claim_rewards')} value={`${earnedRewards.toLocaleString(undefined, {maximumFractionDigits: 4})} OWFN`} />
+                                <Link to="/staking">
+                                    <a className="block w-full text-center bg-primary text-primary-foreground font-bold py-2.5 rounded-lg hover:bg-primary/90 transition-colors mt-2">
+                                        {t('go_to_staking', { defaultValue: 'Go to Staking' })}
+                                    </a>
+                                </Link>
+                            </div>
+                        </ComingSoonWrapper>
                     </DashboardCard>
 
                     <DashboardCard title={t('vesting')} icon={<Lock size={20}/>} animDelay="300ms">
@@ -190,7 +194,7 @@ export default function Profile() {
                     </DashboardCard>
                     
                     <DashboardCard title={t('impact_badges')} icon={<Award size={20}/>} animDelay="400ms">
-                         <ComingSoonWrapper showMessage={false}>
+                         <ComingSoonWrapper>
                              <div className="grid grid-cols-4 gap-4">
                                 {MOCK_BADGES.map(badge => (
                                     <div key={badge.id} className="group relative flex flex-col items-center text-center">

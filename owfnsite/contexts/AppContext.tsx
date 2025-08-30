@@ -7,6 +7,31 @@ import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernancePro
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 
+// Mock Data for Governance Proposals
+const MOCK_PROPOSALS: GovernanceProposal[] = [
+    {
+        id: 'prop1',
+        title: { en: 'Focus First Impact Project in Southeast Asia?', ro: 'Concentrăm Primul Proiect de Impact în Asia de Sud-Est?' },
+        description: { en: 'Proposal to allocate the first round of Impact Treasury funds to a verified educational project in Southeast Asia, focusing on building schools.', ro: 'Propunere de a aloca prima rundă de fonduri din Trezoreria de Impact unui proiect educațional verificat din Asia de Sud-Est, axat pe construirea de școli.' },
+        proposer: '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy',
+        status: 'active',
+        votesFor: 185700000,
+        votesAgainst: 21300000,
+        endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+    },
+    {
+        id: 'prop2',
+        title: { en: 'Partner with "Health for All" NGO?', ro: 'Parteneriat cu ONG-ul "Sănătate pentru Toți"?' },
+        description: { en: 'This proposal suggests a strategic partnership with the "Health for All" NGO to expand our medical aid reach in rural areas.', ro: 'Această propunere sugerează un parteneriat strategic cu ONG-ul "Sănătate pentru Toți" pentru a extinde acoperirea noastră de ajutor medical în zonele rurale.' },
+        proposer: 'HJBKht6wRZYNC7ChJc4TbE8ugT5c3QX6buSbEPNYX1k6',
+        status: 'passed',
+        votesFor: 312500000,
+        votesAgainst: 45000000,
+        endDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // Ended 10 days ago
+    },
+];
+
+
 interface AppContextType {
   theme: Theme;
   toggleTheme: () => void;
@@ -36,7 +61,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
-  const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
+  const [proposals, setProposals] = useState<GovernanceProposal[]>(MOCK_PROPOSALS);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
   const addSocialCase = (newCase: SocialCase) => {
@@ -87,9 +112,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [solana.address]);
   
   const voteOnProposal = useCallback((proposalId: string, vote: 'for' | 'against') => {
+    // This is an off-chain simulation, so we just update the state.
+    // The hook `solana.voteOnProposal` will prevent re-voting.
+    solana.voteOnProposal(proposalId, vote);
+
     setProposals(prev => prev.map(p => {
         if (p.id === proposalId) {
-            const votePower = 1000000;
+            // Simulate vote power based on a mock value
+            const votePower = Math.floor(Math.random() * 5000000) + 1000000;
             return {
                 ...p,
                 votesFor: vote === 'for' ? p.votesFor + votePower : p.votesFor,
@@ -98,7 +128,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
         return p;
     }));
-  }, []);
+  }, [solana.voteOnProposal]);
 
   const value: AppContextType = {
     theme,
