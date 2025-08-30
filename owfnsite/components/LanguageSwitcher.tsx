@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -27,7 +28,7 @@ export const LanguageSwitcher = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(prev => !prev)}
-                className="flex items-center space-x-2 p-2 rounded-lg text-primary-700 dark:text-darkPrimary-300 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"
+                className="flex items-center space-x-2 p-2 rounded-lg text-foreground-muted hover:bg-surface transition-colors"
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 aria-label="Change language"
@@ -38,7 +39,7 @@ export const LanguageSwitcher = () => {
             </button>
             {isOpen && (
                 <div 
-                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-darkPrimary-800 rounded-md shadow-lg py-1 z-20 animate-fade-in-up" 
+                    className="absolute right-0 mt-2 w-48 bg-surface rounded-md shadow-lg py-1 z-20 animate-fade-in-up border border-border" 
                     style={{ animationDuration: '200ms' }}
                     role="menu"
                 >
@@ -46,7 +47,7 @@ export const LanguageSwitcher = () => {
                         <button
                             key={lang.code}
                             onClick={() => handleSelectLanguage(lang.code)}
-                            className="w-full text-left px-4 py-2 text-sm text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 flex items-center space-x-3"
+                            className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-border/50 flex items-center space-x-3"
                             role="menuitem"
                         >
                             <span className="text-xl" aria-hidden="true">{lang.flag}</span>
