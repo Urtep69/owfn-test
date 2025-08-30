@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
-import type { Token } from '../types.ts';
+import type { Token, VestingSchedule } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
@@ -19,6 +19,7 @@ export interface UseSolanaReturn {
     votesCast: number;
     donations: any[]; 
     votedProposalIds: string[];
+    vestingSchedule: VestingSchedule | null;
   };
   stakedBalance: number;
   earnedRewards: number;
@@ -313,14 +314,23 @@ export const useSolana = (): UseSolanaReturn => {
     loading,
     connection,
     userStats: { 
-        totalDonated: 0,
-        projectsSupported: 0,
-        votesCast: 0,
+        totalDonated: 125.50, // Mock data
+        projectsSupported: 3, // Mock data
+        votesCast: 8, // Mock data
         donations: [],
-        votedProposalIds: []
+        votedProposalIds: [],
+        // Mock vesting schedule for UI demonstration
+        vestingSchedule: {
+          recipientAddress: address || '',
+          totalAmount: 500000,
+          claimedAmount: 150000,
+          startDate: new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000), // 6 months ago
+          endDate: new Date(Date.now() + 6 * 30 * 24 * 60 * 60 * 1000), // 6 months from now
+          cliffDate: new Date(Date.now() - 3 * 30 * 24 * 60 * 60 * 1000), // 3 months ago
+        }
     },
-    stakedBalance: 0,
-    earnedRewards: 0,
+    stakedBalance: 123456.78, // Mock data
+    earnedRewards: 78.1234, // Mock data
     disconnectWallet: disconnect,
     getWalletBalances,
     sendTransaction,

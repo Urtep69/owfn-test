@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Wallet, DollarSign, HandHeart, Vote, Gem, Loader2, ShieldCheck } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Gem, Loader2, ShieldCheck, TrendingUp, Lock, Gift } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { ImpactBadge } from '../types.ts';
+import type { ImpactBadge, VestingSchedule } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
 import { formatNumber } from '../lib/utils.ts';
 import { WalletAvatar } from '../components/WalletAvatar.tsx';
+import { ProgressBar } from '../components/ProgressBar.tsx';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -15,9 +16,19 @@ const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge3', titleKey: 'badge_diverse_donor', descriptionKey: 'badge_diverse_donor_desc', icon: <Gem /> },
 ];
 
-const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => (
-    <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg flex items-center space-x-4">
-        <div className="text-accent-500 dark:text-darkAccent-400">{icon}</div>
+const DashboardCard = ({ title, icon, children }: { title: string, icon?: React.ReactNode, children: React.ReactNode }) => (
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            {icon}
+            {title}
+        </h2>
+        {children}
+    </div>
+);
+
+const StatItem = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => (
+    <div className="flex items-center space-x-4">
+        <div className="text-accent-500 dark:text-darkAccent-400 flex-shrink-0">{icon}</div>
         <div>
             <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
             <p className="text-xl font-bold">{value}</p>
@@ -27,7 +38,7 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
 
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, loading, userStats } = solana;
+    const { connected, address, userTokens, loading, userStats, stakedBalance, earnedRewards } = solana;
     
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
@@ -53,6 +64,20 @@ export default function Profile() {
                 </button>
             </div>
         );
+    }
+    
+    // Vesting Calculations
+    const userVestingSchedule = userStats.vestingSchedule;
+    const now = new Date();
+    let vestingProgress = 0;
+    let claimableVestedAmount = 0;
+    if (userVestingSchedule) {
+        const totalDuration = userVestingSchedule.endDate.getTime() - userVestingSchedule.startDate.getTime();
+        const elapsedDuration = Math.max(0, now.getTime() - userVestingSchedule.startDate.getTime());
+        vestingProgress = Math.min(100, (elapsedDuration / totalDuration) * 100);
+        const totalVested = (userVestingSchedule.totalAmount * vestingProgress) / 100;
+        const isAfterCliff = userVestingSchedule.cliffDate ? now >= userVestingSchedule.cliffDate : true;
+        claimableVestedAmount = isAfterCliff ? Math.max(0, totalVested - userVestingSchedule.claimedAmount) : 0;
     }
     
     return (
@@ -123,19 +148,57 @@ export default function Profile() {
                 
                 {/* --- Right Column: Stats & Badges --- */}
                 <div className="space-y-8">
-                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
+                    <DashboardCard title={t('my_impact_stats')}>
+                         <div className="space-y-4">
+                            <StatItem icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
+                            <StatItem icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
+                            <StatItem icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
+                            <StatItem icon={<TrendingUp size={24} />} title={t('my_staked_balance')} value={`${stakedBalance.toLocaleString()} OWFN`} />
+                        </div>
+                    </DashboardCard>
+
+                    <DashboardCard title={t('staking')} icon={<TrendingUp size={24} />}>
                         <ComingSoonWrapper>
-                             <div className="space-y-4">
-                                <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
-                                <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
-                                <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
+                            <div className="space-y-4">
+                                <div className="text-center bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg">
+                                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('my_staked_balance')}</p>
+                                    <p className="text-2xl font-bold">{stakedBalance.toLocaleString()} OWFN</p>
+                                </div>
+                                <div className="text-center bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg">
+                                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('claim_rewards')}</p>
+                                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">{earnedRewards.toFixed(4)} OWFN</p>
+                                </div>
+                                <Link to="/staking">
+                                    <a className="block w-full text-center bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors">
+                                        {t('go_to_staking', { defaultValue: 'Go to Staking' })}
+                                    </a>
+                                </Link>
                             </div>
                         </ComingSoonWrapper>
-                    </div>
+                    </DashboardCard>
 
-                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h2 className="text-2xl font-bold mb-4">{t('impact_badges')}</h2>
+                    <DashboardCard title={t('vesting')} icon={<Lock size={24} />}>
+                         <ComingSoonWrapper>
+                             {userVestingSchedule ? (
+                                <div className="space-y-4">
+                                    <ProgressBar progress={vestingProgress} label={t('vesting_progress')} />
+                                    <div className="text-center bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg">
+                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('claimable_now')}</p>
+                                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">{claimableVestedAmount.toLocaleString(undefined, {maximumFractionDigits: 2})} OWFN</p>
+                                    </div>
+                                     <Link to="/vesting">
+                                        <a className="block w-full text-center bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors">
+                                            {t('view_vesting_details', { defaultValue: 'View Vesting Details' })}
+                                        </a>
+                                    </Link>
+                                </div>
+                             ) : (
+                                <p className="text-primary-600 dark:text-darkPrimary-400 text-center py-4">{t('no_vesting_schedule')}</p>
+                             )}
+                         </ComingSoonWrapper>
+                    </DashboardCard>
+                    
+                    <DashboardCard title={t('impact_badges')} icon={<Gem size={24} />}>
                          <ComingSoonWrapper showMessage={false}>
                              <div className="grid grid-cols-3 gap-4">
                                 {MOCK_BADGES.map(badge => (
@@ -152,7 +215,7 @@ export default function Profile() {
                                 ))}
                             </div>
                          </ComingSoonWrapper>
-                    </div>
+                    </DashboardCard>
                 </div>
             </div>
             
