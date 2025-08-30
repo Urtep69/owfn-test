@@ -3,8 +3,8 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
-import type { Theme, Language, SocialCase, VestingSchedule, GovernanceProposal } from '../types.ts';
-import { SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
+import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 
 interface AppContextType {
@@ -24,7 +24,6 @@ interface AppContextType {
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
   isMaintenanceActive: boolean;
   setWalletModalOpen: (open: boolean) => void;
-  isLoadingData: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -35,53 +34,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const solana = useSolana();
   const { setVisible: setWalletModalOpen } = useWalletModal();
 
-  const [socialCases, setSocialCases] = useState<SocialCase[]>([]);
+  const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(true);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
-  
-  useEffect(() => {
-    const fetchData = async () => {
-        setIsLoadingData(true);
-        try {
-            const [casesRes, vestingRes] = await Promise.all([
-                fetch('/api/social-cases'),
-                fetch('/api/vesting-schedules')
-            ]);
-
-            if (casesRes.ok) {
-                const casesData = await casesRes.json();
-                setSocialCases(casesData);
-            } else {
-                console.error('Failed to fetch social cases');
-            }
-            
-            if (vestingRes.ok) {
-                const vestingData = await vestingRes.json();
-                // Convert date strings from DB to Date objects
-                const formattedSchedules = vestingData.map((s: any) => ({
-                    ...s,
-                    totalAmount: parseFloat(s.totalAmount),
-                    claimedAmount: parseFloat(s.claimedAmount),
-                    startDate: new Date(s.startDate),
-                    endDate: new Date(s.endDate),
-                    cliffDate: s.cliffDate ? new Date(s.cliffDate) : undefined,
-                }));
-                setVestingSchedules(formattedSchedules);
-            } else {
-                 console.error('Failed to fetch vesting schedules');
-            }
-
-        } catch (error) {
-            console.error('Error fetching initial app data:', error);
-        } finally {
-            setIsLoadingData(false);
-        }
-    };
-    fetchData();
-  }, []);
-
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
@@ -161,7 +117,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     voteOnProposal,
     isMaintenanceActive,
     setWalletModalOpen,
-    isLoadingData,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

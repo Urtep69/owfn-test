@@ -85,6 +85,8 @@ export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
 ];
 
+export const INITIAL_SOCIAL_CASES: SocialCase[] = [];
+
 export const KNOWN_TOKEN_MINT_ADDRESSES: { [key: string]: string } = {
   OWFN: 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B',
   SOL: 'So11111111111111111111111111111111111111112',

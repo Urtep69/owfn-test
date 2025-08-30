@@ -57,7 +57,11 @@ const AppContent = () => {
               <Staking />
             </ComingSoonWrapper>
           </Route>
-          <Route path="/vesting"><Vesting /></Route>
+          <Route path="/vesting">
+            <ComingSoonWrapper>
+              <Vesting />
+            </ComingSoonWrapper>
+          </Route>
           <Route path="/airdrop">
             <ComingSoonWrapper>
               <Airdrop />
