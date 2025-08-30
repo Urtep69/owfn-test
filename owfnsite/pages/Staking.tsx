@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, TrendingUp, Gift, Database, HeartHandshake } from 'lucide-react';
@@ -63,17 +62,13 @@ const StakingInterface = () => {
         if (result.success) {
             alert(t(result.messageKey, result.params));
             setAmount('');
-        } else {
-            // Error is handled inside the hook for now
         }
     };
     
     const handleClaim = async () => {
-        const result = await solana.claimRewards();
+        const result = await solana.claimRewards(impactStakingPercentage);
          if (result.success) {
             alert(t(result.messageKey, result.params));
-        } else {
-            // Error is handled inside the hook for now
         }
     }
 
@@ -136,7 +131,7 @@ const StakingInterface = () => {
                 <input
                     type="range"
                     min="0"
-                    max="10"
+                    max="100"
                     step="1"
                     value={impactStakingPercentage}
                     onChange={(e) => setImpactStakingPercentage(Number(e.target.value))}
@@ -154,7 +149,7 @@ const StakingInterface = () => {
 
 export default function Staking() {
     const { t, solana } = useAppContext();
-    const MOCK_STAKING_INFO = { totalStaked: 0, apy: 0 }; // Placeholder
+    const MOCK_TOTAL_STAKED = 1_250_000_000; // Mock data for display
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -168,8 +163,8 @@ export default function Staking() {
             {solana.connected ? (
                 <>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <StatCard icon={<Database size={24} />} title={t('total_staked')} value={`-- OWFN`} />
-                        <StatCard icon={<TrendingUp size={24} />} title={t('estimated_apy')} value={`--%`} />
+                        <StatCard icon={<Database size={24} />} title={t('total_staked')} value={`${MOCK_TOTAL_STAKED.toLocaleString()} OWFN`} />
+                        <StatCard icon={<TrendingUp size={24} />} title={t('estimated_apy')} value={`~8%`} />
                         <StatCard icon={<OwfnIcon className="w-6 h-6" />} title={t('my_staked_balance')} value={`${solana.stakedBalance.toLocaleString(undefined, {maximumFractionDigits: 0})} OWFN`} />
                     </div>
                     <StakingInterface />

@@ -52,11 +52,7 @@ const AppContent = () => {
           <Route path="/whitepaper"><Whitepaper /></Route>
           <Route path="/tokenomics"><Tokenomics /></Route>
           <Route path="/roadmap"><Roadmap /></Route>
-          <Route path="/staking">
-            <ComingSoonWrapper>
-              <Staking />
-            </ComingSoonWrapper>
-          </Route>
+          <Route path="/staking"><Staking /></Route>
           <Route path="/vesting">
             <ComingSoonWrapper>
               <Vesting />

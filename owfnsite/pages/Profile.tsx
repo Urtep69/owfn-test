@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-// FIX: Add 'Award' to lucide-react imports to resolve missing component error.
 import { Wallet, DollarSign, HandHeart, Vote, Gem, Loader2, ShieldCheck, TrendingUp, Lock, Gift, User, Star, Award } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { ImpactBadge } from '../types.ts';
@@ -162,17 +161,15 @@ export default function Profile() {
                     </DashboardCard>
                     
                      <DashboardCard title={t('staking')} icon={<TrendingUp size={20}/>} animDelay="200ms">
-                        <ComingSoonWrapper>
-                            <div className="space-y-4">
-                                <StatItem icon={<TrendingUp size={20} />} title={t('my_staked_balance')} value={`${stakedBalance.toLocaleString()} OWFN`} />
-                                <StatItem icon={<Gift size={20} />} title={t('claim_rewards')} value={`${earnedRewards.toFixed(4)} OWFN`} />
-                                <Link to="/staking">
-                                    <a className="block w-full text-center bg-primary text-primary-foreground font-bold py-2.5 rounded-lg hover:bg-primary/90 transition-colors mt-2">
-                                        {t('go_to_staking', { defaultValue: 'Go to Staking' })}
-                                    </a>
-                                </Link>
-                            </div>
-                        </ComingSoonWrapper>
+                        <div className="space-y-4">
+                            <StatItem icon={<TrendingUp size={20} />} title={t('my_staked_balance')} value={`${stakedBalance.toLocaleString(undefined, {maximumFractionDigits: 2})} OWFN`} />
+                            <StatItem icon={<Gift size={20} />} title={t('claim_rewards')} value={`${earnedRewards.toLocaleString(undefined, {maximumFractionDigits: 4})} OWFN`} />
+                            <Link to="/staking">
+                                <a className="block w-full text-center bg-primary text-primary-foreground font-bold py-2.5 rounded-lg hover:bg-primary/90 transition-colors mt-2">
+                                    {t('go_to_staking', { defaultValue: 'Go to Staking' })}
+                                </a>
+                            </Link>
+                        </div>
                     </DashboardCard>
 
                     <DashboardCard title={t('vesting')} icon={<Lock size={20}/>} animDelay="300ms">

@@ -30,7 +30,7 @@ const simpleHash = (str: string): number => {
 
 export const WalletAvatar: React.FC<WalletAvatarProps> = ({ address, className = 'w-16 h-16' }) => {
     const svgData = useMemo(() => {
-        if (!address) return { bg: COLORS[0], shapes: [] };
+        if (!address) return { bg_color1: COLORS[0], bg_color2: COLORS[1], shapes: [], rotation: 0 };
         
         const hash = simpleHash(address);
         
