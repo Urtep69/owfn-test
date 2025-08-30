@@ -27,7 +27,7 @@ export default async function handler(req: any, res: any) {
         const baseQuery = `
             SELECT
                 wallet_address,
-                SUM(amount_usd) AS total_donated,
+                SUM(total_token_usd) AS total_donated,
                 json_agg(
                     json_build_object(
                         'symbol', token_symbol,
@@ -70,7 +70,8 @@ export default async function handler(req: any, res: any) {
             donationsByToken: row.donations_by_token.map((d: any) => ({
                 ...d,
                 totalAmount: parseFloat(d.totalamount),
-                totalUSD: parseFloat(d.totalusd)
+                totalUSD: parseFloat(d.totalusd),
+                lastDonationDate: d.lastdonationdate,
             }))
         }));
 
