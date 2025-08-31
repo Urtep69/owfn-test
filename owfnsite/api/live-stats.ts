@@ -124,8 +124,13 @@ export default async function handler(req: any, res: any) {
         try {
             const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
             const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
-            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            
+            // Get total SOL balance directly. This is the most reliable way to get the total amount raised.
+            const balanceInLamports = await connection.getBalance(presalePublicKey);
+            presaleStats.totalSolRaised = balanceInLamports / LAMPORTS_PER_SOL;
 
+            // Estimate contributors by fetching recent signatures. This is a secondary stat and less critical if it's not perfectly accurate.
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
             const signatures = await connection.getSignaturesForAddress(presalePublicKey, { limit: 1000 });
             const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
             
@@ -135,25 +140,22 @@ export default async function handler(req: any, res: any) {
                     { maxSupportedTransactionVersion: 0 }
                 );
                 
-                let totalLamports = 0;
                 const uniqueSources = new Set<string>();
-
                 transactions.forEach(tx => {
                     if (tx) {
                         tx.transaction.message.instructions.forEach(inst => {
                             if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === DISTRIBUTION_WALLETS.presale) {
-                                totalLamports += inst.parsed.info.lamports;
                                 uniqueSources.add(inst.parsed.info.source);
                             }
                         });
                     }
                 });
                 
-                presaleStats.totalSolRaised = totalLamports / LAMPORTS_PER_SOL;
                 presaleStats.presaleContributors = uniqueSources.size;
             }
         } catch (solanaError) {
             console.error("Failed to fetch presale stats from Solana:", solanaError);
+            // Non-fatal error. Proceed with what we have. The `totalSolRaised` might be 0 but the API won't crash.
         }
         
         const totalOwfnSold = presaleStats.totalSolRaised * PRESALE_DETAILS.rate;
