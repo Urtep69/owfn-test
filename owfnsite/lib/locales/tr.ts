@@ -337,8 +337,8 @@ export const tr = {
     faq_a12: `Yol Haritamıza göre, ön satışın başarılı bir şekilde tamamlanmasının ardından, $OWFN tokenini Solana ekosistemi içindeki merkezi olmayan borsalarda (DEX) resmi olarak listeleyeceğiz. Kesin tarih ve platformlar resmi kanallarımızda duyurulacaktır.`,
     faq_q13: `Ön satışta neden maksimum satın alma limiti (Max Buy) var?`,
     faq_a13: `Maksimum satın alma limiti, tokenlerin mümkün olan en adil şekilde dağıtılmasını sağlamak ve az sayıda büyük yatırımcının ("balinalar") arzın önemli bir bölümünü kontrol etmesini önlemek için önemli bir önlemdir. Bu, uzun vadede daha sağlıklı ve daha merkezi olmayan bir topluluğu teşvik eder.`,
+// FIX: Removed duplicated block of FAQ entries to fix duplicate property error.
     faq_q14: `Tokenin %2 APY ile "faiz getiren" olması ne anlama geliyor? Nasıl çalışır?`,
-    // FIX: Corrected duplicate property `faq_a15` to `faq_a14`.
     faq_a14: `Bu, OWFN tokeninin otomatik olarak faiz üretecek şekilde programlandığı anlamına gelir. Tokenleri Solana uyumlu cüzdanınızda tutarak, token miktarınız zamanla %2'lik yıllık yüzde getiri (APY) ile artacaktır. Onları stake etmeniz veya başka bir ek işlem yapmanız gerekmez; ödüller otomatik olarak birikir.`,
     faq_q15: `%0,5'lik transfer ücreti nedir ve ne zaman etkinleştirilir?`,
     faq_a15: `Bu ücret, misyonumuzun uzun vadeli finansmanı için önemli bir mekanizmadır. Ön satış süresi sona erdikten *sonra* OWFN tokeni ile yapılan tüm işlemlere %0,5'lik bir ücret uygulanacaktır. Bu ücretten toplanan fonlar, sosyal projelerimizi sürekli olarak finanse etmek için otomatik olarak Etki Hazinesi'ne yönlendirilir. Böylece, her işlem ortak iyiliğe katkıda bulunur.`,

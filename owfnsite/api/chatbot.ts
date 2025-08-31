@@ -73,9 +73,8 @@ export default async function handler(req: any, res: any) {
         }
         
         // --- Fetch Live Stats ---
-        let liveStatsText = "The assistant currently does not have access to live statistics. When asked about specific numbers of donors or funds raised, state that you do not have that specific information and direct the user to the [Visit Page: Dashboard] or [Visit Page: Leaderboards] pages for transparency.";
+        let liveStatsText = "The assistant currently does not have access to live statistics. When asked about specific numbers, state that you do not have that specific information and direct the user to the [Visit Page: Dashboard] or [Visit Page: Leaderboards] pages for transparency.";
         try {
-            // Construct the full URL to the API route within the same deployment
             const protocol = req.headers['x-forwarded-proto'] || 'http';
             const host = req.headers.host;
             const statsUrl = `${protocol}://${host}/api/live-stats`;
@@ -84,14 +83,27 @@ export default async function handler(req: any, res: any) {
             if (statsRes.ok) {
                 const stats = await statsRes.json();
                 liveStatsText = `
-### Live Project Statistics (as of right now) ###
-- All-Time Donors (excluding presale): ${stats.totalDonors} unique donors have contributed a total of $${stats.totalDonatedUSD.toFixed(2)} USD.
-- Presale Progress:
-  - Total SOL Raised: ${stats.totalSolRaised.toFixed(4)} SOL has been raised.
-  - Total OWFN Sold: Approximately ${stats.totalOwfnSold.toLocaleString()} OWFN has been sold.
-  - Number of Presale Contributors: There have been ${stats.presaleContributors} unique buyers in the presale.
+### Live Financial & Project Statistics (as of right now) ###
 
-**Instructions for Live Data**: When asked about the number of donors, donation amounts, presale progress, number of presale buyers, or amount of SOL raised, YOU MUST use the data from the 'Live Project Statistics' section above. Do not say you don't have this information. If a value is 0, state that clearly (e.g., "Currently, there have been 0 presale contributions."). Provide the specific numbers. Use this data to give a complete and informative answer.
+**Token Price:**
+- Current OWFN Price: ${stats.owfnPrice.currentUsd} USD. (Source: ${stats.owfnPrice.source})
+- **Instruction**: If the price is 0, you MUST state that the token is in its presale phase and is not yet trading on exchanges. You must then state the official presale rate of 1 SOL = 10,000,000 OWFN.
+
+**Presale Progress:**
+- Total SOL Raised: ${stats.presale.totalSolRaised.toFixed(4)} SOL
+- Presale Progress: ${stats.presale.percentageSold.toFixed(2)}% of the presale allocation has been sold.
+- Total OWFN Sold: Approximately ${stats.presale.totalOwfnSold.toLocaleString()} OWFN has been sold.
+- Number of Presale Contributors: ${stats.presale.presaleContributors} unique buyers.
+- **Instruction**: Use this data to give detailed explanations about the presale. You can combine these numbers to be more descriptive, e.g., "The presale is currently ${stats.presale.percentageSold.toFixed(2)}% complete, with a total of ${stats.presale.totalSolRaised.toFixed(4)} SOL raised from ${stats.presale.presaleContributors} contributors."
+
+**Donation Statistics:**
+- All-Time Total Donated (excluding presale): $${stats.totalDonatedUSD.toFixed(2)} USD from ${stats.totalDonors} unique donors.
+- Donations in the Last 7 Days (by token):
+  - SOL: $${(stats.donationsLastWeek.SOL || 0).toFixed(2)} USD
+  - USDC: $${(stats.donationsLastWeek.USDC || 0).toFixed(2)} USD
+  - USDT: $${(stats.donationsLastWeek.USDT || 0).toFixed(2)} USD
+  - OWFN: $${(stats.donationsLastWeek.OWFN || 0).toFixed(2)} USD
+- **Instruction**: When asked about recent donations (e.g., "last week"), you MUST use the "Donations in the Last 7 Days" data. For overall totals, use the "All-Time Total" data. Be specific about which token is being discussed if the user asks. If a value is 0, state that clearly.
                 `;
             } else {
                 console.error(`Failed to fetch live stats, status: ${statsRes.status}`);
