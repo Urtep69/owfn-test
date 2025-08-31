@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { Target, Users, Zap } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OWFN_LOGO_URL } from '../constants.ts';
+import { CommunityToolkit } from '../components/CommunityToolkit.tsx';
 
 const FeatureCard = ({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) => (
     <div className="bg-white/50 dark:bg-darkPrimary-800/50 backdrop-blur-sm p-6 rounded-xl shadow-3d hover:shadow-3d-lg transition-all duration-300 group perspective-1000">
@@ -77,6 +78,9 @@ export default function Home() {
                     </FeatureCard>
                 </div>
             </section>
+
+            <CommunityToolkit />
+
         </div>
     );
 }

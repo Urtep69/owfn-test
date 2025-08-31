@@ -585,4 +585,11 @@ export const en = {
     contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
     send_direct_message: `Send a Direct Message`,
+    // Community Ambassador Toolkit
+    community_toolkit_title: `Community Ambassador Toolkit`,
+    community_toolkit_subtitle: `Help spread the word about OWFN! Use our AI-powered tool to generate unique social media posts and share our mission with the world.`,
+    community_toolkit_generate_button: `Generate Another Post`,
+    community_toolkit_copy_button: `Copy Post`,
+    community_toolkit_copied_button: `Copied!`,
+    community_toolkit_share_button: `Share on X`,
 };

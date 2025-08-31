@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -577,4 +576,11 @@ export const ro = {
     contact_social_discord_title: `Server Discord`,
     contact_social_discord_desc: `Deveniți parte a comunității noastre active pentru discuții și suport.`,
     send_direct_message: 'Trimite un Mesaj Direct',
+    // Community Ambassador Toolkit
+    community_toolkit_title: `Trusa Ambasadorului Comunității`,
+    community_toolkit_subtitle: `Ajută la răspândirea mesajului OWFN! Folosește instrumentul nostru bazat pe AI pentru a genera postări unice pentru rețelele sociale și pentru a împărtăși misiunea noastră cu lumea.`,
+    community_toolkit_generate_button: `Generează o Altă Postare`,
+    community_toolkit_copy_button: `Copiază Postarea`,
+    community_toolkit_copied_button: `Copiat!`,
+    community_toolkit_share_button: `Distribuie pe X`,
 };

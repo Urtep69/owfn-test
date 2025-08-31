@@ -1,4 +1,3 @@
-
 export const de = {
     // Navigation
     home: `Startseite`,
@@ -318,8 +317,6 @@ export const de = {
     faq_q13: `Warum gibt es im Vorverkauf ein maximales Kauflimit (Max Buy)?`,
     faq_a13: `Das maximale Kauflimit ist eine wichtige Maßnahme, um eine möglichst faire Verteilung der Token zu gewährleisten und zu verhindern, dass eine kleine Anzahl großer Investoren ("Wale") einen erheblichen Teil des Angebots kontrolliert. Dies fördert langfristig eine gesündere und dezentralere Gemeinschaft.`,
     faq_q14: `Was bedeutet es, dass der Token "zinstragend" mit 2% APY ist? Wie funktioniert das?`,
-    faq_a14: `Das bedeutet, dass der OWFN-Token so programmiert ist, dass er automatisch Zinsen generiert. Indem Sie die Token einfach in Ihrer Solana-kompatiblen Wallet halten, wird sich die Anzahl Ihrer Token im Laufe der Zeit mit einer jährlichen prozentualen Rendite (APY) von 2% erhöhen. Sie müssen sie nicht staken oder zusätzliche Maßnahmen ergreifen; die Belohnungen sammeln sich automatisch an.`,
-    faq_q15: `Was ist die Überweisungsgebühr von 0,5% und wann wird sie aktiviert?`,
     faq_a15: `Diese Gebühr ist ein Schlüsselmechanismus für die langfristige Finanzierung unserer Mission. Eine Gebühr von 0,5% wird auf alle Transaktionen mit dem OWFN-Token *nach* Abschluss des Vorverkaufszeitraums erhoben. Die aus dieser Gebühr gesammelten Mittel werden automatisch an die Impact Treasury weitergeleitet, um unsere sozialen Projekte kontinuierlich zu finanzieren. So trägt jede Transaktion zum Gemeinwohl bei.`,
     faq_q16: `Warum haben Sie die Solana-Blockchain für dieses Projekt gewählt?`,
     faq_a16: `Wir haben uns für Solana wegen seiner außergewöhnlichen Geschwindigkeit, sehr niedrigen Transaktionskosten und hohen Skalierbarkeit entschieden. Diese Eigenschaften sind für ein globales Projekt wie unseres unerlässlich und ermöglichen effiziente Mikrotransaktionen und eine schnelle und zugängliche Erfahrung für alle Benutzer, egal ob sie spenden, kaufen oder Token handeln.`,
@@ -462,8 +459,6 @@ export const de = {
     airdrop_eligible_message: `Ihre Wallet ist berechtigt! Sie erhalten {amount} OWFN-Token bei der nächsten Verteilung.`,
     airdrop_not_eligible: `Nicht berechtigt`,
     airdrop_not_eligible_message: `Leider ist diese Wallet-Adresse nicht für den aktuellen Airdrop berechtigt. Bleiben Sie in unserer Community aktiv für zukünftige Gelegenheiten!`,
-    airdrop_info_box_title: `Über diesen Airdrop`,
-    airdrop_info_box_desc: `Dieser Airdrop wurde entwickelt, um frühe Unterstützer und aktive Community-Mitglieder zu belohnen. Die Berechtigung basiert auf Faktoren wie der Teilnahme am Vorverkauf und dem Engagement bei Community-Events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -577,4 +572,11 @@ export const de = {
     contact_social_discord_title: `Discord-Server`,
     contact_social_discord_desc: `Werden Sie Teil unserer aktiven Community für Diskussionen und Unterstützung.`,
     send_direct_message: `Direktnachricht Senden`,
+    // Community Ambassador Toolkit
+    community_toolkit_title: `Community-Botschafter-Toolkit`,
+    community_toolkit_subtitle: `Helfen Sie mit, die Botschaft von OWFN zu verbreiten! Nutzen Sie unser KI-gestütztes Tool, um einzigartige Social-Media-Beiträge zu erstellen und unsere Mission mit der Welt zu teilen.`,
+    community_toolkit_generate_button: `Weiteren Beitrag erstellen`,
+    community_toolkit_copy_button: `Beitrag kopieren`,
+    community_toolkit_copied_button: `Kopiert!`,
+    community_toolkit_share_button: `Auf X teilen`,
 };
