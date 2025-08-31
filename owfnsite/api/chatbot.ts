@@ -128,6 +128,9 @@ export default async function handler(req: any, res: any) {
                 }
 
                 liveStatsText = `
+### REAL-TIME DATA INSTRUCTIONS ###
+You have been provided with live, real-time data below. When a user asks about any of these topics (token price, presale progress, donation statistics), you MUST use the data provided in the "Live Financial & Project Statistics" section to give a precise, numerical answer. DO NOT state that you do not have access to this information. Use the numbers directly from the data.
+
 ### Live Financial & Project Statistics (as of right now) ###
 
 **Token Price:**
@@ -221,7 +224,7 @@ This is a summary of every page on the owfn.org website. Use this information as
   - Use ONLY these platform names and URLs:
     - For X/Twitter: [Social Link: X|https://x.com/OWFN_Official]
     - For Telegram Group: [Social Link: Telegram Group|https://t.me/OWFNOfficial]
-    - For Telegram Channel: [Social Link: Telegram Channel|https://t.me/OWFNOfficial]
+    - For Telegram Channel: [Social Link: Telegram Channel|https://t.me/OWFN_Official]
     - For Discord: [Social Link: Discord|https://discord.gg/DzHm5HCqDW]`;
         
         const systemInstruction = `${liveStatsText}\n\n${staticSystemInstruction}`;

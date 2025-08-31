@@ -1,4 +1,3 @@
-
 export const tr = {
     // Navigation
     home: `Anasayfa`,
@@ -236,7 +235,6 @@ export const tr = {
     donation_history_general: `Genel Bağış`,
 
     // Leaderboards
-    leaderboards: `Sıralamalar`,
     leaderboards_desc: `Hareketimize en çok katkıda bulunanları görün.`,
     leaderboard_rank: `Sıra`,
     leaderboard_donor: `Bağışçı`,
@@ -338,7 +336,7 @@ export const tr = {
     faq_q13: `Ön satışta neden maksimum satın alma limiti (Max Buy) var?`,
     faq_a13: `Maksimum satın alma limiti, tokenlerin mümkün olan en adil şekilde dağıtılmasını sağlamak ve az sayıda büyük yatırımcının ("balinalar") arzın önemli bir bölümünü kontrol etmesini önlemek için önemli bir önlemdir. Bu, uzun vadede daha sağlıklı ve daha merkezi olmayan bir topluluğu teşvik eder.`,
     faq_q14: `Tokenin %2 APY ile "faiz getiren" olması ne anlama geliyor? Nasıl çalışır?`,
-    faq_a14: `Bu, OWFN tokeninin otomatik olarak faiz üretecek şekilde programlandığı anlamına gelir. Tokenleri Solana uyumlu cüzdanınızda tutarak, token miktarınız zamanla %2'lik yıllık yüzde getiri (APY) ile artacaktır. Onları stake etmeniz veya başka bir ek işlem yapmanız gerekmez; ödüller otomatik olarak birikir.`,
+    faq_a14: `OWFN tokeninin otomatik olarak faiz üretecek şekilde programlandığı anlamına gelir. Tokenleri Solana uyumlu cüzdanınızda tutarak, token miktarınız zamanla %2'lik yıllık yüzde getiri (APY) ile artacaktır. Onları stake etmeniz veya başka bir ek işlem yapmanız gerekmez; ödüller otomatik olarak birikir.`,
     faq_q15: `%0,5'lik transfer ücreti nedir ve ne zaman etkinleştirilir?`,
     faq_a15: `Bu ücret, misyonumuzun uzun vadeli finansmanı için önemli bir mekanizmadır. Ön satış süresi sona erdikten *sonra* OWFN tokeni ile yapılan tüm işlemlere %0,5'lik bir ücret uygulanacaktır. Bu ücretten toplanan fonlar, sosyal projelerimizi sürekli olarak finanse etmek için otomatik olarak Etki Hazinesi'ne yönlendirilir. Böylece, her işlem ortak iyiliğe katkıda bulunur.`,
     faq_q16: `Bu proje için neden Solana blok zincirini seçtiniz?`,
