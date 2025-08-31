@@ -1,11 +1,12 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Wallet, DollarSign, Vote, Loader2, Heart, Trophy, HeartHandshake } from 'lucide-react';
+import { Wallet, DollarSign, Vote, Loader2, Heart, Trophy, HeartHandshake, ExternalLink } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { ImpactBadge, UserStats } from '../types.ts';
+import type { ImpactBadge, UserStats, DonationHistoryEntry } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { formatNumber } from '../lib/utils.ts';
+import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 
 const iconMap: { [key: string]: React.ReactNode } = {
     Heart: <Heart size={32} />,
@@ -13,6 +14,14 @@ const iconMap: { [key: string]: React.ReactNode } = {
     Vote: <Vote size={32} />,
     Trophy: <Trophy size={32} />, // Fallback icon
 };
+
+const tokenIconMap: { [key: string]: React.ReactNode } = {
+    'OWFN': <OwfnIcon className="w-6 h-6" />,
+    'SOL': <SolIcon className="w-6 h-6" />,
+    'USDC': <UsdcIcon className="w-6 h-6" />,
+    'USDT': <UsdtIcon className="w-6 h-6" />,
+};
+
 
 const StatCard = ({ icon, title, value, isLoading }: { icon: React.ReactNode, title: string, value: string | number, isLoading: boolean }) => (
     <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg flex items-center space-x-4">
@@ -51,16 +60,19 @@ const BadgeDisplay = ({ badge }: { badge: ImpactBadge }) => {
 const defaultStats: UserStats = { totalDonatedUSD: 0, causesSupported: 0, donationCount: 0, votedProposalIds: [] };
 
 export default function Profile() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana, setWalletModalOpen, socialCases, currentLanguage } = useAppContext();
     const { connected, address, userTokens, loading: walletLoading } = solana;
     
     const [stats, setStats] = useState<UserStats>(defaultStats);
     const [badges, setBadges] = useState<ImpactBadge[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [donationHistory, setDonationHistory] = useState<DonationHistoryEntry[]>([]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(true);
 
     useEffect(() => {
         if (!connected || !address) {
             setIsLoading(false);
+            setIsHistoryLoading(false);
             return;
         }
 
@@ -91,7 +103,25 @@ export default function Profile() {
             }
         };
 
+        const fetchHistory = async () => {
+            setIsHistoryLoading(true);
+            try {
+                const res = await fetch(`/api/my-donations?wallet=${address}`);
+                if (!res.ok) {
+                    throw new Error('Failed to fetch donation history');
+                }
+                const data = await res.json();
+                setDonationHistory(data);
+            } catch (error) {
+                console.error("Error fetching donation history:", error);
+                setDonationHistory([]);
+            } finally {
+                setIsHistoryLoading(false);
+            }
+        };
+
         fetchProfileData();
+        fetchHistory();
     }, [connected, address]);
 
     
@@ -219,6 +249,73 @@ export default function Profile() {
                 ) : (
                      <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400">
                         <p>{t('profile_no_tokens')}</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                <h2 className="text-2xl font-bold mb-4">{t('my_donation_history')}</h2>
+                {isHistoryLoading ? (
+                    <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <span>{t('donation_history_loading')}</span>
+                    </div>
+                ) : donationHistory.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[700px] text-sm text-left">
+                             <thead className="text-xs text-primary-700 dark:text-darkPrimary-300 uppercase bg-primary-100 dark:bg-darkPrimary-700">
+                                <tr>
+                                    <th scope="col" className="px-6 py-3">{t('donation_history_date')}</th>
+                                    <th scope="col" className="px-6 py-3">{t('donation_history_token')}</th>
+                                    <th scope="col" className="px-6 py-3">{t('donation_history_amount')}</th>
+                                    <th scope="col" className="px-6 py-3">{t('donation_history_cause')}</th>
+                                    <th scope="col" className="px-6 py-3">{t('donation_history_transaction')}</th>
+                                </tr>
+                            </thead>
+                             <tbody>
+                                {donationHistory.map(donation => {
+                                    const cause = socialCases.find(c => c.id === donation.cause_id);
+                                    const causeTitle = cause ? (cause.title[currentLanguage.code] || cause.title['en']) : t('donation_history_general');
+                                    
+                                    return (
+                                        <tr key={donation.id} className="border-b dark:border-darkPrimary-700 hover:bg-primary-50 dark:hover:bg-darkPrimary-700/50">
+                                            <td className="px-6 py-4 whitespace-nowrap">{new Date(donation.created_at).toLocaleString(currentLanguage.code, { dateStyle: 'medium', timeStyle: 'short' })}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    {tokenIconMap[donation.token_symbol]}
+                                                    <span className="font-semibold">{donation.token_symbol}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col font-mono text-right">
+                                                    <span className="font-semibold text-primary-900 dark:text-darkPrimary-100">{donation.token_amount.toLocaleString(undefined, { maximumFractionDigits: 6 })}</span>
+                                                    <span className="text-xs text-primary-500 dark:text-darkPrimary-400">~${donation.amount_usd.toFixed(2)}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {cause ? (
+                                                    <Link to={`/impact/case/${cause.id}`}>
+                                                        <a className="text-accent-600 dark:text-darkAccent-400 hover:underline">{causeTitle}</a>
+                                                    </Link>
+                                                ) : (
+                                                    <span>{causeTitle}</span>
+                                                )}
+                                            </td>
+                                             <td className="px-6 py-4">
+                                                <a href={`https://solscan.io/tx/${donation.transaction_signature}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400">
+                                                    <span>{donation.transaction_signature.slice(0, 4)}...{donation.transaction_signature.slice(-4)}</span>
+                                                    <ExternalLink size={14} />
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400">
+                        <p>{t('donation_history_empty')}</p>
                     </div>
                 )}
             </div>

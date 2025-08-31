@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -240,6 +239,15 @@ export const ro = {
     badge_health_hero_desc: `Acordat pentru contribuții semnificative la cauzele din domeniul sănătății.`,
     badge_active_voter_title: `Votant Activ`,
     badge_active_voter_desc: `Acordat pentru participarea la 5 sau mai multe voturi de guvernanță.`,
+    my_donation_history: `Istoricul Donațiilor Mele`,
+    donation_history_date: `Data`,
+    donation_history_token: `Token`,
+    donation_history_amount: `Sumă`,
+    donation_history_cause: `Cauza`,
+    donation_history_transaction: `Tranzacție`,
+    donation_history_loading: `Se încarcă istoricul donațiilor...`,
+    donation_history_empty: `Nu ați făcut nicio donație încă. Contribuțiile dumneavoastră vor apărea aici.`,
+    donation_history_general: `Donație Generală`,
     
     // Leaderboards
     leaderboards_desc: `Vezi cine sunt cei mai mari contribuitori la mișcarea noastră.`,

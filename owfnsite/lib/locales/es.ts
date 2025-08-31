@@ -1,4 +1,3 @@
-
 export const es = {
     // Navigation
     home: `Inicio`,
@@ -238,8 +237,17 @@ export const es = {
     badge_first_donor_desc: `Otorgado por realizar tu primera donación a cualquier causa.`,
     badge_health_hero_title: `Héroe de la Salud`,
     badge_health_hero_desc: `Otorgado por contribuciones significativas a causas relacionadas con la salud.`,
-    badge_active_voter_title: `Votante Activo`,
+badge_active_voter_title: `Votante Activo`,
     badge_active_voter_desc: `Otorgado por participar en 5 o más votaciones de gobernanza.`,
+    my_donation_history: `Mi Historial de Donaciones`,
+    donation_history_date: `Fecha`,
+    donation_history_token: `Token`,
+    donation_history_amount: `Cantidad`,
+    donation_history_cause: `Causa`,
+    donation_history_transaction: `Transacción`,
+    donation_history_loading: `Cargando historial de donaciones...`,
+    donation_history_empty: `Aún no ha realizado ninguna donación. Sus contribuciones aparecerán aquí.`,
+    donation_history_general: `Donación General`,
 
     // Leaderboards
     leaderboards_desc: `Vea quiénes son los principales contribuyentes a nuestro movimiento.`,

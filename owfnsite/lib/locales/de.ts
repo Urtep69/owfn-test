@@ -1,4 +1,3 @@
-
 export const de = {
     // Navigation
     home: `Startseite`,
@@ -240,6 +239,15 @@ export const de = {
     badge_health_hero_desc: `Verliehen für bedeutende Beiträge zu gesundheitsbezogenen Anliegen.`,
     badge_active_voter_title: `Aktiver Wähler`,
     badge_active_voter_desc: `Verliehen für die Teilnahme an 5 oder mehr Governance-Abstimmungen.`,
+    my_donation_history: `Meine Spendengeschichte`,
+    donation_history_date: `Datum`,
+    donation_history_token: `Token`,
+    donation_history_amount: `Betrag`,
+    donation_history_cause: `Zweck`,
+    donation_history_transaction: `Transaktion`,
+    donation_history_loading: `Lade Spendengeschichte...`,
+    donation_history_empty: `Sie haben noch keine Spenden getätigt. Ihre Beiträge werden hier angezeigt.`,
+    donation_history_general: `Allgemeine Spende`,
     
     // Leaderboards
     leaderboards_desc: `Sehen Sie, wer die größten Beitragszahler zu unserer Bewegung sind.`,
@@ -485,8 +493,6 @@ export const de = {
     airdrop_eligible_message: `Ihre Wallet ist berechtigt! Sie erhalten {amount} OWFN-Token bei der nächsten Verteilung.`,
     airdrop_not_eligible: `Nicht berechtigt`,
     airdrop_not_eligible_message: `Leider ist diese Wallet-Adresse nicht für den aktuellen Airdrop berechtigt. Bleiben Sie in unserer Community aktiv für zukünftige Gelegenheiten!`,
-    airdrop_info_box_title: `Über diesen Airdrop`,
-    airdrop_info_box_desc: `Dieser Airdrop wurde entwickelt, um frühe Unterstützer und aktive Community-Mitglieder zu belohnen. Die Berechtigung basiert auf Faktoren wie der Teilnahme am Vorverkauf und dem Engagement bei Community-Events.`,
     
     // Governance
     governance_title: `Governance`,
