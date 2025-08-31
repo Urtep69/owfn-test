@@ -351,6 +351,8 @@ export const en = {
     faq_q13: 'Why is there a maximum purchase limit (Max Buy) in the presale?',
     faq_a13: 'The maximum purchase limit is an important measure to ensure the fairest possible distribution of tokens and to prevent a small number of large investors ("whales") from controlling a significant portion of the supply. This promotes a healthier and more decentralized community in the long run.',
     faq_q14: 'What does it mean that the token is "Interest-Bearing" with 2% APY? How does it work?',
+    faq_a14: `This means the OWFN token is programmed to automatically generate interest. By simply holding the tokens in your Solana-compatible wallet, your amount of tokens will increase over time at a 2% annual percentage yield (APY). You don't need to stake them or perform any extra actions; the rewards accumulate automatically.`,
+    faq_q15: 'What is the 0.5% transfer fee and when will it be activated?',
     faq_a15: 'This fee is a key mechanism for the long-term funding of our mission. A 0.5% fee will apply to all transactions with the OWFN token *after* the presale period concludes. The funds collected from this fee are automatically directed to the Impact Treasury to continuously fund our social projects. Thus, every transaction contributes to the common good.',
     faq_q16: 'Why did you choose the Solana blockchain for this project?',
     faq_a16: 'We chose Solana for its exceptional speed, very low transaction costs, and high scalability. These features are essential for a global project like ours, allowing for efficient micro-transactions and ensuring a fast and accessible experience for all users, whether they are donating, buying, or trading tokens.',
@@ -370,6 +372,7 @@ export const en = {
     chatbot_loading_1: `Connecting to my circuits...`,
     chatbot_loading_2: `Analyzing your question...`,
     chatbot_loading_3: `Formulating a response...`,
+    chatbot_welcome_message: `Welcome to OWFN! How can I help you today?`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,

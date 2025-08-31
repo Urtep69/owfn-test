@@ -370,6 +370,7 @@ export const de = {
     chatbot_loading_1: `Verbindung zu meinen Schaltkreisen...`,
     chatbot_loading_2: `Analyse Ihrer Frage...`,
     chatbot_loading_3: `Formulierung einer Antwort...`,
+    chatbot_welcome_message: `Willkommen bei OWFN! Wie kann ich Ihnen heute helfen?`,
     
     // Whitepaper
     whitepaper_title: `OWFN-Whitepaper`,

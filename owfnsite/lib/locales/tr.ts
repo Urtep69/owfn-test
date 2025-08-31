@@ -19,16 +19,23 @@ export const tr = {
     governance: `Yönetişim`,
     maintenance_mode: `Bakım Modu`,
     contact: `İletişim`,
+    leaderboards: `Sıralamalar`,
 
     // Sidebar Groups
     sidebar_explore: `Keşfet`,
     sidebar_finance: `Finans`,
     sidebar_engage: `Katıl`,
 
+    // Header
+    header_new: `YENİ`,
+    header_wallet_manager: `Cüzdan Yöneticisi`,
+
     // General
     connect_wallet: `Cüzdanı Bağla`,
     disconnect_wallet: `Cüzdan Bağlantısını Kes`,
+    copy_address: `Adresi Kopyala`,
     change_wallet: `Cüzdanı Değiştir`,
+    view_on_solscan: `Solscan'de Görüntüle`,
     connected_as: `Bağlı olunan`,
     buy_now: `Şimdi Al!`,
     donate: `Bağış Yap`,
@@ -40,15 +47,6 @@ export const tr = {
     connect_wallet_first: `Lütfen önce cüzdanınızı bağlayın.`,
     yes: `Evet`,
     no: `Hayır`,
-    authenticating: `Doğrulanıyor...`,
-    sign_in_to_buy: `Satın Almak için Giriş Yap`,
-    sign_in_to_donate: `Bağış Yapmak için Giriş Yap`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `Resmi Dünya Aile Ağı (OWFN) ile kimlik doğrulamak için bu mesajı imzalayın.`,
-    siws_message_uri: `Alan Adı`,
-    siws_message_issued_at: `Yayınlanma Tarihi`,
-    siwS_message_no_cost: `Bu istek bir blok zinciri işlemi tetiklemeyecek ve herhangi bir gaz ücreti gerektirmeyecektir.`,
 
     // Time Units
     time_days: `Gün`,
@@ -176,6 +174,7 @@ export const tr = {
     presale_you_contributed: `Zaten katkıda bulundunuz: {amount} SOL.`,
     presale_you_can_buy: `{amount} SOL daha katkıda bulunabilirsiniz.`,
     presale_bonus_offer: `{threshold} SOL ve üzeri alımlarda %{percentage} BONUS!`,
+    presale_checking_contribution: `Katkınız kontrol ediliyor...`,
     
     // Donations Page
     make_donation: `Bağış Yap`,
@@ -214,23 +213,41 @@ export const tr = {
     token_types: `Token Türleri`,
     profile_loading_tokens: `Tokenler yükleniyor...`,
     profile_connect_prompt: `Profilinizi ve token bakiyelerinizi görmek için cüzdanınızı bağlayın.`,
-    profile_sign_in_prompt: `Profilinizi görmek için cüzdanınızla bağlanın ve oturum açın.`,
     profile_no_tokens: `Bu cüzdanda token bulunamadı.`,
-    impact_dashboard_title: `Etki Panelim`,
-    my_impact_stats: `Etki İstatistiklerim`,
-    total_donated: `Toplam Bağış`,
-    projects_supported: `Desteklenen Projeler`,
-    votes_cast: `Kullanılan Oylar`,
-    impact_trophies_nfts: `Etki Kupaları (NFTler)`,
-    impact_badges: `Etki Rozetleri`,
-    badge_first_donation: `İlk Bağışçı`,
-    badge_first_donation_desc: `İlk bağışınızı yaptığınız için verilir.`,
-    badge_community_voter: `Topluluk Oyuncusu`,
-    badge_community_voter_desc: `5 yönetişim oylamasına katıldığınız için verilir.`,
-    badge_diverse_donor: `Çeşitli Bağışçı`,
-    badge_diverse_donor_desc: `3 farklı kategorideki projelere bağış yaptığınız için verilir.`,
-    asset: `Varlık`,
-    value_usd: `Değer (USD)`,
+    my_impact_dashboard: `Etki Panelim`,
+    total_donated_usd: `Toplam Bağış (USD)`,
+    causes_supported: `Desteklenen Davalar`,
+    number_of_donations: `Bağış Sayısı`,
+    unlocked_badges: `Açılan Rozetler`,
+    badge_first_donor_title: `İlk Bağışçı`,
+    badge_first_donor_desc: `Herhangi bir davaya ilk bağışınızı yaptığınız için verilir.`,
+    badge_health_hero_title: `Sağlık Kahramanı`,
+    badge_health_hero_desc: `Sağlıkla ilgili davalara önemli katkılarda bulunduğunuz için verilir.`,
+    badge_active_voter_title: `Aktif Oyuncu`,
+    badge_active_voter_desc: `5 veya daha fazla yönetişim oylamasına katıldığınız için verilir.`,
+    my_donation_history: `Bağış Geçmişim`,
+    donation_history_date: `Tarih`,
+    donation_history_token: `Token`,
+    donation_history_amount: `Miktar`,
+    donation_history_cause: `Dava`,
+    donation_history_transaction: `İşlem`,
+    donation_history_loading: `Bağış geçmişi yükleniyor...`,
+    donation_history_empty: `Henüz hiç bağış yapmadınız. Katkılarınız burada görünecektir.`,
+    donation_history_general: `Genel Bağış`,
+
+    // Leaderboards
+    leaderboards: `Sıralamalar`,
+    leaderboards_desc: `Hareketimize en çok katkıda bulunanları görün.`,
+    leaderboard_rank: `Sıra`,
+    leaderboard_donor: `Bağışçı`,
+    leaderboard_total_donated: `Toplam Bağış (USD)`,
+    weekly: `Haftalık`,
+    monthly: `Aylık`,
+    all_time: `Tüm Zamanlar`,
+    leaderboard_3_months: "3 Ay",
+    leaderboard_6_months: "6 Ay",
+    leaderboard_9_months: "9 Ay",
+    leaderboard_1_year: "1 Yıl",
 
     // Impact Portal
     social_cases: `Sosyal Vakalar`,
@@ -321,12 +338,20 @@ export const tr = {
     faq_q13: `Ön satışta neden maksimum satın alma limiti (Max Buy) var?`,
     faq_a13: `Maksimum satın alma limiti, tokenlerin mümkün olan en adil şekilde dağıtılmasını sağlamak ve az sayıda büyük yatırımcının ("balinalar") arzın önemli bir bölümünü kontrol etmesini önlemek için önemli bir önlemdir. Bu, uzun vadede daha sağlıklı ve daha merkezi olmayan bir topluluğu teşvik eder.`,
     faq_q14: `Tokenin %2 APY ile "faiz getiren" olması ne anlama geliyor? Nasıl çalışır?`,
+    // FIX: Corrected duplicate key `faq_a15` to `faq_a14` based on the file's own comment.
+    faq_a14: `Bu, OWFN tokeninin otomatik olarak faiz üretecek şekilde programlandığı anlamına gelir. Tokenleri Solana uyumlu cüzdanınızda tutarak, token miktarınız zamanla %2'lik yıllık yüzde getiri (APY) ile artacaktır. Onları stake etmeniz veya başka bir ek işlem yapmanız gerekmez; ödüller otomatik olarak birikir.`,
+    faq_q15: `%0,5'lik transfer ücreti nedir ve ne zaman etkinleştirilir?`,
     faq_a15: `Bu ücret, misyonumuzun uzun vadeli finansmanı için önemli bir mekanizmadır. Ön satış süresi sona erdikten *sonra* OWFN tokeni ile yapılan tüm işlemlere %0,5'lik bir ücret uygulanacaktır. Bu ücretten toplanan fonlar, sosyal projelerimizi sürekli olarak finanse etmek için otomatik olarak Etki Hazinesi'ne yönlendirilir. Böylece, her işlem ortak iyiliğe katkıda bulunur.`,
     faq_q16: `Bu proje için neden Solana blok zincirini seçtiniz?`,
-    faq_a17: `Solana'yı olağanüstü hızı, çok düşük işlem maliyetleri ve yüksek ölçeklenebilirliği nedeniyle seçtik. Bu özellikler, bizim gibi küresel bir proje için çok önemlidir ve bağış yapma, satın alma veya token ticareti yapma gibi işlemlerde tüm kullanıcılar için verimli mikro işlemler ve hızlı ve erişilebilir bir deneyim sağlar.`,
-    faq_q18: `Bağışlarımın desteklediğiniz amaçlara ulaştığından nasıl emin olabilirim?`,
-    faq_a19: `Şeffaflık bizim için temel bir unsurdur. Sosyal amaçlar için ayrılan tüm fonlar, cüzdan adresi halka açık olan Etki Hazinesi aracılığıyla yönetilir. Solscan gibi bir Solana blok gezgini üzerinden tüm gelen ve giden işlemleri izleyebilirsiniz. Ayrıca, Etki Portalı'nda finanse edilen projeler hakkında düzenli güncellemeler ve ayrıntılı raporlar sunacağız.`,
-    faq_q20: `OWFN tarafından finanse edilecek bir sosyal vaka veya amaç önerebilir miyim?`,
+    faq_a16: `Solana'yı olağanüstü hızı, çok düşük işlem maliyetleri ve yüksek ölçeklenebilirliği nedeniyle seçtik. Bu özellikler, bizim gibi küresel bir proje için çok önemlidir ve bağış yapma, satın alma veya token ticareti yapma gibi işlemlerde tüm kullanıcılar için verimli mikro işlemler ve hızlı ve erişilebilir bir deneyim sağlar.`,
+    faq_q17: `Bağışlarımın desteklediğiniz amaçlara ulaştığından nasıl emin olabilirim?`,
+    faq_a17: `Şeffaflık bizim için temel bir unsurdur. Sosyal amaçlar için ayrılan tüm fonlar, cüzdan adresi halka açık olan Etki Hazinesi aracılığıyla yönetilir. Solscan gibi bir Solana blok gezgini üzerinden tüm gelen ve giden işlemleri izleyebilirsiniz. Ayrıca, Etki Portalı'nda finanse edilen projeler hakkında düzenli güncellemeler ve ayrıntılı raporlar sunacağız.`,
+    faq_q18: `OWFN tarafından finanse edilecek bir sosyal vaka veya amaç önerebilir miyim?`,
+    faq_a18: `Başlangıç aşamasında, projeler ekibimiz tarafından etki ve fizibilite gibi katı kriterlere göre seçilir. Proje ilerledikçe, topluluk üyelerinin gelecekteki girişimleri önermesine ve oylamasına olanak tanıyan bir yönetişim sistemi (DAO) uygulayacağız, böylece fonların yönlendirilmesinde doğrudan bir rolünüz olacak.`,
+    faq_q19: `OWFN projesinin arkasında kim var? Ekip anonim mi?`,
+    faq_a19: `Ekibimizin vizyonu ve değerleri hakkındaki ayrıntılar web sitesinde sunulmaktadır. Halka açık lansmana yaklaştıkça, projenin başarısına katkıda bulunan kilit üyeler ve danışmanlar hakkında daha fazla şeffaflık sağlayacağız, aynı zamanda güvenliklerini ve gizliliklerini de koruyacağız.`,
+    faq_q20: `Proje ve yatırımcıların fonlarını korumak için hangi güvenlik önlemlerini aldınız?`,
+    faq_a20: `Güvenlik bizim en büyük önceliğimizdir. Kritik fonları yönetmek için çoklu imza cüzdanları kullanıyoruz, bu da tek bir kişinin bir işlemi onaylayamayacağı anlamına gelir. Tokenin akıllı sözleşmesi, lansmandan önce olası güvenlik açıklarını belirlemek ve düzeltmek için saygın güvenlik firmaları tarafından denetlenecektir.`,
     
     // Chatbot
     chatbot_title: `OWFN Asistanı`,
@@ -335,6 +360,7 @@ export const tr = {
     chatbot_loading_1: `Devrelerime bağlanıyorum...`,
     chatbot_loading_2: `Sorunuzu analiz ediyorum...`,
     chatbot_loading_3: `Bir yanıt hazırlıyorum...`,
+    chatbot_welcome_message: `OWFN'ye hoş geldiniz! Bugün size nasıl yardımcı olabilirim?`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -364,6 +390,7 @@ export const tr = {
     back_to_profile: `Profile Geri Dön`,
     token_not_found: `Token verileri bulunamadı.`,
     token_description_title: `TOKEN AÇIKLAMASI`,
+    price_per_token: `Fiyat`,
     sell: `Sat`,
     sells: `Satışlar`,
     market_cap: `Piyasa Değeri`,
@@ -372,6 +399,7 @@ export const tr = {
     pair_address: `Çift Adresi`,
     mint_authority: `Mint Yetkisi`,
     freeze_authority: `Dondurma Yetkisi`,
+    update_authority: `Güncelleme Yetkisi`,
     fully_diluted_valuation: `Tamamen Seyreltilmiş Değerleme (FDV)`,
     market_stats: `Piyasa İstatistikleri`,
     trading_stats: `Ticaret İstatistikleri`,
@@ -445,7 +473,7 @@ export const tr = {
     create_schedule: `Program Oluştur`,
     vesting_schedule_created: `Vesting programı başarıyla oluşturuldu!`,
     all_vesting_schedules: `Tüm Vesting Programları`,
-    
+
     // Airdrop
     airdrop_title: `OWFN Token Airdrop`,
     airdrop_subtitle: `Topluluk airdrop ve ödüllerimiz için uygunluğunuzu kontrol edin.`,
@@ -483,13 +511,12 @@ export const tr = {
     maintenance_heading: `Daha iyi hale getiriyoruz!`,
     maintenance_message: `Deneyiminizi iyileştirmek için platformumuz şu anda planlı bakımdadır. Sabrınız ve anlayışınız için teşekkür ederiz. Kısa süre içinde tekrar çevrimiçi olacağız.`,
     maintenance_stay_tuned: `Sosyal kanallarımızdaki güncellemeler için bizi izlemeye devam edin:`,
-    admin_controls: `Yönetici Kontrolleri`,
+    admin_login: `Yönetici Girişi`,
     maintenance_status: `Durum`,
     maintenance_status_active: `AKTİF`,
     maintenance_status_inactive: `PASİF`,
     activate_maintenance_mode: `Bakımı Etkinleştir`,
     deactivate_maintenance_mode: `Bakımı Devre Dışı Bırak`,
-    admin_login: `Yönetici Girişi`,
     maintenance_login_denied: `Bağlantı reddedildi. Platform bakım modunda. Sadece yöneticiler giriş yapabilir.`,
     
     // Coming Soon

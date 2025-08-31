@@ -101,6 +101,24 @@ export const Chatbot = () => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
+    const [showWelcome, setShowWelcome] = useState(false);
+
+    useEffect(() => {
+        const welcomeShown = sessionStorage.getItem('owfnWelcomeMessageShown');
+        if (!welcomeShown) {
+            const timer = setTimeout(() => {
+                if (!isOpen) { // Only show if the chatbot isn't already open
+                    setShowWelcome(true);
+                }
+            }, 2500);
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen]);
+
+    const handleDismissWelcome = () => {
+        setShowWelcome(false);
+        sessionStorage.setItem('owfnWelcomeMessageShown', 'true');
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -223,13 +241,31 @@ export const Chatbot = () => {
     
     if (!isOpen) {
         return (
-            <button
-                onClick={() => setIsOpen(true)}
-                className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
-                aria-label="Open Chatbot"
-            >
-                <MessageCircle size={28} />
-            </button>
+            <>
+                {showWelcome && (
+                    <div className="fixed bottom-24 right-5 w-auto max-w-xs bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg p-3 animate-fade-in-up z-40 text-sm text-primary-800 dark:text-darkPrimary-200">
+                        <button
+                            onClick={handleDismissWelcome}
+                            className="absolute -top-2 -right-2 p-1 bg-primary-200 dark:bg-darkPrimary-700 rounded-full text-primary-500 hover:text-primary-800 dark:text-darkPrimary-400 dark:hover:text-darkPrimary-100"
+                            aria-label="Dismiss welcome message"
+                        >
+                            <X size={14} />
+                        </button>
+                        {t('chatbot_welcome_message')}
+                        <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white dark:bg-darkPrimary-800 transform rotate-45 -z-10"></div>
+                    </div>
+                )}
+                <button
+                    onClick={() => {
+                        setIsOpen(true);
+                        handleDismissWelcome();
+                    }}
+                    className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110 z-50"
+                    aria-label="Open Chatbot"
+                >
+                    <MessageCircle size={28} />
+                </button>
+            </>
         );
     }
 

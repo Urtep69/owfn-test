@@ -370,6 +370,7 @@ badge_active_voter_title: `Votante Activo`,
     chatbot_loading_1: `Conectando a mis circuitos...`,
     chatbot_loading_2: `Analizando tu pregunta...`,
     chatbot_loading_3: `Formulando una respuesta...`,
+    chatbot_welcome_message: `¡Bienvenido a OWFN! ¿En qué puedo ayudarte hoy?`,
 
     // Whitepaper
     whitepaper_title: `Whitepaper de OWFN`,
