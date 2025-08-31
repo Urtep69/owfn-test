@@ -1,3 +1,4 @@
+
 import { sql } from '../lib/db.ts';
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { 
@@ -24,8 +25,6 @@ async function getOwfnPrice(): Promise<{ currentUsd: number; source: string }> {
         console.warn("Helius API key not set, cannot fetch live price.");
         return { currentUsd: 0, source: 'Presale Rate' };
     }
-    // During presale, the token is not yet traded, so its market price is effectively 0.
-    // After launch, this function will fetch the real-time price from a DEX via Helius.
     const isPresaleActive = new Date() > PRESALE_DETAILS.startDate && new Date() < PRESALE_DETAILS.endDate;
     if (isPresaleActive) {
         return { currentUsd: 0, source: 'Presale Rate' };
@@ -57,39 +56,53 @@ async function getOwfnPrice(): Promise<{ currentUsd: number; source: string }> {
 
 export default async function handler(req: any, res: any) {
     try {
-        // --- Fetch General Donation Stats from DB ---
-        const { rows: donationRows } = await sql`
+        const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+        const startDate = searchParams.get('startDate'); // Expects ISO string e.g., '2025-08-01T00:00:00.000Z'
+        const endDate = searchParams.get('endDate');   // Expects ISO string
+
+        // --- Fetch General (All-Time) Donation Stats from DB ---
+        const { rows: allTimeDonationRows } = await sql`
             SELECT 
                 COUNT(DISTINCT wallet_address) as total_donors, 
                 SUM(amount_usd) as total_donated_usd 
             FROM donations;
         `;
-        const donationStats = {
-            totalDonors: parseInt(donationRows[0]?.total_donors || '0', 10),
-            totalDonatedUSD: parseFloat(donationRows[0]?.total_donated_usd || '0'),
+        const allTimeDonationStats = {
+            totalDonors: parseInt(allTimeDonationRows[0]?.total_donors || '0', 10),
+            totalDonatedUSD: parseFloat(allTimeDonationRows[0]?.total_donated_usd || '0'),
         };
+        
+        // --- Fetch Donations for the SPECIFIED PERIOD from DB ---
+        let donationsForPeriod: { [key: string]: number } = {};
+        if (startDate && endDate) {
+            try {
+                if (isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))) {
+                    throw new Error("Invalid date format provided.");
+                }
 
-        // --- Fetch Donations from Last Week ---
-        const { rows: weeklyDonationRows } = await sql`
-            SELECT
-                token_symbol,
-                SUM(amount_usd) as total_usd
-            FROM donations
-            WHERE created_at >= NOW() - INTERVAL '7 days'
-            GROUP BY token_symbol;
-        `;
+                const { rows: periodDonationRows } = await sql`
+                    SELECT
+                        token_symbol,
+                        SUM(amount_usd) as total_usd
+                    FROM donations
+                    WHERE created_at >= ${startDate} AND created_at <= ${endDate}
+                    GROUP BY token_symbol;
+                `;
+                
+                periodDonationRows.forEach(row => {
+                    donationsForPeriod[row.token_symbol] = parseFloat(row.total_usd);
+                });
+            } catch (dateError) {
+                 console.error("Error fetching period-specific donations:", dateError);
+                 // Gracefully fail, donationsForPeriod will be empty
+            }
+        }
 
-        const donationsLastWeek: { [key: string]: number } = {};
-        weeklyDonationRows.forEach(row => {
-            donationsLastWeek[row.token_symbol] = parseFloat(row.total_usd);
-        });
-
-        // --- Fetch Presale Stats from Solana Blockchain ---
+        // --- Fetch Presale Stats from Solana Blockchain (Always Live) ---
         let presaleStats = {
             totalSolRaised: 0,
             presaleContributors: 0,
         };
-
         try {
             const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
             const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
@@ -129,12 +142,13 @@ export default async function handler(req: any, res: any) {
         const presaleAllocation = TOKEN_ALLOCATIONS.find(a => a.name.includes('Presale'))?.value ?? 0;
         const percentageSold = presaleAllocation > 0 ? (totalOwfnSold / presaleAllocation) * 100 : 0;
         
-        // --- Fetch Live OWFN Price ---
+        // --- Fetch Live OWFN Price (Always Live) ---
         const owfnPrice = await getOwfnPrice();
 
         const responseData = {
-            ...donationStats,
-            donationsLastWeek,
+            ...allTimeDonationStats,
+            donationsForPeriod, // Dynamic period data
+            period: { startDate, endDate }, // Echo back the period for clarity
             presale: {
                 ...presaleStats,
                 totalOwfnSold,
