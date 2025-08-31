@@ -66,15 +66,18 @@ export default async function handler(req: any, res: any) {
         let supply = 0;
         try {
             if (rawSupply !== null && rawSupply !== undefined) {
-                // Helius can return supply as a string, sometimes with decimals (e.g., "1.0").
-                // BigInt cannot parse strings with decimals, so we take the integer part first.
-                const supplyString = String(rawSupply).split('.')[0];
-                const supplyBigInt = BigInt(supplyString);
-                supply = Number(supplyBigInt) / (10 ** decimals);
+                // Use Number() for robust parsing of different formats (including scientific notation).
+                // While it may lose precision for extremely large numbers, it is safer than BigInt,
+                // which can crash the function with unexpected formats. A slightly imprecise market cap
+                // is better than a server error.
+                const supplyInSmallestUnit = Number(rawSupply);
+                if (!isNaN(supplyInSmallestUnit)) {
+                    supply = supplyInSmallestUnit / (10 ** decimals);
+                }
             }
         } catch (e) {
             console.warn(`Could not parse supply from Helius for mint ${mintAddress}. Value was:`, rawSupply, e);
-            supply = 0; // Fallback to 0 if parsing fails, preventing a crash.
+            supply = 0;
         }
 
         let mintAuthority: string | null = null;
