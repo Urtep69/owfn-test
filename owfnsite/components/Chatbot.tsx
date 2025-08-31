@@ -23,7 +23,8 @@ const pageNameToPath: { [key: string]: string } = {
   'Impact Portal': '/impact',
   'Partnerships': '/partnerships',
   'FAQ': '/faq',
-  'Contact': '/contact'
+  'Contact': '/contact',
+  'Leaderboards': '/leaderboard'
 };
 
 const socialIconMap: { [key: string]: React.ReactNode } = {
