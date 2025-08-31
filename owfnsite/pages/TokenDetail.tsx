@@ -115,12 +115,12 @@ export default function TokenDetail() {
 
                 if (!response.ok) {
                     let errorMsg = `Error: ${response.status} ${response.statusText}`;
+                    const errorText = await response.text();
                     try {
-                        const errorData = await response.json();
+                        const errorData = JSON.parse(errorText);
                         errorMsg = errorData.error || errorMsg;
                     } catch (e) {
-                         const errorText = await response.text();
-                         errorMsg = errorText.substring(0, 200) || errorMsg;
+                        errorMsg = errorText.substring(0, 200) || errorMsg;
                     }
                     throw new Error(errorMsg);
                 }

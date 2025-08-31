@@ -53,7 +53,6 @@ export default async function handler(req: any, res: any) {
             return res.status(404).json({ error: `No data could be found for mint: ${mintAddress}.` });
         }
         
-        // Defensively access nested properties
         const tokenInfo = asset.token_info || {};
         const content = asset.content || {};
         const metadata = content.metadata || {};
@@ -63,11 +62,17 @@ export default async function handler(req: any, res: any) {
         const decimals = tokenInfo.decimals ?? 9;
         const price = priceInfo.price_per_token || 0;
         
-        // FIX: Add a defensive check for null/undefined before passing to BigInt
         const rawSupply = tokenInfo.supply;
-        const supply = (rawSupply !== null && rawSupply !== undefined)
-            ? Number(BigInt(rawSupply)) / (10 ** decimals)
-            : 0;
+        let supply = 0;
+        if (rawSupply !== null && rawSupply !== undefined) {
+             try {
+                // BigInt can handle strings or numbers, but will throw on other types. This is safer.
+                supply = Number(BigInt(rawSupply)) / (10 ** decimals);
+            } catch (e) {
+                console.warn(`Could not parse supply from Helius for mint ${mintAddress}. Value was:`, rawSupply, e);
+                supply = 0; // Fallback to 0 if parsing fails
+            }
+        }
 
         let mintAuthority: string | null = null;
         let freezeAuthority: string | null = null;
@@ -105,7 +110,6 @@ export default async function handler(req: any, res: any) {
             tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
         };
 
-        // Populate description from mock if available
         const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
         if (mockDetailsKey) {
             responseData.description = MOCK_TOKEN_DETAILS[mockDetailsKey].description;
