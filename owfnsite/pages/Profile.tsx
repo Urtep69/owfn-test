@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2, LogIn } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { ImpactBadge, ImpactNFT } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
@@ -25,9 +25,8 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
 );
 
 export default function Profile() {
-    const { t, solana, siws, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, loading } = solana;
-    const { isAuthenticated, isSessionLoading, isLoading, signIn } = siws;
+    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { connected, address, userTokens, loading, userStats } = solana;
     
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
@@ -50,30 +49,6 @@ export default function Profile() {
                     className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
                 >
                     {loading ? t('connecting') : t('connect_wallet')}
-                </button>
-            </div>
-        );
-    }
-
-    if (isSessionLoading || isLoading) {
-        return (
-            <div className="flex justify-center items-center h-96">
-                <Loader2 className="w-12 h-12 animate-spin text-accent-500" />
-            </div>
-        );
-    }
-    
-    if (!isAuthenticated) {
-        return (
-            <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
-                <LogIn className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
-                <h1 className="text-2xl font-bold mb-2">{t('my_profile')}</h1>
-                <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_sign_in_prompt')}</p>
-                <button
-                    onClick={() => signIn()}
-                    className="bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center mx-auto gap-2"
-                >
-                    <LogIn size={18}/> Sign In
                 </button>
             </div>
         );
@@ -157,9 +132,9 @@ export default function Profile() {
                 <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                     <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
                     <div className="grid md:grid-cols-3 gap-4">
-                        <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${solana.userStats.totalDonated.toFixed(2)}`} />
-                        <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={solana.userStats.projectsSupported} />
-                        <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={solana.userStats.votesCast} />
+                        <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
+                        <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
+                        <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
                     </div>
                 </div>
             </ComingSoonWrapper>

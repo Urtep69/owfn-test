@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
-import { useSiws } from '../hooks/useSiws.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, SiwsReturn } from '../types.ts';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 
@@ -15,7 +15,6 @@ interface AppContextType {
   currentLanguage: Language;
   supportedLanguages: Language[];
   solana: ReturnType<typeof useSolana>;
-  siws: SiwsReturn;
   socialCases: SocialCase[];
   addSocialCase: (newCase: SocialCase) => void;
   vestingSchedules: VestingSchedule[];
@@ -24,7 +23,6 @@ interface AppContextType {
   addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
   isMaintenanceActive: boolean;
-  isWalletModalOpen: boolean;
   setWalletModalOpen: (open: boolean) => void;
 }
 
@@ -34,8 +32,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [theme, toggleTheme] = useTheme();
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
   const solana = useSolana();
-  const siws = useSiws();
-  const [isWalletModalOpen, setWalletModalOpen] = useState(false);
+  const { setVisible: setWalletModalOpen } = useWalletModal();
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
@@ -111,7 +108,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     currentLanguage,
     supportedLanguages,
     solana,
-    siws,
     socialCases,
     addSocialCase,
     vestingSchedules,
@@ -120,7 +116,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addProposal,
     voteOnProposal,
     isMaintenanceActive,
-    isWalletModalOpen,
     setWalletModalOpen,
   };
 

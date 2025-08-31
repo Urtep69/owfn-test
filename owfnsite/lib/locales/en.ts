@@ -46,9 +46,6 @@ export const en = {
     connect_wallet_first: `Please connect your wallet first.`,
     yes: `Yes`,
     no: `No`,
-    authenticating: `Authenticating...`,
-    sign_in_to_buy: `Sign In to Buy`,
-    sign_in_to_donate: `Sign In to Donate`,
 
     // Time Units
     time_days: `Days`,
@@ -215,7 +212,6 @@ export const en = {
     token_types: `Token Types`,
     profile_loading_tokens: `Loading tokens...`,
     profile_connect_prompt: `Connect your wallet to see your profile and token balances.`,
-    profile_sign_in_prompt: `Connect and sign in with your wallet to see your profile.`,
     profile_no_tokens: `No tokens found in this wallet.`,
     impact_dashboard_title: `My Impact Dashboard`,
     my_impact_stats: `My Impact Stats`,
@@ -466,6 +462,8 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
+    airdrop_info_box_title: `About this Airdrop`,
+    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
