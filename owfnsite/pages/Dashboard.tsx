@@ -13,33 +13,77 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
     const { t, solana } = useAppContext();
     const [loading, setLoading] = useState(true);
     const [totalValue, setTotalValue] = useState(0);
+    const [balances, setBalances] = useState<Token[]>([]);
 
     useEffect(() => {
         const fetchBalances = async () => {
             setLoading(true);
-            const fetchedBalances = await solana.getWalletBalances(walletInfo.address);
-            setTotalValue(fetchedBalances.reduce((sum, token) => sum + token.usdValue, 0));
-            setLoading(false);
+            try {
+                const fetchedBalances = await solana.getWalletBalances(walletInfo.address);
+                // Filter out tokens with a USD value of less than $0.01 for a cleaner UI
+                const significantBalances = fetchedBalances.filter(token => token.usdValue >= 0.01);
+                
+                setBalances(significantBalances);
+                setTotalValue(fetchedBalances.reduce((sum, token) => sum + token.usdValue, 0));
+            } catch (error) {
+                console.error(`Failed to fetch balances for ${walletInfo.name} (${walletInfo.address}):`, error);
+                setBalances([]);
+                setTotalValue(0);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchBalances();
     }, [walletInfo.address, solana.getWalletBalances]);
 
     return (
-        <div className={`bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d transition-all duration-300 hover:shadow-3d-lg hover:-translate-y-1 transform-style-3d group perspective-1000 ${gridClass}`}>
-            <div className="transition-transform duration-500 group-hover:rotate-x-[5deg]">
+        <div className={`bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d transition-all duration-300 hover:shadow-3d-lg hover:-translate-y-1 transform-style-3d group perspective-1000 flex flex-col ${gridClass}`}>
+            <div className="transition-transform duration-500 group-hover:rotate-x-[5deg] flex flex-col flex-grow">
                 <h3 className="text-lg font-bold font-serif mb-1">{walletInfo.name}</h3>
                 <div className="mb-4">
                     <AddressDisplay address={walletInfo.address} />
                 </div>
                 {loading ? (
-                    <div className="h-16 bg-primary-200 dark:bg-darkPrimary-700 rounded-lg animate-pulse"></div>
+                    <>
+                        <div className="h-16 bg-primary-200 dark:bg-darkPrimary-700 rounded-lg animate-pulse"></div>
+                        <div className="mt-4 pt-4 border-t border-primary-200 dark:border-darkPrimary-700/50 space-y-3 flex-grow">
+                            <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
+                            <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
+                        </div>
+                    </>
                 ) : (
-                    <div>
-                        <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('total_value')}</p>
-                        <p className="text-4xl font-bold text-green-600 dark:text-green-400">
-                           $<AnimatedNumber value={totalValue} />
-                        </p>
-                    </div>
+                    <>
+                        <div>
+                            <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('total_value')}</p>
+                            <p className="text-4xl font-bold text-green-600 dark:text-green-400">
+                               $<AnimatedNumber value={totalValue} />
+                            </p>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-primary-200 dark:border-darkPrimary-700/50 flex-grow flex flex-col">
+                            <h4 className="text-xs font-bold uppercase text-primary-500 dark:text-darkPrimary-500 mb-2">Assets</h4>
+                            {balances.length > 0 ? (
+                                <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                                    {balances.map(token => (
+                                        <div key={token.mintAddress} className="flex items-center justify-between text-sm">
+                                            <div className="flex items-center gap-3">
+                                                {/* FIX: Add a more specific type assertion to let TypeScript know that the cloned element accepts a className prop. */}
+                                                {React.isValidElement(token.logo) ? React.cloneElement(token.logo as React.ReactElement<{ className?: string }>, { className: 'w-6 h-6' }) : null}
+                                                <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{token.symbol}</span>
+                                            </div>
+                                            <div className="text-right font-mono">
+                                                <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
+                                                <p className="text-xs text-primary-500 dark:text-darkPrimary-400">${token.usdValue.toFixed(2)}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex-grow flex items-center justify-center">
+                                    <p className="text-sm text-center text-primary-500 dark:text-darkPrimary-400">This wallet is empty.</p>
+                                </div>
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
         </div>
