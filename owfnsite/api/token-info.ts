@@ -62,8 +62,13 @@ export default async function handler(req: any, res: any) {
 
         const decimals = tokenInfo.decimals ?? 9;
         const price = priceInfo.price_per_token || 0;
-        const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
         
+        // FIX: Add a defensive check for null/undefined before passing to BigInt
+        const rawSupply = tokenInfo.supply;
+        const supply = (rawSupply !== null && rawSupply !== undefined)
+            ? Number(BigInt(rawSupply)) / (10 ** decimals)
+            : 0;
+
         let mintAuthority: string | null = null;
         let freezeAuthority: string | null = null;
         let updateAuthority: string | null = null;
