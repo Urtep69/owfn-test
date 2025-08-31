@@ -4,7 +4,7 @@ import { Link, useRoute } from 'wouter';
 import { 
     Home, Info, FileText, Map, Handshake, HelpCircle, Mail,
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
-    Heart, TrendingUp, Lock, Award, User, Vote, Shield
+    Heart, TrendingUp, Lock, Award, User, Vote, Shield, Rss, Settings
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
@@ -41,8 +41,8 @@ const NavGroup = ({ title, isOpen, children }: { title: string, isOpen: boolean,
 );
 
 export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
-    const { t, solana } = useAppContext();
-    const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
+    const { t, solana, siws } = useAppContext();
+    const isAdmin = siws.isAuthenticated && solana.address === ADMIN_WALLET_ADDRESS;
 
     const handleLinkClick = () => {
         if (window.innerWidth < 768) {
@@ -58,6 +58,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 { to: '/about', label: t('about'), icon: <Info size={20} /> },
                 { to: '/whitepaper', label: t('whitepaper'), icon: <FileText size={20} /> },
                 { to: '/roadmap', label: t('roadmap'), icon: <Map size={20} /> },
+                { to: '/blog', label: t('blog'), icon: <Rss size={20} /> },
                 { to: '/partnerships', label: t('partnerships'), icon: <Handshake size={20} /> },
                 { to: '/faq', label: t('faq'), icon: <HelpCircle size={20} /> },
             ]
@@ -101,21 +102,13 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                         ))}
                     </NavGroup>
                 ))}
-                 {isAdmin && (
-                    <NavGroup title="Admin" isOpen={isOpen}>
-                        <NavItem 
-                            to="/admin/presale" 
-                            icon={<Shield size={20} />} 
-                            label={t('presale_admin_title')} 
-                            isOpen={isOpen} 
-                            onClick={handleLinkClick} 
-                        />
-                    </NavGroup>
-                )}
             </nav>
             
             <div className="px-2 py-4 border-t border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
                  <NavItem to="/profile" icon={<User size={20} />} label={t('profile')} isOpen={isOpen} onClick={handleLinkClick} />
+                 {isAdmin && (
+                    <NavItem to="/admin" icon={<Settings size={20} />} label={t('admin_panel')} isOpen={isOpen} onClick={handleLinkClick} />
+                )}
             </div>
         </aside>
     );

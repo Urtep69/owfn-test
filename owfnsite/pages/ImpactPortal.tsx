@@ -36,15 +36,22 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
 
             const translations = await Promise.all(translationPromises);
 
+            // FIX: Changed 'imageUrl' to 'imageUrls' (an array) and added missing required fields 
+            // from the SocialCase type with sensible defaults to resolve compilation errors.
             const newCase: SocialCase = {
                 id: Date.now().toString(),
                 title: { en: title },
                 description: { en: description },
                 details: { en: details },
                 category,
-                imageUrl: imageUrl || `https://picsum.photos/seed/${Date.now()}/400/300`,
+                imageUrls: [imageUrl || `https://picsum.photos/seed/${Date.now()}/400/300`],
                 goal: parseFloat(goal),
                 donated: 0,
+                country: 'Global', // Placeholder value
+                region: 'Humanity', // Placeholder value
+                beneficiaryCount: 1, // Placeholder value
+                createdAt: new Date().toISOString(),
+                status: 'active',
             };
             
             languagesToTranslate.forEach((lang, index) => {
@@ -97,6 +104,7 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
 
 
 export default function ImpactPortal() {
+    // FIX: Destructured 'addSocialCase' from useAppContext, which is now provided by the context.
     const { t, solana, socialCases, addSocialCase } = useAppContext();
     const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
     

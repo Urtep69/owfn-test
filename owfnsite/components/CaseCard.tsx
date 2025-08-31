@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -10,10 +11,11 @@ export const CaseCard = ({ socialCase }: { socialCase: SocialCase }) => {
     
     const title = socialCase.title[currentLanguage.code] || socialCase.title['en'];
     const description = socialCase.description[currentLanguage.code] || socialCase.description['en'];
+    const imageUrl = socialCase.imageUrls && socialCase.imageUrls.length > 0 ? socialCase.imageUrls[0] : 'https://picsum.photos/seed/placeholder/400/300';
 
     return (
         <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d overflow-hidden flex flex-col">
-            <img src={socialCase.imageUrl} alt={title} className="w-full h-48 object-cover" />
+            <img src={imageUrl} alt={title} className="w-full h-48 object-cover" />
             <div className="p-6 flex-grow flex flex-col">
                 <span className="text-sm font-semibold text-accent-600 dark:text-darkAccent-500 mb-1">{t(`category_${socialCase.category.toLowerCase().replace(' ', '_')}`, { defaultValue: socialCase.category })}</span>
                 <h3 className="text-xl font-bold mb-2 h-14">{title}</h3>

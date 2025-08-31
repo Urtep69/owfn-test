@@ -1,10 +1,13 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { ProgressBar } from '../components/ProgressBar.tsx';
-import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle, MapPin, Users, Landmark } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
+import { ImageSlideshow } from '../components/ImageSlideshow.tsx';
+import { CommentSection } from '../components/CommentSection.tsx';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -20,7 +23,7 @@ const mockUpdates = [
 ];
 
 export default function ImpactCaseDetail() {
-    const { t, solana, currentLanguage, socialCases, setWalletModalOpen } = useAppContext();
+    const { t, solana, siws, currentLanguage, socialCases, setWalletModalOpen } = useAppContext();
     const params = useParams();
     const id = params?.['id'];
     const socialCase = socialCases.find(c => c.id === id);
@@ -29,7 +32,7 @@ export default function ImpactCaseDetail() {
     const [selectedToken, setSelectedToken] = useState('USDC');
     
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
-    const percentages = [5, 10, 15, 25, 50, 75, 100];
+    const percentages = [25, 50, 75, 100];
 
     const tokenPrice = useMemo(() => currentUserToken?.pricePerToken ?? 0, [currentUserToken]);
 
@@ -76,6 +79,11 @@ export default function ImpactCaseDetail() {
             return;
         }
 
+        if (!siws.isAuthenticated) {
+            const signedIn = await siws.signIn();
+            if (!signedIn) return;
+        }
+
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
             alert(t('invalid_amount_generic'));
@@ -87,6 +95,7 @@ export default function ImpactCaseDetail() {
         if (result.success) {
             alert(t('case_donation_success_alert', { title }));
             setAmount('');
+            // Here you would typically update the case's donated amount from a server
         } else {
             alert(t(result.messageKey, result.params));
         }
@@ -94,6 +103,13 @@ export default function ImpactCaseDetail() {
     
     const categorySlug = socialCase.category.toLowerCase().replace(/\s+/g, '-');
     const categoryName = t(`category_${socialCase.category.toLowerCase().replace(/\s+/g, '_')}`);
+    
+    const buttonText = useMemo(() => {
+        if (solana.loading || siws.isLoading) return t('processing');
+        if (!solana.connected) return t('connect_wallet');
+        if (!siws.isAuthenticated) return t('sign_in_to_donate');
+        return t('donate');
+    }, [solana.connected, solana.loading, siws.isAuthenticated, siws.isLoading, t]);
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -101,10 +117,17 @@ export default function ImpactCaseDetail() {
                 <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
             </Link>
             <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden">
-                <img src={socialCase.imageUrl} alt={title} className="w-full h-64 md:h-96 object-cover" />
+                <ImageSlideshow imageUrls={socialCase.imageUrls} altText={title} />
                 <div className="p-6 md:p-10">
-                    <span className="text-lg font-semibold text-accent-600 dark:text-darkAccent-500 mb-2 inline-block">{t(`category_${socialCase.category.toLowerCase().replace(' ', '_')}`, { defaultValue: socialCase.category })}</span>
+                    <span className="text-lg font-semibold text-accent-600 dark:text-darkAccent-500 mb-2 inline-block">{categoryName}</span>
                     <h1 className="text-3xl md:text-5xl font-bold mb-6">{title}</h1>
+                    
+                    <div className="grid md:grid-cols-3 gap-4 mb-8 text-center">
+                        <div className="bg-primary-50 dark:bg-darkPrimary-700/50 p-3 rounded-lg"><MapPin className="inline-block mr-2"/> {socialCase.region}, {socialCase.country}</div>
+                        <div className="bg-primary-50 dark:bg-darkPrimary-700/50 p-3 rounded-lg"><Users className="inline-block mr-2"/> {socialCase.beneficiaryCount} {t('beneficiaries')}</div>
+                        {socialCase.bankAccountIBAN && <div className="bg-primary-50 dark:bg-darkPrimary-700/50 p-3 rounded-lg"><Landmark className="inline-block mr-2"/> {t('bank_transfer_available')}</div>}
+                    </div>
+
                     <p className="text-lg text-primary-700 dark:text-darkPrimary-300 leading-relaxed mb-8">{description}</p>
                     
                     <div className="mb-8">
@@ -119,25 +142,22 @@ export default function ImpactCaseDetail() {
 
             <div className="grid lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-3 space-y-8">
-                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Newspaper /> {t('live_updates')}</h3>
-                        <div className="space-y-4">
-                            {mockUpdates.map(update => (
-                                <div key={update.date} className="border-b border-primary-200 dark:border-darkPrimary-700 pb-4 last:border-b-0 last:pb-0">
-                                    <p className="text-sm text-primary-500 dark:text-darkPrimary-400 font-semibold">{update.date}</p>
-                                    <p className="text-primary-700 dark:text-darkPrimary-300 mt-1">{t(update.key)}</p>
-                                    {update.image && <img src={update.image} alt="Update" className="mt-2 rounded-lg" />}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                     {details && (
+                    {details && (
                         <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                             <h3 className="text-2xl font-bold mb-4">{t('case_details_title')}</h3>
                             <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed whitespace-pre-wrap">{details}</p>
+                            {socialCase.bankAccountIBAN && (
+                                <div className="mt-6 p-4 bg-primary-50 dark:bg-darkPrimary-700/50 rounded-lg border-l-4 border-accent-500">
+                                    <h4 className="font-bold">{t('direct_bank_transfer')}</h4>
+                                    <p className="font-mono text-lg mt-1">{socialCase.bankAccountIBAN}</p>
+                                    <p className="text-xs mt-1 text-primary-500">{t('bank_transfer_verified_note')}</p>
+                                </div>
+                            )}
                         </div>
                     )}
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <CommentSection parentId={socialCase.id} title={t('messages_of_support')} />
+                    </div>
                 </div>
 
                 <div className="lg:col-span-2">
@@ -147,29 +167,28 @@ export default function ImpactCaseDetail() {
                                 <Heart className="text-red-500" />
                                 <span>{t('support_this_cause')}</span>
                             </h3>
-                            <div className="bg-accent-100/30 dark:bg-darkAccent-900/20 border border-accent-400/30 dark:border-darkAccent-500/30 text-accent-800 dark:text-darkAccent-200 p-3 rounded-md text-sm flex items-start space-x-2 mb-6">
-                                <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                                <p>{t('donation_solana_warning')}</p>
-                            </div>
-                            <div className="space-y-6">
+                            <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-primary-600 dark:text-darkPrimary-400 mb-2">{t('select_token')}</label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                    <div className="grid grid-cols-4 gap-2">
                                         {tokens.map(token => (
                                             <button
                                                 key={token.symbol}
                                                 onClick={() => setSelectedToken(token.symbol)}
-                                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-accent-500 bg-accent-100/50 dark:bg-darkAccent-900/50' : 'border-primary-200 dark:border-darkPrimary-600'}`}
+                                                className={`flex flex-col items-center justify-center p-3 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-accent-500 bg-accent-100/50 dark:bg-darkAccent-900/50' : 'border-primary-200 dark:border-darkPrimary-600'}`}
                                             >
-                                                <div className="w-8 h-8 mb-2">{token.icon}</div>
-                                                <span className="font-semibold">{token.symbol}</span>
+                                                <div className="w-6 h-6 mb-1">{token.icon}</div>
+                                                <span className="font-semibold text-xs">{token.symbol}</span>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                         
                                 <div>
-                                    <label htmlFor="amount" className="block text-sm font-medium text-primary-600 dark:text-darkPrimary-400 mb-1">{t('amount')}</label>
+                                    <div className="flex justify-between items-baseline">
+                                        <label htmlFor="amount" className="block text-sm font-medium text-primary-600 dark:text-darkPrimary-400 mb-1">{t('amount')}</label>
+                                        {solana.connected && currentUserToken && <span className="text-xs">{t('balance')}: {currentUserToken.balance.toFixed(4)}</span>}
+                                    </div>
                                     <input
                                         type="number"
                                         id="amount"
@@ -178,7 +197,7 @@ export default function ImpactCaseDetail() {
                                         placeholder="0.0"
                                         className="w-full p-3 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
                                     />
-                                    <div className="flex flex-wrap gap-2 mt-3">
+                                    <div className="flex flex-wrap gap-2 mt-2">
                                         {percentages.map(p => (
                                             <button
                                                 key={p}
@@ -192,59 +211,20 @@ export default function ImpactCaseDetail() {
                                     </div>
                                 </div>
                             
-                                {solana.connected && (
-                                    <div className="animate-fade-in-up" style={{animationDuration: '300ms'}}>
-                                        {currentUserToken ? (
-                                            <div className="text-center">
-                                                <p className="text-xl font-bold text-primary-800 dark:text-darkPrimary-200">
-                                                    {t('balance')}: {currentUserToken.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })} {currentUserToken.symbol}
-                                                </p>
-                                            </div>
-                                        ) : (
-                                            <div className="text-center py-3 px-4 bg-accent-100/20 dark:bg-darkAccent-900/20 border border-accent-400/30 dark:border-darkAccent-500/30 rounded-lg">
-                                                <div className="flex items-center justify-center space-x-2 text-accent-700 dark:text-darkAccent-200">
-                                                    {React.cloneElement(tokens.find(t => t.symbol === selectedToken)!.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
-                                                    <p className="font-semibold">
-                                                        {t('donation_no_token_balance', { symbol: selectedToken })}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-
                                 {parseFloat(amount) > 0 && (
-                                    <div className="p-4 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg text-center animate-fade-in-up" style={{animationDuration: '300ms'}}>
-                                        <p className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">
+                                    <div className="p-3 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg text-center animate-fade-in-up" style={{animationDuration: '300ms'}}>
+                                        <p className="text-xl font-bold text-primary-900 dark:text-darkPrimary-100">
                                             {parseFloat(amount).toLocaleString(undefined, {maximumFractionDigits: 4})} {selectedToken}
                                         </p>
-                                        <p className="text-md text-primary-700 dark:text-darkPrimary-300 font-semibold">
+                                        <p className="text-sm text-primary-700 dark:text-darkPrimary-300 font-semibold">
                                             ~ ${usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                         </p>
                                     </div>
                                 )}
 
-                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50">
-                                    {solana.loading ? t('processing') : (solana.connected ? t('donate') : t('connect_wallet'))}
+                                <button onClick={handleDonate} disabled={solana.loading || siws.isLoading || (solana.connected && siws.isAuthenticated && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50">
+                                     {buttonText}
                                 </button>
-                            </div>
-                        </div>
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                            <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Milestone /> {t('funding_milestones')}</h3>
-                             <div className="relative pl-4">
-                                <div className="absolute top-0 left-4 h-full w-0.5 bg-primary-200 dark:bg-darkPrimary-700"></div>
-                                <div className="absolute top-0 left-4 h-full w-0.5 bg-accent-500 dark:bg-darkAccent-500 transition-all duration-500" style={{ height: `${progress}%` }}></div>
-                                {milestones.map(milestone => (
-                                    <div key={milestone.percentage} className="flex items-start mb-4 relative">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center -ml-8 flex-shrink-0 z-10 ${progress >= milestone.percentage ? 'bg-accent-500 dark:bg-darkAccent-500' : 'bg-primary-300 dark:bg-darkPrimary-600'}`}>
-                                            <CheckCircle size={16} className="text-white"/>
-                                        </div>
-                                        <div className="ml-4">
-                                            <p className="font-bold">{milestone.percentage}%</p>
-                                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t(milestone.key)}</p>
-                                        </div>
-                                    </div>
-                                ))}
                             </div>
                         </div>
                     </div>

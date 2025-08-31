@@ -1,11 +1,12 @@
+
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
 import { useSiws } from '../hooks/useSiws.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, SiwsReturn } from '../types.ts';
-import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, SiwsReturn, BlogPost, Comment } from '../types.ts';
+import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, INITIAL_BLOG_POSTS } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 
 interface AppContextType {
@@ -18,7 +19,12 @@ interface AppContextType {
   solana: ReturnType<typeof useSolana>;
   siws: SiwsReturn;
   socialCases: SocialCase[];
+  setSocialCases: React.Dispatch<React.SetStateAction<SocialCase[]>>;
   addSocialCase: (newCase: SocialCase) => void;
+  blogPosts: BlogPost[];
+  setBlogPosts: React.Dispatch<React.SetStateAction<BlogPost[]>>;
+  comments: Comment[];
+  addComment: (newComment: Omit<Comment, 'id'>) => void;
   vestingSchedules: VestingSchedule[];
   addVestingSchedule: (schedule: VestingSchedule) => void;
   proposals: GovernanceProposal[];
@@ -38,12 +44,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { setVisible: setWalletModalOpen } = useWalletModal();
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(INITIAL_BLOG_POSTS);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
+  // FIX: Added 'addSocialCase' function to allow adding new social cases to the state.
   const addSocialCase = (newCase: SocialCase) => {
-    setSocialCases(prevCases => [newCase, ...prevCases]);
+    setSocialCases(prev => [newCase, ...prev]);
+  };
+
+  const addComment = (newCommentData: Omit<Comment, 'id'>) => {
+    const newComment: Comment = {
+      id: `comment_${Date.now()}_${Math.random()}`,
+      ...newCommentData,
+    };
+    setComments(prev => [newComment, ...prev]);
   };
   
   const addVestingSchedule = (schedule: VestingSchedule) => {
@@ -113,7 +130,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     solana,
     siws,
     socialCases,
+    setSocialCases,
     addSocialCase,
+    blogPosts,
+    setBlogPosts,
+    comments,
+    addComment,
     vestingSchedules,
     addVestingSchedule,
     proposals,

@@ -1,3 +1,4 @@
+
 import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
@@ -32,6 +33,9 @@ import Governance from './pages/Governance.tsx';
 import Maintenance from './pages/Maintenance.tsx';
 import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
+import Blog from './pages/Blog.tsx';
+import BlogPostDetail from './pages/BlogPostDetail.tsx';
+import Admin from './pages/Admin.tsx';
 import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
@@ -52,6 +56,8 @@ const AppContent = () => {
           <Route path="/whitepaper"><Whitepaper /></Route>
           <Route path="/tokenomics"><Tokenomics /></Route>
           <Route path="/roadmap"><Roadmap /></Route>
+          <Route path="/blog/:slug"><BlogPostDetail /></Route>
+          <Route path="/blog"><Blog /></Route>
           <Route path="/staking">
             <ComingSoonWrapper>
               <Staking />
@@ -87,6 +93,7 @@ const AppContent = () => {
             </ComingSoonWrapper>
           </Route>
           {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
+          {isAdmin && <Route path="/admin"><Admin /></Route>}
           <Route path="/maintenance"><Maintenance /></Route>
           <Route path="/"><Home /></Route>
         </Switch>
