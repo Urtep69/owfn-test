@@ -64,15 +64,17 @@ export default async function handler(req: any, res: any) {
         
         const rawSupply = tokenInfo.supply;
         let supply = 0;
-        if (rawSupply !== null && rawSupply !== undefined) {
-            try {
-                // This is the key fix. BigInt throws on non-primitive types like objects.
-                // Wrapping this ensures the function doesn't crash if Helius sends weird data.
-                supply = Number(BigInt(rawSupply)) / (10 ** decimals);
-            } catch (e) {
-                console.warn(`Could not parse supply from Helius for mint ${mintAddress}. Value was:`, rawSupply, e);
-                supply = 0; // Fallback to 0 if parsing fails, preventing a crash.
+        try {
+            if (rawSupply !== null && rawSupply !== undefined) {
+                // Helius can return supply as a string, sometimes with decimals (e.g., "1.0").
+                // BigInt cannot parse strings with decimals, so we take the integer part first.
+                const supplyString = String(rawSupply).split('.')[0];
+                const supplyBigInt = BigInt(supplyString);
+                supply = Number(supplyBigInt) / (10 ** decimals);
             }
+        } catch (e) {
+            console.warn(`Could not parse supply from Helius for mint ${mintAddress}. Value was:`, rawSupply, e);
+            supply = 0; // Fallback to 0 if parsing fails, preventing a crash.
         }
 
         let mintAuthority: string | null = null;

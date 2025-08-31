@@ -111,20 +111,15 @@ export default function TokenDetail() {
             
             try {
                 const response = await fetch(`/api/token-info?mint=${mintAddress}`);
-                const responseText = await response.text();
 
                 if (!response.ok) {
-                    let errorMsg = `Error: ${response.status}`;
-                    try {
-                        const errorData = JSON.parse(responseText);
-                        errorMsg = errorData.error || responseText;
-                    } catch (e) {
-                         errorMsg = responseText || errorMsg;
-                    }
-                    throw new Error(errorMsg);
+                    // When the function crashes, the body is often text from Vercel, not JSON.
+                    const errorText = await response.text();
+                    // We'll throw this to be caught below and displayed to the user.
+                    throw new Error(errorText || `A server error occurred: ${response.status}`);
                 }
                 
-                const data: TokenDetails = JSON.parse(responseText);
+                const data: TokenDetails = await response.json();
                 setToken(data);
 
             } catch (err) {
