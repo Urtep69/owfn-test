@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2, TrendingUp, Users, Droplets, Info, RefreshCw, ChevronDown } from 'lucide-react';
+import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2, TrendingUp, Users, Droplets, RefreshCw } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import { GenericTokenIcon, SolIcon, OwfnIcon } from '../components/IconComponents.tsx';
+import { GenericTokenIcon, SolIcon } from '../components/IconComponents.tsx';
 import { DualProgressBar } from '../components/DualProgressBar.tsx';
-import { MOCK_TOKEN_DETAILS } from '../constants.ts';
 
 const StatCard = ({ title, value, icon, change, changeColor }: { title: string, value: string, icon: React.ReactNode, change?: string, changeColor?: string }) => (
     <div className="bg-white/50 dark:bg-darkPrimary-800/50 backdrop-blur-sm p-5 rounded-2xl shadow-3d hover:shadow-3d-lg transition-all duration-300 group perspective-1000">
@@ -45,8 +44,8 @@ const SwapCard = ({ tokenSymbol, tokenLogo }: { tokenSymbol: string, tokenLogo: 
             <div className="space-y-2">
                 <div className="bg-primary-100 dark:bg-darkPrimary-700 p-3 rounded-lg">
                     <div className="flex justify-between text-xs mb-1">
-                        <span>You pay</span>
-                        <span>Balance: --</span>
+                        <span>{t('you_pay')}</span>
+                        <span>{t('balance')}: --</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <input type="number" placeholder="0.0" className="w-full bg-transparent text-2xl font-mono focus:outline-none"/>
@@ -59,8 +58,8 @@ const SwapCard = ({ tokenSymbol, tokenLogo }: { tokenSymbol: string, tokenLogo: 
 
                 <div className="bg-primary-100 dark:bg-darkPrimary-700 p-3 rounded-lg">
                     <div className="flex justify-between text-xs mb-1">
-                        <span>You receive</span>
-                        <span>Balance: --</span>
+                        <span>{t('you_receive')}</span>
+                        <span>{t('balance')}: --</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <input type="number" placeholder="0.0" className="w-full bg-transparent text-2xl font-mono focus:outline-none"/>
@@ -112,27 +111,22 @@ export default function TokenDetail() {
             
             try {
                 const response = await fetch(`/api/token-info?mint=${mintAddress}`);
+                const responseText = await response.text();
 
                 if (!response.ok) {
-                    let errorMsg = `Error: ${response.status} ${response.statusText}`;
-                    const errorText = await response.text();
+                    let errorMsg = `Error: ${response.status}`;
                     try {
-                        const errorData = JSON.parse(errorText);
-                        errorMsg = errorData.error || errorMsg;
+                        const errorData = JSON.parse(responseText);
+                        errorMsg = errorData.error || responseText;
                     } catch (e) {
-                        errorMsg = errorText.substring(0, 200) || errorMsg;
+                         errorMsg = responseText || errorMsg;
                     }
                     throw new Error(errorMsg);
                 }
                 
-                const data: TokenDetails = await response.json();
-
-                const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
-                if (mockDetailsKey) {
-                    const mock = MOCK_TOKEN_DETAILS[mockDetailsKey];
-                    data.description = data.description || mock.description;
-                }
+                const data: TokenDetails = JSON.parse(responseText);
                 setToken(data);
+
             } catch (err) {
                 console.error("Failed to fetch token details:", err);
                 setError(err instanceof Error ? err.message : "An unknown error occurred.");

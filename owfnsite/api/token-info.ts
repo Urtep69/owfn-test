@@ -65,12 +65,13 @@ export default async function handler(req: any, res: any) {
         const rawSupply = tokenInfo.supply;
         let supply = 0;
         if (rawSupply !== null && rawSupply !== undefined) {
-             try {
-                // BigInt can handle strings or numbers, but will throw on other types. This is safer.
+            try {
+                // This is the key fix. BigInt throws on non-primitive types like objects.
+                // Wrapping this ensures the function doesn't crash if Helius sends weird data.
                 supply = Number(BigInt(rawSupply)) / (10 ** decimals);
             } catch (e) {
                 console.warn(`Could not parse supply from Helius for mint ${mintAddress}. Value was:`, rawSupply, e);
-                supply = 0; // Fallback to 0 if parsing fails
+                supply = 0; // Fallback to 0 if parsing fails, preventing a crash.
             }
         }
 
