@@ -3,14 +3,22 @@ import React from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { CommentSection } from '../components/CommentSection.tsx';
 
 export default function BlogPostDetail() {
-    const { t, currentLanguage, blogPosts } = useAppContext();
+    const { t, currentLanguage, blogPosts, isDataLoading } = useAppContext();
     const params = useParams();
     const slug = params?.['slug'];
     const post = blogPosts.find(p => p.slug === slug);
+
+    if (isDataLoading) {
+        return (
+            <div className="flex justify-center items-center h-96">
+                <Loader2 className="w-12 h-12 animate-spin text-accent-500" />
+            </div>
+        );
+    }
 
     if (!post) {
         return (

@@ -85,33 +85,6 @@ export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
 ];
 
-export const INITIAL_SOCIAL_CASES: SocialCase[] = [];
-
-export const INITIAL_BLOG_POSTS: BlogPost[] = [
-    {
-        id: '1',
-        slug: 'welcome-to-the-owfn-movement',
-        title: { en: 'Welcome to the OWFN Movement: A New Era of Transparent Aid' },
-        content: { 
-            en: 'Today marks a significant milestone. The Official World Family Network (OWFN) is live, and our mission to revolutionize humanitarian aid through blockchain technology has officially begun. We believe in a future where every contribution is transparent, every action is accountable, and every individual has the power to make a tangible difference. This blog will be our space to share updates, stories of impact, and insights into our journey. Together, we are not just building a project; we are building a global family united for good. Join us as we take these first crucial steps towards a better world.'
-        },
-        imageUrl: `https://picsum.photos/seed/blog1/1200/800`,
-        authorAddress: ADMIN_WALLET_ADDRESS,
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-        id: '2',
-        slug: 'understanding-our-tokenomics-for-sustainable-impact',
-        title: { en: 'Understanding Our Tokenomics for Sustainable Impact' },
-        content: { 
-            en: 'The financial engine of OWFN is its unique tokenomics, designed for long-term sustainability and perpetual funding of social causes. With a fixed supply of 18 billion tokens, we have carefully allocated resources to ensure growth, community engagement, and, most importantly, a constantly replenishing Impact Treasury. A key feature is the 0.5% transfer fee that will be activated post-presale. This small fee on all transactions acts as a continuous micro-donation, ensuring that as our ecosystem grows, so does our ability to provide aid. It’s a model where economic activity directly fuels our humanitarian mission, creating a self-sustaining cycle of giving.'
-        },
-        imageUrl: `https://picsum.photos/seed/blog2/1200/800`,
-        authorAddress: ADMIN_WALLET_ADDRESS,
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    }
-];
-
 export const KNOWN_TOKEN_MINT_ADDRESSES: { [key: string]: string } = {
   OWFN: 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B',
   SOL: 'So11111111111111111111111111111111111111112',

@@ -6,8 +6,8 @@ import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
 import { useSiws } from '../hooks/useSiws.ts';
 import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, SiwsReturn, BlogPost, Comment } from '../types.ts';
-import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, INITIAL_BLOG_POSTS } from '../constants.ts';
-import { translateText } from '../services/geminiService.ts';
+import { SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
+import { STATIC_SOCIAL_CASES, STATIC_BLOG_POSTS } from '../lib/static-data.ts';
 
 interface AppContextType {
   theme: Theme;
@@ -19,12 +19,10 @@ interface AppContextType {
   solana: ReturnType<typeof useSolana>;
   siws: SiwsReturn;
   socialCases: SocialCase[];
-  setSocialCases: React.Dispatch<React.SetStateAction<SocialCase[]>>;
-  addSocialCase: (newCase: SocialCase) => void;
   blogPosts: BlogPost[];
-  setBlogPosts: React.Dispatch<React.SetStateAction<BlogPost[]>>;
-  comments: Comment[];
-  addComment: (newComment: Omit<Comment, 'id'>) => void;
+  isDataLoading: boolean;
+  addSocialCase: (newCase: Omit<SocialCase, 'id' | 'createdAt' | 'donated' | 'status'>) => Promise<void>;
+  addBlogPost: (newPost: Omit<BlogPost, 'id' | 'createdAt' | 'slug'>) => Promise<void>;
   vestingSchedules: VestingSchedule[];
   addVestingSchedule: (schedule: VestingSchedule) => void;
   proposals: GovernanceProposal[];
@@ -43,60 +41,73 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const siws = useSiws();
   const { setVisible: setWalletModalOpen } = useWalletModal();
 
-  const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(INITIAL_BLOG_POSTS);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [socialCases, setSocialCases] = useState<SocialCase[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
-  // FIX: Added 'addSocialCase' function to allow adding new social cases to the state.
-  const addSocialCase = (newCase: SocialCase) => {
-    setSocialCases(prev => [newCase, ...prev]);
+  useEffect(() => {
+    setIsDataLoading(true);
+    // Load initial data statically to prevent deployment/network errors.
+    // A small timeout prevents UI flicker and simulates a loading state.
+    const timer = setTimeout(() => {
+      try {
+        setSocialCases(STATIC_SOCIAL_CASES);
+        setBlogPosts(STATIC_BLOG_POSTS);
+      } catch (error) {
+        console.error("Failed to load static data:", error);
+        setSocialCases([]);
+        setBlogPosts([]);
+      } finally {
+        setIsDataLoading(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
+  const addSocialCase = async (newCaseData: Omit<SocialCase, 'id' | 'createdAt' | 'donated' | 'status'>) => {
+    const response = await fetch('/api/cases', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newCaseData),
+    });
+    if (response.ok) {
+        const newCase = await response.json();
+        setSocialCases(prev => [newCase, ...prev]);
+    } else {
+        throw new Error('Failed to create social case');
+    }
   };
 
-  const addComment = (newCommentData: Omit<Comment, 'id'>) => {
-    const newComment: Comment = {
-      id: `comment_${Date.now()}_${Math.random()}`,
-      ...newCommentData,
-    };
-    setComments(prev => [newComment, ...prev]);
+  const addBlogPost = async (newPostData: Omit<BlogPost, 'id' | 'createdAt' | 'slug'>) => {
+    const response = await fetch('/api/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newPostData),
+    });
+    if (response.ok) {
+        const newPost = await response.json();
+        setBlogPosts(prev => [newPost, ...prev]);
+    } else {
+        throw new Error('Failed to create blog post');
+    }
   };
   
   const addVestingSchedule = (schedule: VestingSchedule) => {
     setVestingSchedules(prev => [schedule, ...prev]);
   };
 
-  const addProposal = useCallback(async (proposalData: { title: string; description: string; endDate: Date; }) => {
-    const newTitleTranslations: Record<string, string> = { en: proposalData.title };
-    const newDescriptionTranslations: Record<string, string> = { en: proposalData.description };
-
-    const languagesToTranslate = SUPPORTED_LANGUAGES.filter(lang => lang.code !== 'en');
-    
-    try {
-        const translationPromises = languagesToTranslate.flatMap(lang => [
-            translateText(proposalData.title, lang.name),
-            translateText(proposalData.description, lang.name),
-        ]);
-
-        const translations = await Promise.all(translationPromises);
-
-        languagesToTranslate.forEach((lang, index) => {
-            newTitleTranslations[lang.code] = translations[index * 2] || proposalData.title;
-            newDescriptionTranslations[lang.code] = translations[index * 2 + 1] || proposalData.description;
-        });
-    } catch (error) {
-        console.error("Translation failed for proposal:", error);
-        languagesToTranslate.forEach(lang => {
-            newTitleTranslations[lang.code] = proposalData.title;
-            newDescriptionTranslations[lang.code] = proposalData.description;
-        });
-    }
-    
+  const addProposal = async (proposalData: { title: string; description: string; endDate: Date; }) => {
+    // This remains client-side for now as it's not connected to a DB yet
     const newProposal: GovernanceProposal = {
         id: `prop${Date.now()}`,
-        title: newTitleTranslations,
-        description: newDescriptionTranslations,
+        title: { en: proposalData.title },
+        description: { en: proposalData.description },
         endDate: proposalData.endDate,
         proposer: solana.address || 'Anonymous',
         status: 'active',
@@ -104,7 +115,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         votesAgainst: 0,
     };
     setProposals(prev => [newProposal, ...prev]);
-  }, [solana.address]);
+  };
   
   const voteOnProposal = useCallback((proposalId: string, vote: 'for' | 'against') => {
     setProposals(prev => prev.map(p => {
@@ -130,12 +141,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     solana,
     siws,
     socialCases,
-    setSocialCases,
-    addSocialCase,
     blogPosts,
-    setBlogPosts,
-    comments,
-    addComment,
+    isDataLoading,
+    addSocialCase,
+    addBlogPost,
     vestingSchedules,
     addVestingSchedule,
     proposals,

@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { ProgressBar } from '../components/ProgressBar.tsx';
-import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle, MapPin, Users, Landmark } from 'lucide-react';
+import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle, MapPin, Users, Landmark, Loader2 } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { ImageSlideshow } from '../components/ImageSlideshow.tsx';
@@ -16,17 +16,13 @@ const tokens = [
     { symbol: 'USDT', icon: <UsdtIcon /> },
 ];
 
-const mockUpdates = [
-    { date: '2024-07-15', key: 'case_update_1', image: 'https://picsum.photos/seed/materials/400/200' },
-    { date: '2024-07-01', key: 'case_update_2' },
-    { date: '2024-06-20', key: 'case_update_3' },
-];
-
 export default function ImpactCaseDetail() {
-    const { t, solana, siws, currentLanguage, socialCases, setWalletModalOpen } = useAppContext();
+    const { t, solana, siws, currentLanguage, socialCases, setWalletModalOpen, isDataLoading } = useAppContext();
     const params = useParams();
     const id = params?.['id'];
-    const socialCase = socialCases.find(c => c.id === id);
+    
+    // Find the case only after data has loaded
+    const socialCase = useMemo(() => socialCases.find(c => c.id === id), [socialCases, id]);
 
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
@@ -51,6 +47,14 @@ export default function ImpactCaseDetail() {
         }
     };
 
+    if (isDataLoading) {
+        return (
+            <div className="flex justify-center items-center h-96">
+                <Loader2 className="w-12 h-12 animate-spin text-accent-500" />
+            </div>
+        );
+    }
+
     if (!socialCase) {
         return (
             <div className="text-center py-10 animate-fade-in-up">
@@ -65,13 +69,6 @@ export default function ImpactCaseDetail() {
     const details = socialCase.details[currentLanguage.code] || socialCase.details['en'];
     
     const progress = (socialCase.donated / socialCase.goal) * 100;
-
-    const milestones = [
-        { percentage: 25, key: 'milestone_25' },
-        { percentage: 50, key: 'milestone_50' },
-        { percentage: 75, key: 'milestone_75' },
-        { percentage: 100, key: 'milestone_100' },
-    ];
 
     const handleDonate = async () => {
         if (!solana.connected) {
@@ -90,12 +87,14 @@ export default function ImpactCaseDetail() {
             return;
         }
 
+        // In a real implementation, this would call a server endpoint to process the donation.
+        // For now, it remains a placeholder call.
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
         
         if (result.success) {
             alert(t('case_donation_success_alert', { title }));
             setAmount('');
-            // Here you would typically update the case's donated amount from a server
+            // Here you would typically re-fetch the case data to show the updated donated amount.
         } else {
             alert(t(result.messageKey, result.params));
         }

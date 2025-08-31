@@ -4,6 +4,7 @@ import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { BlogPost } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import { Loader2 } from 'lucide-react';
 
 const BlogPostCard = ({ post }: { post: BlogPost }) => {
     const { t, currentLanguage } = useAppContext();
@@ -42,7 +43,7 @@ const BlogPostCard = ({ post }: { post: BlogPost }) => {
 
 
 export default function Blog() {
-    const { t, blogPosts } = useAppContext();
+    const { t, blogPosts, isDataLoading } = useAppContext();
     
     // Sort posts by creation date, newest first
     const sortedPosts = [...blogPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -56,7 +57,11 @@ export default function Blog() {
                 </p>
             </div>
             
-            {sortedPosts.length > 0 ? (
+            {isDataLoading ? (
+                <div className="flex justify-center items-center py-20">
+                    <Loader2 className="w-12 h-12 animate-spin text-accent-500" />
+                </div>
+            ) : sortedPosts.length > 0 ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {sortedPosts.map(post => (
                         <BlogPostCard key={post.id} post={post} />

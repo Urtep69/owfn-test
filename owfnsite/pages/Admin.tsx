@@ -46,7 +46,8 @@ export default function Admin() {
 
 // Placeholder for managing Social Cases
 const ManageSocialCases = () => {
-    const { t, socialCases, setSocialCases } = useAppContext();
+    // FIX: Removed `setSocialCases` from destructuring as it's not provided by AppContext and is unused.
+    const { t, socialCases } = useAppContext();
     // In a real app, you'd have functions to edit/delete cases.
     // For now, we'll just show the list and add functionality.
 
@@ -62,7 +63,8 @@ const ManageSocialCases = () => {
 
 // Placeholder for managing Blog Posts
 const ManageBlogPosts = () => {
-    const { t, blogPosts, setBlogPosts } = useAppContext();
+    // FIX: Removed `setBlogPosts` from destructuring as it's not provided by AppContext and is unused.
+    const { t, blogPosts } = useAppContext();
     // Similar to cases, list and manage posts here.
 
     return (
