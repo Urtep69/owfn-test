@@ -20,10 +20,8 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
             setLoading(true);
             try {
                 const fetchedBalances = await solana.getWalletBalances(walletInfo.address);
-                // Filter out tokens with a USD value of less than $0.01 for a cleaner UI
-                const significantBalances = fetchedBalances.filter(token => token.usdValue >= 0.01);
-                
-                setBalances(significantBalances);
+                // Display all tokens, even those without USD value, as requested.
+                setBalances(fetchedBalances);
                 setTotalValue(fetchedBalances.reduce((sum, token) => sum + token.usdValue, 0));
             } catch (error) {
                 console.error(`Failed to fetch balances for ${walletInfo.name} (${walletInfo.address}):`, error);
