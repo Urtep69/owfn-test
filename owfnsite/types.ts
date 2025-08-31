@@ -184,3 +184,14 @@ export interface LeaderboardEntry {
     totalDonatedUSD: number;
     donationsByToken: TokenDonationDetail[];
 }
+
+export interface DonationHistoryEntry {
+    id: number;
+    created_at: string;
+    token_symbol: 'OWFN' | 'SOL' | 'USDC' | 'USDT';
+    token_amount: number;
+    amount_usd: number;
+    cause_id: string | null;
+    cause_title: Record<string, string> | null;
+    transaction_signature: string;
+}
