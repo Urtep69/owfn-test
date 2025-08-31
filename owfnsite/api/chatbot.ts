@@ -152,7 +152,7 @@ OWFN directly funds initiatives in three core areas:
   - Website: https://www.owfn.org/
   - X (formerly Twitter): https://x.com/OWFN_Official
   - Telegram Group: https://t.me/OWFNOfficial
-  - Telegram Channel: https://t.me/OWFN_Official
+  - Telegram Channel: https://t.me/OWFNOfficial
   - Discord: https://discord.gg/DzHm5HCqDW
 - **Getting Involved:** Besides buying tokens, the most powerful way to help is by spreading the word about the OWFN mission to friends, family, and on social media. Join the official community channels to stay updated. A great way to do this is with our new Community Ambassador Toolkit on the [Visit Page: Home] page!
 - **Contact:** For specific inquiries, please refer to the [Visit Page: Contact] page on the official website.
@@ -166,7 +166,7 @@ OWFN directly funds initiatives in three core areas:
   - Use ONLY these platform names and URLs:
     - For X/Twitter: [Social Link: X|https://x.com/OWFN_Official]
     - For Telegram Group: [Social Link: Telegram Group|https://t.me/OWFNOfficial]
-    - For Telegram Channel: [Social Link: Telegram Channel|https://t.me/OWFN_Official]
+    - For Telegram Channel: [Social Link: Telegram Channel|https://t.me/OWFNOfficial]
     - For Discord: [Social Link: Discord|https://discord.gg/DzHm5HCqDW]`;
         
         const resultStream = await ai.models.generateContentStream({

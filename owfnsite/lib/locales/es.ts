@@ -572,6 +572,7 @@ export const es = {
     contact_social_discord_title: `Servidor de Discord`,
     contact_social_discord_desc: `Forma parte de nuestra comunidad activa para discusiones y soporte.`,
     send_direct_message: `Enviar Mensaje Directo`,
+
     // Community Ambassador Toolkit
     community_toolkit_title: `Kit de Herramientas del Embajador`,
     community_toolkit_subtitle: `¡Ayuda a difundir la palabra sobre OWFN! Usa nuestra herramienta impulsada por IA para generar publicaciones únicas para redes sociales y compartir nuestra misión con el mundo.`,
@@ -579,4 +580,6 @@ export const es = {
     community_toolkit_copy_button: `Copiar Publicación`,
     community_toolkit_copied_button: `¡Copiado!`,
     community_toolkit_share_button: `Compartir en X`,
+    community_toolkit_error_message: `No se pudo generar la publicación. Por favor, inténtalo de nuevo.`,
+    community_toolkit_error_message_network: `Ocurrió un error. Por favor, inténtalo de nuevo.`,
 };

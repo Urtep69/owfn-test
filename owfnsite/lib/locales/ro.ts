@@ -317,8 +317,6 @@ export const ro = {
     faq_q13: `De ce există o limită maximă de cumpărare (Max Buy) în prevânzare?`,
     faq_a13: `Limita maximă de cumpărare este o măsură importantă pentru a asigura o distribuție cât mai echitabilă a tokenilor și pentru a preveni ca un număr mic de investitori mari ("whales") să controleze o parte semnificativă din ofertă. Acest lucru promovează o comunitate mai sănătoasă și mai descentralizată pe termen lung.`,
     faq_q14: `Ce înseamnă că tokenul este "Purtător de Dobândă" (Interest-Bearing) cu 2% APY? Cum funcționează?`,
-    faq_a14: `Înseamnă că tokenul OWFN este programat să genereze automat o dobândă. Doar prin deținerea tokenilor în portofelul dumneavoastră compatibil cu Solana, cantitatea de tokeni va crește în timp, cu un randament procentual anual (APY) de 2%. Nu este necesar să îi puneți în staking sau să faceți vreo acțiune suplimentară; recompensele se acumulează automat.`,
-    faq_q15: `Ce este taxa de transfer de 0.5% și când se va activa?`,
     faq_a15: `Această taxă este un mecanism cheie pentru finanțarea pe termen lung a misiunii noastre. O taxă de 0.5% se va aplica tuturor tranzacțiilor cu tokenul OWFN *după* finalizarea perioadei de prevânzare. Fondurile colectate din această taxă sunt direcționate automat către Trezoreria de Impact pentru a finanța continuu proiectele noastre sociale. Astfel, fiecare tranzacție contribuie la binele comun.`,
     faq_q16: `De ce ați ales blockchain-ul Solana pentru acest proiect?`,
     faq_a16: `Am ales Solana datorită vitezei sale excepționale, costurilor de tranzacție foarte scăzute și scalabilității ridicate. Aceste caracteristici sunt esențiale pentru un proiect global ca al nostru, permițând micro-tranzacții eficiente și asigurând o experiență rapidă și accesibilă pentru toți utilizatorii, fie că donează, cumpără sau tranzacționează tokeni.`,
@@ -576,6 +574,7 @@ export const ro = {
     contact_social_discord_title: `Server Discord`,
     contact_social_discord_desc: `Deveniți parte a comunității noastre active pentru discuții și suport.`,
     send_direct_message: 'Trimite un Mesaj Direct',
+
     // Community Ambassador Toolkit
     community_toolkit_title: `Trusa Ambasadorului Comunității`,
     community_toolkit_subtitle: `Ajută la răspândirea mesajului OWFN! Folosește instrumentul nostru bazat pe AI pentru a genera postări unice pentru rețelele sociale și pentru a împărtăși misiunea noastră cu lumea.`,
@@ -583,4 +582,6 @@ export const ro = {
     community_toolkit_copy_button: `Copiază Postarea`,
     community_toolkit_copied_button: `Copiat!`,
     community_toolkit_share_button: `Distribuie pe X`,
+    community_toolkit_error_message: `Nu s-a putut genera postarea. Vă rugăm să încercați din nou.`,
+    community_toolkit_error_message_network: `A apărut o eroare. Vă rugăm să încercați din nou.`,
 };

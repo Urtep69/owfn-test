@@ -20,15 +20,15 @@ export const CommunityToolkit = () => {
                 const data = await response.json();
                 setPost(data.post);
             } else {
-                setPost("Failed to generate post. Please try again.");
+                setPost(t('community_toolkit_error_message', { defaultValue: "Failed to generate post. Please try again."}));
             }
         } catch (error) {
             console.error("Failed to fetch post:", error);
-            setPost("An error occurred. Please try again.");
+            setPost(t('community_toolkit_error_message_network', { defaultValue: "An error occurred. Please try again."}));
         } finally {
             setLoading(false);
         }
-    }, [currentLanguage.code]);
+    }, [currentLanguage.code, t]);
 
     useEffect(() => {
         generatePost();
