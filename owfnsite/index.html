@@ -96,12 +96,15 @@
               '3d': '0 2.8px 2.2px rgba(0, 0, 0, 0.02), 0 6.7px 5.3px rgba(0, 0, 0, 0.028), 0 12.5px 10px rgba(0, 0, 0, 0.035), 0 22.3px 17.9px rgba(0, 0, 0, 0.042), 0 41.8px 33.4px rgba(0, 0, 0, 0.05), 0 100px 80px rgba(0, 0, 0, 0.07)',
               '3d-lg': '0 5px 15px rgba(0, 0, 0, 0.05), 0 15px 35px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0,0,0,0.03)',
               'inner-3d': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
+              'inner-press': 'inset 0 3px 6px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)',
             },
             animation: {
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
               'slide-in': 'slideIn 0.5s ease-out forwards',
               'glow': 'glow 2.5s ease-in-out infinite alternate',
               'aurora': 'aurora 20s ease-in-out infinite alternate',
+              'press-in': 'pressIn 0.2s ease-out forwards',
+              'scroll-fade-in': 'scrollFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
             },
             keyframes: {
               fadeInUp: {
@@ -120,7 +123,15 @@
                 '0%': { 'background-position': '0% 50%' },
                 '50%': { 'background-position': '100% 50%' },
                 '100%': { 'background-position': '0% 50%' },
-              }
+              },
+              pressIn: {
+                '0%': { transform: 'scale(1)', boxShadow: '0 2.8px 2.2px rgba(0, 0, 0, 0.02)' },
+                '100%': { transform: 'scale(0.97)', boxShadow: 'inset 0 3px 6px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)' },
+              },
+              scrollFadeIn: {
+                from: { opacity: 0, transform: 'translateY(30px) scale(0.98)' },
+                to: { opacity: 1, transform: 'translateY(0) scale(1)' },
+              },
             },
           },
         },
@@ -128,8 +139,24 @@
     </script>
     <style>
         html {
-            font-size: 16px; /* Reset to browser default for better accessibility */
+            font-size: 16px;
             scroll-behavior: smooth;
+        }
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .btn-tactile:active {
+            animation: pressIn 0.15s ease-out forwards;
+        }
+        .animate-scroll {
+            animation-range-start: entry 0%;
+            animation-range-end: entry 40%;
+            animation-timeline: view(block);
+            animation-name: scrollFadeIn;
+            animation-fill-mode: both;
         }
         .aurora-bg {
             position: relative;

@@ -53,7 +53,7 @@ const ConnectButton = () => {
         return (
             <button
                 onClick={() => setVisible(true)}
-                className="group relative inline-flex items-center justify-center px-5 py-2.5 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-3d hover:shadow-3d-lg transition-all duration-300 transform hover:-translate-y-0.5"
+                className="group relative inline-flex items-center justify-center px-5 py-2.5 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-3d hover:shadow-3d-lg transition-all duration-300 transform hover:-translate-y-0.5 btn-tactile"
             >
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-accent-400 to-accent-500 dark:from-darkAccent-400 dark:to-darkAccent-600"></span>
                 <span className="absolute bottom-0 right-0 w-full h-full transition-all duration-500 ease-in-out transform translate-x-full translate-y-full bg-accent-500/80 dark:bg-darkAccent-500/80 group-hover:translate-x-0 group-hover:translate-y-0"></span>
@@ -129,7 +129,7 @@ export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
           <div className="flex items-center">
              <button
               onClick={toggleSidebar}
-              className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none"
+              className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none hidden md:block"
               aria-label="Toggle sidebar"
             >
               {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
