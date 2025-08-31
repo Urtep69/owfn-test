@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat } from 'lucide-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { LanguageSwitcher } from './LanguageSwitcher.tsx';
-import { ThemeSwitcher } from './ThemeSwitcher.tsx';
+import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat, LogIn } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { WalletManagerIcon } from './IconComponents.tsx';
+import { WalletAvatar } from './WalletAvatar.tsx';
+// FIX: Import missing components
+import { ThemeSwitcher } from './ThemeSwitcher.tsx';
+import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -12,9 +12,10 @@ interface HeaderProps {
 }
 
 const ConnectButton = () => {
-    const { t, solana } = useAppContext();
-    const { setVisible } = useWalletModal();
-    const { connected, address, connecting, disconnectWallet } = solana;
+    const { t, solana, siws, setWalletModalOpen } = useAppContext();
+    const { address, connecting } = solana;
+    const { isAuthenticated, isLoading, isSessionLoading, signIn, signOut } = siws;
+    
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -37,22 +38,24 @@ const ConnectButton = () => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
+    
+    const isLoadingState = connecting || isLoading || isSessionLoading;
 
-    if (connecting) {
+    if (isLoadingState) {
         return (
             <div className="flex items-center space-x-3 px-4 py-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
                 <Loader2 size={18} className="animate-spin text-primary-600 dark:text-darkPrimary-400" />
                 <span className="font-semibold text-sm text-primary-700 dark:text-darkPrimary-200">
-                    {t('connecting')}
+                    {connecting ? t('connecting') : t('authenticating')}
                 </span>
             </div>
         );
     }
-
-    if (!connected || !address) {
+    
+    if (!address) {
         return (
             <button
-                onClick={() => setVisible(true)}
+                onClick={() => setWalletModalOpen(true)}
                 className="group relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-md transition-transform transform hover:scale-105"
             >
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600"></span>
@@ -63,23 +66,27 @@ const ConnectButton = () => {
         );
     }
     
+    if (!isAuthenticated) {
+        return (
+            <button
+                onClick={() => signIn()}
+                className="group relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-md transition-transform transform hover:scale-105"
+            >
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-400 to-blue-500 dark:from-blue-500 dark:to-blue-600"></span>
+                <span className="relative flex items-center gap-2"><LogIn size={18}/> Sign In</span>
+            </button>
+        );
+    }
+    
     return (
          <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setDropdownOpen(prev => !prev)}
-                className="flex items-center bg-[#22252A] dark:bg-darkPrimary-800 border border-green-400/30 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:border-green-400/70 shadow-lg"
+                className="flex items-center gap-2 p-1.5 pr-4 bg-white dark:bg-darkPrimary-800 border border-primary-200 dark:border-darkPrimary-700 rounded-full text-sm font-semibold text-primary-800 dark:text-darkPrimary-100 transition-all duration-300 hover:border-primary-300 dark:hover:border-darkPrimary-600 shadow-sm"
             >
-                <div 
-                    className="bg-green-500 text-white font-bold py-[7px] pl-4 pr-5 text-xs rounded-l-full"
-                    style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)' }}
-                >
-                    NEW
-                </div>
-                <div className="flex items-center space-x-2 pl-2 pr-3">
-                    <WalletManagerIcon className="w-5 h-5" />
-                    <span className="text-green-400 text-xs tracking-wider">Wallet Manager</span>
-                    <ChevronRight size={16} className="text-green-400/70" />
-                </div>
+                <WalletAvatar address={address} className="w-8 h-8"/>
+                <span className="font-mono">{truncateAddress(address)}</span>
+                <ChevronRight size={16} className={`text-primary-500/70 transition-transform ${isDropdownOpen ? 'rotate-90' : ''}`} />
             </button>
 
             {isDropdownOpen && (
@@ -96,7 +103,7 @@ const ConnectButton = () => {
                             {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
                         </button>
                         <button
-                            onClick={() => setVisible(true)}
+                            onClick={() => setWalletModalOpen(true)}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
                             <span>{t('change_wallet', {defaultValue: 'Change Wallet'})}</span>
@@ -114,7 +121,7 @@ const ConnectButton = () => {
                     </div>
                     <div className="p-2 border-t border-primary-200 dark:border-darkPrimary-700">
                          <button
-                            onClick={disconnectWallet}
+                            onClick={() => signOut()}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-red-600 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10 font-semibold transition-colors"
                         >
                             <span>{t('disconnect_wallet')}</span>

@@ -46,6 +46,9 @@ export const ro = {
     connect_wallet_first: `Vă rugăm să vă conectați mai întâi portofelul.`,
     yes: `Da`,
     no: `Nu`,
+    authenticating: `Autentificare...`,
+    sign_in_to_buy: `Autentifică-te pentru a Cumpăra`,
+    sign_in_to_donate: `Autentifică-te pentru a Dona`,
 
     // Time Units
     time_days: `Zile`,
@@ -212,6 +215,7 @@ export const ro = {
     token_types: `Tipuri de Tokenuri`,
     profile_loading_tokens: `Se încarcă tokenurile...`,
     profile_connect_prompt: `Conectează-ți portofelul pentru a vedea profilul și soldurile tokenurilor.`,
+    profile_sign_in_prompt: `Conectează-te și autentifică-te cu portofelul pentru a-ți vedea profilul.`,
     profile_no_tokens: `Nu s-au găsit tokenuri în acest portofel.`,
     impact_dashboard_title: `Panoul Meu de Impact`,
     my_impact_stats: `Statisticile Mele de Impact`,
@@ -462,8 +466,6 @@ export const ro = {
     airdrop_eligible_message: `Portofelul tău este eligibil! Vei primi {amount} tokeni OWFN la următoarea distribuire.`,
     airdrop_not_eligible: `Neeligibil`,
     airdrop_not_eligible_message: `Ne pare rău, această adresă de portofel nu este eligibilă pentru airdrop-ul curent. Fii activ în comunitatea noastră pentru oportunități viitoare!`,
-    airdrop_info_box_title: `Despre acest Airdrop`,
-    airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
     
     // Governance
     governance_title: `Guvernanță`,

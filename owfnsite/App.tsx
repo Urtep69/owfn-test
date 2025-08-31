@@ -2,13 +2,13 @@ import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
+import { WalletConnectModal } from './components/WalletConnectModal.tsx';
 
 import Home from './pages/Home.tsx';
 import Presale from './pages/Presale.tsx';
@@ -35,7 +35,7 @@ import Contact from './pages/Contact.tsx';
 import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana } = useAppContext();
+  const { isMaintenanceActive, solana, isWalletModalOpen, setWalletModalOpen } = useAppContext();
   const { address } = solana;
   const isAdmin = address === ADMIN_WALLET_ADDRESS;
 
@@ -44,54 +44,57 @@ const AppContent = () => {
   }
 
   return (
-    <Router>
-      <Layout>
-        <Switch>
-          <Route path="/presale"><Presale /></Route>
-          <Route path="/about"><About /></Route>
-          <Route path="/whitepaper"><Whitepaper /></Route>
-          <Route path="/tokenomics"><Tokenomics /></Route>
-          <Route path="/roadmap"><Roadmap /></Route>
-          <Route path="/staking">
-            <ComingSoonWrapper>
-              <Staking />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/vesting">
-            <ComingSoonWrapper>
-              <Vesting />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/airdrop">
-            <ComingSoonWrapper>
-              <Airdrop />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/donations"><Donations /></Route>
-          <Route path="/dashboard/token/:mint">
-            <ComingSoonWrapper>
-              <TokenDetail />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/dashboard"><Dashboard /></Route>
-          <Route path="/profile"><Profile /></Route>
-          <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
-          <Route path="/impact/category/:category"><ImpactCategory /></Route>
-          <Route path="/impact"><ImpactPortal /></Route>
-          <Route path="/partnerships"><Partnerships /></Route>
-          <Route path="/faq"><FAQ /></Route>
-          <Route path="/contact"><Contact /></Route>
-          <Route path="/governance">
-            <ComingSoonWrapper>
-              <Governance />
-            </ComingSoonWrapper>
-          </Route>
-          {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
-          <Route path="/maintenance"><Maintenance /></Route>
-          <Route path="/"><Home /></Route>
-        </Switch>
-      </Layout>
-    </Router>
+    <>
+      <Router>
+        <Layout>
+          <Switch>
+            <Route path="/presale"><Presale /></Route>
+            <Route path="/about"><About /></Route>
+            <Route path="/whitepaper"><Whitepaper /></Route>
+            <Route path="/tokenomics"><Tokenomics /></Route>
+            <Route path="/roadmap"><Roadmap /></Route>
+            <Route path="/staking">
+              <ComingSoonWrapper>
+                <Staking />
+              </ComingSoonWrapper>
+            </Route>
+            <Route path="/vesting">
+              <ComingSoonWrapper>
+                <Vesting />
+              </ComingSoonWrapper>
+            </Route>
+            <Route path="/airdrop">
+              <ComingSoonWrapper>
+                <Airdrop />
+              </ComingSoonWrapper>
+            </Route>
+            <Route path="/donations"><Donations /></Route>
+            <Route path="/dashboard/token/:mint">
+              <ComingSoonWrapper>
+                <TokenDetail />
+              </ComingSoonWrapper>
+            </Route>
+            <Route path="/dashboard"><Dashboard /></Route>
+            <Route path="/profile"><Profile /></Route>
+            <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
+            <Route path="/impact/category/:category"><ImpactCategory /></Route>
+            <Route path="/impact"><ImpactPortal /></Route>
+            <Route path="/partnerships"><Partnerships /></Route>
+            <Route path="/faq"><FAQ /></Route>
+            <Route path="/contact"><Contact /></Route>
+            <Route path="/governance">
+              <ComingSoonWrapper>
+                <Governance />
+              </ComingSoonWrapper>
+            </Route>
+            {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
+            <Route path="/maintenance"><Maintenance /></Route>
+            <Route path="/"><Home /></Route>
+          </Switch>
+        </Layout>
+      </Router>
+      <WalletConnectModal isOpen={isWalletModalOpen} onClose={() => setWalletModalOpen(false)} />
+    </>
   );
 };
 
@@ -110,9 +113,7 @@ const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
      <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-            {children}
-        </WalletModalProvider>
+        {children}
       </WalletProvider>
     </ConnectionProvider>
   )

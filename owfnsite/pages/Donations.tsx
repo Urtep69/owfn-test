@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
-import { AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle, Info, LogIn } from 'lucide-react';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -12,7 +12,7 @@ const tokens = [
 ];
 
 export default function Donations() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana, siws, setWalletModalOpen } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
 
@@ -42,6 +42,10 @@ export default function Donations() {
             setWalletModalOpen(true);
             return;
         }
+        if (!siws.isAuthenticated) {
+            await siws.signIn();
+            return;
+        }
     
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
@@ -60,10 +64,11 @@ export default function Donations() {
     };
     
     const buttonText = useMemo(() => {
-        if (solana.loading) return t('processing');
+        if (solana.loading || siws.isLoading || siws.isSessionLoading) return t('processing');
         if (!solana.connected) return t('connect_wallet');
+        if (!siws.isAuthenticated) return t('sign_in_to_donate');
         return t('donate');
-    }, [solana.connected, solana.loading, t]);
+    }, [solana.connected, solana.loading, siws.isAuthenticated, siws.isLoading, siws.isSessionLoading, t]);
 
     const percentages = [5, 10, 15, 25, 50, 75, 100];
 
@@ -178,7 +183,8 @@ export default function Donations() {
                             </p>
                         </div>
                     )}
-                     <button onClick={handleDonate} disabled={solana.loading || (solana.connected && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                     <button onClick={handleDonate} disabled={solana.loading || siws.isLoading || siws.isSessionLoading || (solana.connected && siws.isAuthenticated && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                         {buttonText === t('sign_in_to_donate') && <LogIn size={20} />}
                          {buttonText}
                     </button>
                 </div>
