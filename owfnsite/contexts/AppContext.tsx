@@ -1,13 +1,11 @@
-
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
-import { useSiws } from '../hooks/useSiws.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, SiwsReturn, BlogPost, Comment } from '../types.ts';
-import { SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
-import { STATIC_SOCIAL_CASES, STATIC_BLOG_POSTS } from '../lib/static-data.ts';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
+import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
+import { translateText } from '../services/geminiService.ts';
 
 interface AppContextType {
   theme: Theme;
@@ -17,12 +15,8 @@ interface AppContextType {
   currentLanguage: Language;
   supportedLanguages: Language[];
   solana: ReturnType<typeof useSolana>;
-  siws: SiwsReturn;
   socialCases: SocialCase[];
-  blogPosts: BlogPost[];
-  isDataLoading: boolean;
-  addSocialCase: (newCase: Omit<SocialCase, 'id' | 'createdAt' | 'donated' | 'status'>) => Promise<void>;
-  addBlogPost: (newPost: Omit<BlogPost, 'id' | 'createdAt' | 'slug'>) => Promise<void>;
+  addSocialCase: (newCase: SocialCase) => void;
   vestingSchedules: VestingSchedule[];
   addVestingSchedule: (schedule: VestingSchedule) => void;
   proposals: GovernanceProposal[];
@@ -38,76 +32,51 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [theme, toggleTheme] = useTheme();
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
   const solana = useSolana();
-  const siws = useSiws();
   const { setVisible: setWalletModalOpen } = useWalletModal();
 
-  const [socialCases, setSocialCases] = useState<SocialCase[]>([]);
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-  const [isDataLoading, setIsDataLoading] = useState(true);
-
+  const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
-  useEffect(() => {
-    setIsDataLoading(true);
-    // Load initial data statically to prevent deployment/network errors.
-    // A small timeout prevents UI flicker and simulates a loading state.
-    const timer = setTimeout(() => {
-      try {
-        setSocialCases(STATIC_SOCIAL_CASES);
-        setBlogPosts(STATIC_BLOG_POSTS);
-      } catch (error) {
-        console.error("Failed to load static data:", error);
-        setSocialCases([]);
-        setBlogPosts([]);
-      } finally {
-        setIsDataLoading(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-
-  const addSocialCase = async (newCaseData: Omit<SocialCase, 'id' | 'createdAt' | 'donated' | 'status'>) => {
-    const response = await fetch('/api/cases', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newCaseData),
-    });
-    if (response.ok) {
-        const newCase = await response.json();
-        setSocialCases(prev => [newCase, ...prev]);
-    } else {
-        throw new Error('Failed to create social case');
-    }
-  };
-
-  const addBlogPost = async (newPostData: Omit<BlogPost, 'id' | 'createdAt' | 'slug'>) => {
-    const response = await fetch('/api/posts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newPostData),
-    });
-    if (response.ok) {
-        const newPost = await response.json();
-        setBlogPosts(prev => [newPost, ...prev]);
-    } else {
-        throw new Error('Failed to create blog post');
-    }
+  const addSocialCase = (newCase: SocialCase) => {
+    setSocialCases(prevCases => [newCase, ...prevCases]);
   };
   
   const addVestingSchedule = (schedule: VestingSchedule) => {
     setVestingSchedules(prev => [schedule, ...prev]);
   };
 
-  const addProposal = async (proposalData: { title: string; description: string; endDate: Date; }) => {
-    // This remains client-side for now as it's not connected to a DB yet
+  const addProposal = useCallback(async (proposalData: { title: string; description: string; endDate: Date; }) => {
+    const newTitleTranslations: Record<string, string> = { en: proposalData.title };
+    const newDescriptionTranslations: Record<string, string> = { en: proposalData.description };
+
+    const languagesToTranslate = SUPPORTED_LANGUAGES.filter(lang => lang.code !== 'en');
+    
+    try {
+        const translationPromises = languagesToTranslate.flatMap(lang => [
+            translateText(proposalData.title, lang.name),
+            translateText(proposalData.description, lang.name),
+        ]);
+
+        const translations = await Promise.all(translationPromises);
+
+        languagesToTranslate.forEach((lang, index) => {
+            newTitleTranslations[lang.code] = translations[index * 2] || proposalData.title;
+            newDescriptionTranslations[lang.code] = translations[index * 2 + 1] || proposalData.description;
+        });
+    } catch (error) {
+        console.error("Translation failed for proposal:", error);
+        languagesToTranslate.forEach(lang => {
+            newTitleTranslations[lang.code] = proposalData.title;
+            newDescriptionTranslations[lang.code] = proposalData.description;
+        });
+    }
+    
     const newProposal: GovernanceProposal = {
         id: `prop${Date.now()}`,
-        title: { en: proposalData.title },
-        description: { en: proposalData.description },
+        title: newTitleTranslations,
+        description: newDescriptionTranslations,
         endDate: proposalData.endDate,
         proposer: solana.address || 'Anonymous',
         status: 'active',
@@ -115,7 +84,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         votesAgainst: 0,
     };
     setProposals(prev => [newProposal, ...prev]);
-  };
+  }, [solana.address]);
   
   const voteOnProposal = useCallback((proposalId: string, vote: 'for' | 'against') => {
     setProposals(prev => prev.map(p => {
@@ -139,12 +108,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     currentLanguage,
     supportedLanguages,
     solana,
-    siws,
     socialCases,
-    blogPosts,
-    isDataLoading,
     addSocialCase,
-    addBlogPost,
     vestingSchedules,
     addVestingSchedule,
     proposals,

@@ -35,17 +35,10 @@ export interface SocialCase {
   title: Record<string, string>;
   description: Record<string, string>;
   category: string;
-  imageUrls: string[]; // Changed from imageUrl: string
+  imageUrl: string;
   goal: number;
   donated: number;
   details: Record<string, string>;
-  // New fields
-  country: string;
-  region: string;
-  bankAccountIBAN?: string;
-  beneficiaryCount: number;
-  createdAt: string; // ISO string
-  status: 'active' | 'completed' | 'pending';
 }
 
 export interface Language {
@@ -168,22 +161,4 @@ export interface SiwsReturn {
   session: SiwsSession | null;
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
-}
-
-export interface BlogPost {
-  id: string;
-  slug: string;
-  title: Record<string, string>;
-  content: Record<string, string>;
-  imageUrl: string;
-  authorAddress: string;
-  createdAt: string; // ISO string
-}
-
-export interface Comment {
-  id: string;
-  parentId: string; // ID of the blog post or social case
-  authorAddress: string;
-  content: string;
-  createdAt: string; // ISO string
 }

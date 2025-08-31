@@ -1,5 +1,5 @@
 
-import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction, BlogPost } from './types.ts';
+import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
 
@@ -84,6 +84,8 @@ export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
   { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
 ];
+
+export const INITIAL_SOCIAL_CASES: SocialCase[] = [];
 
 export const KNOWN_TOKEN_MINT_ADDRESSES: { [key: string]: string } = {
   OWFN: 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B',
