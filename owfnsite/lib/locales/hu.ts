@@ -236,7 +236,6 @@ export const hu = {
     donation_history_general: `Általános Adomány`,
     
     // Leaderboards
-    leaderboards: `Ranglisták`,
     leaderboards_desc: `Nézze meg, kik a mozgalmunk legnagyobb támogatói.`,
     leaderboard_rank: `Helyezés`,
     leaderboard_donor: `Adományozó`,
@@ -331,14 +330,13 @@ export const hu = {
     faq_a9: `Az Ön részvétele kulcsfontosságú! Az OWFN-ről való szó terjesztése hihetetlenül hatékony. Beszéljen barátaival, családjával és kollégáival a küldetésünkről. Ossza meg elképzeléseinket a közösségi médiában, utazásai során vagy a munkahelyén. Minden beszélgetés, minden megosztás segít növelni a tudatosságot és több embert von be a globális családunkba, felerősítve közös hatásunkat. Csatlakozzon közösségi csatornáinkhoz, hogy naprakész maradjon és részt vegyen a vitákban.`,
     faq_q10: `Vannak-e speciális utasítások az USDC vagy USDT adományozásához?`,
     faq_a10: `Igen, ez kritikusan fontos. Minden USDC és USDT adományt *kizárólag* a Solana blokkláncról kell küldeni. Ne küldjön más hálózatról (pl. Ethereum), mert az összegek elvesznek és nem érik el a céljukat. Ez az információ az adományozási oldalon is egyértelműen fel van tüntetve.`,
-    faq_q11: 'Pontosan mi történik, miután tokeneket vásároltam az előértékesítés során? Kell tennem valamit?',
-    faq_a11: 'Nem, miután sikeresen befejezte az OWFN tokenek vásárlását az előértékesítés során, Önnek nincs további teendője. A tokeneket automatikusan lefoglaljuk a pénztárca címére. Az előértékesítési időszak végén minden token automatikusan kiosztásra kerül (airdrop) a vásárlók pénztárcájába.',
-    faq_q12: 'Mikor és hol tudok majd kereskedni (eladni/vásárolni) OWFN tokenekkel az előértékesítés után?',
-    faq_a12: 'Útitervünk szerint, az előértékesítés sikeres lezárása után folytatjuk az $OWFN token hivatalos listázását a Solana ökoszisztéma decentralizált tőzsdéin (DEX). A pontos dátumot és platformokat a hivatalos csatornáinkon fogjuk bejelenteni.',
-    faq_q13: 'Miért van maximális vásárlási limit (Max Buy) az előértékesítés során?',
-    faq_a13: 'A maximális vásárlási limit egy fontos intézkedés a tokenek lehető legigazságosabb elosztásának biztosítására, és annak megakadályozására, hogy néhány nagy befektető ("bálna") a kínálat jelentős részét ellenőrizze. Ez hosszú távon egy egészségesebb és decentralizáltabb közösséget támogat.',
+    faq_q11: `Pontosan mi történik, miután tokeneket vásároltam az előértékesítés során? Kell tennem valamit?`,
+    faq_a11: `Nem, miután sikeresen befejezte az OWFN tokenek vásárlását az előértékesítés során, Önnek nincs további teendője. A tokeneket automatikusan lefoglaljuk a pénztárca címére. Az előértékesítési időszak végén minden token automatikusan kiosztásra kerül (airdrop) a vásárlók pénztárcájába.`,
+    faq_q12: `Mikor és hol tudok majd kereskedni (eladni/vásárolni) OWFN tokenekkel az előértékesítés után?`,
+    faq_a12: `Útitervünk szerint, az előértékesítés sikeres lezárása után folytatjuk az $OWFN token hivatalos listázását a Solana ökoszisztéma decentralizált tőzsdéin (DEX). A pontos dátumot és platformokat a hivatalos csatornáinkon fogjuk bejelenteni.`,
+    faq_q13: `Miért van maximális vásárlási limit (Max Buy) az előértékesítés során?`,
+    faq_a13: `A maximális vásárlási limit egy fontos intézkedés a tokenek lehető legigazságosabb elosztásának biztosítására, és annak megakadályozására, hogy néhány nagy befektető ("bálna") a kínálat jelentős részét ellenőrizze. Ez hosszú távon egy egészségesebb és decentralizáltabb közösséget támogat.`,
     faq_q14: `Mit jelent az, hogy a token "kamatozó" 2% APY-vel? Hogyan működik?`,
-    // FIX: Corrected duplicate key `faq_a15` to `faq_a14` based on the file's own comment.
     faq_a14: `Ez azt jelenti, hogy az OWFN token úgy van programozva, hogy automatikusan kamatot generáljon. Csak azzal, hogy a tokeneket a Solana-kompatibilis pénztárcájában tartja, a tokenjeinek mennyisége idővel 2%-os éves hozammal (APY) növekszik. Nem kell őket stakelnie vagy bármilyen további műveletet végeznie; a jutalmak automatikusan felhalmozódnak.`,
     faq_q15: `Mi az a 0,5%-os átutalási díj és mikor aktiválódik?`,
     faq_a15: `Ez a díj a küldetésünk hosszú távú finanszírozásának egyik kulcsmechanizmusa. Az elővásárlási időszak lezárulta *után* az OWFN tokennel végzett minden tranzakcióra 0,5%-os díjat számítunk fel. Ebből a díjból származó pénzeszközök automatikusan a Hatás Kincstárba kerülnek, hogy folyamatosan finanszírozzák társadalmi projektjeinket. Így minden tranzakció hozzájárul a közjóhoz.`,
