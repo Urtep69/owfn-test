@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -339,6 +338,8 @@ export const en = {
     chatbot_loading_1: `Connecting to my circuits...`,
     chatbot_loading_2: `Analyzing your question...`,
     chatbot_loading_3: `Formulating a response...`,
+    chatbot_welcome_title: `Welcome to OWFN!`,
+    chatbot_welcome_message: `How can I help you today? I have information about the project, the presale, and our mission.`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -462,8 +463,6 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
-    airdrop_info_box_title: `About this Airdrop`,
-    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -532,6 +531,15 @@ export const en = {
     airdrop_complete: `Airdrop Complete`,
     airdrop_summary: `{success} successful, {failed} failed.`,
     airdrop_log: `Airdrop Log`,
+    airdrop_resume: `Resume Airdrop`,
+    airdrop_clear_progress: `Clear Progress & Logs`,
+    airdrop_clear_progress_confirm: `Are you sure you want to clear the airdrop progress and logs? This cannot be undone and is only for emergency resets.`,
+    airdrop_all_processed: `All contributors have been processed.`,
+    airdrop_run_start_log: `--- Starting airdrop run for {count} wallets. ---`,
+    airdrop_run_complete_log: `--- Airdrop run complete. Success: {success}, Failed: {failed}. Total processed: {processed}/{total} ---`,
+    airdrop_batch_error_log: `❌ Critical error in batch (signing failed?): {error}. Failed addresses: {addresses}`,
+    airdrop_success_log: `✅ Success for {address}... | Sig: {signature}...`,
+    airdrop_failed_log: `❌ Failed for {address}... | Error: {error}`,
 
     // Contact Page
     contact_title: `Contact Us`,

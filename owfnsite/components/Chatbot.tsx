@@ -98,9 +98,30 @@ export const Chatbot = () => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
+    const [showWelcome, setShowWelcome] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        const welcomeDismissed = sessionStorage.getItem('owfn-welcome-dismissed');
+        if (!welcomeDismissed) {
+          const timer = setTimeout(() => setShowWelcome(true), 2000); // Show after 2s delay
+          return () => clearTimeout(timer);
+        }
+      }, []);
+
+    const handleDismissWelcome = () => {
+        setShowWelcome(false);
+        sessionStorage.setItem('owfn-welcome-dismissed', 'true');
+    };
+
+    const handleOpenChat = () => {
+        setIsOpen(true);
+        if (showWelcome) {
+            handleDismissWelcome();
+        }
+    }
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -223,13 +244,24 @@ export const Chatbot = () => {
     
     if (!isOpen) {
         return (
+            <>
+            {showWelcome && (
+                <div className="fixed bottom-24 right-5 w-72 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg p-4 animate-fade-in-up text-sm z-50">
+                    <button onClick={handleDismissWelcome} className="absolute top-1 right-1 p-1 text-primary-400 hover:text-primary-600 dark:text-darkPrimary-500 dark:hover:text-darkPrimary-300">
+                    <X size={16} />
+                    </button>
+                    <p className="font-bold mb-1">{t('chatbot_welcome_title')}</p>
+                    <p>{t('chatbot_welcome_message')}</p>
+                </div>
+            )}
             <button
-                onClick={() => setIsOpen(true)}
+                onClick={handleOpenChat}
                 className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
                 aria-label="Open Chatbot"
             >
                 <MessageCircle size={28} />
             </button>
+            </>
         );
     }
 
