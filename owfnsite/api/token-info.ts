@@ -64,21 +64,29 @@ export default async function handler(req: any, res: any) {
         
         const rawSupply = tokenInfo.supply;
         let supply = 0;
-        try {
-            if (rawSupply !== null && rawSupply !== undefined) {
-                // Use Number() for robust parsing of different formats (including scientific notation).
-                // While it may lose precision for extremely large numbers, it is safer than BigInt,
-                // which can crash the function with unexpected formats. A slightly imprecise market cap
-                // is better than a server error.
-                const supplyInSmallestUnit = Number(rawSupply);
-                if (!isNaN(supplyInSmallestUnit)) {
-                    supply = supplyInSmallestUnit / (10 ** decimals);
+        if (rawSupply !== null && rawSupply !== undefined) {
+            try {
+                const supplyAsString = String(rawSupply);
+                const parsedNum = parseFloat(supplyAsString);
+
+                if (isNaN(parsedNum) || !isFinite(parsedNum)) {
+                    console.warn(`Supply value '${rawSupply}' could not be parsed to a valid number for mint ${mintAddress}. Defaulting to 0.`);
+                    supply = 0;
+                } else {
+                    const calculatedSupply = parsedNum / (10 ** decimals);
+                    if (isFinite(calculatedSupply)) {
+                        supply = calculatedSupply;
+                    } else {
+                        console.warn(`Supply calculation resulted in non-finite number for mint ${mintAddress}. Defaulting to 0.`);
+                        supply = 0;
+                    }
                 }
+            } catch (e) {
+                console.error(`Unexpected error while parsing supply '${rawSupply}' for mint ${mintAddress}:`, e);
+                supply = 0;
             }
-        } catch (e) {
-            console.warn(`Could not parse supply from Helius for mint ${mintAddress}. Value was:`, rawSupply, e);
-            supply = 0;
         }
+
 
         let mintAuthority: string | null = null;
         let freezeAuthority: string | null = null;
