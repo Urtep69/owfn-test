@@ -138,8 +138,7 @@ export interface ImpactBadge {
     id: string;
     titleKey: string;
     descriptionKey: string;
-    icon: string; // Changed from React.ReactNode to string for API serialization
-    unlocked: boolean;
+    icon: React.ReactNode;
 }
 
 export interface PresaleTransaction {
@@ -162,36 +161,4 @@ export interface SiwsReturn {
   session: SiwsSession | null;
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
-}
-
-export interface UserStats {
-    totalDonatedUSD: number;
-    causesSupported: number;
-    donationCount: number;
-    votedProposalIds: string[];
-}
-
-export interface TokenDonationDetail {
-    symbol: 'OWFN' | 'SOL' | 'USDC' | 'USDT';
-    totalAmount: number;
-    totalUSD: number;
-    lastDonationDate: string; // ISO string date
-}
-
-export interface LeaderboardEntry {
-    rank: number;
-    address: string;
-    totalDonatedUSD: number;
-    donationsByToken: TokenDonationDetail[];
-}
-
-export interface DonationHistoryEntry {
-    id: number;
-    created_at: string;
-    token_symbol: 'OWFN' | 'SOL' | 'USDC' | 'USDT';
-    token_amount: number;
-    amount_usd: number;
-    cause_id: string | null;
-    cause_title: Record<string, string> | null;
-    transaction_signature: string;
 }

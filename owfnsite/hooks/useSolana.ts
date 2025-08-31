@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
-import type { Token, UserStats } from '../types.ts';
+import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
@@ -13,6 +13,13 @@ export interface UseSolanaReturn {
   address: string | null;
   userTokens: Token[];
   loading: boolean;
+  userStats: {
+    totalDonated: number;
+    projectsSupported: number;
+    votesCast: number;
+    donations: any[]; 
+    votedProposalIds: string[];
+  };
   stakedBalance: number;
   earnedRewards: number;
   connection: Connection;
@@ -24,8 +31,6 @@ export interface UseSolanaReturn {
   claimRewards: () => Promise<any>;
   claimVestedTokens: (amount: number) => Promise<any>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
-  // FIX: Add userStats to the return type of the hook.
-  userStats: UserStats;
 }
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
@@ -41,16 +46,11 @@ const isValidSolanaAddress = (address: any): boolean => {
     }
 };
 
-// FIX: Add default user stats object.
-const defaultUserStats: UserStats = { totalDonatedUSD: 0, causesSupported: 0, donationCount: 0, votedProposalIds: [] };
-
 export const useSolana = (): UseSolanaReturn => {  
   const { connection } = useConnection();
   const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
-  // FIX: Add userStats state.
-  const [userStats, setUserStats] = useState<UserStats>(defaultUserStats);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
 
@@ -193,35 +193,14 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connection]);
 
-  // FIX: Add a function to fetch user-specific stats.
-  const fetchUserStats = useCallback(async (walletAddress: string) => {
-    try {
-        const res = await fetch(`/api/user-stats?wallet=${walletAddress}`);
-        if (res.ok) {
-            const statsData = await res.json();
-            setUserStats(statsData);
-        } else {
-            console.warn(`User stats API route failed with status ${res.status}`);
-            setUserStats(defaultUserStats);
-        }
-    } catch (error) {
-        console.error("Could not fetch user stats from API route:", error);
-        setUserStats(defaultUserStats);
-    }
-  }, []);
-
   useEffect(() => {
     if (connected && address) {
       getWalletBalances(address).then(setUserTokens);
-      // FIX: Fetch user stats when wallet is connected.
-      fetchUserStats(address);
     } else {
       setUserTokens([]);
-      // FIX: Reset user stats on disconnect.
-      setUserStats(defaultUserStats);
       balanceCache.clear();
     }
-  }, [connected, address, getWalletBalances, fetchUserStats]);
+  }, [connected, address, getWalletBalances]);
 
  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
     if (!connected || !publicKey || !signTransaction) {
@@ -320,31 +299,6 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
-  // FIX: Implement a mock version of voteOnProposal to update local state.
-  const voteOnProposal = async (proposalId: string, _vote: 'for' | 'against'): Promise<any> => {
-    if (!address) {
-        return { success: false, messageKey: 'connect_wallet_first' };
-    }
-    // This is a placeholder for a real on-chain transaction.
-    // For now, we simulate success and update the local state to reflect the vote.
-    console.warn("voteOnProposal is a placeholder and not implemented on-chain yet.");
-    
-    // Simulate API call to record vote and get updated stats
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            setUserStats(prevStats => {
-                const newVotedIds = new Set(prevStats.votedProposalIds);
-                newVotedIds.add(proposalId);
-                return {
-                    ...prevStats,
-                    votedProposalIds: Array.from(newVotedIds),
-                };
-            });
-            resolve({ success: true, messageKey: 'vote_success_alert' });
-        }, 500); // Simulate network delay
-    });
-  };
-
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
       alert("This feature is coming soon and requires on-chain programs to be deployed.");
@@ -358,10 +312,15 @@ export const useSolana = (): UseSolanaReturn => {
     userTokens,
     loading,
     connection,
+    userStats: { 
+        totalDonated: 0,
+        projectsSupported: 0,
+        votesCast: 0,
+        donations: [],
+        votedProposalIds: []
+    },
     stakedBalance: 0,
     earnedRewards: 0,
-    // FIX: Return userStats from the hook.
-    userStats,
     disconnectWallet: disconnect,
     getWalletBalances,
     sendTransaction,
@@ -369,7 +328,6 @@ export const useSolana = (): UseSolanaReturn => {
     unstakeTokens: notImplemented,
     claimRewards: notImplemented,
     claimVestedTokens: notImplemented,
-    // FIX: Return the new mock implementation of voteOnProposal.
-    voteOnProposal,
+    voteOnProposal: notImplemented,
   };
 };

@@ -1,3 +1,4 @@
+
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -18,7 +19,6 @@ export const ro = {
     governance: `Guvernanță`,
     maintenance_mode: `Mod Mentenanță`,
     contact: `Contact`,
-    leaderboards: `Clasamente`,
 
     // Sidebar Groups
     sidebar_explore: `Explorare`,
@@ -46,6 +46,9 @@ export const ro = {
     connect_wallet_first: `Vă rugăm să vă conectați mai întâi portofelul.`,
     yes: `Da`,
     no: `Nu`,
+    authenticating: `Autentificare...`,
+    sign_in_to_buy: `Autentifică-te pentru a Cumpăra`,
+    sign_in_to_donate: `Autentifică-te pentru a Dona`,
 
     // Time Units
     time_days: `Zile`,
@@ -212,6 +215,7 @@ export const ro = {
     token_types: `Tipuri de Tokenuri`,
     profile_loading_tokens: `Se încarcă tokenurile...`,
     profile_connect_prompt: `Conectează-ți portofelul pentru a vedea profilul și soldurile tokenurilor.`,
+    profile_sign_in_prompt: `Conectează-te și autentifică-te cu portofelul pentru a-ți vedea profilul.`,
     profile_no_tokens: `Nu s-au găsit tokenuri în acest portofel.`,
     impact_dashboard_title: `Panoul Meu de Impact`,
     my_impact_stats: `Statisticile Mele de Impact`,
@@ -228,39 +232,6 @@ export const ro = {
     badge_diverse_donor_desc: `Acordat pentru donații la proiecte din 3 categorii diferite.`,
     asset: `Activ`,
     value_usd: `Valoare (USD)`,
-    my_impact_dashboard: `Panoul Meu de Impact`,
-    total_donated_usd: `Total Donat (USD)`,
-    causes_supported: `Cauze Susținute`,
-    number_of_donations: `Număr de Donații`,
-    unlocked_badges: `Insigne Deblocate`,
-    badge_first_donor_title: `Primul Donator`,
-    badge_first_donor_desc: `Acordat pentru efectuarea primei donații către orice cauză.`,
-    badge_health_hero_title: `Erou al Sănătății`,
-    badge_health_hero_desc: `Acordat pentru contribuții semnificative la cauzele din domeniul sănătății.`,
-    badge_active_voter_title: `Votant Activ`,
-    badge_active_voter_desc: `Acordat pentru participarea la 5 sau mai multe voturi de guvernanță.`,
-    my_donation_history: `Istoricul Donațiilor Mele`,
-    donation_history_date: `Data`,
-    donation_history_token: `Token`,
-    donation_history_amount: `Sumă`,
-    donation_history_cause: `Cauza`,
-    donation_history_transaction: `Tranzacție`,
-    donation_history_loading: `Se încarcă istoricul donațiilor...`,
-    donation_history_empty: `Nu ați făcut nicio donație încă. Contribuțiile dumneavoastră vor apărea aici.`,
-    donation_history_general: `Donație Generală`,
-    
-    // Leaderboards
-    leaderboards_desc: `Vezi cine sunt cei mai mari contribuitori la mișcarea noastră.`,
-    leaderboard_rank: `Rang`,
-    leaderboard_donor: `Donator`,
-    leaderboard_total_donated: `Total Donat (USD)`,
-    weekly: `Săptămânal`,
-    monthly: `Lunar`,
-    all_time: `Total`,
-    leaderboard_3_months: "3 Luni",
-    leaderboard_6_months: "6 Luni",
-    leaderboard_9_months: "9 Luni",
-    leaderboard_1_year: "1 An",
 
     // Impact Portal
     social_cases: `Cazuri Sociale`,
@@ -351,6 +322,8 @@ export const ro = {
     faq_q13: `De ce există o limită maximă de cumpărare (Max Buy) în prevânzare?`,
     faq_a13: `Limita maximă de cumpărare este o măsură importantă pentru a asigura o distribuție cât mai echitabilă a tokenilor și pentru a preveni ca un număr mic de investitori mari ("whales") să controleze o parte semnificativă din ofertă. Acest lucru promovează o comunitate mai sănătoasă și mai descentralizată pe termen lung.`,
     faq_q14: `Ce înseamnă că tokenul este "Purtător de Dobândă" (Interest-Bearing) cu 2% APY? Cum funcționează?`,
+    faq_a14: `Înseamnă că tokenul OWFN este programat să genereze automat o dobândă. Doar prin deținerea tokenilor în portofelul dumneavoastră compatibil cu Solana, cantitatea de tokeni va crește în timp, cu un randament procentual anual (APY) de 2%. Nu este necesar să îi puneți în staking sau să faceți vreo acțiune suplimentară; recompensele se acumulează automat.`,
+    faq_q15: `Ce este taxa de transfer de 0.5% și când se va activa?`,
     faq_a15: `Această taxă este un mecanism cheie pentru finanțarea pe termen lung a misiunii noastre. O taxă de 0.5% se va aplica tuturor tranzacțiilor cu tokenul OWFN *după* finalizarea perioadei de prevânzare. Fondurile colectate din această taxă sunt direcționate automat către Trezoreria de Impact pentru a finanța continuu proiectele noastre sociale. Astfel, fiecare tranzacție contribuie la binele comun.`,
     faq_q16: `De ce ați ales blockchain-ul Solana pentru acest proiect?`,
     faq_a16: `Am ales Solana datorită vitezei sale excepționale, costurilor de tranzacție foarte scăzute și scalabilității ridicate. Aceste caracteristici sunt esențiale pentru un proiect global ca al nostru, permițând micro-tranzacții eficiente și asigurând o experiență rapidă și accesibilă pentru toți utilizatorii, fie că donează, cumpără sau tranzacționează tokeni.`,
@@ -370,7 +343,6 @@ export const ro = {
     chatbot_loading_1: `Mă conectez la circuitele mele...`,
     chatbot_loading_2: `Analizez întrebarea...`,
     chatbot_loading_3: `Formulez un răspuns...`,
-    chatbot_welcome_message: `Bun venit la OWFN! Cu ce vă pot ajuta astăzi?`,
     
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,

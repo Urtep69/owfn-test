@@ -32,13 +32,12 @@ import Governance from './pages/Governance.tsx';
 import Maintenance from './pages/Maintenance.tsx';
 import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
-import Leaderboard from './pages/Leaderboard.tsx';
 import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana } = useAppContext();
+  const { isMaintenanceActive, solana, siws } = useAppContext();
   const { address } = solana;
-  const isAdmin = address === ADMIN_WALLET_ADDRESS;
+  const isAdmin = siws.isAuthenticated && address === ADMIN_WALLET_ADDRESS;
 
   if (isMaintenanceActive && !isAdmin) {
     return <Maintenance />;
@@ -87,7 +86,6 @@ const AppContent = () => {
               <Governance />
             </ComingSoonWrapper>
           </Route>
-          <Route path="/leaderboard"><Leaderboard /></Route>
           {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
           <Route path="/maintenance"><Maintenance /></Route>
           <Route path="/"><Home /></Route>

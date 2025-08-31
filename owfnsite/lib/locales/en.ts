@@ -1,3 +1,4 @@
+
 export const en = {
     // Navigation
     home: `Home`,
@@ -18,7 +19,6 @@ export const en = {
     governance: `Governance`,
     maintenance_mode: `Maintenance Mode`,
     contact: `Contact`,
-    leaderboards: `Leaderboards`,
 
     // Sidebar Groups
     sidebar_explore: `Explore`,
@@ -46,6 +46,9 @@ export const en = {
     connect_wallet_first: `Please connect your wallet first.`,
     yes: `Yes`,
     no: `No`,
+    authenticating: `Authenticating...`,
+    sign_in_to_buy: `Sign In to Buy`,
+    sign_in_to_donate: `Sign In to Donate`,
 
     // Time Units
     time_days: `Days`,
@@ -212,6 +215,7 @@ export const en = {
     token_types: `Token Types`,
     profile_loading_tokens: `Loading tokens...`,
     profile_connect_prompt: `Connect your wallet to see your profile and token balances.`,
+    profile_sign_in_prompt: `Connect and sign in with your wallet to see your profile.`,
     profile_no_tokens: `No tokens found in this wallet.`,
     impact_dashboard_title: `My Impact Dashboard`,
     my_impact_stats: `My Impact Stats`,
@@ -228,39 +232,6 @@ export const en = {
     badge_diverse_donor_desc: `Awarded for donating to projects in 3 different categories.`,
     asset: `Asset`,
     value_usd: `Value (USD)`,
-    my_impact_dashboard: `My Impact Dashboard`,
-    total_donated_usd: `Total Donated (USD)`,
-    causes_supported: `Causes Supported`,
-    number_of_donations: `Number of Donations`,
-    unlocked_badges: `Unlocked Badges`,
-    badge_first_donor_title: `First Donor`,
-    badge_first_donor_desc: `Awarded for making your first donation to any cause.`,
-    badge_health_hero_title: `Health Hero`,
-    badge_health_hero_desc: `Awarded for significant contributions to health-related causes.`,
-    badge_active_voter_title: `Active Voter`,
-    badge_active_voter_desc: `Awarded for participating in 5 or more governance votes.`,
-    my_donation_history: `My Donation History`,
-    donation_history_date: `Date`,
-    donation_history_token: `Token`,
-    donation_history_amount: `Amount`,
-    donation_history_cause: `Cause`,
-    donation_history_transaction: `Transaction`,
-    donation_history_loading: `Loading donation history...`,
-    donation_history_empty: `You have not made any donations yet. Your contributions will appear here.`,
-    donation_history_general: `General Donation`,
-
-    // Leaderboards
-    leaderboards_desc: `See who are the top contributors to our movement.`,
-    leaderboard_rank: `Rank`,
-    leaderboard_donor: `Donor`,
-    leaderboard_total_donated: `Total Donated (USD)`,
-    weekly: `Weekly`,
-    monthly: `Monthly`,
-    all_time: `All-Time`,
-    leaderboard_3_months: "3 Months",
-    leaderboard_6_months: "6 Months",
-    leaderboard_9_months: "9 Months",
-    leaderboard_1_year: "1 Year",
 
     // Impact Portal
     social_cases: `Social Cases`,
@@ -351,7 +322,7 @@ export const en = {
     faq_q13: 'Why is there a maximum purchase limit (Max Buy) in the presale?',
     faq_a13: 'The maximum purchase limit is an important measure to ensure the fairest possible distribution of tokens and to prevent a small number of large investors ("whales") from controlling a significant portion of the supply. This promotes a healthier and more decentralized community in the long run.',
     faq_q14: 'What does it mean that the token is "Interest-Bearing" with 2% APY? How does it work?',
-    faq_a14: `This means the OWFN token is programmed to automatically generate interest. By simply holding the tokens in your Solana-compatible wallet, your amount of tokens will increase over time at a 2% annual percentage yield (APY). You don't need to stake them or perform any extra actions; the rewards accumulate automatically.`,
+    faq_a14: 'It means the OWFN token is programmed to automatically generate interest. Just by holding the tokens in your Solana-compatible wallet, the amount of your tokens will increase over time, with a 2% Annual Percentage Yield (APY). You do not need to stake them or take any additional action; the rewards accumulate automatically.',
     faq_q15: 'What is the 0.5% transfer fee and when will it be activated?',
     faq_a15: 'This fee is a key mechanism for the long-term funding of our mission. A 0.5% fee will apply to all transactions with the OWFN token *after* the presale period concludes. The funds collected from this fee are automatically directed to the Impact Treasury to continuously fund our social projects. Thus, every transaction contributes to the common good.',
     faq_q16: 'Why did you choose the Solana blockchain for this project?',
@@ -372,7 +343,6 @@ export const en = {
     chatbot_loading_1: `Connecting to my circuits...`,
     chatbot_loading_2: `Analyzing your question...`,
     chatbot_loading_3: `Formulating a response...`,
-    chatbot_welcome_message: `Welcome to OWFN! How can I help you today?`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
