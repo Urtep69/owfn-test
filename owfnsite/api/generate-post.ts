@@ -25,18 +25,18 @@ export default async function handler(req: any, res: any) {
 
         const ai = new GoogleGenAI({ apiKey });
 
-        const prompt = `You are a social media marketing expert for a humanitarian crypto project called Official World Family Network (OWFN). Your mission is to generate an engaging, positive, and concise social media post (like a tweet, under 280 characters) to encourage community growth and support. The post MUST be in ${languageName}.
+        const prompt = `You are a social media marketing expert for a humanitarian crypto project called Official World Family Network (OWFN). Your task is to generate a single, unique, ready-to-share social media post (like a tweet, under 280 characters) to encourage community growth and support. The post MUST be in ${languageName}.
 
-Focus on one of these key aspects of OWFN:
-- Its core mission to provide transparent aid.
-- The power of the community.
-- The benefits of being built on Solana (speed, low fees).
-- The ongoing presale and how to participate.
-- The vision for a better world.
+Internally, choose one of the following themes for the post, but do not mention the theme in your response:
+- The core mission of transparent aid.
+- The power of the OWFN community.
+- The benefits of using the Solana blockchain.
+- The ongoing presale.
+- The project's vision for a better world.
 
-The post should be inspiring and include relevant hashtags like #OWFN, #Solana, #CryptoForGood, #SocialImpact.
+Your response MUST be ONLY the text of the social media post itself. Do NOT include any prefixes, titles, labels like "Option 1:", markdown formatting like asterisks (**), or any other explanatory text. The post should be inspiring and must include relevant hashtags like #OWFN, #Solana, #CryptoForGood, and #SocialImpact.
 
-Generate a unique post now.`;
+Generate the post now.`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
