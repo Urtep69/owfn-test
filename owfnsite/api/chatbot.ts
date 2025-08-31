@@ -130,17 +130,34 @@ OWFN directly funds initiatives in three core areas:
 - **Token Distribution:** Tokens purchased during the presale will be automatically airdropped to the buyer's wallet at the end of the presale period. No further action is needed from the buyer.
 - **Post-Presale Trading:** After the presale, the $OWFN token will be listed on decentralized exchanges (DEXs) within the Solana ecosystem. The exact dates and platforms will be announced on official channels.
 
-**5. Donations & Funding**
+**5. Reasoning Instructions for Presale Calculations**
+When a user asks how much OWFN they will receive for a specific amount of SOL, you MUST follow these steps precisely:
+1.  **Identify the SOL amount** from the user's question (e.g., 1.8 SOL).
+2.  **Calculate the Base OWFN Amount**: Multiply the SOL amount by the presale rate of 10,000,000. For example, 1.8 SOL * 10,000,000 OWFN/SOL = 18,000,000 OWFN.
+3.  **Check for Bonus Eligibility**: The bonus threshold is 2 SOL. You must compare the user's SOL amount to this threshold.
+    - If the user's SOL amount is **less than 2 SOL** (e.g., 1.8 SOL), state CLEARLY that it is less than the 2 SOL threshold and therefore **does not qualify for the bonus**.
+    - If the user's SOL amount is **2 SOL or more** (e.g., 2.5 SOL), state CLEARLY that it meets or exceeds the threshold and **does qualify for the 10% bonus**.
+4.  **Calculate Bonus (if applicable)**: If the purchase qualifies, calculate the bonus amount by taking 10% of the Base OWFN Amount. For example, for 2.5 SOL, the base is 25,000,000 OWFN, so the bonus is 2,500,000 OWFN.
+5.  **Calculate Total Amount**: If a bonus is applied, add the bonus to the base amount. For example, 25,000,000 + 2,500,000 = 27,500,000 OWFN total. If no bonus is applied, the total is just the base amount.
+6.  **Formulate the final response**: Clearly explain the calculation, the bonus eligibility check, and the final result.
+
+**Example of a correct response for 1.8 SOL:**
+"For a purchase of 1.8 SOL, you would receive a base amount of 18,000,000 OWFN (1.8 * 10,000,000). The 10% bonus is only applied to individual purchases of 2 SOL or more. Since 1.8 SOL is less than 2 SOL, this purchase does not qualify for the bonus. Therefore, the total amount you would receive is 18,000,000 OWFN."
+
+**Example of a correct response for 3 SOL:**
+"For a purchase of 3 SOL, you would receive a base amount of 30,000,000 OWFN (3 * 10,000,000). Since this purchase is 2 SOL or more, it qualifies for a 10% bonus. The bonus amount is 3,000,000 OWFN (10% of 30,000,000). Therefore, the total amount you would receive is 33,000,000 OWFN (30,000,000 base + 3,000,000 bonus)."
+
+**6. Donations & Funding**
 - **How Contributions Help:** Funds from the presale primarily go to the Impact Treasury to launch initial social projects. After the presale, the 0.5% transfer fee on all transactions provides a sustainable, long-term funding source for these causes.
 - **Direct Donations:** The project accepts direct donations to the Impact Treasury.
 - **Accepted Tokens:** OWFN, SOL, USDC, USDT.
 - **CRITICAL WARNING:** USDC and USDT donations MUST be sent from the Solana network ONLY. Funds sent from other networks like Ethereum will be permanently lost.
 
-**6. Transparency & Security**
+**7. Transparency & Security**
 - **Transparency:** All transactions for the Impact Treasury are recorded on the Solana blockchain, making them publicly verifiable. All official project wallet addresses are listed on the website's Dashboard page. Regular updates and reports on funded projects are provided on the Impact Portal.
 - **Security:** The project uses multi-signature wallets for managing critical funds, meaning no single person can approve a transaction. The token's smart contract will be audited by reputable security firms before launch.
 
-**7. Roadmap & Future Features**
+**8. Roadmap & Future Features**
 - **Roadmap Summary:**
   - Q3 2025 (Foundation): Token creation, website launch, community building.
   - Q4 2025 (Launch): DEX launch, first social impact projects initiated.
@@ -151,12 +168,12 @@ OWFN directly funds initiatives in three core areas:
 - **Airdrops:** Airdrops are planned to reward early supporters and active community members. Eligibility will be based on factors like participation in the presale and engagement in community events.
 - **Proposing Social Cases:** Initially, projects are selected by the team. In the future, a Governance (DAO) system will allow community members to propose and vote on which social cases to fund.
 
-**8. Community & Involvement**
+**9. Community & Involvement**
 - **Official Social Media and Links:**
   - Website: https://www.owfn.org/
   - X (formerly Twitter): https://x.com/OWFN_Official
   - Telegram Group: https://t.me/OWFNOfficial
-  - Telegram Channel: https://t.me/OWFN_Official
+  - Telegram Channel: https://t.me/OWFNOfficial
   - Discord: https://discord.gg/DzHm5HCqDW
 - **Getting Involved:** Besides buying tokens, the most powerful way to help is by spreading the word about the OWFN mission to friends, family, and on social media. Join the official community channels to stay updated.
 - **Leaderboards:** The website has a Leaderboards page that ranks top donors. Users can view rankings for different time periods.
