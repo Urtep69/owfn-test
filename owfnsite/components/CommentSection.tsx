@@ -1,8 +1,7 @@
-
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { AddressDisplay } from './AddressDisplay.tsx';
-import { MessageSquare, Send, User, Loader2 } from 'lucide-react';
+import { WalletAvatar } from './WalletAvatar.tsx';
+import { MessageSquare, Send, Loader2 } from 'lucide-react';
 import type { Comment } from '../types.ts';
 
 interface CommentSectionProps {
@@ -74,56 +73,64 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ parentId, title 
         }
     };
 
+    const buttonText = useMemo(() => {
+        if (isSubmitting) return <Loader2 className="animate-spin" size={20} />;
+        if (!siws.isAuthenticated) return t('connect_to_comment');
+        return t('post_comment');
+    }, [isSubmitting, siws.isAuthenticated, t]);
+
     return (
         <div>
             <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
                 <MessageSquare /> {title} ({comments.length})
             </h3>
 
-            <div className="bg-primary-50 dark:bg-darkPrimary-700/50 p-4 rounded-lg mb-6">
-                <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder={t('leave_a_comment_placeholder')}
-                    rows={3}
-                    className="w-full p-2 bg-white dark:bg-darkPrimary-800 rounded-md focus:ring-2 focus:ring-accent-500 focus:outline-none"
-                    disabled={isSubmitting}
-                />
-                <div className="flex justify-end mt-2">
+            <div className="bg-primary-50 dark:bg-darkPrimary-900 p-4 rounded-lg mb-8">
+                <div className="relative">
+                    <textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder={t('leave_a_comment_placeholder')}
+                        rows={3}
+                        className="w-full p-3 pr-28 bg-white dark:bg-darkPrimary-800 rounded-md shadow-inner-3d focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none transition-shadow"
+                        disabled={isSubmitting || !siws.isAuthenticated}
+                    />
                     <button
                         onClick={handlePostComment}
                         disabled={!newComment.trim() || isSubmitting}
-                        className="flex items-center gap-2 bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 disabled:opacity-50 transition-colors"
+                        className="absolute right-3 bottom-3 flex items-center gap-2 bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                        {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Send size={18} />}
-                        {siws.isAuthenticated ? t('post_comment') : t('connect_to_comment')}
+                        {buttonText}
                     </button>
                 </div>
+                 {!siws.isAuthenticated && (
+                    <p className="text-xs text-center mt-2 text-primary-500 dark:text-darkPrimary-400">
+                        {t('connect_to_comment')} to leave a message.
+                    </p>
+                )}
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
                 {isLoading ? (
-                    <div className="flex justify-center py-4"><Loader2 className="animate-spin" /></div>
+                    <div className="flex justify-center py-8"><Loader2 className="animate-spin w-8 h-8 text-accent-500" /></div>
                 ) : comments.length > 0 ? (
                     comments.map(comment => (
-                        <div key={comment.id} className="flex items-start gap-4">
-                            <div className="bg-primary-100 dark:bg-darkPrimary-700 p-2 rounded-full">
-                                <User className="text-primary-500 dark:text-darkPrimary-400" />
-                            </div>
+                        <div key={comment.id} className="flex items-start gap-4 animate-fade-in-up" style={{ animationDuration: '300ms' }}>
+                            <WalletAvatar address={comment.authorAddress} className="w-10 h-10 flex-shrink-0" />
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 text-sm">
-                                    <AddressDisplay address={comment.authorAddress} />
-                                    <span className="text-primary-400 dark:text-darkPrimary-500">&bull;</span>
+                                    <p className="font-bold text-primary-800 dark:text-darkPrimary-200">{comment.authorAddress.slice(0, 6)}...{comment.authorAddress.slice(-4)}</p>
+                                    <span className="text-primary-300 dark:text-darkPrimary-600">&bull;</span>
                                     <time className="text-primary-400 dark:text-darkPrimary-500">
                                         {new Date(comment.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                                     </time>
                                 </div>
-                                <p className="mt-1 text-primary-700 dark:text-darkPrimary-300">{comment.content}</p>
+                                <p className="mt-1 text-primary-700 dark:text-darkPrimary-300 bg-primary-50 dark:bg-darkPrimary-900/50 p-3 rounded-lg">{comment.content}</p>
                             </div>
                         </div>
                     ))
                 ) : (
-                    <p className="text-center text-primary-500 dark:text-darkPrimary-400 py-4">{t('no_comments_yet')}</p>
+                    <p className="text-center text-primary-500 dark:text-darkPrimary-400 py-8">{t('no_comments_yet')}</p>
                 )}
             </div>
         </div>

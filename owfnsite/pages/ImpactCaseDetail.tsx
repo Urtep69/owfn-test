@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -115,16 +114,16 @@ export default function ImpactCaseDetail() {
             <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
                 <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
             </Link>
-            <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden">
+            <div className="bg-white dark:bg-darkPrimary-900 rounded-lg shadow-3d-lg overflow-hidden">
                 <ImageSlideshow imageUrls={socialCase.imageUrls} altText={title} />
                 <div className="p-6 md:p-10">
                     <span className="text-lg font-semibold text-accent-600 dark:text-darkAccent-500 mb-2 inline-block">{categoryName}</span>
                     <h1 className="text-3xl md:text-5xl font-bold mb-6">{title}</h1>
                     
                     <div className="grid md:grid-cols-3 gap-4 mb-8 text-center">
-                        <div className="bg-primary-50 dark:bg-darkPrimary-700/50 p-3 rounded-lg"><MapPin className="inline-block mr-2"/> {socialCase.region}, {socialCase.country}</div>
-                        <div className="bg-primary-50 dark:bg-darkPrimary-700/50 p-3 rounded-lg"><Users className="inline-block mr-2"/> {socialCase.beneficiaryCount} {t('beneficiaries')}</div>
-                        {socialCase.bankAccountIBAN && <div className="bg-primary-50 dark:bg-darkPrimary-700/50 p-3 rounded-lg"><Landmark className="inline-block mr-2"/> {t('bank_transfer_available')}</div>}
+                        <div className="bg-primary-50 dark:bg-darkPrimary-800 p-3 rounded-lg"><MapPin className="inline-block mr-2"/> {socialCase.region}, {socialCase.country}</div>
+                        <div className="bg-primary-50 dark:bg-darkPrimary-800 p-3 rounded-lg"><Users className="inline-block mr-2"/> {socialCase.beneficiaryCount} {t('beneficiaries')}</div>
+                        {socialCase.bankAccountIBAN && <div className="bg-primary-50 dark:bg-darkPrimary-800 p-3 rounded-lg"><Landmark className="inline-block mr-2"/> {t('bank_transfer_available')}</div>}
                     </div>
 
                     <p className="text-lg text-primary-700 dark:text-darkPrimary-300 leading-relaxed mb-8">{description}</p>
@@ -142,11 +141,11 @@ export default function ImpactCaseDetail() {
             <div className="grid lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-3 space-y-8">
                     {details && (
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <div className="bg-white dark:bg-darkPrimary-900 p-6 rounded-lg shadow-3d">
                             <h3 className="text-2xl font-bold mb-4">{t('case_details_title')}</h3>
                             <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed whitespace-pre-wrap">{details}</p>
                             {socialCase.bankAccountIBAN && (
-                                <div className="mt-6 p-4 bg-primary-50 dark:bg-darkPrimary-700/50 rounded-lg border-l-4 border-accent-500">
+                                <div className="mt-6 p-4 bg-primary-50 dark:bg-darkPrimary-800 rounded-lg border-l-4 border-accent-500">
                                     <h4 className="font-bold">{t('direct_bank_transfer')}</h4>
                                     <p className="font-mono text-lg mt-1">{socialCase.bankAccountIBAN}</p>
                                     <p className="text-xs mt-1 text-primary-500">{t('bank_transfer_verified_note')}</p>
@@ -154,14 +153,14 @@ export default function ImpactCaseDetail() {
                             )}
                         </div>
                     )}
-                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <div className="bg-white dark:bg-darkPrimary-900 p-6 rounded-lg shadow-3d">
                         <CommentSection parentId={socialCase.id} title={t('messages_of_support')} />
                     </div>
                 </div>
 
                 <div className="lg:col-span-2">
                     <div className="lg:sticky top-24 space-y-8">
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <div className="bg-white dark:bg-darkPrimary-900 p-6 rounded-lg shadow-3d">
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
                                 <Heart className="text-red-500" />
                                 <span>{t('support_this_cause')}</span>
@@ -194,7 +193,7 @@ export default function ImpactCaseDetail() {
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
                                         placeholder="0.0"
-                                        className="w-full p-3 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
+                                        className="w-full p-3 bg-primary-100 dark:bg-darkPrimary-800 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
                                     />
                                     <div className="flex flex-wrap gap-2 mt-2">
                                         {percentages.map(p => (
@@ -211,7 +210,7 @@ export default function ImpactCaseDetail() {
                                 </div>
                             
                                 {parseFloat(amount) > 0 && (
-                                    <div className="p-3 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg text-center animate-fade-in-up" style={{animationDuration: '300ms'}}>
+                                    <div className="p-3 bg-primary-100 dark:bg-darkPrimary-800 rounded-lg text-center animate-fade-in-up" style={{animationDuration: '300ms'}}>
                                         <p className="text-xl font-bold text-primary-900 dark:text-darkPrimary-100">
                                             {parseFloat(amount).toLocaleString(undefined, {maximumFractionDigits: 4})} {selectedToken}
                                         </p>

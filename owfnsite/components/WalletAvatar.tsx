@@ -10,8 +10,8 @@ const COLORS = [
     '#f59e0b', // accent-500
     '#d97706', // accent-600
     '#b45309', // accent-700
-    '#92400e', // accent-800
-    '#78350f', // accent-900
+    '#eac06a', // darkAccent-400 (lighter)
+    '#d2b48c', // darkAccent-500 (lighter)
 ];
 
 // Simple hashing function to get a number from a string
@@ -27,30 +27,37 @@ const simpleHash = (str: string): number => {
 
 export const WalletAvatar: React.FC<WalletAvatarProps> = ({ address, className = 'w-8 h-8' }) => {
     const avatarData = useMemo(() => {
-        if (!address) return { bgColor: COLORS[0], shapes: [] };
+        if (!address) return { bgColor: '#374151', gradient: { c1: '#4b5563', c2: '#6b7280' }, shapes: [] };
         
         const hash = simpleHash(address);
         
-        const bgColor = COLORS[hash % COLORS.length];
-        
+        const c1 = COLORS[hash % COLORS.length];
+        const c2 = COLORS[(hash >> 8) % COLORS.length];
+
         const shapes = Array.from({ length: 3 }).map((_, i) => {
-            const shapeHash = simpleHash(address.slice(i * 5, (i + 1) * 5));
+            const shapeHash = simpleHash(address.slice(i * 4, (i + 1) * 4));
             return {
                 cx: 15 + (shapeHash % 70),
-                cy: 15 + ((shapeHash >> 8) % 70),
-                r: 10 + (shapeHash % 15),
-                fill: COLORS[(shapeHash >> 16) % COLORS.length],
-                opacity: 0.6 + ((shapeHash % 40) / 100)
+                cy: 15 + ((shapeHash >> 4) % 70),
+                r: 8 + (shapeHash % 12),
+                fill: 'white',
+                opacity: 0.1 + ((shapeHash % 20) / 100)
             };
         });
         
-        return { bgColor, shapes };
+        return { gradient: { id: `grad_${address}`, c1, c2 }, shapes };
     }, [address]);
 
     return (
-        <div className={`${className} rounded-full overflow-hidden`}>
+        <div className={`${className} rounded-full overflow-hidden border-2 border-primary-200/50 dark:border-darkPrimary-700/50`}>
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <rect width="100" height="100" fill={avatarData.bgColor} />
+                 <defs>
+                    <linearGradient id={avatarData.gradient.id} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={avatarData.gradient.c1} />
+                        <stop offset="100%" stopColor={avatarData.gradient.c2} />
+                    </linearGradient>
+                </defs>
+                <rect width="100" height="100" fill={`url(#${avatarData.gradient.id})`} />
                 {avatarData.shapes.map((shape, i) => (
                     <circle 
                         key={i}

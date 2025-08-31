@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import { WalletAvatar } from '../components/WalletAvatar.tsx';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { CommentSection } from '../components/CommentSection.tsx';
 
@@ -35,35 +34,41 @@ export default function BlogPostDetail() {
 
     return (
         <div className="animate-fade-in-up">
-            <Link to="/blog" className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline mb-8">
-                <ArrowLeft size={16} /> {t('back_to_blog')}
-            </Link>
-            
-            <article className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden">
-                <img src={post.imageUrl} alt={title} className="w-full h-64 md:h-96 object-cover" />
-                <div className="p-6 md:p-10">
-                    <h1 className="text-3xl md:text-5xl font-bold mb-4">{title}</h1>
-                    <div className="flex items-center space-x-4 text-sm text-primary-500 dark:text-darkPrimary-400 mb-8">
-                        <div>
-                           <span>{t('author')}: </span>
-                           <AddressDisplay address={post.authorAddress} />
+            <div className="max-w-4xl mx-auto">
+                <Link to="/blog" className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline mb-8">
+                    <ArrowLeft size={16} /> {t('back_to_blog')}
+                </Link>
+                
+                <article>
+                    <header className="mb-8">
+                        <h1 className="text-3xl md:text-5xl font-extrabold mb-4 text-primary-900 dark:text-darkPrimary-100 leading-tight">{title}</h1>
+                        <div className="flex items-center space-x-4 text-sm text-primary-500 dark:text-darkPrimary-400">
+                            <div className="flex items-center gap-3">
+                                <WalletAvatar address={post.authorAddress} className="w-10 h-10"/>
+                                <div>
+                                    <p className="font-semibold text-primary-700 dark:text-darkPrimary-300">{t('author')}</p>
+                                    <p className="text-xs">{post.authorAddress}</p>
+                                </div>
+                            </div>
+                            <span className="text-primary-300 dark:text-darkPrimary-600">&bull;</span>
+                            <time dateTime={post.createdAt} className="font-semibold">
+                                {createdAt.toLocaleDateString(currentLanguage.code, { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </time>
                         </div>
-                        <span>&bull;</span>
-                        <time dateTime={post.createdAt}>
-                            {createdAt.toLocaleDateString(currentLanguage.code, { year: 'numeric', month: 'long', day: 'numeric' })}
-                        </time>
-                    </div>
+                    </header>
 
-                    <div className="prose dark:prose-invert max-w-none text-lg leading-relaxed text-primary-800 dark:text-darkPrimary-200">
+                    <img src={post.imageUrl} alt={title} className="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg mb-8" />
+
+                    <div className="prose dark:prose-invert max-w-none text-lg lg:text-xl leading-relaxed text-primary-800 dark:text-darkPrimary-200">
                         {content.split('\n').map((paragraph, index) => (
-                            <p key={index}>{paragraph}</p>
+                            <p key={index} className="mb-6">{paragraph}</p>
                         ))}
                     </div>
-                </div>
-            </article>
+                </article>
 
-            <div className="mt-12">
-                <CommentSection parentId={post.id} title={t('comments')} />
+                <div className="mt-16 pt-8 border-t border-primary-200 dark:border-darkPrimary-700">
+                    <CommentSection parentId={post.id} title={t('comments')} />
+                </div>
             </div>
         </div>
     );
