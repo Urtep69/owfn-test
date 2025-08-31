@@ -7,27 +7,29 @@ import {
     QUICKNODE_RPC_URL,
     TOKEN_ALLOCATIONS,
     OWFN_MINT_ADDRESS,
+    KNOWN_TOKEN_MINT_ADDRESSES,
 } from '../constants.ts';
 
-// Helius API setup for fetching token price
 const HELIUS_API_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
 
 interface HeliusAsset {
+    id: string;
     token_info?: {
         price_info?: {
             price_per_token?: number;
         };
     };
+    content?: {
+        metadata?: {
+            symbol?: string;
+        };
+    };
 }
 
-async function getOwfnPrice(): Promise<{ currentUsd: number; source: string }> {
-    if (!process.env.HELIUS_API_KEY) {
-        console.warn("Helius API key not set, cannot fetch live price.");
-        return { currentUsd: 0, source: 'Presale Rate' };
-    }
-    const isPresaleActive = new Date() > PRESALE_DETAILS.startDate && new Date() < PRESALE_DETAILS.endDate;
-    if (isPresaleActive) {
-        return { currentUsd: 0, source: 'Presale Rate' };
+async function getMultipleTokenPrices(mints: string[]): Promise<{ [symbol: string]: number }> {
+    if (!process.env.HELIUS_API_KEY || mints.length === 0) {
+        console.warn("Helius API key not set or no mints provided.");
+        return {};
     }
 
     try {
@@ -36,20 +38,40 @@ async function getOwfnPrice(): Promise<{ currentUsd: number; source: string }> {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 jsonrpc: '2.0',
-                id: 'owfn-live-price',
-                method: 'getAsset',
-                params: { id: OWFN_MINT_ADDRESS },
+                id: 'owfn-token-prices',
+                method: 'getAssetBatch',
+                params: { ids: mints },
             }),
         });
-        if (!response.ok) return { currentUsd: 0, source: 'API Error' };
+        if (!response.ok) {
+            console.error(`Helius API error for getAssetBatch: ${response.status}`);
+            return {};
+        }
         
-        const { result: asset } = (await response.json()) as { result: HeliusAsset };
-        const price = asset?.token_info?.price_info?.price_per_token ?? 0;
-        return { currentUsd: price, source: 'DEX' };
+        const { result: assets } = (await response.json()) as { result: HeliusAsset[] };
+        const prices: { [symbol: string]: number } = {};
+        
+        assets.forEach(asset => {
+            const symbol = asset.content?.metadata?.symbol;
+            const price = asset.token_info?.price_info?.price_per_token;
+            if (symbol && typeof price === 'number') {
+                prices[symbol] = price;
+            }
+        });
+        
+        // Ensure USDC and USDT are pegged to 1 if API fails for them
+        if (!prices['USDC']) prices['USDC'] = 1.0;
+        if (!prices['USDT']) prices['USDT'] = 1.0;
+        
+        // If OWFN price is not found and we are post-presale, it's 0. During presale, it's also effectively 0 on DEX.
+        if (!prices['OWFN']) prices['OWFN'] = 0;
+
+
+        return prices;
 
     } catch (error) {
-        console.error("Failed to fetch OWFN price from Helius:", error);
-        return { currentUsd: 0, source: 'API Error' };
+        console.error("Failed to fetch token prices from Helius:", error);
+        return { 'USDC': 1.0, 'USDT': 1.0 }; // Fallback for stablecoins
     }
 }
 
@@ -57,10 +79,9 @@ async function getOwfnPrice(): Promise<{ currentUsd: number; source: string }> {
 export default async function handler(req: any, res: any) {
     try {
         const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
-        const startDate = searchParams.get('startDate'); // Expects ISO string e.g., '2025-08-01T00:00:00.000Z'
-        const endDate = searchParams.get('endDate');   // Expects ISO string
+        const startDate = searchParams.get('startDate');
+        const endDate = searchParams.get('endDate');
 
-        // --- Fetch General (All-Time) Donation Stats from DB ---
         const { rows: allTimeDonationRows } = await sql`
             SELECT 
                 COUNT(DISTINCT wallet_address) as total_donors, 
@@ -72,7 +93,6 @@ export default async function handler(req: any, res: any) {
             totalDonatedUSD: parseFloat(allTimeDonationRows[0]?.total_donated_usd || '0'),
         };
         
-        // --- Fetch Donations for the SPECIFIED PERIOD from DB ---
         let donationsForPeriod: { [key: string]: number } = {};
         if (startDate && endDate) {
             try {
@@ -94,11 +114,9 @@ export default async function handler(req: any, res: any) {
                 });
             } catch (dateError) {
                  console.error("Error fetching period-specific donations:", dateError);
-                 // Gracefully fail, donationsForPeriod will be empty
             }
         }
 
-        // --- Fetch Presale Stats from Solana Blockchain (Always Live) ---
         let presaleStats = {
             totalSolRaised: 0,
             presaleContributors: 0,
@@ -139,29 +157,32 @@ export default async function handler(req: any, res: any) {
         }
         
         const totalOwfnSold = presaleStats.totalSolRaised * PRESALE_DETAILS.rate;
-        const presaleAllocation = TOKEN_ALLOCATIONS.find(a => a.name.includes('Presale'))?.value ?? 0;
-        const percentageSold = presaleAllocation > 0 ? (totalOwfnSold / presaleAllocation) * 100 : 0;
+        const percentageSold = PRESALE_DETAILS.hardCap > 0 ? (presaleStats.totalSolRaised / PRESALE_DETAILS.hardCap) * 100 : 0;
         
-        // --- Fetch Live OWFN Price (Always Live) ---
-        const owfnPrice = await getOwfnPrice();
+        const tokenPrices = await getMultipleTokenPrices([
+            OWFN_MINT_ADDRESS,
+            KNOWN_TOKEN_MINT_ADDRESSES.SOL,
+            KNOWN_TOKEN_MINT_ADDRESSES.USDC,
+            KNOWN_TOKEN_MINT_ADDRESSES.USDT
+        ]);
 
         const responseData = {
             ...allTimeDonationStats,
-            donationsForPeriod, // Dynamic period data
-            period: { startDate, endDate }, // Echo back the period for clarity
+            donationsForPeriod,
+            period: { startDate, endDate },
             presale: {
                 ...presaleStats,
                 totalOwfnSold,
                 percentageSold,
             },
-            owfnPrice,
+            tokenPrices,
         };
         
         return new Response(JSON.stringify(responseData), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
-                'Cache-Control': 's-maxage=60, stale-while-revalidate=300', // Cache for 1 min
+                'Cache-Control': 's-maxage=60, stale-while-revalidate=300',
             },
         });
 

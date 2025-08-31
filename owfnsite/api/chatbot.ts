@@ -99,10 +99,8 @@ export default async function handler(req: any, res: any) {
         
         const ai = new GoogleGenAI({ apiKey });
         
-        // --- Step 1: Extract Date Range from Question ---
         const dateRange = await extractDateRange(ai, question, currentTime);
         
-        // --- Step 2: Fetch Live Stats (with dynamic dates if available) ---
         let liveStatsText = "The assistant currently does not have access to live statistics. When asked about specific numbers, state that you do not have that specific information and direct the user to the [Visit Page: Dashboard] or [Visit Page: Leaderboards] pages for transparency.";
         try {
             const protocol = req.headers['x-forwarded-proto'] || 'http';
@@ -126,27 +124,38 @@ export default async function handler(req: any, res: any) {
                          periodDonationsText = `Data for the user's requested period (${new Date(stats.period.startDate).toLocaleDateString()} - ${new Date(stats.period.endDate).toLocaleDateString()}): No donations were recorded in this period.`;
                      }
                 }
+                
+                let tokenPricesText = "Token prices are not available right now.";
+                if (stats.tokenPrices) {
+                    tokenPricesText = Object.entries(stats.tokenPrices)
+                        .map(([symbol, price]) => `  - ${symbol}: $${(price as number).toFixed(4)} USD`)
+                        .join('\n');
+                }
 
                 liveStatsText = `
 ### REAL-TIME DATA INSTRUCTIONS ###
-You have been provided with live, real-time data below. When a user asks about any of these topics (token price, presale progress, donation statistics), you MUST use the data provided in the "Live Financial & Project Statistics" section to give a precise, numerical answer. DO NOT state that you do not have access to this information. Use the numbers directly from the data.
+You have been provided with live, real-time data below. When a user asks about any of these topics, you MUST use the exact numbers from the "Live Financial & Project Statistics" section to give a precise answer. DO NOT state you cannot access this information.
 
 ### Live Financial & Project Statistics (as of right now) ###
 
-**Token Price:**
-- Current OWFN Price: ${stats.owfnPrice.currentUsd} USD. (Source: ${stats.owfnPrice.source})
-- **Instruction**: If the price is 0, you MUST state that the token is in its presale phase and is not yet trading on exchanges. You must then state the official presale rate of 1 SOL = 10,000,000 OWFN.
+**Token Prices:**
+- **Instruction**: Use these prices when asked about the value of OWFN, SOL, USDC, or USDT.
+${tokenPricesText}
+- **Instruction**: If the OWFN price is 0, you MUST state that the token is in its presale phase and is not yet trading on exchanges. You must then state the official presale rate of 1 SOL = 10,000,000 OWFN.
 
 **Presale Progress:**
+- **Instruction**: Use these numbers to answer questions about how much SOL has been raised or how much OWFN has been sold in the presale.
 - Total SOL Raised: ${stats.presale.totalSolRaised.toFixed(4)} SOL
-- Presale Progress: ${stats.presale.percentageSold.toFixed(2)}% of the presale allocation has been sold.
+- Total OWFN Sold: ${stats.presale.totalOwfnSold.toLocaleString(undefined, {maximumFractionDigits: 0})} OWFN
+- Presale Progress: ${stats.presale.percentageSold.toFixed(2)}% of the hard cap has been reached.
 - Number of Presale Contributors: ${stats.presale.presaleContributors} unique buyers.
 
 **Donation Statistics (All-Time):**
+- **Instruction**: Use this data for general questions about total donations.
 - Total Donated (excluding presale): $${stats.totalDonatedUSD.toFixed(2)} USD from ${stats.totalDonors} unique donors.
 
 **Donation Statistics (For a specific period):**
-- **Instruction**: This data is ONLY available if the user asks a question about a specific time period (e.g., "last week"). If they do, you MUST use the data below. If they ask a general question about donations without a time period, use only the "All-Time" data and suggest they can ask about a specific period.
+- **Instruction**: This data is ONLY available if the user asks a question about a specific time period (e.g., "last week"). If they do, you MUST use the data below. If they ask a general question about donations without a time period, use only the "All-Time" data.
 - ${periodDonationsText}
                 `;
             } else {
