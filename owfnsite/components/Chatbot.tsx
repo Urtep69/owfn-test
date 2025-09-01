@@ -111,19 +111,31 @@ export const Chatbot = () => {
             return;
         }
 
-        const proactiveMessages: Record<string, string> = {
-            '/presale': t('chatbot_proactive_presale'),
-            '/donations': t('chatbot_proactive_donations'),
+        const proactiveMessages: { [key: string]: string } = {
+            '/': t('chatbot_proactive_home', { defaultValue: '' }),
+            '/presale': t('chatbot_proactive_presale', { defaultValue: '' }),
+            '/donations': t('chatbot_proactive_donations', { defaultValue: '' }),
+            '/about': t('chatbot_proactive_about', { defaultValue: '' }),
+            '/whitepaper': t('chatbot_proactive_whitepaper', { defaultValue: '' }),
+            '/tokenomics': t('chatbot_proactive_tokenomics', { defaultValue: '' }),
+            '/roadmap': t('chatbot_proactive_roadmap', { defaultValue: '' }),
+            '/dashboard': t('chatbot_proactive_dashboard', { defaultValue: '' }),
+            '/contact': t('chatbot_proactive_contact', { defaultValue: '' }),
         };
         const message = proactiveMessages[location];
-        const key = `owfn-proactive-${location}`;
+        
+        // Ensure message is not an empty string and key exists
+        if (!message || message.startsWith('chatbot_proactive_')) {
+            return;
+        }
 
+        const key = `owfn-proactive-${location}`;
         if (message && !sessionStorage.getItem(key)) {
             const timer = setTimeout(() => {
-                if (!isOpen) { // Check again in case user opened chat during timeout
+                if (!isOpen) {
                     setProactiveMessage(message);
                 }
-            }, 3000); // 3-second delay
+            }, 3000);
             return () => clearTimeout(timer);
         }
     }, [location, t, isOpen]);

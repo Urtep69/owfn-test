@@ -14,7 +14,7 @@ const tokens = [
 
 export default function Donations() {
     const { t, solana, setWalletModalOpen } = useAppContext();
-    const [location] = useLocation();
+    const [location, setLocation] = useLocation();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
 
@@ -27,6 +27,10 @@ export default function Donations() {
         }
         if (amountFromQuery) {
             setAmount(amountFromQuery);
+        }
+         // Clean the URL after reading params
+        if (tokenFromQuery || amountFromQuery) {
+             window.history.replaceState({}, document.title, window.location.pathname);
         }
     }, [location]);
 

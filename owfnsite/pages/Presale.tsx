@@ -243,7 +243,7 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 
 export default function Presale() {
   const { t, solana, setWalletModalOpen } = useAppContext();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -260,6 +260,8 @@ export default function Presale() {
     const amountFromQuery = params.get('amount');
     if (amountFromQuery) {
         setSolAmount(amountFromQuery);
+        // Clean the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [location]);
 
@@ -665,7 +667,7 @@ export default function Presale() {
                                 {isCheckingContribution ? (
                                     <div className="flex items-center justify-center gap-2">
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>Checking your contribution...</span>
+                                        <span>{t('presale_checking_contribution')}</span>
                                     </div>
                                 ) : (
                                     <>
