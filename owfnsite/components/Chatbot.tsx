@@ -121,11 +121,10 @@ export const Chatbot = () => {
 
             let message = '';
             const specialPages = ['/presale', '/donations', '/profile'];
-            const relevantTokens = ['OWFN', 'SOL', 'USDC', 'USDT'];
             
             if (specialPages.includes(location) && solana.connected && solana.userTokens.length > 0) {
                  const balances = solana.userTokens
-                    .filter(t => relevantTokens.includes(t.symbol) && t.balance > 0)
+                    .filter(t => t.balance > 0)
                     .map(t => `${t.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${t.symbol}`)
                     .join(', ');
 
