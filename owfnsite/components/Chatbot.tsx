@@ -139,7 +139,7 @@ export const Chatbot = () => {
                 }
             }
 
-            // Fallback for disconnected users OR pages not handled above
+            // Fallback for disconnected users OR pages not handled by the connected user logic above
             if (!message) {
                  const proactiveMessageKeys: { [key: string]: string } = {
                     '/': 'chatbot_proactive_home',
@@ -172,6 +172,7 @@ export const Chatbot = () => {
             
             if (message) {
                 setProactiveMessage(message);
+                sessionStorage.setItem(key, 'true');
             }
 
         }, 1500); // Reduced delay from 3000ms to 1500ms
@@ -181,8 +182,6 @@ export const Chatbot = () => {
 
     const handleDismissProactive = () => {
         setProactiveMessage(null);
-        const key = `owfn-proactive-${location}`;
-        sessionStorage.setItem(key, 'true');
     };
 
     const handleOpenChat = (initialMessage?: string) => {
@@ -190,8 +189,6 @@ export const Chatbot = () => {
         if (proactiveMessage) {
             setMessages([{ role: 'model', parts: [{ text: proactiveMessage }], timestamp: new Date() }]);
             setProactiveMessage(null);
-            const key = `owfn-proactive-${location}`;
-            sessionStorage.setItem(key, 'true');
         } else if (initialMessage) {
             setMessages([{ role: 'model', parts: [{ text: initialMessage }], timestamp: new Date() }]);
         }
