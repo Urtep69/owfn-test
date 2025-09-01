@@ -14,6 +14,7 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
     const [loading, setLoading] = useState(true);
     const [totalValue, setTotalValue] = useState(0);
     const [balances, setBalances] = useState<Token[]>([]);
+    const [tokenTypesCount, setTokenTypesCount] = useState(0);
 
     useEffect(() => {
         const fetchBalances = async () => {
@@ -23,10 +24,12 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
                 // Display all tokens, even those without USD value, as requested.
                 setBalances(fetchedBalances);
                 setTotalValue(fetchedBalances.reduce((sum, token) => sum + token.usdValue, 0));
+                setTokenTypesCount(fetchedBalances.length);
             } catch (error) {
                 console.error(`Failed to fetch balances for ${walletInfo.name} (${walletInfo.address}):`, error);
                 setBalances([]);
                 setTotalValue(0);
+                setTokenTypesCount(0);
             } finally {
                 setLoading(false);
             }
@@ -44,6 +47,7 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
                 {loading ? (
                     <>
                         <div className="h-16 bg-primary-200 dark:bg-darkPrimary-700 rounded-lg animate-pulse"></div>
+                        <div className="h-4 mt-2 w-28 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
                         <div className="mt-4 pt-4 border-t border-primary-200 dark:border-darkPrimary-700/50 space-y-3 flex-grow">
                             <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
                             <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
@@ -55,6 +59,9 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
                             <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('total_value')}</p>
                             <p className="text-4xl font-bold text-green-600 dark:text-green-400">
                                $<AnimatedNumber value={totalValue} />
+                            </p>
+                            <p className="text-sm text-primary-500 dark:text-darkPrimary-500 mt-1">
+                                {t('token_types')}: {tokenTypesCount}
                             </p>
                         </div>
                         <div className="mt-4 pt-4 border-t border-primary-200 dark:border-darkPrimary-700/50 flex-grow flex flex-col">
