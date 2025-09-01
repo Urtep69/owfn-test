@@ -123,22 +123,23 @@ export const Chatbot = () => {
             if (isOpen) return;
 
             let message = '';
-            // The personalized balance message is best for transactional pages.
-            // For /profile, the generic welcome message is more appropriate as balances are already on screen.
-            const specialPages = ['/presale', '/donations'];
             
-            if (specialPages.includes(location) && solana.connected && solana.userTokens.length > 0) {
-                 const balances = solana.userTokens
-                    .filter(t => t.balance > 0)
-                    .map(t => `${t.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${t.symbol}`)
-                    .join(', ');
-
-                if (balances) {
-                    message = `${t('chatbot_proactive_wallet_intro')} ${balances}. ${t('chatbot_proactive_wallet_outro')}`;
+            // Handle personalized messages for connected users
+            if (solana.connected) {
+                if (location === '/profile') {
+                    message = t('chatbot_proactive_profile');
+                } else if (['/presale', '/donations'].includes(location) && solana.userTokens.length > 0) {
+                     const balances = solana.userTokens
+                        .filter(t => t.balance > 0)
+                        .map(t => `${t.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${t.symbol}`)
+                        .join(', ');
+                    if (balances) {
+                        message = `${t('chatbot_proactive_wallet_intro')} ${balances}. ${t('chatbot_proactive_wallet_outro')}`;
+                    }
                 }
             }
 
-            // Fallback to a generic message if the special personalized message was not created
+            // Fallback for disconnected users OR pages not handled above
             if (!message) {
                  const proactiveMessageKeys: { [key: string]: string } = {
                     '/': 'chatbot_proactive_home',
@@ -157,7 +158,8 @@ export const Chatbot = () => {
                     '/governance': 'chatbot_proactive_governance',
                     '/partnerships': 'chatbot_proactive_partnerships',
                     '/faq': 'chatbot_proactive_faq',
-                    '/profile': 'chatbot_proactive_profile',
+                    // NOTE: '/profile' is intentionally excluded here.
+                    // The profile message should only appear for connected users, which is handled above.
                 };
                 const messageKey = proactiveMessageKeys[location];
                 if (messageKey) {
