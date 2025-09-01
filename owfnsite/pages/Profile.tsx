@@ -8,6 +8,7 @@ import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
 import { formatNumber } from '../lib/utils.ts';
 import { AnimatedNumber } from '../components/AnimatedNumber.tsx';
+import { ImpactNarrative } from '../components/ImpactNarrative.tsx';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -63,13 +64,15 @@ export default function Profile() {
 
             {/* Bento Grid Layout */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d flex flex-col justify-center">
+                <div className="md:col-span-1 bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d flex flex-col justify-center">
                     <p className="text-lg text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
                     <p className="text-5xl font-bold text-green-600 dark:text-green-400 my-2">
                         {loading ? '-' : `$`}<AnimatedNumber value={totalUsdValue} />
                     </p>
                     <p className="text-sm text-primary-500 dark:text-darkPrimary-500">{t('token_types')}: {loading ? '-' : userTokens.length}</p>
                 </div>
+                
+                <ImpactNarrative userStats={userStats} />
 
                 <ComingSoonWrapper showMessage={false}>
                     <StatCard icon={<DollarSign size={32} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
@@ -84,7 +87,7 @@ export default function Profile() {
                 </ComingSoonWrapper>
 
                 <ComingSoonWrapper showMessage={false}>
-                    <div className="md:col-span-1 bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d">
+                    <div className="md:col-span-3 bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d">
                         <h2 className="text-xl font-bold mb-4">{t('impact_badges')}</h2>
                          <div className="flex justify-around items-center h-full">
                             {MOCK_BADGES.map(badge => (

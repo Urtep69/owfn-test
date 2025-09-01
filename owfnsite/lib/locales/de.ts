@@ -582,4 +582,17 @@ export const de = {
     community_toolkit_share_button: `Auf X teilen`,
     community_toolkit_error_message: `Beitrag konnte nicht erstellt werden. Bitte versuchen Sie es erneut.`,
     community_toolkit_error_message_network: `Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.`,
+
+    // AI Features
+    ai_summary_button: `KI-Zusammenfassung erhalten`,
+    ai_summary_loading: `Wird generiert...`,
+    ai_summary_title: `KI-Zusammenfassung`,
+    generated_by_ai: `Von KI generiert`,
+    impact_narrative_title: `Ihre Wirkungsgeschichte`,
+    impact_narrative_loading: `Ihre persönliche Geschichte wird erstellt...`,
+    nft_reward_title: `Ein besonderes Dankeschön`,
+    nft_reward_button: `Dankeschön-Kunst generieren`,
+    nft_reward_loading: `Ihre einzigartige Kunst wird erstellt... Dies kann einen Moment dauern.`,
+    nft_reward_significant_donation_prompt: `Spenden Sie ${'$'}{threshold}+, um einzigartige Dankeschön-Kunst zu generieren!`,
+    api_error_generic: `Die Anfrage konnte derzeit nicht abgeschlossen werden.`,
 };

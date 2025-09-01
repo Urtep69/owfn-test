@@ -488,8 +488,6 @@ export const ro = {
     airdrop_eligible_message: `Portofelul tău este eligibil! Vei primi {amount} tokeni OWFN la următoarea distribuire.`,
     airdrop_not_eligible: `Neeligibil`,
     airdrop_not_eligible_message: `Ne pare rău, această adresă de portofel nu este eligibilă pentru airdrop-ul curent. Fii activ în comunitatea noastră pentru oportunități viitoare!`,
-    airdrop_info_box_title: `Despre acest Airdrop`,
-    airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
     
     // Governance
     governance_title: `Guvernanță`,
@@ -613,4 +611,17 @@ export const ro = {
     community_toolkit_share_button: `Distribuie pe X`,
     community_toolkit_error_message: `Nu s-a putut genera postarea. Vă rugăm să încercați din nou.`,
     community_toolkit_error_message_network: `A apărut o eroare. Vă rugăm să încercați din nou.`,
+
+    // AI Features
+    ai_summary_button: `Obțineți un rezumat AI`,
+    ai_summary_loading: `Se generează...`,
+    ai_summary_title: `Rezumat AI`,
+    generated_by_ai: `Generat de AI`,
+    impact_narrative_title: `Povestea Impactului Tău`,
+    impact_narrative_loading: `Se creează povestea ta personalizată...`,
+    nft_reward_title: `O Mulțumire Specială`,
+    nft_reward_button: `Generează Artă de Mulțumire`,
+    nft_reward_loading: `Se generează opera ta de artă unică... Acest proces poate dura un moment.`,
+    nft_reward_significant_donation_prompt: `Donează ${'$'}{threshold}+ pentru a genera o operă de artă unică de mulțumire!`,
+    api_error_generic: `Solicitarea nu a putut fi finalizată în acest moment.`,
 };

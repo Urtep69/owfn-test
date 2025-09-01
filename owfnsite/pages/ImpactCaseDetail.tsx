@@ -5,6 +5,8 @@ import { ProgressBar } from '../components/ProgressBar.tsx';
 import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
+import { AiSummary } from '../components/AiSummary.tsx';
+import { NftReward } from '../components/NftReward.tsx';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -119,7 +121,8 @@ export default function ImpactCaseDetail() {
 
             <div className="grid lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-3 space-y-8">
-                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '200ms'}}>
+                     <div id="case-details-content" className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '200ms'}}>
+                        <AiSummary contentId="case-details-content" />
                         <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Newspaper /> {t('live_updates')}</h3>
                         <div className="space-y-4">
                             {mockUpdates.map(update => (
@@ -227,6 +230,8 @@ export default function ImpactCaseDetail() {
                                 <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 btn-tactile">
                                     {solana.loading ? t('processing') : (solana.connected ? t('donate') : t('connect_wallet'))}
                                 </button>
+                                
+                                <NftReward caseTitle={title} donationAmountUsd={usdValue} />
                             </div>
                         </div>
                         <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '500ms'}}>
