@@ -355,6 +355,16 @@ export const ro = {
     chatbot_guided_contact_prepare: "Am înțeles. Vă voi duce la pagina de contact cu '{reason}' deja selectat. Vă rugăm să folosiți butonul de mai jos.",
     chatbot_guided_contact_button: "Mergi la Formularul de Contact",
     chatbot_personalized_apy_reminder: `Ca deținător de token OWFN, vă mulțumim că faceți parte din misiunea noastră! Nu uitați, câștigați automat 2% APY doar prin deținerea token-urilor în portofel.`,
+    chatbot_proactive_staking: "Bun venit! Deși deținerea OWFN vă aduce automat 2% APY, vă pot răspunde la orice întrebare despre cum funcționează.",
+    chatbot_proactive_vesting: "Verificați programul de vesting? Vă pot ajuta să găsiți informațiile de care aveți nevoie.",
+    chatbot_proactive_airdrop: "Sunteți curios despre eligibilitatea pentru airdrop? Spuneți-mi cum vă pot ajuta.",
+    chatbot_proactive_impact: "Bun venit la Portalul de Impact! Aici puteți vedea cum comunitatea noastră face o diferență. Aveți întrebări?",
+    chatbot_proactive_governance: "Sunteți interesat de guvernanță? Aici puteți afla despre propuneri și vot. Cu ce vă pot ajuta?",
+    chatbot_proactive_partnerships: "Explorați parteneriate? Vă pot oferi informații despre viziunea noastră de colaborare.",
+    chatbot_proactive_faq: "Aveți o întrebare? Vă pot ajuta să găsiți răspunsuri aici în FAQ sau să vă ofer mai multe detalii.",
+    chatbot_proactive_profile: "Bun venit la profilul dumneavoastră! Anunțați-mă dacă aveți întrebări despre token-urile sau statisticile de impact.",
+    chatbot_proactive_wallet_intro: `Bun venit înapoi! Văd că aveți câteva active în portofelul conectat:`,
+    chatbot_proactive_wallet_outro: `Vă pot ajuta să cumpărați mai mulți tokeni OWFN sau să faceți o donație. Ce vă interesează astăzi?`,
     
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,

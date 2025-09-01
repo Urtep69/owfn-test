@@ -1,25 +1,27 @@
 import { GoogleGenAI } from "@google/genai";
 
-// A list of high-quality, pre-written fallback posts in English.
-const fallbackPosts: string[] = [
-    "Join the Official World Family Network (OWFN) movement! We're using #Solana to build a better future with transparent aid. Get involved today! #OWFN #CryptoForGood #SocialImpact",
-    "Transparency is key to real change. That's why OWFN is built on #Solana, ensuring every contribution makes a difference. See how we're changing lives. #OWFN #SocialImpact #Blockchain",
-    "Be part of something bigger. The OWFN presale is your chance to support a project dedicated to global humanitarian aid. Let's build a better world together. #OWFN #Presale #CryptoForGood",
-    "Community is our strength. Together, we can fund projects in health, education, and basic needs worldwide. Join the Official World Family Network. #OWFN #Community #SocialImpact #Solana",
-    "Imagine a world where help reaches those in need instantly and transparently. That's the vision of OWFN, powered by the speed of #Solana. Join us. #OWFN #Vision #CryptoForGood"
-];
-
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
+
+    // Define fallback posts here for use in case of any error
+    const getFallbackPost = () => {
+        const fallbackPosts: string[] = [
+            "Join the Official World Family Network (OWFN) movement! We're using #Solana to build a better future with transparent aid. Get involved today! #OWFN #CryptoForGood #SocialImpact",
+            "Transparency is key to real change. That's why OWFN is built on #Solana, ensuring every contribution makes a difference. See how we're changing lives. #OWFN #SocialImpact #Blockchain",
+            "Be part of something bigger. The OWFN presale is your chance to support a project dedicated to global humanitarian aid. Let's build a better world together. #OWFN #Presale #CryptoForGood",
+            "Community is our strength. Together, we can fund projects in health, education, and basic needs worldwide. Join the Official World Family Network. #OWFN #Community #SocialImpact #Solana",
+            "Imagine a world where help reaches those in need instantly and transparently. That's the vision of OWFN, powered by the speed of #Solana. Join us. #OWFN #Vision #CryptoForGood"
+        ];
+        return fallbackPosts[Math.floor(Math.random() * fallbackPosts.length)];
+    };
+
     if (!apiKey) {
         console.error("CRITICAL: GEMINI_API_KEY is not set.");
-        // Return a fallback post instead of an error to keep the UI functional
-        const fallback = fallbackPosts[Math.floor(Math.random() * fallbackPosts.length)];
-        return res.status(200).json({ post: fallback });
+        return res.status(200).json({ post: getFallbackPost() });
     }
 
     try {
@@ -36,22 +38,23 @@ export default async function handler(req: any, res: any) {
 
         const ai = new GoogleGenAI({ apiKey });
 
-        // More dynamic prompt to increase variety
         const themes = [
-            "the core mission of transparent aid",
-            "the power of the OWFN community",
-            "the benefits of using the Solana blockchain",
-            "the ongoing presale and why it matters",
-            "the project's vision for a better world",
-            "the urgency and importance of contributing now",
+            "the core mission of transparent humanitarian aid and helping those in need",
+            "the power of the OWFN global community coming together for good",
+            "the benefits of using the fast and transparent Solana blockchain",
+            "the ongoing presale and how participation directly fuels social projects",
+            "the project's vision for a more connected and compassionate world",
+            "an emotional appeal about making a real-world difference together",
+            "the 2% automatic APY for holders as a thank you for their support"
         ];
         const randomTheme = themes[Math.floor(Math.random() * themes.length)];
 
-        const prompt = `You are a social media marketing expert for a humanitarian crypto project called Official World Family Network (OWFN). Your task is to generate a single, unique, ready-to-share social media post (like a tweet, under 280 characters) to encourage community growth and support. The post MUST be in ${languageName}.
+        const prompt = `Act as an eloquent and empathetic community ambassador for a humanitarian crypto project called Official World Family Network (OWFN). Your task is to generate a single, unique, ready-to-share social media post (like a tweet, under 280 characters). The post's tone should be inspiring, emotional, and respectful. It must encourage community growth and support for the project's presale and humanitarian mission.
 
-Focus the post on the theme of: "${randomTheme}".
+The post MUST be in ${languageName}.
+Focus this specific post on the theme of: "${randomTheme}".
 
-Your response MUST be ONLY the text of the social media post itself. Do NOT include any prefixes, titles, labels like "Option 1:", markdown formatting like asterisks (**), or any other explanatory text. The post should be inspiring and must include relevant hashtags like #OWFN, #Solana, #CryptoForGood, and #SocialImpact.
+Crucially, your entire response MUST be ONLY the text of the social media post itself. Do NOT include any prefixes, titles, labels like "Post:", markdown formatting like asterisks or quotes, or any other explanatory text. The post must include relevant and powerful hashtags like #OWFN, #Solana, #CryptoForGood, and #SocialImpact.
 
 Generate the post now.`;
 
@@ -67,18 +70,14 @@ Generate the post now.`;
         const post = response.text;
         
         if (!post || !post.trim()) {
-            // If Gemini returns an empty response, send a random fallback.
-            const fallback = fallbackPosts[Math.floor(Math.random() * fallbackPosts.length)];
             console.warn("Gemini returned an empty post, serving a fallback.");
-            return res.status(200).json({ post: fallback });
+            return res.status(200).json({ post: getFallbackPost() });
         }
         
-        return res.status(200).json({ post: post.trim().replace(/\"/g, '') }); // Remove quotes Gemini sometimes adds
+        return res.status(200).json({ post: post.trim().replace(/\"/g, '') });
 
     } catch (error) {
         console.error("Error in generate-post API, serving fallback:", error);
-        // On any error, serve a random fallback to ensure the user always gets a post.
-        const fallback = fallbackPosts[Math.floor(Math.random() * fallbackPosts.length)];
-        return res.status(200).json({ post: fallback });
+        return res.status(200).json({ post: getFallbackPost() });
     }
 }

@@ -111,34 +111,67 @@ export const Chatbot = () => {
             return;
         }
 
-        const proactiveMessages: { [key: string]: string } = {
-            '/': t('chatbot_proactive_home', { defaultValue: '' }),
-            '/presale': t('chatbot_proactive_presale', { defaultValue: '' }),
-            '/donations': t('chatbot_proactive_donations', { defaultValue: '' }),
-            '/about': t('chatbot_proactive_about', { defaultValue: '' }),
-            '/whitepaper': t('chatbot_proactive_whitepaper', { defaultValue: '' }),
-            '/tokenomics': t('chatbot_proactive_tokenomics', { defaultValue: '' }),
-            '/roadmap': t('chatbot_proactive_roadmap', { defaultValue: '' }),
-            '/dashboard': t('chatbot_proactive_dashboard', { defaultValue: '' }),
-            '/contact': t('chatbot_proactive_contact', { defaultValue: '' }),
-        };
-        const message = proactiveMessages[location];
-        
-        // Ensure message is not an empty string and key exists
-        if (!message || message.startsWith('chatbot_proactive_')) {
+        const key = `owfn-proactive-${location}`;
+        if (sessionStorage.getItem(key)) {
             return;
         }
 
-        const key = `owfn-proactive-${location}`;
-        if (message && !sessionStorage.getItem(key)) {
-            const timer = setTimeout(() => {
-                if (!isOpen) {
-                    setProactiveMessage(message);
+        const timer = setTimeout(() => {
+            if (isOpen) return;
+
+            let message = '';
+            const specialPages = ['/presale', '/donations', '/profile'];
+            const relevantTokens = ['OWFN', 'SOL', 'USDC', 'USDT'];
+            
+            if (specialPages.includes(location) && solana.connected && solana.userTokens.length > 0) {
+                 const balances = solana.userTokens
+                    .filter(t => relevantTokens.includes(t.symbol) && t.balance > 0)
+                    .map(t => `${t.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${t.symbol}`)
+                    .join(', ');
+
+                if (balances) {
+                    message = `${t('chatbot_proactive_wallet_intro')} ${balances}. ${t('chatbot_proactive_wallet_outro')}`;
                 }
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [location, t, isOpen]);
+            }
+
+            // Fallback to a generic message if the special personalized message was not created
+            if (!message) {
+                 const proactiveMessageKeys: { [key: string]: string } = {
+                    '/': 'chatbot_proactive_home',
+                    '/presale': 'chatbot_proactive_presale',
+                    '/donations': 'chatbot_proactive_donations',
+                    '/about': 'chatbot_proactive_about',
+                    '/whitepaper': 'chatbot_proactive_whitepaper',
+                    '/tokenomics': 'chatbot_proactive_tokenomics',
+                    '/roadmap': 'chatbot_proactive_roadmap',
+                    '/dashboard': 'chatbot_proactive_dashboard',
+                    '/contact': 'chatbot_proactive_contact',
+                    '/staking': 'chatbot_proactive_staking',
+                    '/vesting': 'chatbot_proactive_vesting',
+                    '/airdrop': 'chatbot_proactive_airdrop',
+                    '/impact': 'chatbot_proactive_impact',
+                    '/governance': 'chatbot_proactive_governance',
+                    '/partnerships': 'chatbot_proactive_partnerships',
+                    '/faq': 'chatbot_proactive_faq',
+                    '/profile': 'chatbot_proactive_profile',
+                };
+                const messageKey = proactiveMessageKeys[location];
+                if (messageKey) {
+                    const potentialMessage = t(messageKey, { defaultValue: '' });
+                    if (potentialMessage && potentialMessage !== messageKey) {
+                        message = potentialMessage;
+                    }
+                }
+            }
+            
+            if (message) {
+                setProactiveMessage(message);
+            }
+
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [location, t, isOpen, solana.connected, solana.userTokens]);
 
     const handleDismissProactive = () => {
         setProactiveMessage(null);

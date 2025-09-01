@@ -359,6 +359,16 @@ export const en = {
     chatbot_guided_contact_prepare: "Understood. I will take you to the contact page with '{reason}' already selected for you. Please use the button below.",
     chatbot_guided_contact_button: "Go to Contact Form",
     chatbot_personalized_apy_reminder: `As an OWFN token holder, thank you for being part of our mission! Remember, you are automatically earning 2% APY just by holding the tokens in your wallet.`,
+    chatbot_proactive_staking: "Welcome! While holding OWFN automatically earns you 2% APY, I can answer any questions you have about how it works.",
+    chatbot_proactive_vesting: "Checking your vesting schedule? I can help you find the information you need.",
+    chatbot_proactive_airdrop: "Curious about airdrop eligibility? Let me know how I can assist you.",
+    chatbot_proactive_impact: "Welcome to the Impact Portal! Here you can see how our community is making a difference. Do you have any questions?",
+    chatbot_proactive_governance: "Interested in governance? You can learn about proposals and voting here. What can I help you with?",
+    chatbot_proactive_partnerships: "Exploring partnerships? I can provide information on our collaboration vision.",
+    chatbot_proactive_faq: "Have a question? I can help you find answers here in the FAQ or provide more details.",
+    chatbot_proactive_profile: "Welcome to your profile! Let me know if you have questions about your tokens or impact stats.",
+    chatbot_proactive_wallet_intro: `Welcome back! I see you have some assets in your connected wallet:`,
+    chatbot_proactive_wallet_outro: `I can help you purchase more OWFN or make a donation. What are you interested in today?`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
