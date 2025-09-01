@@ -8,14 +8,20 @@ interface ImpactNarrativeProps {
         projectsSupported: number;
         votesCast: number;
     };
+    isParentLoading: boolean;
 }
 
-export const ImpactNarrative: React.FC<ImpactNarrativeProps> = ({ userStats }) => {
+export const ImpactNarrative: React.FC<ImpactNarrativeProps> = ({ userStats, isParentLoading }) => {
     const { t, currentLanguage } = useAppContext();
     const [narrative, setNarrative] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        // Do not attempt to generate if the parent component is still loading its data.
+        if (isParentLoading) {
+            return;
+        }
+
         const generateNarrative = async () => {
             setIsLoading(true);
             try {
@@ -39,15 +45,15 @@ export const ImpactNarrative: React.FC<ImpactNarrativeProps> = ({ userStats }) =
         };
 
         generateNarrative();
-    }, [userStats, currentLanguage.name, t]);
+    }, [userStats, currentLanguage.name, t, isParentLoading]);
     
     return (
-        <div className="md:col-span-2 bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d flex flex-col justify-center">
+        <div className="md:col-span-2 bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d flex flex-col justify-center min-h-[170px]">
             <h2 className="text-xl font-bold font-serif mb-3 flex items-center gap-2">
                 <Sparkles className="text-accent-500 dark:text-darkAccent-400" />
                 {t('impact_narrative_title')}
             </h2>
-            {isLoading ? (
+            {isLoading || isParentLoading ? (
                 <div className="flex items-center gap-3 text-primary-600 dark:text-darkPrimary-400">
                     <Loader2 className="w-5 h-5 animate-spin" />
                     <span>{t('impact_narrative_loading')}</span>

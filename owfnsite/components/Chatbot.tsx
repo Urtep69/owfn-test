@@ -106,7 +106,7 @@ export const Chatbot = () => {
     const loadingIntervalRef = useRef<number | null>(null);
 
      useEffect(() => {
-        if (isOpen) {
+        if (isOpen || solana.loading) {
             setProactiveMessage(null);
             return;
         }
@@ -171,7 +171,7 @@ export const Chatbot = () => {
         }, 3000);
 
         return () => clearTimeout(timer);
-    }, [location, t, isOpen, solana.connected, solana.userTokens]);
+    }, [location, t, isOpen, solana.connected, solana.userTokens, solana.loading]);
 
     const handleDismissProactive = () => {
         setProactiveMessage(null);

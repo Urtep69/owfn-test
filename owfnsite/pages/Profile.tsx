@@ -72,7 +72,7 @@ export default function Profile() {
                     <p className="text-sm text-primary-500 dark:text-darkPrimary-500">{t('token_types')}: {loading ? '-' : userTokens.length}</p>
                 </div>
                 
-                <ImpactNarrative userStats={userStats} />
+                <ImpactNarrative userStats={userStats} isParentLoading={loading} />
 
                 <ComingSoonWrapper showMessage={false}>
                     <StatCard icon={<DollarSign size={32} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
