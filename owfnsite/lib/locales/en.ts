@@ -340,6 +340,15 @@ export const en = {
     chatbot_loading_3: `Formulating a response...`,
     chatbot_welcome_title: `Welcome to OWFN!`,
     chatbot_welcome_message: `How can I help you today? I have information about the project, the presale, and our mission.`,
+    chatbot_proactive_presale: `Have questions about how the presale works? I can help!`,
+    chatbot_proactive_donations: `Thinking about making a donation? I can guide you through the process.`,
+    chatbot_guided_donation_start: `That's wonderful! We accept donations in several cryptocurrencies. Which one would you like to use and how much would you like to donate?`,
+    chatbot_guided_donation_prepare: `Great! I can pre-fill the donation form for you with {amount} {token}. Just click the button below to proceed.`,
+    chatbot_guided_donation_button: `Go to Donation Form`,
+    chatbot_guided_presale_start: `You can buy OWFN with SOL on our presale page. How much SOL would you like to spend? I can help you get started.`,
+    chatbot_guided_presale_prepare: `Excellent! A {amount} SOL purchase qualifies for a bonus. I can take you to the presale page with that amount pre-filled.`,
+    chatbot_guided_presale_button: `Go to Presale`,
+    chatbot_personalized_staking: `I see you're an OWFN holder! Have you considered exploring our upcoming staking options to earn more rewards? You can find more info on the [Visit Page: Staking] page.`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,

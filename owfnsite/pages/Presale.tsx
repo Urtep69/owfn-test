@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
@@ -243,6 +243,7 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 
 export default function Presale() {
   const { t, solana, setWalletModalOpen } = useAppContext();
+  const [location] = useLocation();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -253,6 +254,14 @@ export default function Presale() {
   const [presaleStatus, setPresaleStatus] = useState<'pending' | 'active' | 'ended'>('pending');
   const [endReason, setEndReason] = useState<'date' | 'hardcap' | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const amountFromQuery = params.get('amount');
+    if (amountFromQuery) {
+        setSolAmount(amountFromQuery);
+    }
+  }, [location]);
 
   const fetchPresaleProgress = useCallback(async () => {
         if (new Date() < PRESALE_DETAILS.startDate) {

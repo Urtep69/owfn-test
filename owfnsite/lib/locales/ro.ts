@@ -336,6 +336,15 @@ export const ro = {
     chatbot_loading_1: `Mă conectez la circuitele mele...`,
     chatbot_loading_2: `Analizez întrebarea...`,
     chatbot_loading_3: `Formulez un răspuns...`,
+    chatbot_proactive_presale: `Aveți întrebări despre cum funcționează pre-vânzarea? Vă pot ajuta!`,
+    chatbot_proactive_donations: `Vă gândiți să faceți o donație? Vă pot ghida prin proces.`,
+    chatbot_guided_donation_start: `Minunat! Acceptăm donații în mai multe criptomonede. Pe care doriți să o folosiți și ce sumă doriți să donați?`,
+    chatbot_guided_donation_prepare: `Excelent! Pot pre-completa formularul de donație pentru dumneavoastră cu {amount} {token}. Doar faceți clic pe butonul de mai jos pentru a continua.`,
+    chatbot_guided_donation_button: `Mergi la Formularul de Donație`,
+    chatbot_guided_presale_start: `Puteți cumpăra OWFN cu SOL de pe pagina noastră de prevânzare. Ce sumă de SOL doriți să cheltuiți? Vă pot ajuta să începeți.`,
+    chatbot_guided_presale_prepare: `Excelent! O achiziție de {amount} SOL se califică pentru un bonus. Vă pot duce la pagina de prevânzare cu acea sumă pre-completată.`,
+    chatbot_guided_presale_button: `Mergi la Prevânzare`,
+    chatbot_personalized_staking: `Văd că sunteți un deținător de OWFN! Ați luat în considerare explorarea opțiunilor noastre viitoare de staking pentru a câștiga mai multe recompense? Puteți găsi mai multe informații pe pagina de [Visit Page: Staking].`,
     
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,
