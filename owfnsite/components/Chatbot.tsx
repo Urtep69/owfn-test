@@ -123,7 +123,9 @@ export const Chatbot = () => {
             if (isOpen) return;
 
             let message = '';
-            const specialPages = ['/presale', '/donations', '/profile'];
+            // The personalized balance message is best for transactional pages.
+            // For /profile, the generic welcome message is more appropriate as balances are already on screen.
+            const specialPages = ['/presale', '/donations'];
             
             if (specialPages.includes(location) && solana.connected && solana.userTokens.length > 0) {
                  const balances = solana.userTokens
