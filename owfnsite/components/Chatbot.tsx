@@ -106,8 +106,10 @@ export const Chatbot = () => {
     const loadingIntervalRef = useRef<number | null>(null);
 
      useEffect(() => {
+        // Immediately hide the previous message when navigating to a new page.
+        setProactiveMessage(null);
+
         if (isOpen || solana.loading) {
-            setProactiveMessage(null);
             return;
         }
 
@@ -116,6 +118,7 @@ export const Chatbot = () => {
             return;
         }
 
+        // Set a shorter timer for the new message to appear.
         const timer = setTimeout(() => {
             if (isOpen) return;
 
@@ -167,7 +170,7 @@ export const Chatbot = () => {
                 setProactiveMessage(message);
             }
 
-        }, 3000);
+        }, 1500); // Reduced delay from 3000ms to 1500ms
 
         return () => clearTimeout(timer);
     }, [location, t, isOpen, solana.connected, solana.userTokens, solana.loading]);
