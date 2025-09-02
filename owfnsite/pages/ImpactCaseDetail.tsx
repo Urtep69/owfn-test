@@ -20,7 +20,7 @@ const mockUpdates = [
 ];
 
 export default function ImpactCaseDetail() {
-    const { t, solana, currentLanguage, socialCases, setWalletModalOpen } = useAppContext();
+    const { t, solana, currentLanguage, socialCases, setWalletModalOpen, siws } = useAppContext();
     const params = useParams();
     const id = params?.['id'];
     const socialCase = socialCases.find(c => c.id === id);
@@ -29,7 +29,7 @@ export default function ImpactCaseDetail() {
     const [selectedToken, setSelectedToken] = useState('USDC');
     
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
-    const percentages = [5, 10, 15, 25, 50, 75, 100];
+    const percentages = [25, 50, 75, 100];
 
     const tokenPrice = useMemo(() => currentUserToken?.pricePerToken ?? 0, [currentUserToken]);
 
@@ -76,6 +76,11 @@ export default function ImpactCaseDetail() {
             return;
         }
 
+        if (!siws.isAuthenticated) {
+            const signedIn = await siws.signIn();
+            if (!signedIn) return; // Stop if user cancels sign-in
+        }
+
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
             alert(t('invalid_amount_generic'));
@@ -94,6 +99,13 @@ export default function ImpactCaseDetail() {
     
     const categorySlug = socialCase.category.toLowerCase().replace(/\s+/g, '-');
     const categoryName = t(`category_${socialCase.category.toLowerCase().replace(/\s+/g, '_')}`);
+    
+    const buttonText = useMemo(() => {
+        if (solana.loading || siws.isLoading) return t('processing');
+        if (!solana.connected) return t('connect_wallet');
+        if (!siws.isAuthenticated) return t('sign_in_to_donate', {defaultValue: 'Sign In to Donate'});
+        return t('donate');
+    }, [solana.connected, solana.loading, siws.isAuthenticated, siws.isLoading, t]);
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -224,8 +236,8 @@ export default function ImpactCaseDetail() {
                                     </div>
                                 )}
 
-                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50">
-                                    {solana.loading ? t('processing') : (solana.connected ? t('donate') : t('connect_wallet'))}
+                                <button onClick={handleDonate} disabled={solana.loading || siws.isLoading || (solana.connected && siws.isAuthenticated && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50">
+                                    {buttonText}
                                 </button>
                             </div>
                         </div>

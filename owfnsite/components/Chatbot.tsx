@@ -42,15 +42,10 @@ const renderMessageContent = (text: string) => {
     let match;
 
     while ((match = regex.exec(text)) !== null) {
-        // Push the text before the match
         if (match.index > lastIndex) {
             result.push(text.substring(lastIndex, match.index));
         }
         
-        // match[1] is 'Visit Page', match[2] is page name
-        // OR
-        // match[3] is 'Social Link', match[4] is platform, match[5] is URL
-
         if (match[1] === 'Visit Page') {
             const pageName = match[2];
             const path = pageNameToPath[pageName];
@@ -61,7 +56,7 @@ const renderMessageContent = (text: string) => {
                     </Link>
                 );
             } else {
-                result.push(`[Visit Page: ${pageName}]`); // Fallback
+                result.push(`[Visit Page: ${pageName}]`);
             }
         } else if (match[3] === 'Social Link') {
             const platformName = match[4];
@@ -74,14 +69,13 @@ const renderMessageContent = (text: string) => {
                     </a>
                 );
             } else {
-                 result.push(`[Social Link: ${platformName}|${url}]`); // Fallback
+                 result.push(`[Social Link: ${platformName}|${url}]`);
             }
         }
 
         lastIndex = regex.lastIndex;
     }
 
-    // Push the remaining text after the last match
     if (lastIndex < text.length) {
         result.push(text.substring(lastIndex));
     }
@@ -110,12 +104,10 @@ export const Chatbot = () => {
     
     useEffect(() => {
         if (isOpen) {
-            // A small delay helps ensure the element is visible and animations are settled.
             setTimeout(() => inputRef.current?.focus(), 100);
         }
     }, [isOpen, isMaximized]);
 
-    // Cleanup interval on component unmount
     useEffect(() => {
         return () => {
             if (loadingIntervalRef.current) {
@@ -126,12 +118,8 @@ export const Chatbot = () => {
 
     const formatTimestamp = (date: Date) => {
         return date.toLocaleString(currentLanguage.code, {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit'
         });
     };
 
@@ -141,7 +129,11 @@ export const Chatbot = () => {
         const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }], timestamp: new Date() };
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
         const currentInput = input;
+        
+        // START: Updated for Phase 1 - Pass context to AI
         const currentTime = new Date().toISOString();
+        const langCode = currentLanguage.code;
+        // END: Updated for Phase 1
 
         setMessages(prev => [...prev, userMessage]);
         setInput('');
@@ -159,7 +151,7 @@ export const Chatbot = () => {
             index = (index + 1) % loadingMessages.length;
         };
         
-        updateLoadingText(); // Set initial text immediately
+        updateLoadingText();
         loadingIntervalRef.current = window.setInterval(updateLoadingText, 2500);
 
         try {
@@ -168,13 +160,13 @@ export const Chatbot = () => {
             await getChatbotResponse(
                 historyForApi,
                 currentInput,
-                currentLanguage.code,
-                currentTime,
-                (chunk) => { // onChunk: Append text to the last message
+                langCode, // Pass language code
+                currentTime, // Pass current time
+                (chunk) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
-                        setIsLoading(false); // Stop loading animation
+                        setIsLoading(false);
                     }
                     if (!firstChunkReceived) {
                         setMessages(prev => [...prev, { role: 'model', parts: [{ text: chunk }], timestamp: new Date() }]);
@@ -190,12 +182,13 @@ export const Chatbot = () => {
                         });
                     }
                 },
-                (errorMsg) => { // onError: Display error in a new message bubble
+                (errorMsg) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
                     }
-                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: errorMsg }], timestamp: new Date() }]);
+                    setIsLoading(false);
+                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: `Error: ${errorMsg}` }], timestamp: new Date() }]);
                 }
             );
         } catch (error) {
@@ -263,16 +256,16 @@ export const Chatbot = () => {
                             <div className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
                                 <div className="flex flex-col">
-                                    {msg.timestamp && (
-                                        <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mb-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                                            {formatTimestamp(msg.timestamp)}
-                                        </p>
-                                    )}
                                     <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
                                        <div className="text-sm whitespace-pre-wrap">
                                            {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
                                        </div>
                                     </div>
+                                     {msg.timestamp && (
+                                        <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mt-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                                            {formatTimestamp(msg.timestamp)}
+                                        </p>
+                                    )}
                                 </div>
                                 {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                             </div>

@@ -1,5 +1,3 @@
-
-
 export interface Token {
   name: string;
   symbol: string;
@@ -149,9 +147,10 @@ export interface PresaleTransaction {
   time: Date;
 }
 
+// --- START: Added for Phase 1 ---
 export interface SiwsSession {
   publicKey: string;
-  signedAt: number;
+  signedAt: number; // Unix timestamp
 }
 
 export interface SiwsReturn {
@@ -162,3 +161,4 @@ export interface SiwsReturn {
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
 }
+// --- END: Added for Phase 1 ---

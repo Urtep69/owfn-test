@@ -1,18 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import type { ChatMessage } from '../types.ts';
 
-/**
- * The definitive, "anti-crash" history builder. This function is
- * hyper-defensive, designed to create a perfectly valid history.
- *
- * Guarantees:
- * 1. Filters for structurally sound messages.
- * 2. Finds the first valid 'user' message and discards everything before it.
- * 3. Rebuilds history from that point, enforcing perfect 'user' -> 'model' alternation.
- * 4. Ensures the final history array ends with a 'model' turn, which is good practice.
- */
 function buildValidHistory(history: unknown): ChatMessage[] {
-    // 1. Defensively ensure history is an array and filter out malformed entries.
     const cleanHistory = Array.isArray(history)
         ? history.filter((msg): msg is ChatMessage =>
             msg && typeof msg === 'object' &&
@@ -22,19 +11,13 @@ function buildValidHistory(history: unknown): ChatMessage[] {
           )
         : [];
 
-    // 2. Find the index of the first valid user message.
     const firstUserIndex = cleanHistory.findIndex(msg => msg.role === 'user');
 
-    // If no user message exists, history must be empty.
-    if (firstUserIndex === -1) {
-        return [];
-    }
+    if (firstUserIndex === -1) return [];
 
-    // 3. Reconstruct the history from the first user message, ensuring strict alternation.
     const validHistory: ChatMessage[] = [];
     let lastRole: 'user' | 'model' | null = null;
     
-    // Slice from the first valid user message to the end.
     const historyToProcess = cleanHistory.slice(firstUserIndex);
 
     for (const message of historyToProcess) {
@@ -44,8 +27,6 @@ function buildValidHistory(history: unknown): ChatMessage[] {
         }
     }
     
-    // 4. If the validly alternating history ends with a 'user' turn, remove it.
-    // This makes it a clean user/model/user/model... sequence, ready for a new user question.
     if (validHistory.length > 0 && validHistory[validHistory.length - 1].role === 'user') {
         validHistory.pop();
     }
@@ -55,21 +36,35 @@ function buildValidHistory(history: unknown): ChatMessage[] {
 
 
 export default async function handler(req: any, res: any) {
-    try {
-        if (req.method !== 'POST') {
-            return res.status(405).json({ error: 'Method Not Allowed' });
-        }
+    if (req.method !== 'POST') {
+        res.setHeader('Allow', ['POST']);
+        return res.status(405).json({ type: 'error', data: 'Method Not Allowed' });
+    }
 
+    const sendJsonMessage = (data: object) => {
+        if (!res.headersSent) {
+             res.writeHead(200, {
+                'Content-Type': 'application/json-seq', 
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+            });
+        }
+        res.write(JSON.stringify(data) + '\n');
+    };
+
+    try {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
             console.error("CRITICAL: GEMINI_API_KEY environment variable is not set.");
-            return res.status(500).json({ error: "Server configuration error. The site administrator needs to configure the API key." });
+            sendJsonMessage({ type: 'error', data: "Server configuration error. API key not set." });
+            return res.end();
         }
 
         const { history, question, langCode, currentTime } = req.body;
 
         if (!question || typeof question !== 'string' || question.trim() === '') {
-            return res.status(400).json({ error: 'Invalid question provided.' });
+            sendJsonMessage({ type: 'error', data: 'Invalid question provided.' });
+            return res.end();
         }
         
         const validHistory = buildValidHistory(history);
@@ -171,7 +166,7 @@ OWFN directly funds initiatives in three core areas:
   - Use ONLY these platform names and URLs:
     - For X/Twitter: [Social Link: X|https://x.com/OWFN_Official]
     - For Telegram Group: [Social Link: Telegram Group|https://t.me/OWFNOfficial]
-    - For Telegram Channel: [Social Link: Telegram Channel|https://t.me/OWFN_Official]
+    - For Telegram Channel: [Social Link: Telegram Channel|https://t.me/OWFNOfficial]
     - For Discord: [Social Link: Discord|https://discord.gg/DzHm5HCqDW]`;
         
         const resultStream = await ai.models.generateContentStream({
@@ -183,42 +178,26 @@ OWFN directly funds initiatives in three core areas:
             }
         });
 
-        res.writeHead(200, {
-            'Content-Type': 'application/json-seq', 
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-        });
-
-        const sendJsonMessage = (data: object) => {
-            res.write(JSON.stringify(data) + '\n');
-        };
-
-        try {
-            for await (const chunk of resultStream) {
-                if (chunk.candidates?.[0]?.finishReason === 'SAFETY') {
-                   sendJsonMessage({ type: 'error', data: "The response was blocked due to safety filters. Please try rephrasing your question." });
-                   break; 
-                }
-                const text = chunk.text;
-                if (text) {
-                    sendJsonMessage({ type: 'chunk', data: text });
-                }
+        for await (const chunk of resultStream) {
+            if (chunk.candidates?.[0]?.finishReason === 'SAFETY') {
+               sendJsonMessage({ type: 'error', data: "The response was blocked due to safety filters. Please try rephrasing your question." });
+               break; 
             }
-            sendJsonMessage({ type: 'end' });
-        } catch (streamError) {
-            console.error("Error during chatbot response streaming:", streamError);
-            try {
-                sendJsonMessage({ type: 'error', data: "An error occurred while generating the response. The stream has been terminated." });
-            } catch {}
-        } finally {
-            res.end();
+            const text = chunk.text;
+            if (text) {
+                sendJsonMessage({ type: 'chunk', data: text });
+            }
         }
+        sendJsonMessage({ type: 'end' });
+        res.end();
 
     } catch (error) {
         console.error("Fatal error in chatbot handler:", error);
         if (!res.headersSent) {
-            const errorMessage = "I'm sorry, I couldn't establish a connection with the AI. This might be a temporary server issue or a network timeout. Please try again in a moment.";
-            res.status(500).json({ error: errorMessage });
+             res.status(500).json({ type: 'error', data: "An unexpected error occurred on the server." });
+        } else {
+            sendJsonMessage({ type: 'error', data: "An error occurred while generating the response." });
+            res.end();
         }
     }
 }

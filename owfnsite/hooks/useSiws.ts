@@ -3,8 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import type { SiwsSession, SiwsReturn } from '../types.ts';
 
 const SESSION_KEY = 'owfn-siws-session';
-const SESSION_ATTEMPTED_KEY = 'owfn-siws-attempted';
-const SESSION_DURATION = 48 * 60 * 60 * 1000; // 48 hours in milliseconds
+const SESSION_DURATION = 48 * 60 * 60 * 1000; // 48 hours
 
 export const useSiws = (): SiwsReturn => {
     const { publicKey, signMessage, disconnect, connecting } = useWallet();
@@ -56,11 +55,12 @@ export const useSiws = (): SiwsReturn => {
         if (!publicKey) {
             setIsAuthenticated(false);
             setSession(null);
+            localStorage.removeItem(SESSION_KEY);
             setIsSessionLoading(false);
             return;
         }
         
-        const checkSession = async () => {
+        const checkSession = () => {
             setIsSessionLoading(true);
             let sessionIsValid = false;
 
@@ -77,11 +77,18 @@ export const useSiws = (): SiwsReturn => {
                         setIsAuthenticated(true);
                     } else {
                         localStorage.removeItem(SESSION_KEY);
+                        setIsAuthenticated(false);
+                        setSession(null);
                     }
+                } else {
+                    setIsAuthenticated(false);
+                    setSession(null);
                 }
             } catch (error) {
                 console.error("Failed to parse or validate SIWS session:", error);
                 localStorage.removeItem(SESSION_KEY);
+                setIsAuthenticated(false);
+                setSession(null);
             }
             
             setIsSessionLoading(false);
@@ -92,13 +99,12 @@ export const useSiws = (): SiwsReturn => {
     }, [publicKey, connecting]);
 
     const signOut = useCallback(async () => {
+        localStorage.removeItem(SESSION_KEY);
+        setSession(null);
+        setIsAuthenticated(false);
         if (disconnect) {
             await disconnect();
         }
-        localStorage.removeItem(SESSION_KEY);
-        sessionStorage.removeItem(SESSION_ATTEMPTED_KEY);
-        setSession(null);
-        setIsAuthenticated(false);
     }, [disconnect]);
     
     return { isAuthenticated, isLoading, isSessionLoading, session, signIn, signOut };

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
@@ -35,9 +35,8 @@ import Contact from './pages/Contact.tsx';
 import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana } = useAppContext();
-  const { address } = solana;
-  const isAdmin = address === ADMIN_WALLET_ADDRESS;
+  const { isMaintenanceActive, siws } = useAppContext();
+  const isAdmin = siws.isAuthenticated && siws.session?.publicKey === ADMIN_WALLET_ADDRESS;
 
   if (isMaintenanceActive && !isAdmin) {
     return <Maintenance />;

@@ -4,7 +4,7 @@ import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
 import { useSiws } from '../hooks/useSiws.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, SiwsReturn } from '../types.ts';
+import type { Theme, Language, SocialCase, VestingSchedule, GovernanceProposal, SiwsReturn } from '../types.ts';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 
@@ -16,7 +16,7 @@ interface AppContextType {
   currentLanguage: Language;
   supportedLanguages: Language[];
   solana: ReturnType<typeof useSolana>;
-  siws: SiwsReturn;
+  siws: SiwsReturn; // Added for Phase 1
   socialCases: SocialCase[];
   addSocialCase: (newCase: SocialCase) => void;
   vestingSchedules: VestingSchedule[];
@@ -34,7 +34,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [theme, toggleTheme] = useTheme();
   const { t, setLang, currentLanguage, supportedLanguages } = useLocalization();
   const solana = useSolana();
-  const siws = useSiws();
+  const siws = useSiws(); // Added for Phase 1
   const { setVisible: setWalletModalOpen } = useWalletModal();
 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
@@ -111,7 +111,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     currentLanguage,
     supportedLanguages,
     solana,
-    siws,
+    siws, // Added for Phase 1
     socialCases,
     addSocialCase,
     vestingSchedules,
