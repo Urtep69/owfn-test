@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -84,7 +85,7 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
                                 </div>
                             ) : (
                                 <div className="flex-grow flex items-center justify-center">
-                                    <p className="text-sm text-center text-primary-500 dark:text-darkPrimary-400">This wallet is empty.</p>
+                                    <p className="text-sm text-center text-primary-500 dark:text-darkPrimary-400">{t('dashboard_wallet_empty')}</p>
                                 </div>
                             )}
                         </div>
@@ -96,12 +97,13 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
 }
 
 const FundFlowDiagram = () => {
+    const { t } = useAppContext();
     const wallets = [
-        { name: 'Presale', gridPos: 'row-start-1 col-start-1' },
-        { name: 'Liquidity', gridPos: 'row-start-2 col-start-1' },
-        { name: 'Impact Treasury', gridPos: 'row-start-1 col-start-3' },
-        { name: 'Team', gridPos: 'row-start-2 col-start-3' },
-        { name: 'Community', gridPos: 'row-start-3 col-start-3' },
+        { name: t('presale'), gridPos: 'row-start-1 col-start-1' },
+        { name: t('liquidity'), gridPos: 'row-start-2 col-start-1' },
+        { name: t('wallet_name_impact_treasury'), gridPos: 'row-start-1 col-start-3' },
+        { name: t('wallet_name_team'), gridPos: 'row-start-2 col-start-3' },
+        { name: t('wallet_name_community'), gridPos: 'row-start-3 col-start-3' },
     ];
     
     return (
@@ -155,14 +157,14 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Bento Grid Layout */}
                 <div className="lg:col-span-2 bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d">
-                     <h3 className="text-xl font-bold font-serif mb-4">Fund Flow Visualization</h3>
+                     <h3 className="text-xl font-bold font-serif mb-4">{t('dashboard_fund_flow_title')}</h3>
                      <FundFlowDiagram />
                 </div>
                 
                 <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d flex flex-col justify-center items-center text-center">
                      <PieChart className="w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4"/>
-                     <h3 className="text-xl font-bold font-serif">Tokenomics Overview</h3>
-                     <p className="text-primary-600 dark:text-darkPrimary-400 text-sm mt-2 mb-4">A sustainable model for long-term impact and growth.</p>
+                     <h3 className="text-xl font-bold font-serif">{t('dashboard_tokenomics_overview_title')}</h3>
+                     <p className="text-primary-600 dark:text-darkPrimary-400 text-sm mt-2 mb-4">{t('dashboard_tokenomics_overview_desc')}</p>
                      <Link to="/tokenomics" className="font-bold text-accent-600 dark:text-darkAccent-400 hover:underline flex items-center gap-2">
                         {t('view_full_details')} <ArrowRight size={16} />
                      </Link>

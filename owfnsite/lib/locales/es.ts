@@ -1,4 +1,3 @@
-
 export const es = {
     // Navigation
     home: `Inicio`,
@@ -337,8 +336,6 @@ export const es = {
     chatbot_loading_1: `Conectando a mis circuitos...`,
     chatbot_loading_2: `Analizando tu pregunta...`,
     chatbot_loading_3: `Formulando una respuesta...`,
-    chatbot_welcome_title: `¡Bienvenido a OWFN!`,
-    chatbot_welcome_message: `¿Cómo puedo ayudarte hoy? Tengo información sobre el proyecto, la preventa y nuestra misión.`,
     chatbot_proactive_home: "¡Bienvenido a OWFN! Puedo ayudarte a encontrar información sobre nuestra misión, la preventa o nuestra tokenómica. ¿Qué te interesa?",
     chatbot_proactive_presale: `¿Tienes preguntas sobre cómo funciona la preventa? ¡Puedo ayudar!`,
     chatbot_proactive_donations: `¿Estás pensando en hacer una donación? Puedo guiarte en el proceso.`,
@@ -559,6 +556,15 @@ export const es = {
     airdrop_complete: `Airdrop Completado`,
     airdrop_summary: `{success} exitosos, {failed} fallidos.`,
     airdrop_log: `Registro de Airdrop`,
+    airdrop_resume: `Reanudar Airdrop`,
+    airdrop_clear_progress_confirm: `¿Está seguro de que desea borrar el progreso y los registros del airdrop? Esta acción no se puede deshacer y solo debe usarse para reinicios de emergencia.`,
+    airdrop_clear_progress: `Borrar Progreso y Registros`,
+    airdrop_all_processed: `Todos los contribuyentes han sido procesados.`,
+    airdrop_run_start_log: `--- Iniciando el airdrop para {count} billeteras. ---`,
+    airdrop_run_complete_log: `--- Airdrop finalizado. Éxito: {success}, Fallos: {failed}. Total procesado: {processed}/{total} ---`,
+    airdrop_batch_error_log: `❌ Error crítico en el lote (¿falló la firma?): {error}. Direcciones fallidas: {addresses}`,
+    airdrop_success_log: `✅ Éxito para {address}... | Sig: {signature}...`,
+    airdrop_failed_log: `❌ Fallo para {address}... | Error: {error}`,
 
     // Contact Page
     contact_title: `Contáctanos`,
@@ -627,4 +633,9 @@ export const es = {
     nft_reward_loading: `Generando tu obra de arte única... Esto puede tardar un momento.`,
     nft_reward_significant_donation_prompt: `¡Dona ${'$'}{threshold}+ para generar arte de agradecimiento único!`,
     api_error_generic: `No se pudo completar la solicitud en este momento.`,
+    
+    // WalletConnectModal
+    wallet_modal_easy_connect: 'Conexión Fácil (Recomendado)',
+    wallet_modal_connect_with: 'Conectar con una Billetera',
+    wallet_modal_terms: 'Al conectar, aceptas nuestros Términos de Servicio.',
 };

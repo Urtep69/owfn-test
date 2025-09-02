@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
 import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2, TrendingUp, Users, Droplets, RefreshCw } from 'lucide-react';
@@ -215,7 +216,7 @@ export default function TokenDetail() {
                         <InfoRow label={t('token_standard')}>{token.tokenStandard || 'N/A'}</InfoRow>
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
-                        <AuthorityRow label="Update Authority" address={token.updateAuthority} />
+                        <AuthorityRow label={t('token_detail_update_authority')} address={token.updateAuthority} />
                     </InfoCard>
                 </div>
             </section>

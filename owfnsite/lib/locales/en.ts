@@ -1,3 +1,4 @@
+
 export const en = {
     // Navigation
     home: `Home`,
@@ -204,6 +205,10 @@ export const en = {
     wallet_name_team: `Team & Founders`,
     wallet_name_marketing: `Marketing & Business Development`,
     wallet_name_advisors: `Advisors & Partnerships`,
+    dashboard_fund_flow_title: 'Fund Flow Visualization',
+    dashboard_tokenomics_overview_title: 'Tokenomics Overview',
+    dashboard_tokenomics_overview_desc: 'A sustainable model for long-term impact and growth.',
+    dashboard_wallet_empty: 'This wallet is empty.',
 
     // Profile
     my_profile: `My Profile`,
@@ -254,6 +259,7 @@ export const en = {
     category_health: `Health`,
     category_education: `Education`,
     category_basic_needs: `Basic Needs`,
+    category_not_found_title: 'Category Not Found',
     live_updates: `Live Updates`,
     funding_milestones: `Funding Milestones`,
     milestone_25: `Initial funding for materials secured.`,
@@ -348,13 +354,10 @@ export const en = {
     chatbot_proactive_dashboard: "This is the transparency dashboard. Do you have any questions about the project wallets?",
     chatbot_proactive_contact: "Need to get in touch with the team? I can help you find the right contact information.",
     chatbot_guided_donation_start: `That's wonderful! We accept donations in several cryptocurrencies. Which one would you like to use and how much would you like to donate?`,
-    chatbot_guided_donation_prepare: `Great! I can pre-fill the donation form for you with {amount} {token}. Just click the button below to proceed.`,
     chatbot_guided_donation_button: `Go to Donation Form`,
     chatbot_guided_presale_start: `You can buy OWFN with SOL on our presale page. How much SOL would you like to spend? I can help you get started.`,
-    chatbot_guided_presale_prepare: `Excellent! A {amount} SOL purchase qualifies for a bonus. I can take you to the presale page with that amount pre-filled.`,
     chatbot_guided_presale_button: `Go to Presale`,
     chatbot_guided_contact_start: "I can help with that. To direct you to the right place, could you tell me the reason for your contact? For example, 'partnerships', 'technical support', or a 'general question'.",
-    chatbot_guided_contact_prepare: "Understood. I will take you to the contact page with '{reason}' already selected for you. Please use the button below.",
     chatbot_guided_contact_button: "Go to Contact Form",
     chatbot_personalized_apy_reminder: `As an OWFN token holder, thank you for being part of our mission! Remember, you are automatically earning 2% APY just by holding the tokens in your wallet.`,
     chatbot_proactive_staking: "Welcome! While holding OWFN automatically earns you 2% APY, I can answer any questions you have about how it works.",
@@ -367,7 +370,10 @@ export const en = {
     chatbot_proactive_profile: "Welcome to your profile! Let me know if you have questions about your tokens or impact stats.",
     chatbot_proactive_wallet_intro: `Welcome back! I see you have some assets in your connected wallet:`,
     chatbot_proactive_wallet_outro: `I can help you purchase more OWFN or make a donation. What are you interested in today?`,
-    
+    chatbot_guided_presale_prepare: `Excellent! A {amount} SOL purchase qualifies for a bonus. I can take you to the presale page with that amount pre-filled.`,
+    chatbot_guided_donation_prepare: `Great! I can pre-fill the donation form for you with {amount} {token}. Just click the button below to proceed.`,
+    chatbot_guided_contact_prepare: "Understood. I will take you to the contact page with '{reason}' already selected for you. Please use the button below.",
+
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
     whitepaper_subtitle: `A Detailed Overview of the Official World Family Network Project`,
@@ -558,6 +564,15 @@ export const en = {
     airdrop_complete: `Airdrop Complete`,
     airdrop_summary: `{success} successful, {failed} failed.`,
     airdrop_log: `Airdrop Log`,
+    airdrop_resume: `Resume Airdrop`,
+    airdrop_clear_progress: `Clear Progress & Logs`,
+    airdrop_clear_progress_confirm: `Are you sure you want to clear the airdrop progress and logs? This cannot be undone and is only for emergency resets.`,
+    airdrop_all_processed: `All contributors have been processed.`,
+    airdrop_run_start_log: `--- Starting airdrop run for {count} wallets. ---`,
+    airdrop_run_complete_log: `--- Airdrop run complete. Success: {success}, Failed: {failed}. Total processed: {processed}/{total} ---`,
+    airdrop_batch_error_log: `❌ Critical error in batch (signing failed?): {error}. Failed addresses: {addresses}`,
+    airdrop_success_log: `✅ Success for {address}... | Sig: {signature}...`,
+    airdrop_failed_log: `❌ Failed for {address}... | Error: {error}`,
 
     // Contact Page
     contact_title: `Contact Us`,
@@ -626,4 +641,22 @@ export const en = {
     nft_reward_loading: `Generating your unique artwork... This may take a moment.`,
     nft_reward_significant_donation_prompt: `Donate ${'$'}{threshold}+ to generate unique thank-you art!`,
     api_error_generic: `Could not complete the request at this time.`,
+    
+    // WalletConnectModal
+    wallet_modal_easy_connect: 'Easy Connect (Recommended)',
+    wallet_modal_connect_with: 'Connect with a Wallet',
+    wallet_modal_terms: 'By connecting, you agree to our Terms of Service.',
+    wallet_modal_google: 'Google',
+    wallet_modal_twitter: 'X / Twitter',
+    wallet_modal_email: 'Email',
+    wallet_modal_or: 'OR',
+
+    // API Fallbacks
+    narrative_fallback: "Your support is making a tangible difference in the world. Thank you for being a vital part of the OWFN family!",
+    summary_fallback: "The AI could not generate a summary for this content.",
+    fallback_post_1: "Join the Official World Family Network (OWFN) movement! We're using #Solana to build a better future with transparent aid. Get involved today! #OWFN #CryptoForGood #SocialImpact",
+    fallback_post_2: "Transparency is key to real change. That's why OWFN is built on #Solana, ensuring every contribution makes a difference. See how we're changing lives. #OWFN #SocialImpact #Blockchain",
+    fallback_post_3: "Be part of something bigger. The OWFN presale is your chance to support a project dedicated to global humanitarian aid. Let's build a better world together. #OWFN #Presale #CryptoForGood",
+    fallback_post_4: "Community is our strength. Together, we can fund projects in health, education, and basic needs worldwide. Join the Official World Family Network. #OWFN #Community #SocialImpact #Solana",
+    fallback_post_5: "Imagine a world where help reaches those in need instantly and transparently. That's the vision of OWFN, powered by the speed of #Solana. Join us. #OWFN #Vision #CryptoForGood",
 };

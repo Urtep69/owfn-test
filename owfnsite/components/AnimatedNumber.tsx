@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 
 interface AnimatedNumberProps {
@@ -15,7 +16,6 @@ const defaultFormatter = (value: number) => {
 
 export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({ value, formatter = defaultFormatter }) => {
     const [displayValue, setDisplayValue] = useState(0);
-    // FIX: Initialize useRef with null to provide an argument and satisfy the compiler.
     const animationFrameRef = useRef<number | null>(null);
     const prevValueRef = useRef(0);
 

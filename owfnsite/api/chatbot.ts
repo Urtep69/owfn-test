@@ -101,7 +101,7 @@ export default async function handler(req: any, res: any) {
         if (isComingSoonPage) {
             contextSpecificInstructions = `
 ### CRITICAL CONTEXT ###
-The user is currently on the '${isComingSoonPage}' page. This feature is marked as 'Coming Soon' and is under development. If the user asks what they can do on this page or about this feature, you MUST inform them that this functionality is being built and will be available soon. Suggest they follow the official social channels for announcements. Do not attempt to describe what the feature *will* do in detail, simply state it's coming soon.
+The user is currently on the '${isComingSoonPage}' page. This feature is marked as 'Coming Soon' and is under development. If the user asks about this feature, you MUST inform them that this functionality is being built and will be available soon. You MUST then direct them to the project's official channels for launch announcements. List the channels clearly using the 'Social Link' format. Do not attempt to describe what the feature *will* do in detail, simply state it's coming soon.
 `;
         }
         
@@ -173,7 +173,7 @@ A conversation might start because you sent a proactive message listing the user
 - **CRITICAL WARNING:** USDC and USDT donations MUST be from the Solana network ONLY.
 
 **6. Unavailable & Future Features ("Coming Soon")**
-- **Under development:** Staking page (for viewing rewards, not for action), Vesting, Airdrop portal, Governance (DAO).
+- **Under development:** Staking page (for viewing rewards, not for action), Vesting, Airdrop portal, Governance (DAO), Token Analytics pages.
 - **If asked:** State they are being worked on and to follow official channels for announcements. Do not link to the Staking page as it is not live.
 
 **7. Community & Official Links**
