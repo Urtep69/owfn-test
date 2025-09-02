@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { type WalletName } from '@solana/wallet-adapter-base';
@@ -10,16 +9,16 @@ interface WalletConnectModalProps {
   onClose: () => void;
 }
 
+const socialConnectors = [
+    { name: 'Google', icon: <img src="https://www.google.com/favicon.ico" alt="Google" className="w-6 h-6" />,comingSoon: true },
+    { name: 'X / Twitter', icon: <svg role="img" viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path></svg>, comingSoon: true },
+    { name: 'Email', icon: <Mail size={22} />, comingSoon: true },
+]
+
 export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, onClose }) => {
     const { t } = useAppContext();
     const { wallets, select, connect } = useWallet();
     
-    const socialConnectors = [
-        { name: t('wallet_modal_google'), icon: <img src="https://www.google.com/favicon.ico" alt="Google" className="w-6 h-6" />,comingSoon: true },
-        { name: t('wallet_modal_twitter'), icon: <svg role="img" viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path></svg>, comingSoon: true },
-        { name: t('wallet_modal_email'), icon: <Mail size={22} />, comingSoon: true },
-    ]
-
     const handleWalletSelect = async (walletName: WalletName) => {
         const selectedWallet = wallets.find(w => w.adapter.name === walletName);
         if (!selectedWallet) {
@@ -76,7 +75,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                 <div className="p-6 space-y-6">
                     {/* Easy Connect Section */}
                     <div>
-                        <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">{t('wallet_modal_easy_connect')}</h3>
+                        <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">Easy Connect (Recommended)</h3>
                          <div className="space-y-2">
                             {socialConnectors.map(connector => (
                                 <button key={connector.name} disabled={connector.comingSoon} className="w-full flex items-center space-x-4 p-3 rounded-lg bg-primary-100 dark:bg-darkPrimary-700/50 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed group">
@@ -94,13 +93,13 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                             <div className="w-full border-t border-primary-200 dark:border-darkPrimary-600"></div>
                         </div>
                         <div className="relative flex justify-center">
-                            <span className="bg-white dark:bg-darkPrimary-800 px-2 text-sm text-primary-500 dark:text-darkPrimary-400">{t('wallet_modal_or')}</span>
+                            <span className="bg-white dark:bg-darkPrimary-800 px-2 text-sm text-primary-500 dark:text-darkPrimary-400">OR</span>
                         </div>
                     </div>
 
                     {/* Traditional Wallet Section */}
                     <div>
-                         <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">{t('wallet_modal_connect_with')}</h3>
+                         <h3 className="text-sm font-semibold text-primary-500 dark:text-darkPrimary-400 mb-2">Connect with a Wallet</h3>
                          <div className="space-y-2">
                             {wallets.filter(w => w.readyState !== 'Unsupported').map(wallet => (
                                 <button
@@ -117,7 +116,7 @@ export const WalletConnectModal: React.FC<WalletConnectModalProps> = ({ isOpen, 
                 </div>
 
                  <footer className="p-4 text-center text-xs text-primary-500 dark:text-darkPrimary-500 bg-primary-50 dark:bg-darkPrimary-800/50 border-t border-primary-200 dark:border-darkPrimary-700 rounded-b-2xl">
-                    <p>{t('wallet_modal_terms')}</p>
+                    <p>By connecting, you agree to our Terms of Service.</p>
                 </footer>
             </div>
         </div>
