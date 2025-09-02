@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -72,7 +73,6 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
                                     {balances.map(token => (
                                         <div key={token.mintAddress} className="flex items-center justify-between text-sm">
                                             <div className="flex items-center gap-3">
-                                                {/* FIX: Add a more specific type assertion to let TypeScript know that the cloned element accepts a className prop. */}
                                                 {React.isValidElement(token.logo) ? React.cloneElement(token.logo as React.ReactElement<{ className?: string }>, { className: 'w-6 h-6' }) : null}
                                                 <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{token.symbol}</span>
                                             </div>
