@@ -74,7 +74,6 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
                                         <div key={token.mintAddress} className="flex items-center justify-between text-sm">
                                             <div className="flex items-center gap-3">
                                                 {React.isValidElement(token.logo) ? React.cloneElement(token.logo as React.ReactElement<{ className?: string }>, { className: 'w-6 h-6' }) : null}
-                                                <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{token.symbol}</span>
                                             </div>
                                             <div className="text-right font-mono">
                                                 <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>

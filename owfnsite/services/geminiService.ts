@@ -6,15 +6,16 @@ export async function getChatbotResponse(
   question: string,
   langCode: string,
   currentTime: string,
-  owfnBalance: number,
   onChunk: (chunk: string) => void,
-  onError: (errorMsg: string) => void
+  onError: (errorMsg: string) => void,
+  pageContext: string,
+  walletData: any | null
 ): Promise<void> {
   try {
     const response = await fetch('/api/chatbot', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'chat', history, question, langCode, currentTime, owfnBalance }),
+      body: JSON.stringify({ history, question, langCode, currentTime, pageContext, walletData }),
     });
 
     // The server should always respond with 200 OK now, even for errors.
@@ -130,37 +131,4 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     console.error("Failed to fetch translation:", error);
     return text;
   }
-};
-
-
-export const getAiSummary = async (text: string, lang: string): Promise<string> => {
-    const response = await fetch('/api/chatbot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'summarize', text, lang }),
-    });
-
-    if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || 'Failed to fetch summary.');
-    }
-    
-    const data = await response.json();
-    return data.summary;
-};
-
-export const getAiNarrative = async (userStats: any, lang: string): Promise<string> => {
-     const response = await fetch('/api/chatbot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'narrate', ...userStats, lang }),
-    });
-
-    if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || 'Failed to fetch narrative.');
-    }
-    
-    const data = await response.json();
-    return data.narrative;
 };

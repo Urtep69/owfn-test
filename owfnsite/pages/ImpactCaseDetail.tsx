@@ -1,11 +1,12 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { ProgressBar } from '../components/ProgressBar.tsx';
-import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
-import { getAiSummary } from '../services/geminiService.ts';
+import { AiSummary } from '../components/AiSummary.tsx';
+import { NftReward } from '../components/NftReward.tsx';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -19,59 +20,6 @@ const mockUpdates = [
     { date: '2024-07-01', key: 'case_update_2' },
     { date: '2024-06-20', key: 'case_update_3' },
 ];
-
-const AiSummary = () => {
-    const { t, currentLanguage } = useAppContext();
-    const [summary, setSummary] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const generateSummary = useCallback(async () => {
-        setIsLoading(true);
-        setError(null);
-        setSummary(null);
-
-        try {
-            const contentElements = document.querySelectorAll('[data-summarize-content]');
-            if (contentElements.length === 0) throw new Error('Content for summary not found.');
-            
-            const textContent = Array.from(contentElements).map(el => (el as HTMLElement).innerText).join('\n\n');
-            const result = await getAiSummary(textContent, currentLanguage.code);
-            setSummary(result);
-
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred.');
-            console.error(err);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [currentLanguage.code]);
-
-    return (
-        <div className="bg-primary-50 dark:bg-darkPrimary-800/50 p-6 rounded-lg shadow-inner-3d border border-primary-200 dark:border-darkPrimary-700">
-            <button
-                onClick={generateSummary}
-                disabled={isLoading}
-                className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold rounded-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-70"
-            >
-                {isLoading ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /><span>Generating...</span></>
-                ) : (
-                    <><Sparkles className="w-5 h-5" /><span>{t('get_ai_summary', { defaultValue: 'Get AI Summary' })}</span></>
-                )}
-            </button>
-
-            {summary && (
-                <div className="mt-4 pt-4 border-t border-primary-200 dark:border-darkPrimary-700 animate-fade-in-up">
-                    <h4 className="text-lg font-bold mb-2 text-primary-800 dark:text-darkPrimary-200">AI Summary</h4>
-                    <div className="text-primary-700 dark:text-darkPrimary-300 prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: summary.replace(/\n/g, '<br />') }}></div>
-                </div>
-            )}
-            {error && <p className="mt-4 text-red-500">{error}</p>}
-        </div>
-    );
-};
-
 
 export default function ImpactCaseDetail() {
     const { t, solana, currentLanguage, socialCases, setWalletModalOpen } = useAppContext();
@@ -150,16 +98,16 @@ export default function ImpactCaseDetail() {
     const categoryName = t(`category_${socialCase.category.toLowerCase().replace(/\s+/g, '_')}`);
 
     return (
-        <div className="animate-fade-in-up space-y-8">
-            <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
+        <div className="space-y-8">
+            <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline animate-fade-in-up">
                 <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
             </Link>
-            <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden">
+            <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden animate-scroll" style={{animationDelay: '100ms'}}>
                 <img src={socialCase.imageUrl} alt={title} className="w-full h-64 md:h-96 object-cover" />
                 <div className="p-6 md:p-10">
                     <span className="text-lg font-semibold text-accent-600 dark:text-darkAccent-500 mb-2 inline-block">{t(`category_${socialCase.category.toLowerCase().replace(' ', '_')}`, { defaultValue: socialCase.category })}</span>
-                    <h1 className="text-3xl md:text-5xl font-bold mb-6" data-summarize-content>{title}</h1>
-                    <p className="text-lg text-primary-700 dark:text-darkPrimary-300 leading-relaxed mb-8" data-summarize-content>{description}</p>
+                    <h1 className="text-3xl md:text-5xl font-bold mb-6">{title}</h1>
+                    <p className="text-lg text-primary-700 dark:text-darkPrimary-300 leading-relaxed mb-8">{description}</p>
                     
                     <div className="mb-8">
                         <ProgressBar progress={progress} />
@@ -173,9 +121,8 @@ export default function ImpactCaseDetail() {
 
             <div className="grid lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-3 space-y-8">
-                     <AiSummary />
-
-                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                     <div id="case-details-content" className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '200ms'}}>
+                        <AiSummary contentId="case-details-content" />
                         <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Newspaper /> {t('live_updates')}</h3>
                         <div className="space-y-4">
                             {mockUpdates.map(update => (
@@ -189,7 +136,7 @@ export default function ImpactCaseDetail() {
                     </div>
 
                      {details && (
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d" data-summarize-content>
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '300ms'}}>
                             <h3 className="text-2xl font-bold mb-4">{t('case_details_title')}</h3>
                             <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed whitespace-pre-wrap">{details}</p>
                         </div>
@@ -198,7 +145,7 @@ export default function ImpactCaseDetail() {
 
                 <div className="lg:col-span-2">
                     <div className="lg:sticky top-24 space-y-8">
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '400ms'}}>
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
                                 <Heart className="text-red-500" />
                                 <span>{t('support_this_cause')}</span>
@@ -280,12 +227,14 @@ export default function ImpactCaseDetail() {
                                     </div>
                                 )}
 
-                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50">
+                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 btn-tactile">
                                     {solana.loading ? t('processing') : (solana.connected ? t('donate') : t('connect_wallet'))}
                                 </button>
+                                
+                                <NftReward caseTitle={title} donationAmountUsd={usdValue} />
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '500ms'}}>
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Milestone /> {t('funding_milestones')}</h3>
                              <div className="relative pl-4">
                                 <div className="absolute top-0 left-4 h-full w-0.5 bg-primary-200 dark:bg-darkPrimary-700"></div>
