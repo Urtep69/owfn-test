@@ -9,10 +9,9 @@ const TabBarItem = ({ to, icon, label }: { to: string, icon: React.ReactNode, la
     return (
         <Link to={to} className="flex-1 flex flex-col items-center justify-center text-center p-2 transition-colors duration-200">
             <div className={`p-2 rounded-full transition-all duration-300 ${isActive ? 'bg-accent-100 dark:bg-darkAccent-900/50 -translate-y-1 scale-110 shadow-lg' : ''}`}>
-                {/* FIX: Add a more specific type assertion to let TypeScript know that the cloned element accepts a className prop. */}
-                {React.cloneElement(icon as React.ReactElement<{ className: string }>, { 
+                {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<{ className: string }>, { 
                     className: `w-6 h-6 ${isActive ? 'text-accent-600 dark:text-darkAccent-400' : 'text-primary-500 dark:text-darkPrimary-400'}`
-                })}
+                }) : null}
             </div>
             <span className={`text-xs mt-1 font-semibold ${isActive ? 'text-accent-700 dark:text-darkAccent-400' : 'text-primary-600 dark:text-darkPrimary-500'}`}>
                 {label}

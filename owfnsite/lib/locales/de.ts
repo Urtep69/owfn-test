@@ -638,4 +638,17 @@ export const de = {
     wallet_modal_easy_connect: 'Einfache Verbindung (Empfohlen)',
     wallet_modal_connect_with: 'Mit einer Wallet verbinden',
     wallet_modal_terms: 'Durch die Verbindung stimmen Sie unseren Nutzungsbedingungen zu.',
+    wallet_modal_google: 'Google',
+    wallet_modal_twitter: 'X / Twitter',
+    wallet_modal_email: 'Email',
+    wallet_modal_or: 'OR',
+
+    // API Fallbacks
+    narrative_fallback: "Ihre Unterstützung macht einen spürbaren Unterschied in der Welt. Vielen Dank, dass Sie ein wichtiger Teil der OWFN-Familie sind!",
+    summary_fallback: "Die KI konnte keine Zusammenfassung für diesen Inhalt erstellen.",
+    fallback_post_1: "Treten Sie der Bewegung des Official World Family Network (OWFN) bei! Wir nutzen #Solana, um mit transparenter Hilfe eine bessere Zukunft zu schaffen. Machen Sie noch heute mit! #OWFN #CryptoForGood #SocialImpact",
+    fallback_post_2: "Transparenz ist der Schlüssel zu echtem Wandel. Deshalb basiert OWFN auf #Solana, um sicherzustellen, dass jeder Beitrag einen Unterschied macht. Sehen Sie, wie wir Leben verändern. #OWFN #SocialImpact #Blockchain",
+    fallback_post_3: "Seien Sie Teil von etwas Größerem. Der OWFN-Vorverkauf ist Ihre Chance, ein Projekt zu unterstützen, das sich der globalen humanitären Hilfe widmet. Lassen Sie uns gemeinsam eine bessere Welt bauen. #OWFN #Presale #CryptoForGood",
+    fallback_post_4: "Die Gemeinschaft ist unsere Stärke. Gemeinsam können wir Projekte in den Bereichen Gesundheit, Bildung und Grundbedürfnisse weltweit finanzieren. Treten Sie dem Official World Family Network bei. #OWFN #Community #SocialImpact #Solana",
+    fallback_post_5: "Stellen Sie sich eine Welt vor, in der Hilfe Bedürftige sofort und transparent erreicht. Das ist die Vision von OWFN, angetrieben von der Geschwindigkeit von #Solana. Machen Sie mit. #OWFN #Vision #CryptoForGood",
 };
