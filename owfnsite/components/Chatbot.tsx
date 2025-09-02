@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'wouter';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Link, useLocation } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
@@ -36,7 +36,7 @@ const socialIconMap: { [key: string]: React.ReactNode } = {
 
 
 const renderMessageContent = (text: string) => {
-    const regex = /\[(Visit Page): (.*?)\]|\[(Social Link): (.*?)\|(.*?)\]/g;
+    const regex = /\[(Visit Page): (.*?)\]|\[(Social Link): (.*?)\|(.*?)\]|\[(Action: Navigate)\|(.*?)\|(.*?)\]/g;
     const result: (string | JSX.Element)[] = [];
     let lastIndex = 0;
     let match;
@@ -46,21 +46,20 @@ const renderMessageContent = (text: string) => {
             result.push(text.substring(lastIndex, match.index));
         }
         
-        if (match[1] === 'Visit Page') {
-            const pageName = match[2];
-            const path = pageNameToPath[pageName];
-            if (path) {
+        const [fullMatch, visitPage, pageName, socialLink, platformName, url, actionNavigate, buttonText, path] = match;
+
+        if (visitPage === 'Visit Page') {
+            const resolvedPath = pageNameToPath[pageName];
+            if (resolvedPath) {
                 result.push(
-                    <Link key={match.index} href={path} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
+                    <Link key={match.index} href={resolvedPath} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
                         {pageName}
                     </Link>
                 );
             } else {
-                result.push(`[Visit Page: ${pageName}]`);
+                result.push(`[Visit Page: ${pageName}]`); // Fallback
             }
-        } else if (match[3] === 'Social Link') {
-            const platformName = match[4];
-            const url = match[5];
+        } else if (socialLink === 'Social Link') {
             const icon = socialIconMap[platformName];
             if (url && platformName) {
                  result.push(
@@ -69,8 +68,16 @@ const renderMessageContent = (text: string) => {
                     </a>
                 );
             } else {
-                 result.push(`[Social Link: ${platformName}|${url}]`);
+                 result.push(`[Social Link: ${platformName}|${url}]`); // Fallback
             }
+        } else if (actionNavigate === 'Action: Navigate') {
+             result.push(
+                <Link key={match.index} href={path}>
+                    <a className="inline-block mt-2 bg-accent-500 text-white dark:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-colors btn-tactile">
+                       {buttonText}
+                    </a>
+                </Link>
+            );
         }
 
         lastIndex = regex.lastIndex;
@@ -85,16 +92,107 @@ const renderMessageContent = (text: string) => {
 
 
 export const Chatbot = () => {
-    const { t, currentLanguage } = useAppContext();
+    const { t, currentLanguage, solana } = useAppContext();
+    const [location] = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
+    const [proactiveMessage, setProactiveMessage] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
+
+     useEffect(() => {
+        // Immediately hide the previous message when navigating to a new page.
+        setProactiveMessage(null);
+
+        if (isOpen || solana.loading) {
+            return;
+        }
+
+        const key = `owfn-proactive-${location}`;
+        if (sessionStorage.getItem(key)) {
+            return;
+        }
+
+        // Set a shorter timer for the new message to appear.
+        const timer = setTimeout(() => {
+            if (isOpen) return;
+
+            let message = '';
+            
+            // Handle personalized messages for connected users
+            if (solana.connected) {
+                if (location === '/profile') {
+                    message = t('chatbot_proactive_profile');
+                } else if (['/presale', '/donations'].includes(location) && solana.userTokens.length > 0) {
+                     const balances = solana.userTokens
+                        .filter(t => t.balance > 0)
+                        .map(t => `${t.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${t.symbol}`)
+                        .join(', ');
+                    if (balances) {
+                        message = `${t('chatbot_proactive_wallet_intro')} ${balances}. ${t('chatbot_proactive_wallet_outro')}`;
+                    }
+                }
+            }
+
+            // Fallback for disconnected users OR pages not handled by the connected user logic above
+            if (!message) {
+                 const proactiveMessageKeys: { [key: string]: string } = {
+                    '/': 'chatbot_proactive_home',
+                    '/presale': 'chatbot_proactive_presale',
+                    '/donations': 'chatbot_proactive_donations',
+                    '/about': 'chatbot_proactive_about',
+                    '/whitepaper': 'chatbot_proactive_whitepaper',
+                    '/tokenomics': 'chatbot_proactive_tokenomics',
+                    '/roadmap': 'chatbot_proactive_roadmap',
+                    '/dashboard': 'chatbot_proactive_dashboard',
+                    '/contact': 'chatbot_proactive_contact',
+                    '/staking': 'chatbot_proactive_staking',
+                    '/vesting': 'chatbot_proactive_vesting',
+                    '/airdrop': 'chatbot_proactive_airdrop',
+                    '/impact': 'chatbot_proactive_impact',
+                    '/governance': 'chatbot_proactive_governance',
+                    '/partnerships': 'chatbot_proactive_partnerships',
+                    '/faq': 'chatbot_proactive_faq',
+                    // NOTE: '/profile' is intentionally excluded here.
+                    // The profile message should only appear for connected users, which is handled above.
+                };
+                const messageKey = proactiveMessageKeys[location];
+                if (messageKey) {
+                    const potentialMessage = t(messageKey, { defaultValue: '' });
+                    if (potentialMessage && potentialMessage !== messageKey) {
+                        message = potentialMessage;
+                    }
+                }
+            }
+            
+            if (message) {
+                setProactiveMessage(message);
+                sessionStorage.setItem(key, 'true');
+            }
+
+        }, 1500); // Reduced delay from 3000ms to 1500ms
+
+        return () => clearTimeout(timer);
+    }, [location, t, isOpen, solana.connected, solana.userTokens, solana.loading]);
+
+    const handleDismissProactive = () => {
+        setProactiveMessage(null);
+    };
+
+    const handleOpenChat = (initialMessage?: string) => {
+        setIsOpen(true);
+        if (proactiveMessage) {
+            setMessages([{ role: 'model', parts: [{ text: proactiveMessage }], timestamp: new Date() }]);
+            setProactiveMessage(null);
+        } else if (initialMessage) {
+            setMessages([{ role: 'model', parts: [{ text: initialMessage }], timestamp: new Date() }]);
+        }
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -118,8 +216,12 @@ export const Chatbot = () => {
 
     const formatTimestamp = (date: Date) => {
         return date.toLocaleString(currentLanguage.code, {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
+            second: '2-digit'
         });
     };
 
@@ -129,11 +231,9 @@ export const Chatbot = () => {
         const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }], timestamp: new Date() };
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
         const currentInput = input;
-        
-        // START: Updated for Phase 1 - Pass context to AI
         const currentTime = new Date().toISOString();
-        const langCode = currentLanguage.code;
-        // END: Updated for Phase 1
+        
+        const walletData = solana.connected ? solana.userTokens.map(t => ({ symbol: t.symbol, balance: t.balance })) : null;
 
         setMessages(prev => [...prev, userMessage]);
         setInput('');
@@ -160,8 +260,8 @@ export const Chatbot = () => {
             await getChatbotResponse(
                 historyForApi,
                 currentInput,
-                langCode, // Pass language code
-                currentTime, // Pass current time
+                currentLanguage.code,
+                currentTime,
                 (chunk) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
@@ -187,9 +287,10 @@ export const Chatbot = () => {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
                     }
-                    setIsLoading(false);
-                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: `Error: ${errorMsg}` }], timestamp: new Date() }]);
-                }
+                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: errorMsg }], timestamp: new Date() }]);
+                },
+                location,
+                walletData
             );
         } catch (error) {
             console.error("Chatbot stream failed:", error);
@@ -216,13 +317,29 @@ export const Chatbot = () => {
     
     if (!isOpen) {
         return (
+            <>
+            {proactiveMessage && (
+                 <div className="fixed bottom-24 right-5 w-72 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg p-4 text-sm z-50 animate-fade-in-up cursor-pointer" onClick={() => handleOpenChat(proactiveMessage)}>
+                    <button onClick={(e) => { e.stopPropagation(); handleDismissProactive(); }} className="absolute top-1 right-1 p-1 text-primary-400 hover:text-primary-600 dark:text-darkPrimary-500 dark:hover:text-darkPrimary-300">
+                        <X size={16} />
+                    </button>
+                    <div className="flex items-start gap-3">
+                        <OwfnIcon className="w-8 h-8 flex-shrink-0 mt-1" />
+                        <div>
+                            <p className="font-bold mb-1">{t('chatbot_title')}</p>
+                            <p>{proactiveMessage}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
             <button
-                onClick={() => setIsOpen(true)}
+                onClick={() => handleOpenChat()}
                 className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
                 aria-label="Open Chatbot"
             >
                 <MessageCircle size={28} />
             </button>
+            </>
         );
     }
 
@@ -256,16 +373,16 @@ export const Chatbot = () => {
                             <div className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
                                 <div className="flex flex-col">
-                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
-                                       <div className="text-sm whitespace-pre-wrap">
-                                           {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
-                                       </div>
-                                    </div>
-                                     {msg.timestamp && (
-                                        <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mt-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                                    {msg.timestamp && (
+                                        <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mb-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
                                             {formatTimestamp(msg.timestamp)}
                                         </p>
                                     )}
+                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
+                                       <div className="text-sm whitespace-pre-wrap">
+                                           {renderMessageContent(msg.parts[0].text)}
+                                       </div>
+                                    </div>
                                 </div>
                                 {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                             </div>

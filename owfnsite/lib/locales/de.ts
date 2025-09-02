@@ -1,4 +1,3 @@
-
 export const de = {
     // Navigation
     home: `Startseite`,
@@ -318,8 +317,6 @@ export const de = {
     faq_q13: `Warum gibt es im Vorverkauf ein maximales Kauflimit (Max Buy)?`,
     faq_a13: `Das maximale Kauflimit ist eine wichtige Maßnahme, um eine möglichst faire Verteilung der Token zu gewährleisten und zu verhindern, dass eine kleine Anzahl großer Investoren ("Wale") einen erheblichen Teil des Angebots kontrolliert. Dies fördert langfristig eine gesündere und dezentralere Gemeinschaft.`,
     faq_q14: `Was bedeutet es, dass der Token "zinstragend" mit 2% APY ist? Wie funktioniert das?`,
-    faq_a14: `Das bedeutet, dass der OWFN-Token so programmiert ist, dass er automatisch Zinsen generiert. Indem Sie die Token einfach in Ihrer Solana-kompatiblen Wallet halten, wird sich die Anzahl Ihrer Token im Laufe der Zeit mit einer jährlichen prozentualen Rendite (APY) von 2% erhöhen. Sie müssen sie nicht staken oder zusätzliche Maßnahmen ergreifen; die Belohnungen sammeln sich automatisch an.`,
-    faq_q15: `Was ist die Überweisungsgebühr von 0,5% und wann wird sie aktiviert?`,
     faq_a15: `Diese Gebühr ist ein Schlüsselmechanismus für die langfristige Finanzierung unserer Mission. Eine Gebühr von 0,5% wird auf alle Transaktionen mit dem OWFN-Token *nach* Abschluss des Vorverkaufszeitraums erhoben. Die aus dieser Gebühr gesammelten Mittel werden automatisch an die Impact Treasury weitergeleitet, um unsere sozialen Projekte kontinuierlich zu finanzieren. So trägt jede Transaktion zum Gemeinwohl bei.`,
     faq_q16: `Warum haben Sie die Solana-Blockchain für dieses Projekt gewählt?`,
     faq_a16: `Wir haben uns für Solana wegen seiner außergewöhnlichen Geschwindigkeit, sehr niedrigen Transaktionskosten und hohen Skalierbarkeit entschieden. Diese Eigenschaften sind für ein globales Projekt wie unseres unerlässlich und ermöglichen effiziente Mikrotransaktionen und eine schnelle und zugängliche Erfahrung für alle Benutzer, egal ob sie spenden, kaufen oder Token handeln.`,
@@ -339,7 +336,36 @@ export const de = {
     chatbot_loading_1: `Verbindung zu meinen Schaltkreisen...`,
     chatbot_loading_2: `Analyse Ihrer Frage...`,
     chatbot_loading_3: `Formulierung einer Antwort...`,
-    
+    chatbot_proactive_home: "Willkommen bei OWFN! Ich kann Ihnen helfen, Informationen über unsere Mission, den Vorverkauf oder unsere Tokenomics zu finden. Woran sind Sie interessiert?",
+    chatbot_proactive_presale: `Haben Sie Fragen zur Funktionsweise des Vorverkaufs? Ich kann helfen!`,
+    chatbot_proactive_donations: `Denken Sie darüber nach, eine Spende zu tätigen? Ich kann Sie durch den Prozess führen.`,
+    chatbot_proactive_about: "Möchten Sie mehr über die Mission und Vision von OWFN erfahren? Fragen Sie mich alles!",
+    chatbot_proactive_whitepaper: "Suchen Sie nach detaillierten Informationen? Ich kann Ihnen helfen, spezifische Informationen im Whitepaper zu finden.",
+    chatbot_proactive_tokenomics: "Neugierig auf unsere Token-Verteilung oder die automatische APY von 2%? Fragen Sie einfach!",
+    chatbot_proactive_roadmap: "Interessiert an unseren Zukunftsplänen? Ich kann Ihnen von den Schlüsselphasen auf unserer Roadmap erzählen.",
+    chatbot_proactive_dashboard: "Dies ist das Transparenz-Dashboard. Haben Sie Fragen zu den Projekt-Wallets?",
+    chatbot_proactive_contact: "Müssen Sie mit dem Team in Kontakt treten? Ich kann Ihnen helfen, die richtigen Kontaktinformationen zu finden.",
+    chatbot_guided_donation_start: `Das ist wunderbar! Wir akzeptieren Spenden in verschiedenen Kryptowährungen. Welche möchten Sie verwenden und wie viel möchten Sie spenden?`,
+    chatbot_guided_donation_prepare: `Großartig! Ich kann das Spendenformular für Sie mit {amount} {token} vorausfüllen. Klicken Sie einfach auf die Schaltfläche unten, um fortzufahren.`,
+    chatbot_guided_donation_button: `Zum Spendenformular`,
+    chatbot_guided_presale_start: `Sie können OWFN mit SOL auf unserer Vorverkaufsseite kaufen. Wie viel SOL möchten Sie ausgeben? Ich kann Ihnen beim Einstieg helfen.`,
+    chatbot_guided_presale_prepare: `Ausgezeichnet! Ein Kauf von {amount} SOL qualifiziert sich für einen Bonus. Ich kann Sie zur Vorverkaufsseite mit diesem vorausgefüllten Betrag bringen.`,
+    chatbot_guided_presale_button: `Zum Vorverkauf`,
+    chatbot_guided_contact_start: "Ich kann dabei helfen. Um Sie an die richtige Stelle zu leiten, könnten Sie mir den Grund für Ihre Kontaktaufnahme nennen? Zum Beispiel 'Partnerschaften', 'technischer Support' oder eine 'allgemeine Frage'.",
+    chatbot_guided_contact_prepare: "Verstanden. Ich werde Sie zur Kontaktseite mit bereits ausgewähltem '{reason}' führen. Bitte verwenden Sie die Schaltfläche unten.",
+    chatbot_guided_contact_button: "Zum Kontaktformular",
+    chatbot_personalized_apy_reminder: `Als OWFN-Token-Inhaber danke ich Ihnen, dass Sie Teil unserer Mission sind! Denken Sie daran, dass Sie automatisch 2% APY verdienen, indem Sie die Token einfach in Ihrer Wallet halten.`,
+    chatbot_proactive_staking: "Willkommen! Während das Halten von OWFN Ihnen automatisch 2% APY einbringt, kann ich alle Ihre Fragen zur Funktionsweise beantworten.",
+    chatbot_proactive_vesting: "Überprüfen Sie Ihren Vesting-Zeitplan? Ich kann Ihnen helfen, die benötigten Informationen zu finden.",
+    chatbot_proactive_airdrop: "Neugierig auf die Airdrop-Berechtigung? Lassen Sie mich wissen, wie ich Ihnen helfen kann.",
+    chatbot_proactive_impact: "Willkommen im Impact-Portal! Hier können Sie sehen, wie unsere Community einen Unterschied macht. Haben Sie Fragen?",
+    chatbot_proactive_governance: "Interessiert an Governance? Hier können Sie mehr über Vorschläge und Abstimmungen erfahren. Womit kann ich Ihnen helfen?",
+    chatbot_proactive_partnerships: "Erkunden Sie Partnerschaften? Ich kann Informationen zu unserer Kooperationsvision bereitstellen.",
+    chatbot_proactive_faq: "Haben Sie eine Frage? Ich kann Ihnen helfen, hier in den FAQ Antworten zu finden oder weitere Details zu geben.",
+    chatbot_proactive_profile: "Willkommen in Ihrem Profil! Lassen Sie mich wissen, ob Sie Fragen zu Ihren Token oder Impact-Statistiken haben.",
+    chatbot_proactive_wallet_intro: `Willkommen zurück! Ich sehe, Sie haben einige Vermögenswerte in Ihrer verbundenen Wallet:`,
+    chatbot_proactive_wallet_outro: `Ich kann Ihnen helfen, mehr OWFN zu kaufen oder eine Spende zu tätigen. Woran sind Sie heute interessiert?`,
+
     // Whitepaper
     whitepaper_title: `OWFN-Whitepaper`,
     whitepaper_subtitle: `Ein detaillierter Überblick über das Official World Family Network Projekt`,
@@ -462,8 +488,6 @@ export const de = {
     airdrop_eligible_message: `Ihre Wallet ist berechtigt! Sie erhalten {amount} OWFN-Token bei der nächsten Verteilung.`,
     airdrop_not_eligible: `Nicht berechtigt`,
     airdrop_not_eligible_message: `Leider ist diese Wallet-Adresse nicht für den aktuellen Airdrop berechtigt. Bleiben Sie in unserer Community aktiv für zukünftige Gelegenheiten!`,
-    airdrop_info_box_title: `Über diesen Airdrop`,
-    airdrop_info_box_desc: `Dieser Airdrop wurde entwickelt, um frühe Unterstützer und aktive Community-Mitglieder zu belohnen. Die Berechtigung basiert auf Faktoren wie der Teilnahme am Vorverkauf und dem Engagement bei Community-Events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -532,6 +556,15 @@ export const de = {
     airdrop_complete: `Airdrop abgeschlossen`,
     airdrop_summary: `{success} erfolgreich, {failed} fehlgeschlagen.`,
     airdrop_log: `Airdrop-Protokoll`,
+    airdrop_resume: `Airdrop fortsetzen`,
+    airdrop_clear_progress_confirm: `Sind Sie sicher, dass Sie den Airdrop-Fortschritt und die Protokolle löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden und sollte nur für Notfall-Resets verwendet werden.`,
+    airdrop_clear_progress: `Fortschritt & Protokolle löschen`,
+    airdrop_all_processed: `Alle Beitragenden wurden verarbeitet.`,
+    airdrop_run_start_log: `--- Starte Airdrop-Lauf für {count} Wallets. ---`,
+    airdrop_run_complete_log: `--- Airdrop-Lauf abgeschlossen. Erfolg: {success}, Fehlgeschlagen: {failed}. Insgesamt verarbeitet: {processed}/{total} ---`,
+    airdrop_batch_error_log: `❌ Kritischer Fehler im Batch (Signierung fehlgeschlagen?): {error}. Fehlgeschlagene Adressen: {addresses}`,
+    airdrop_success_log: `✅ Erfolg für {address}... | Sig: {signature}...`,
+    airdrop_failed_log: `❌ Fehler für {address}... | Fehler: {error}`,
 
     // Contact Page
     contact_title: `Kontakt aufnehmen`,
@@ -577,4 +610,32 @@ export const de = {
     contact_social_discord_title: `Discord-Server`,
     contact_social_discord_desc: `Werden Sie Teil unserer aktiven Community für Diskussionen und Unterstützung.`,
     send_direct_message: `Direktnachricht Senden`,
+
+    // Community Ambassador Toolkit
+    community_toolkit_title: `Community-Botschafter-Toolkit`,
+    community_toolkit_subtitle: `Helfen Sie mit, die Botschaft von OWFN zu verbreiten! Nutzen Sie unser KI-gestütztes Tool, um einzigartige Social-Media-Beiträge zu erstellen und unsere Mission mit der Welt zu teilen.`,
+    community_toolkit_generate_button: `Weiteren Beitrag erstellen`,
+    community_toolkit_copy_button: `Beitrag kopieren`,
+    community_toolkit_copied_button: `Kopiert!`,
+    community_toolkit_share_button: `Auf X teilen`,
+    community_toolkit_error_message: `Beitrag konnte nicht erstellt werden. Bitte versuchen Sie es erneut.`,
+    community_toolkit_error_message_network: `Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.`,
+
+    // AI Features
+    ai_summary_button: `KI-Zusammenfassung erhalten`,
+    ai_summary_loading: `Wird generiert...`,
+    ai_summary_title: `KI-Zusammenfassung`,
+    generated_by_ai: `Von KI generiert`,
+    impact_narrative_title: `Ihre Wirkungsgeschichte`,
+    impact_narrative_loading: `Ihre persönliche Geschichte wird erstellt...`,
+    nft_reward_title: `Ein besonderes Dankeschön`,
+    nft_reward_button: `Dankeschön-Kunst generieren`,
+    nft_reward_loading: `Ihre einzigartige Kunst wird erstellt... Dies kann einen Moment dauern.`,
+    nft_reward_significant_donation_prompt: `Spenden Sie ${'$'}{threshold}+, um einzigartige Dankeschön-Kunst zu generieren!`,
+    api_error_generic: `Die Anfrage konnte derzeit nicht abgeschlossen werden.`,
+    
+    // WalletConnectModal
+    wallet_modal_easy_connect: 'Einfache Verbindung (Empfohlen)',
+    wallet_modal_connect_with: 'Mit einer Wallet verbinden',
+    wallet_modal_terms: 'Durch die Verbindung stimmen Sie unseren Nutzungsbedingungen zu.',
 };
