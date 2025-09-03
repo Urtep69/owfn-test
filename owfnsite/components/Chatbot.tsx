@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
@@ -36,36 +37,30 @@ const socialIconMap: { [key: string]: React.ReactNode } = {
 
 
 const renderMessageContent = (text: string) => {
-    const regex = /\[(Visit Page): (.*?)\]|\[(Social Link): (.*?)\|(.*?)\]/g;
+    const regex = /\[(Visit Page): (.*?)\]|\[(Social Link): (.*?)\|(.*?)\]|\[(Action: Navigate)\|(.*?)\|(.*?)\]/g;
     const result: (string | JSX.Element)[] = [];
     let lastIndex = 0;
     let match;
 
     while ((match = regex.exec(text)) !== null) {
-        // Push the text before the match
         if (match.index > lastIndex) {
             result.push(text.substring(lastIndex, match.index));
         }
         
-        // match[1] is 'Visit Page', match[2] is page name
-        // OR
-        // match[3] is 'Social Link', match[4] is platform, match[5] is URL
+        const [fullMatch, visitPage, pageName, socialLink, platformName, url, actionNavigate, buttonText, path] = match;
 
-        if (match[1] === 'Visit Page') {
-            const pageName = match[2];
-            const path = pageNameToPath[pageName];
-            if (path) {
+        if (visitPage === 'Visit Page') {
+            const resolvedPath = pageNameToPath[pageName];
+            if (resolvedPath) {
                 result.push(
-                    <Link key={match.index} href={path} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
+                    <Link key={match.index} href={resolvedPath} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
                         {pageName}
                     </Link>
                 );
             } else {
                 result.push(`[Visit Page: ${pageName}]`); // Fallback
             }
-        } else if (match[3] === 'Social Link') {
-            const platformName = match[4];
-            const url = match[5];
+        } else if (socialLink === 'Social Link') {
             const icon = socialIconMap[platformName];
             if (url && platformName) {
                  result.push(
@@ -76,12 +71,19 @@ const renderMessageContent = (text: string) => {
             } else {
                  result.push(`[Social Link: ${platformName}|${url}]`); // Fallback
             }
+        } else if (actionNavigate === 'Action: Navigate') {
+             result.push(
+                <Link key={match.index} href={path}>
+                    <a className="inline-block mt-2 bg-accent-500 text-white dark:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-2 px-4 rounded-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-colors btn-tactile">
+                       {buttonText}
+                    </a>
+                </Link>
+            );
         }
 
         lastIndex = regex.lastIndex;
     }
 
-    // Push the remaining text after the last match
     if (lastIndex < text.length) {
         result.push(text.substring(lastIndex));
     }
@@ -92,21 +94,106 @@ const renderMessageContent = (text: string) => {
 
 export const Chatbot = () => {
     const { t, currentLanguage, solana } = useAppContext();
+    const [location] = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
+    const [proactiveMessage, setProactiveMessage] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
-    const [location, setLocation] = useLocation();
 
-    // State for the proactive message bubble
-    const [proactiveMessage, setProactiveMessage] = useState<string | null>(null);
-    const [isBubbleVisible, setIsBubbleVisible] = useState(false);
-    const [hasBeenOpened, setHasBeenOpened] = useState(false);
+     useEffect(() => {
+        // Immediately hide the previous message when navigating to a new page.
+        setProactiveMessage(null);
+
+        if (isOpen || solana.loading) {
+            return;
+        }
+
+        const key = `owfn-proactive-${location}`;
+        if (sessionStorage.getItem(key)) {
+            return;
+        }
+
+        // Set a shorter timer for the new message to appear.
+        const timer = setTimeout(() => {
+            if (isOpen) return;
+
+            let message = '';
+            
+            // Handle personalized messages for connected users
+            if (solana.connected) {
+                if (location === '/profile') {
+                    message = t('chatbot_proactive_profile');
+                } else if (['/presale', '/donations'].includes(location) && solana.userTokens.length > 0) {
+                     const balances = solana.userTokens
+                        .filter(t => t.balance > 0)
+                        .map(t => `${t.balance.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${t.symbol}`)
+                        .join(', ');
+                    if (balances) {
+                        message = `${t('chatbot_proactive_wallet_intro')} ${balances}. ${t('chatbot_proactive_wallet_outro')}`;
+                    }
+                }
+            }
+
+            // Fallback for disconnected users OR pages not handled by the connected user logic above
+            if (!message) {
+                 const proactiveMessageKeys: { [key: string]: string } = {
+                    '/': 'chatbot_proactive_home',
+                    '/presale': 'chatbot_proactive_presale',
+                    '/donations': 'chatbot_proactive_donations',
+                    '/about': 'chatbot_proactive_about',
+                    '/whitepaper': 'chatbot_proactive_whitepaper',
+                    '/tokenomics': 'chatbot_proactive_tokenomics',
+                    '/roadmap': 'chatbot_proactive_roadmap',
+                    '/dashboard': 'chatbot_proactive_dashboard',
+                    '/contact': 'chatbot_proactive_contact',
+                    '/staking': 'chatbot_proactive_staking',
+                    '/vesting': 'chatbot_proactive_vesting',
+                    '/airdrop': 'chatbot_proactive_airdrop',
+                    '/impact': 'chatbot_proactive_impact',
+                    '/governance': 'chatbot_proactive_governance',
+                    '/partnerships': 'chatbot_proactive_partnerships',
+                    '/faq': 'chatbot_proactive_faq',
+                    // NOTE: '/profile' is intentionally excluded here.
+                    // The profile message should only appear for connected users, which is handled above.
+                };
+                const messageKey = proactiveMessageKeys[location];
+                if (messageKey) {
+                    const potentialMessage = t(messageKey, { defaultValue: '' });
+                    if (potentialMessage && potentialMessage !== messageKey) {
+                        message = potentialMessage;
+                    }
+                }
+            }
+            
+            if (message) {
+                setProactiveMessage(message);
+                sessionStorage.setItem(key, 'true');
+            }
+
+        }, 1500); // Reduced delay from 3000ms to 1500ms
+
+        return () => clearTimeout(timer);
+    }, [location, t, isOpen, solana.connected, solana.userTokens, solana.loading]);
+
+    const handleDismissProactive = () => {
+        setProactiveMessage(null);
+    };
+
+    const handleOpenChat = (initialMessage?: string) => {
+        setIsOpen(true);
+        if (proactiveMessage) {
+            setMessages([{ role: 'model', parts: [{ text: proactiveMessage }], timestamp: new Date() }]);
+            setProactiveMessage(null);
+        } else if (initialMessage) {
+            setMessages([{ role: 'model', parts: [{ text: initialMessage }], timestamp: new Date() }]);
+        }
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -127,142 +214,6 @@ export const Chatbot = () => {
             }
         };
     }, []);
-    
-    // Proactive, contextual messaging bubble logic
-    useEffect(() => {
-        // 1. Reset bubble visibility on any change that runs this effect (like navigation)
-        setIsBubbleVisible(false);
-
-        // 2. Determine a unique key for the current page/state
-        const pageKey = location.split('/')[1] || 'home';
-        const storageKey = `owfn-proactive-msg-${pageKey}-${solana.address || 'guest'}`;
-
-        // 3. If message has been shown for this page in this session, do nothing.
-        if (sessionStorage.getItem(storageKey)) return;
-
-        // 4. Determine the proactive message text based on the current page.
-        let messageText = '';
-        const comingSoonPages = ['staking', 'vesting', 'airdrop', 'governance'];
-
-        switch (pageKey) {
-            case 'presale':
-                messageText = t('chatbot_proactive_presale');
-                break;
-            case 'donations':
-                messageText = t('chatbot_proactive_donations');
-                break;
-            case 'contact':
-                messageText = t('chatbot_proactive_contact');
-                break;
-            case 'about':
-                messageText = t('chatbot_proactive_about');
-                break;
-            case 'tokenomics':
-                messageText = t('chatbot_proactive_tokenomics');
-                break;
-            case 'roadmap':
-                messageText = t('chatbot_proactive_roadmap');
-                break;
-            case 'dashboard':
-                 if (location.includes('/dashboard/token/')) {
-                    messageText = t('chatbot_proactive_coming_soon');
-                 } else {
-                    messageText = t('chatbot_proactive_dashboard');
-                 }
-                break;
-            case 'profile':
-                if (solana.connected) {
-                    const owfnToken = solana.userTokens.find(t => t.symbol === 'OWFN' && t.balance > 0);
-                    if (owfnToken) {
-                        messageText = t('chatbot_proactive_profile_personalized', { balance: owfnToken.balance.toLocaleString() });
-                    } else {
-                        messageText = t('chatbot_proactive_profile');
-                    }
-                } else {
-                    messageText = t('chatbot_proactive_profile_disconnected');
-                }
-                break;
-            case 'home':
-                const homeOwfnToken = solana.userTokens.find(t => t.symbol === 'OWFN' && t.balance > 0);
-                if (solana.connected && homeOwfnToken) {
-                    messageText = t('chatbot_proactive_staking_personalized', { amount: homeOwfnToken.balance.toLocaleString() });
-                } else {
-                    messageText = t('chatbot_proactive_home');
-                }
-                break;
-            default:
-                if (comingSoonPages.includes(pageKey)) {
-                    messageText = t('chatbot_proactive_coming_soon');
-                } else {
-                    messageText = t('chatbot_proactive_generic');
-                }
-                break;
-        }
-
-        // 5. If a message was determined, set it and schedule the bubble to appear.
-        if (messageText) {
-            setProactiveMessage(messageText);
-            const timer = setTimeout(() => {
-                if (!isOpen) { // This check is crucial
-                    setIsBubbleVisible(true);
-                    sessionStorage.setItem(storageKey, 'true');
-                }
-            }, 2500);
-
-            // Cleanup timer on re-render or unmount
-            return () => clearTimeout(timer);
-        }
-    // Dependencies: Re-run whenever the page, connection status, or user tokens change.
-    }, [location, isOpen, solana.connected, solana.userTokens, t]);
-
-
-     // Action parsing for guided flows
-    useEffect(() => {
-        const lastMessage = messages[messages.length - 1];
-        if (lastMessage && lastMessage.role === 'model' && !lastMessage.isActionProcessed) {
-            const text = lastMessage.parts[0].text;
-            const actionMatch = text.match(/^\[ACTION:([^|\]]+)\|?(.*)\]$/);
-            
-            if (actionMatch) {
-                const action = actionMatch[1];
-                const paramsStr = actionMatch[2];
-                const params = new URLSearchParams(paramsStr.replace(/\|/g, '&'));
-
-                let url = '';
-                let confirmationMessage = '';
-                
-                if (action === 'NAVIGATE_DONATE') {
-                    const token = params.get('TOKEN');
-                    const amount = params.get('AMOUNT');
-                    if (token && amount) {
-                        url = `/donations?token=${token}&amount=${amount}`;
-                        confirmationMessage = t('chatbot_donation_guide_prefilled', { amount, token });
-                    }
-                } else if (action === 'NAVIGATE_PRESALE') {
-                    const amount = params.get('AMOUNT');
-                    if (amount) {
-                        url = `/presale?amount=${amount}`;
-                        confirmationMessage = t('chatbot_presale_guide_prefilled', { amount });
-                    }
-                }
-                
-                if (url && confirmationMessage) {
-                    setMessages(prev => {
-                        const newMessages = [...prev];
-                        const processedMessage = { ...newMessages[newMessages.length - 1], isActionProcessed: true };
-                        processedMessage.parts = [{ text: confirmationMessage }];
-                        newMessages[newMessages.length - 1] = processedMessage;
-                        return newMessages;
-                    });
-                    
-                    setTimeout(() => {
-                        setLocation(url);
-                        if (window.innerWidth < 768) setIsOpen(false);
-                    }, 2000);
-                }
-            }
-        }
-    }, [messages, setLocation, t]);
 
     const formatTimestamp = (date: Date) => {
         return date.toLocaleString(currentLanguage.code, {
@@ -282,27 +233,36 @@ export const Chatbot = () => {
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
         const currentInput = input;
         const currentTime = new Date().toISOString();
-        const pageName = (location.split('/')[1] || 'home').charAt(0).toUpperCase() + (location.split('/')[1] || 'home').slice(1);
-        const walletContext = solana.connected ? {
-            address: solana.address,
-            userTokens: solana.userTokens.map(({ symbol, balance }) => ({ symbol, balance }))
-        } : null;
+        
+        const walletData = solana.connected ? solana.userTokens.map(t => ({ symbol: t.symbol, balance: t.balance })) : null;
 
         setMessages(prev => [...prev, userMessage]);
         setInput('');
         setIsLoading(true);
 
-        const loadingMessages = [ t('chatbot_loading_1'), t('chatbot_loading_2'), t('chatbot_loading_3') ];
+        const loadingMessages = [
+            t('chatbot_loading_1'),
+            t('chatbot_loading_2'),
+            t('chatbot_loading_3'),
+        ];
         let index = 0;
-        const updateLoadingText = () => { setLoadingText(loadingMessages[index]); index = (index + 1) % loadingMessages.length; };
+        
+        const updateLoadingText = () => {
+            setLoadingText(loadingMessages[index]);
+            index = (index + 1) % loadingMessages.length;
+        };
         
         updateLoadingText();
         loadingIntervalRef.current = window.setInterval(updateLoadingText, 2500);
 
         try {
             let firstChunkReceived = false;
+
             await getChatbotResponse(
-                historyForApi, currentInput, currentLanguage.code, currentTime, pageName, walletContext,
+                historyForApi,
+                currentInput,
+                currentLanguage.code,
+                currentTime,
                 (chunk) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
@@ -328,70 +288,67 @@ export const Chatbot = () => {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
                     }
-                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: errorMsg }], timestamp: new Date() }]);
-                }
+
+                    // Map specific English error messages from the service to translatable keys.
+                    let translatedError = errorMsg;
+                    if (errorMsg.includes("connect to my brain")) {
+                        translatedError = t('chatbot_error_connect');
+                    } else if (errorMsg.includes("communication error")) {
+                        translatedError = t('chatbot_error_communicate');
+                    }
+                    
+                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: translatedError }], timestamp: new Date() }]);
+                },
+                location,
+                walletData
             );
         } catch (error) {
             console.error("Chatbot stream failed:", error);
-            if (loadingIntervalRef.current) { window.clearInterval(loadingIntervalRef.current); loadingIntervalRef.current = null; }
+            if (loadingIntervalRef.current) {
+                window.clearInterval(loadingIntervalRef.current);
+                loadingIntervalRef.current = null;
+            }
              setMessages(prev => [...prev, { role: 'model', parts: [{ text: t('chatbot_error') }], timestamp: new Date() }]);
         } finally {
-            if (loadingIntervalRef.current) { window.clearInterval(loadingIntervalRef.current); loadingIntervalRef.current = null; }
+            if (loadingIntervalRef.current) {
+                window.clearInterval(loadingIntervalRef.current);
+                loadingIntervalRef.current = null;
+            }
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 0);
         }
     };
-    
-    const openChatAndHideBubble = () => {
-        setIsOpen(true);
-        setIsBubbleVisible(false);
 
-        if (!hasBeenOpened && proactiveMessage) {
-            const proactiveChatMessage: ChatMessage = {
-                role: 'model',
-                parts: [{ text: proactiveMessage }],
-                timestamp: new Date()
-            };
-            // Add the proactive message to the start of the conversation if it's not already there
-            if (!messages.some(m => m.parts[0].text === proactiveMessage)) {
-                setMessages(prev => [proactiveChatMessage, ...prev]);
-            }
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSend();
         }
-        setHasBeenOpened(true);
     };
-
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') handleSend(); };
     
     if (!isOpen) {
         return (
             <>
-                {isBubbleVisible && (
-                    <div 
-                        className="fixed bottom-24 right-5 max-w-[calc(100vw-40px)] sm:max-w-xs w-full bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg p-4 animate-fade-in-up z-50 cursor-pointer"
-                        onClick={openChatAndHideBubble}
-                        role="alert"
-                        aria-live="assertive"
-                    >
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setIsBubbleVisible(false); }}
-                            className="absolute top-2 right-2 p-1 text-primary-400 dark:text-darkPrimary-500 hover:text-primary-700 dark:hover:text-darkPrimary-200 rounded-full"
-                            aria-label="Dismiss message"
-                        >
-                            <X size={16} />
-                        </button>
-                        <p className="text-sm text-primary-800 dark:text-darkPrimary-200 pr-4">
-                            {proactiveMessage}
-                        </p>
-                        <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white dark:bg-darkPrimary-800 transform rotate-45"></div>
+            {proactiveMessage && (
+                 <div className="fixed bottom-24 right-5 w-72 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg p-4 text-sm z-50 animate-fade-in-up cursor-pointer" onClick={() => handleOpenChat(proactiveMessage)}>
+                    <button onClick={(e) => { e.stopPropagation(); handleDismissProactive(); }} className="absolute top-1 right-1 p-1 text-primary-400 hover:text-primary-600 dark:text-darkPrimary-500 dark:hover:text-darkPrimary-300">
+                        <X size={16} />
+                    </button>
+                    <div className="flex items-start gap-3">
+                        <OwfnIcon className="w-8 h-8 flex-shrink-0 mt-1" />
+                        <div>
+                            <p className="font-bold mb-1">{t('chatbot_title')}</p>
+                            <p>{proactiveMessage}</p>
+                        </div>
                     </div>
-                )}
-                <button
-                    onClick={openChatAndHideBubble}
-                    className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
-                    aria-label="Open Chatbot"
-                >
-                    <MessageCircle size={28} />
-                </button>
+                </div>
+            )}
+            <button
+                onClick={() => handleOpenChat()}
+                className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
+                aria-label={t('chatbot_open_aria_label')}
+            >
+                <MessageCircle size={28} />
+            </button>
             </>
         );
     }
@@ -408,13 +365,13 @@ export const Chatbot = () => {
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Minimize Chat">
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t('chatbot_minimize_aria_label')}>
                         <Minus size={20} />
                     </button>
-                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={isMaximized ? "Restore Chat" : "Maximize Chat"}>
+                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t(isMaximized ? 'chatbot_restore_aria_label' : 'chatbot_maximize_aria_label')}>
                         {isMaximized ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Close Chat">
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t('chatbot_close_aria_label')}>
                         <X size={20} />
                     </button>
                 </div>
@@ -433,7 +390,7 @@ export const Chatbot = () => {
                                     )}
                                     <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
                                        <div className="text-sm whitespace-pre-wrap">
-                                           {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
+                                           {renderMessageContent(msg.parts[0].text)}
                                        </div>
                                     </div>
                                 </div>
@@ -471,7 +428,7 @@ export const Chatbot = () => {
                         onClick={handleSend}
                         disabled={isLoading || input.trim() === ''}
                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
-                        aria-label="Send message"
+                        aria-label={t('chatbot_send_aria_label')}
                     >
                        {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }
                     </button>

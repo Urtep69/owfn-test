@@ -243,23 +243,25 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 
 export default function Presale() {
   const { t, solana, setWalletModalOpen } = useAppContext();
+  const [location, setLocation] = useLocation();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
   const [soldSOL, setSoldSOL] = useState(0);
   const [userContribution, setUserContribution] = useState(0);
   const [isCheckingContribution, setIsCheckingContribution] = useState(false);
-  const [location] = useLocation();
   
   const [presaleStatus, setPresaleStatus] = useState<'pending' | 'active' | 'ended'>('pending');
   const [endReason, setEndReason] = useState<'date' | 'hardcap' | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const params = new URLSearchParams(location.split('?')[1] || '');
-    const amountParam = params.get('amount');
-    if (amountParam) {
-        setSolAmount(amountParam);
+    const params = new URLSearchParams(window.location.search);
+    const amountFromQuery = params.get('amount');
+    if (amountFromQuery) {
+        setSolAmount(amountFromQuery);
+        // Clean the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [location]);
 
@@ -521,6 +523,14 @@ export default function Presale() {
   };
   
   const saleStartDate = PRESALE_DETAILS.startDate;
+  
+  const timerTitle = useMemo(() => {
+      if (presaleStatus === 'pending') return t('presale_sale_starts_in');
+      if (presaleStatus === 'active') return t('presale_public_ending_in');
+      if (presaleStatus === 'ended' && endReason === 'hardcap') return t('presale_ended_hardcap');
+      return t('presale_sale_ended');
+  }, [presaleStatus, endReason, t]);
+
 
   return (
     <div className="bg-primary-50 dark:bg-darkPrimary-950 text-primary-700 dark:text-darkPrimary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
@@ -575,10 +585,7 @@ export default function Presale() {
                         </div>
                         <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 text-center">
                             <p className="text-primary-500 dark:text-darkPrimary-400 text-sm">
-                                {presaleStatus === 'pending' && t('presale_sale_starts_in')}
-                                {presaleStatus === 'active' && t('presale_public_ending_in')}
-                                {presaleStatus === 'ended' && endReason === 'hardcap' && t('presale_ended_hardcap')}
-                                {presaleStatus === 'ended' && endReason !== 'hardcap' && t('presale_sale_ended')}
+                                {timerTitle}
                             </p>
                             <p className="text-primary-800 dark:text-darkPrimary-100 text-2xl font-mono font-bold">
                                 {presaleStatus !== 'ended' ? 

@@ -18,13 +18,13 @@ export const ComingSoonWrapper: React.FC<ComingSoonWrapperProps> = ({ children, 
 
     return (
         <div className="relative rounded-lg overflow-hidden">
-            <div className="blur-md pointer-events-none" aria-hidden="true">
+            <div className="pointer-events-none" aria-hidden="true">
                 {children}
             </div>
             {showMessage ? (
                 <ComingSoon />
             ) : (
-                <div className="absolute inset-0 bg-primary-100/60 dark:bg-darkPrimary-900/60 z-10"></div>
+                <div className="absolute inset-0 bg-white dark:bg-darkPrimary-800 z-10"></div>
             )}
         </div>
     );

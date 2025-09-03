@@ -14,20 +14,23 @@ const tokens = [
 
 export default function Donations() {
     const { t, solana, setWalletModalOpen } = useAppContext();
+    const [location, setLocation] = useLocation();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
-    const [location] = useLocation();
 
     useEffect(() => {
-        const params = new URLSearchParams(location.split('?')[1] || '');
-        const token = params.get('token');
-        const amountParam = params.get('amount');
-        
-        if (token && tokens.some(t => t.symbol === token.toUpperCase())) {
-            setSelectedToken(token.toUpperCase());
+        const params = new URLSearchParams(window.location.search);
+        const tokenFromQuery = params.get('token');
+        const amountFromQuery = params.get('amount');
+        if (tokenFromQuery && tokens.some(t => t.symbol === tokenFromQuery)) {
+            setSelectedToken(tokenFromQuery);
         }
-        if (amountParam) {
-            setAmount(amountParam);
+        if (amountFromQuery) {
+            setAmount(amountFromQuery);
+        }
+         // Clean the URL after reading params
+        if (tokenFromQuery || amountFromQuery) {
+             window.history.replaceState({}, document.title, window.location.pathname);
         }
     }, [location]);
 

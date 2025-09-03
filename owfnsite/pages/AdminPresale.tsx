@@ -204,7 +204,7 @@ export default function AdminPresale() {
         const contributorsToProcess = aggregatedContributors.filter(c => !processedAddresses.has(c.address));
 
         if (contributorsToProcess.length === 0 && aggregatedContributors.length > 0) {
-            alert("All contributors have been processed.");
+            alert(t('airdrop_all_processed'));
             return;
         }
 
@@ -215,7 +215,7 @@ export default function AdminPresale() {
         if (processedAddresses.size === 0) {
             setAirdropLogs([]);
         }
-        setAirdropLogs(prev => [...prev, `--- Starting airdrop run for ${contributorsToProcess.length} wallets. ---`]);
+        setAirdropLogs(prev => [...prev, t('airdrop_run_start_log', { count: contributorsToProcess.length })]);
         setAirdropProgress({ current: processedAddresses.size, total: aggregatedContributors.length });
 
         const BATCH_SIZE = 10;
@@ -268,11 +268,11 @@ export default function AdminPresale() {
                         const signature = await connection.sendRawTransaction(tx.serialize());
                         await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed');
                         setProcessedAddresses(prev => new Set(prev).add(contributor.address));
-                        setAirdropLogs(prev => [...prev, `✅ Success for ${contributor.address.slice(0,6)}... | Sig: ${signature.slice(0,10)}...`]);
+                        setAirdropLogs(prev => [...prev, t('airdrop_success_log', { address: contributor.address.slice(0,6), signature: signature.slice(0,10) })]);
                         successfulInThisRun++;
                     } catch (err) {
                         console.error(`Airdrop failed for ${contributor.address}:`, err);
-                        setAirdropLogs(prev => [...prev, `❌ Failed for ${contributor.address.slice(0,6)}... | Error: ${(err as Error).message}`]);
+                        setAirdropLogs(prev => [...prev, t('airdrop_failed_log', { address: contributor.address.slice(0,6), error: (err as Error).message })]);
                     } finally {
                         setAirdropProgress(prev => ({ ...prev, current: prev.current + 1 }));
                     }
@@ -280,14 +280,14 @@ export default function AdminPresale() {
             } catch (batchError) {
                  console.error(`Error processing batch starting at index ${i}:`, batchError);
                  const failedAddresses = batch.map(b => b.address.slice(0,6)).join(', ');
-                 setAirdropLogs(prev => [...prev, `❌ Critical error in batch (signing failed?): ${(batchError as Error).message}. Failed addresses: ${failedAddresses}`]);
+                 setAirdropLogs(prev => [...prev, t('airdrop_batch_error_log', { error: (batchError as Error).message, addresses: failedAddresses })]);
                  setAirdropProgress(prev => ({ ...prev, current: prev.current + batch.length }));
             }
         }
         
         setIsAirdropping(false);
         const totalFailed = contributorsToProcess.length - successfulInThisRun;
-        setAirdropLogs(prev => [...prev, `--- Airdrop run complete. Success: ${successfulInThisRun}, Failed: ${totalFailed}. Total processed: ${processedAddresses.size + successfulInThisRun}/${aggregatedContributors.length} ---`]);
+        setAirdropLogs(prev => [...prev, t('airdrop_run_complete_log', { success: successfulInThisRun, failed: totalFailed, processed: processedAddresses.size + successfulInThisRun, total: aggregatedContributors.length })]);
 
     }, [wallet, connection, aggregatedContributors, t, processedAddresses]);
 
@@ -296,7 +296,7 @@ export default function AdminPresale() {
             alert("Cannot clear progress while an airdrop is in progress.");
             return;
         }
-        if (window.confirm("Are you sure you want to clear the airdrop progress and logs? This cannot be undone and is only for emergency resets.")) {
+        if (window.confirm(t('airdrop_clear_progress_confirm'))) {
             setProcessedAddresses(new Set());
             setAirdropLogs([]);
             setAirdropProgress({ current: 0, total: 0 });
@@ -326,7 +326,7 @@ export default function AdminPresale() {
     const isResuming = processedAddresses.size > 0 && processedAddresses.size < aggregatedContributors.length;
     const airdropButtonText = isAirdropping 
         ? t('airdrop_in_progress') 
-        : (isResuming ? 'Resume Airdrop' : t('start_airdrop'));
+        : (isResuming ? t('airdrop_resume') : t('start_airdrop'));
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -389,7 +389,7 @@ export default function AdminPresale() {
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold">{t('airdrop_tool_title')}</h2>
                             <button onClick={handleClearProgress} disabled={isAirdropping} className="flex items-center gap-2 text-xs bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-red-200 dark:hover:bg-red-900 disabled:opacity-50">
-                                <RotateCcw size={14} /> Clear Progress & Logs
+                                <RotateCcw size={14} /> {t('airdrop_clear_progress')}
                             </button>
                         </div>
                          <div className="bg-red-500/10 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-r-lg flex items-start gap-3">
@@ -429,7 +429,7 @@ export default function AdminPresale() {
                          {(isAirdropping || airdropProgress.total > 0) && (
                              <div>
                                  <div className="flex justify-between text-sm font-semibold mb-1">
-                                    <span>Airdrop Progress</span>
+                                    <span>{t('airdrop_progress_label')}</span>
                                     <span>{airdropProgress.current} / {airdropProgress.total}</span>
                                  </div>
                                  <div className="w-full bg-primary-200 dark:bg-darkPrimary-700 rounded-full h-4">

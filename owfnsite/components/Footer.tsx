@@ -14,7 +14,7 @@ const socialLinks = [
 export const Footer = () => {
   const { t } = useAppContext();
   return (
-    <footer className="bg-primary-200 dark:bg-darkPrimary-800 shadow-inner">
+    <footer className="bg-primary-200 dark:bg-darkPrimary-900 shadow-inner">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex justify-between items-center">
           <p className="text-sm text-primary-600 dark:text-darkPrimary-400">
@@ -28,8 +28,9 @@ export const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400 transition-colors"
+                aria-label={t(`footer_social_${link.name.toLowerCase()}`)}
               >
-                <span className="sr-only">{link.name}</span>
+                <span className="sr-only">{t(`footer_social_${link.name.toLowerCase()}`)}</span>
                 {link.icon}
               </a>
             ))}
