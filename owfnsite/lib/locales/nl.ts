@@ -1,4 +1,3 @@
-
 export const nl = {
     // Navigation & Sidebar
     home: `Home`,
@@ -28,6 +27,5 @@ export const nl = {
     disconnect_wallet: `Wallet loskoppelen`,
     copy_address: `Adres Kopiëren`,
     change_wallet: `Wallet wijzigen`,
-    // FIX: Completed the unterminated string and closed the object to fix syntax error.
     view_on_solscan: `Bekijk op Solscan`,
 };

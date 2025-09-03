@@ -102,7 +102,6 @@ export const tr = {
     about_new_section_transparency_item3: `Gerçekten fark yaratan şeffaf sosyal girişimler.`,
     about_new_section_info_title: `Temel Bilgiler`,
     about_new_section_info_symbol: `Sembol: OWFN`,
-    // FIX: Corrected missing comma and removed confusing comment
     about_new_section_info_supply: `Toplam Arz: 18.000.000.000 (18 Milyar)`,
     about_new_section_info_purpose: `Amaç: İnsani, Sosyal, Topluluk Odaklı`,
     about_new_section_info_disclaimer: `Spekülatif bir varlık değildir. Kâr vaadi yok. Sadece gerçek yardım.`,

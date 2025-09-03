@@ -64,7 +64,9 @@ export const de = {
     community_toolkit_generate_button: `Weiteren Beitrag erstellen`,
     community_toolkit_copy_button: `Beitrag kopieren`,
     community_toolkit_copied_button: `Kopiert!`,
-    community_toolkit_share_button: `Auf X teilen`,
+    community_toolkit_share_x_aria: `Auf X teilen`,
+    community_toolkit_share_telegram_aria: `Auf Telegram teilen`,
+    community_toolkit_share_facebook_aria: `Auf Facebook teilen`,
     community_toolkit_error_message: `Beitrag konnte nicht erstellt werden. Bitte versuchen Sie es erneut.`,
     community_toolkit_error_message_network: `Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.`,
 

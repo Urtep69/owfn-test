@@ -65,7 +65,9 @@ export const en = {
     community_toolkit_generate_button: `Generate Another Post`,
     community_toolkit_copy_button: `Copy Post`,
     community_toolkit_copied_button: `Copied!`,
-    community_toolkit_share_button: `Share on X`,
+    community_toolkit_share_x_aria: `Share on X`,
+    community_toolkit_share_telegram_aria: `Share on Telegram`,
+    community_toolkit_share_facebook_aria: `Share on Facebook`,
     community_toolkit_error_message: `Failed to generate post. Please try again.`,
     community_toolkit_error_message_network: `An error occurred. Please try again.`,
 
@@ -402,7 +404,6 @@ export const en = {
     on_chain_security: `On-Chain Security`,
     revoked: `Revoked`,
     swap: `Swap`,
-    you_pay: `You pay`,
     you_receive: `You Receive`,
     token_detail_update_authority: `Update Authority`,
     mint_authority: `Mint Authority`,
@@ -504,7 +505,6 @@ export const en = {
     airdrop_failed_log: `❌ Failed for {address}... | Error: {error}`,
     unique_contributors: `Unique Contributors`,
     airdrop_confirmation_prompt: `Are you sure you want to start the airdrop? This will send OWFN tokens to {count} unique wallets and cannot be undone.`,
-    airdrop_progress_label: `Airdrop Progress`,
     
     // Staking
     staking_title: `Stake OWFN, Earn Rewards`,
@@ -603,6 +603,7 @@ export const en = {
     assets: `Assets`,
     chart_tooltip_amount: `Amount:`,
     chart_tooltip_percentage: `Percentage:`,
+    airdrop_progress_label: `Airdrop Progress`,
     
     // Maintenance
     maintenance_heading: `We're Making Improvements!`,
@@ -616,20 +617,7 @@ export const en = {
     deactivate_maintenance_mode: `Deactivate Maintenance`,
     maintenance_login_denied: `Connection denied. The platform is in maintenance mode. Only admins can log in.`,
 
-    // Accessibility & Fallbacks
-    toggle_sidebar_aria_label: "Toggle sidebar",
-    theme_switcher_aria_label_light: `Switch to light mode`,
-    theme_switcher_aria_label_dark: `Switch to dark mode`,
-    language_switcher_aria_label: `Change language`,
-    copy_address_aria_label: `Copy address`,
-    view_on_solscan_aria_label: `View on Solscan`,
-    alt_owfn_logo: `OWFN Logo`,
-    alt_solana_logo: `Solana Logo`,
-    alt_usdc_logo: `USD Coin Logo`,
-    alt_usdt_logo: `Tether Logo`,
-    alt_token_logo: `Token Logo`,
-    chatbot_error_connect: `I can't connect to my brain right now. Please check your internet connection.`,
-    chatbot_error_communicate: `Sorry, I encountered a communication error. Please try again.`,
+    // New error/fallback keys
     error_no_mint_address: `No mint address provided.`,
     error_server_config: `Server configuration error for API.`,
     error_api_helius: `Helius API Error: {error}`,
