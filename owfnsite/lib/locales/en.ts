@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -339,6 +338,10 @@ export const en = {
     chatbot_loading_1: `Connecting to my circuits...`,
     chatbot_loading_2: `Analyzing your question...`,
     chatbot_loading_3: `Formulating a response...`,
+    chatbot_welcome_general: `Welcome to the OWFN Assistant!`,
+    chatbot_welcome_presale: `I see you're checking out our presale.`,
+    chatbot_welcome_donations: `I see you're looking at how to support our mission.`,
+    chatbot_how_can_i_help: `How can I help you today?`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -462,8 +465,6 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
-    airdrop_info_box_title: `About this Airdrop`,
-    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,

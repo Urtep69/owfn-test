@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
-import type { ChatMessage } from '../types.ts';
+import type { ChatMessage, Token } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, DiscordIcon } from './IconComponents.tsx';
 
@@ -89,15 +89,48 @@ const renderMessageContent = (text: string) => {
     return <>{result.map((part, i) => <React.Fragment key={i}>{part}</React.Fragment>)}</>;
 };
 
+const pathToPageName: Record<string, string> = {
+    '/': 'Home',
+    '/presale': 'Presale',
+    '/about': 'About',
+    '/whitepaper': 'Whitepaper',
+    '/tokenomics': 'Tokenomics',
+    '/roadmap': 'Roadmap',
+    '/staking': 'Staking',
+    '/vesting': 'Vesting',
+    '/donations': 'Donations',
+    '/dashboard': 'Dashboard',
+    '/profile': 'Profile',
+    '/impact': 'Impact Portal',
+    '/partnerships': 'Partnerships',
+    '/faq': 'FAQ',
+    '/contact': 'Contact',
+    '/governance': 'Governance',
+    '/airdrop': 'Airdrop'
+};
+
+const getPageName = (path: string) => {
+    if (pathToPageName[path]) return pathToPageName[path];
+    if (path.startsWith('/impact/case/')) return 'Impact Case Detail';
+    if (path.startsWith('/impact/category/')) return 'Impact Category';
+    if (path.startsWith('/dashboard/token/')) return 'Token Detail';
+    return 'Website'; // Generic fallback
+};
+
 
 export const Chatbot = () => {
-    const { t, currentLanguage } = useAppContext();
+    const { t, currentLanguage, solana } = useAppContext();
+    const { address, userTokens } = solana;
+    const [location] = useLocation();
+
     const [isOpen, setIsOpen] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
+    const [initialMessageSent, setInitialMessageSent] = useState(false);
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
@@ -109,11 +142,28 @@ export const Chatbot = () => {
     useEffect(scrollToBottom, [messages, isLoading, loadingText]);
     
     useEffect(() => {
+        if (isOpen && !initialMessageSent) {
+            let welcomeText = t('chatbot_welcome_general');
+            if(location === '/presale'){
+                welcomeText += ' ' + t('chatbot_welcome_presale');
+            } else if (location === '/donations'){
+                welcomeText += ' ' + t('chatbot_welcome_donations');
+            }
+            welcomeText += ' ' + t('chatbot_how_can_i_help');
+            
+            setMessages([{
+                role: 'model' as const,
+                parts: [{ text: welcomeText }],
+                timestamp: new Date()
+            }]);
+            setInitialMessageSent(true);
+        }
+        
         if (isOpen) {
             // A small delay helps ensure the element is visible and animations are settled.
             setTimeout(() => inputRef.current?.focus(), 100);
         }
-    }, [isOpen, isMaximized]);
+    }, [isOpen, initialMessageSent, location, t]);
 
     // Cleanup interval on component unmount
     useEffect(() => {
@@ -141,7 +191,6 @@ export const Chatbot = () => {
         const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }], timestamp: new Date() };
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
         const currentInput = input;
-        const currentTime = new Date().toISOString();
 
         setMessages(prev => [...prev, userMessage]);
         setInput('');
@@ -165,11 +214,18 @@ export const Chatbot = () => {
         try {
             let firstChunkReceived = false;
 
+            const context = {
+                langCode: currentLanguage.code,
+                currentTime: new Date().toISOString(),
+                currentPage: getPageName(location),
+                walletAddress: address,
+                userTokens: userTokens
+            };
+
             await getChatbotResponse(
                 historyForApi,
                 currentInput,
-                currentLanguage.code,
-                currentTime,
+                context,
                 (chunk) => { // onChunk: Append text to the last message
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);

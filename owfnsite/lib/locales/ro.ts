@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -339,6 +338,10 @@ export const ro = {
     chatbot_loading_1: `Mă conectez la circuitele mele...`,
     chatbot_loading_2: `Analizez întrebarea...`,
     chatbot_loading_3: `Formulez un răspuns...`,
+    chatbot_welcome_general: `Bun venit la Asistentul OWFN!`,
+    chatbot_welcome_presale: `Văd că te uiți la prevânzarea noastră.`,
+    chatbot_welcome_donations: `Văd că te interesează cum să susții misiunea noastră.`,
+    chatbot_how_can_i_help: `Cum te pot ajuta astăzi?`,
     
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,
@@ -462,8 +465,6 @@ export const ro = {
     airdrop_eligible_message: `Portofelul tău este eligibil! Vei primi {amount} tokeni OWFN la următoarea distribuire.`,
     airdrop_not_eligible: `Neeligibil`,
     airdrop_not_eligible_message: `Ne pare rău, această adresă de portofel nu este eligibilă pentru airdrop-ul curent. Fii activ în comunitatea noastră pentru oportunități viitoare!`,
-    airdrop_info_box_title: `Despre acest Airdrop`,
-    airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
     
     // Governance
     governance_title: `Guvernanță`,
