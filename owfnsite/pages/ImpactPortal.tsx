@@ -73,7 +73,7 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
 
     return (
         <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d mt-12">
-            <h2 className="text-3xl font-bold mb-6 text-accent-600 dark:text-darkAccent-400">{t('create_new_case')}</h2>
+            <h2 className="text-3xl font-bold font-serif mb-6 text-accent-600 dark:text-darkAccent-400">{t('create_new_case')}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input type="text" placeholder={t('case_title')} value={title} onChange={e => setTitle(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
                 <textarea placeholder={t('case_description')} value={description} onChange={e => setDescription(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md h-32"></textarea>
@@ -87,7 +87,7 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
                     </select>
                     <input type="number" placeholder={t('funding_goal_usd')} value={goal} onChange={e => setGoal(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" min="1" />
                 </div>
-                <button type="submit" disabled={isTranslating} className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 py-3 rounded-lg font-bold hover:bg-accent-500 dark:hover:bg-darkAccent-600 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 transition-colors">
+                <button type="submit" disabled={isTranslating} className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 py-3 rounded-lg font-bold hover:bg-accent-500 dark:hover:bg-darkAccent-600 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 transition-colors btn-tactile">
                     {isTranslating ? t('admin_saving_case') : t('save_case')}
                 </button>
             </form>
@@ -127,7 +127,7 @@ export default function ImpactPortal() {
     return (
         <div className="animate-fade-in-up space-y-8">
             <div className="text-center">
-                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('about_impact_areas_title')}</h1>
+                <h1 className="text-4xl font-bold font-serif text-accent-600 dark:text-darkAccent-400">{t('about_impact_areas_title')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">
                     {t('social_cases_desc')}
                 </p>
@@ -141,7 +141,7 @@ export default function ImpactPortal() {
                     >
                        <a className="block text-center p-8 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d hover:shadow-3d-lg hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent-500">
                             {category.icon}
-                            <h2 className="text-2xl font-bold">{t(category.titleKey)}</h2>
+                            <h2 className="text-2xl font-bold font-serif">{t(category.titleKey)}</h2>
                             <p className="text-primary-600 dark:text-darkPrimary-400 mt-2">{t(category.descKey)}</p>
                        </a>
                     </Link>

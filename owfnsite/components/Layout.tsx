@@ -9,7 +9,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-primary-100 text-primary-800 dark:bg-darkPrimary-950 dark:text-primary-200 font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-primary-100 text-primary-800 dark:bg-darkPrimary-950 dark:text-darkPrimary-200 font-sans transition-colors duration-300">
       <div className="flex">
         {/* Sidebar for Desktop */}
         <div className="hidden md:flex">

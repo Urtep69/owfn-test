@@ -89,7 +89,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
              <div className="flex items-center justify-between h-16 px-4 border-b border-primary-200/80 dark:border-darkPrimary-700/80 flex-shrink-0">
                 <Link to="/" onClick={handleLinkClick} className={`flex items-center space-x-3 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
                     <OwfnIcon className="h-9 w-9" />
-                    <span className={`font-bold text-xl text-primary-900 dark:text-darkPrimary-100 ${isOpen ? 'inline' : 'hidden'}`}>OWFN</span>
+                    <span className={`font-bold text-xl font-serif text-primary-900 dark:text-darkPrimary-100 ${isOpen ? 'inline' : 'hidden'}`}>OWFN</span>
                 </Link>
              </div>
 

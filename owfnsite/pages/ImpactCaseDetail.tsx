@@ -106,7 +106,7 @@ export default function ImpactCaseDetail() {
                 <img src={socialCase.imageUrl} alt={title} className="w-full h-64 md:h-96 object-cover" />
                 <div className="p-6 md:p-10">
                     <span className="text-lg font-semibold text-accent-600 dark:text-darkAccent-500 mb-2 inline-block">{t(`category_${socialCase.category.toLowerCase().replace(' ', '_')}`, { defaultValue: socialCase.category })}</span>
-                    <h1 className="text-3xl md:text-5xl font-bold mb-6">{title}</h1>
+                    <h1 className="text-3xl md:text-5xl font-bold font-serif mb-6">{title}</h1>
                     <p className="text-lg text-primary-700 dark:text-darkPrimary-300 leading-relaxed mb-8">{description}</p>
                     
                     <div className="mb-8">
@@ -123,7 +123,7 @@ export default function ImpactCaseDetail() {
                 <div className="lg:col-span-3 space-y-8">
                      <div id="case-details-content" className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '200ms'}}>
                         <AiSummary contentId="case-details-content" />
-                        <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Newspaper /> {t('live_updates')}</h3>
+                        <h3 className="text-2xl font-bold font-serif mb-4 flex items-center gap-3"><Newspaper /> {t('live_updates')}</h3>
                         <div className="space-y-4">
                             {mockUpdates.map(update => (
                                 <div key={update.date} className="border-b border-primary-200 dark:border-darkPrimary-700 pb-4 last:border-b-0 last:pb-0">
@@ -137,7 +137,7 @@ export default function ImpactCaseDetail() {
 
                      {details && (
                         <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '300ms'}}>
-                            <h3 className="text-2xl font-bold mb-4">{t('case_details_title')}</h3>
+                            <h3 className="text-2xl font-bold font-serif mb-4">{t('case_details_title')}</h3>
                             <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed whitespace-pre-wrap">{details}</p>
                         </div>
                     )}
@@ -146,7 +146,7 @@ export default function ImpactCaseDetail() {
                 <div className="lg:col-span-2">
                     <div className="lg:sticky top-24 space-y-8">
                         <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '400ms'}}>
-                            <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                            <h3 className="text-2xl font-bold font-serif mb-4 flex items-center gap-2">
                                 <Heart className="text-red-500" />
                                 <span>{t('support_this_cause')}</span>
                             </h3>
@@ -235,7 +235,7 @@ export default function ImpactCaseDetail() {
                             </div>
                         </div>
                         <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '500ms'}}>
-                            <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Milestone /> {t('funding_milestones')}</h3>
+                            <h3 className="text-2xl font-bold font-serif mb-4 flex items-center gap-3"><Milestone /> {t('funding_milestones')}</h3>
                              <div className="relative pl-4">
                                 <div className="absolute top-0 left-4 h-full w-0.5 bg-primary-200 dark:bg-darkPrimary-700"></div>
                                 <div className="absolute top-0 left-4 h-full w-0.5 bg-accent-500 dark:bg-darkAccent-500 transition-all duration-500" style={{ height: `${progress}%` }}></div>

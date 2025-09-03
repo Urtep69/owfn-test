@@ -88,7 +88,7 @@ export default function Donations() {
     return (
         <div className="animate-fade-in-up space-y-12">
             <div className="text-center">
-                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('make_donation')}</h1>
+                <h1 className="text-4xl font-bold font-serif text-accent-600 dark:text-darkAccent-400">{t('make_donation')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">
                     {t('donation_desc')}
                 </p>
@@ -96,7 +96,7 @@ export default function Donations() {
             
             <div className="bg-white dark:bg-darkPrimary-800 p-8 md:p-12 rounded-2xl shadow-3d-lg transform hover:scale-[1.02] transition-transform duration-300">
                 <div className="max-w-4xl mx-auto text-center space-y-4">
-                    <h2 className="text-3xl font-bold text-primary-800 dark:text-darkPrimary-200">{t('donation_message_title')}</h2>
+                    <h2 className="text-3xl font-bold font-serif text-primary-800 dark:text-darkPrimary-200">{t('donation_message_title')}</h2>
                     <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{t('donation_message_p1')}</p>
                     <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed">
                         {t('donation_message_p2_part1')}
@@ -118,7 +118,7 @@ export default function Donations() {
             </div>
             
             <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d max-w-2xl mx-auto">
-                <h2 className="text-2xl font-bold mb-6 text-center">{t('donations_form_title')}</h2>
+                <h2 className="text-2xl font-bold font-serif mb-6 text-center">{t('donations_form_title')}</h2>
 
                 <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-3 rounded-lg text-sm text-primary-700 dark:text-darkPrimary-300 mb-6 flex items-start gap-2">
                     <Info size={18} className="flex-shrink-0 mt-0.5 text-primary-500 dark:text-darkPrimary-400" />
@@ -196,7 +196,7 @@ export default function Donations() {
                             </p>
                         </div>
                     )}
-                     <button onClick={handleDonate} disabled={solana.loading || (solana.connected && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                     <button onClick={handleDonate} disabled={solana.loading || (solana.connected && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed btn-tactile">
                          {buttonText}
                     </button>
                 </div>
