@@ -32,7 +32,7 @@ const Countdown = ({ endDate }: { endDate: Date }) => {
     const timerComponents = Object.entries(timeLeft)
         .map(([interval, value]) => `${value}${interval}`);
 
-    return <span>{timerComponents.length > 0 ? timerComponents.join(' ') : 'Ended'}</span>;
+    return <span>{timerComponents.length > 0 ? timerComponents.join(' ') : t('ended')}</span>;
 };
 
 const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {

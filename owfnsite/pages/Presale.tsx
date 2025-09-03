@@ -523,6 +523,14 @@ export default function Presale() {
   };
   
   const saleStartDate = PRESALE_DETAILS.startDate;
+  
+  const timerTitle = useMemo(() => {
+      if (presaleStatus === 'pending') return t('presale_sale_starts_in');
+      if (presaleStatus === 'active') return t('presale_public_ending_in');
+      if (presaleStatus === 'ended' && endReason === 'hardcap') return t('presale_ended_hardcap');
+      return t('presale_sale_ended');
+  }, [presaleStatus, endReason, t]);
+
 
   return (
     <div className="bg-primary-50 dark:bg-darkPrimary-950 text-primary-700 dark:text-darkPrimary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
@@ -577,10 +585,7 @@ export default function Presale() {
                         </div>
                         <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 text-center">
                             <p className="text-primary-500 dark:text-darkPrimary-400 text-sm">
-                                {presaleStatus === 'pending' && t('presale_sale_starts_in')}
-                                {presaleStatus === 'active' && t('presale_public_ending_in')}
-                                {presaleStatus === 'ended' && endReason === 'hardcap' && t('presale_ended_hardcap')}
-                                {presaleStatus === 'ended' && endReason !== 'hardcap' && t('presale_sale_ended')}
+                                {timerTitle}
                             </p>
                             <p className="text-primary-800 dark:text-darkPrimary-100 text-2xl font-mono font-bold">
                                 {presaleStatus !== 'ended' ? 

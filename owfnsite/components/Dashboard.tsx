@@ -67,13 +67,14 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
                             </p>
                         </div>
                         <div className="mt-4 pt-4 border-t border-primary-200 dark:border-darkPrimary-700/50 flex-grow flex flex-col">
-                            <h4 className="text-xs font-bold uppercase text-primary-500 dark:text-darkPrimary-500 mb-2">Assets</h4>
+                            <h4 className="text-xs font-bold uppercase text-primary-500 dark:text-darkPrimary-500 mb-2">{t('assets')}</h4>
                             {balances.length > 0 ? (
                                 <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
                                     {balances.map(token => (
                                         <div key={token.mintAddress} className="flex items-center justify-between text-sm">
                                             <div className="flex items-center gap-3">
                                                 {React.isValidElement(token.logo) ? React.cloneElement(token.logo as React.ReactElement<{ className?: string }>, { className: 'w-6 h-6' }) : null}
+                                                <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{token.symbol}</span>
                                             </div>
                                             <div className="text-right font-mono">
                                                 <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
