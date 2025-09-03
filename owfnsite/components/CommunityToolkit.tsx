@@ -57,7 +57,10 @@ export const CommunityToolkit = () => {
                 shareUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
                 break;
             case 'facebook':
-                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+                // The 'quote' parameter is unreliable for pre-filling text on Facebook.
+                // Sharing just the URL is more robust and ensures Facebook's crawler
+                // correctly generates a preview with the site's title, description, and logo.
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
                 break;
         }
 
