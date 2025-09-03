@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 
 export const LanguageSwitcher = () => {
-    const { t, currentLanguage, supportedLanguages, setLang } = useAppContext();
+    const { currentLanguage, supportedLanguages, setLang } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -30,7 +30,7 @@ export const LanguageSwitcher = () => {
                 className="flex items-center space-x-2 p-2 rounded-lg text-primary-700 dark:text-darkPrimary-300 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"
                 aria-haspopup="true"
                 aria-expanded={isOpen}
-                aria-label={t('language_switcher_aria_label')}
+                aria-label="Change language"
             >
                 <span className="text-xl">{currentLanguage.flag}</span>
                 <span className="font-semibold hidden sm:inline">{currentLanguage.code.toUpperCase()}</span>

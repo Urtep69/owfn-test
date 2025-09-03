@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { AllocationChart } from '../components/AllocationChart.tsx';
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS } from '../constants.ts';
@@ -17,7 +19,7 @@ export default function Tokenomics() {
     return (
         <div className="animate-fade-in-up">
             <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold font-serif text-accent-600 dark:text-darkAccent-400">{t('tokenomics_title')}</h1>
+                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('tokenomics_title')}</h1>
                 <p className="mt-4 text-lg text-primary-600 dark:text-darkPrimary-400">
                     {t('tokenomics_subtitle')}
                 </p>
@@ -25,7 +27,7 @@ export default function Tokenomics() {
 
             <div className="grid lg:grid-cols-2 gap-12 items-start">
                 <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
-                    <h2 className="text-2xl font-bold font-serif mb-6">{t('tokenomics_details_title')}</h2>
+                    <h2 className="text-2xl font-bold mb-6">{t('tokenomics_details_title')}</h2>
                     <div className="space-y-2">
                         <DetailItem 
                             label={t('total_supply')} 
@@ -46,7 +48,7 @@ export default function Tokenomics() {
                 </div>
 
                 <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
-                    <h2 className="text-2xl font-bold font-serif mb-6">{t('tokenomics_allocation_title')}</h2>
+                    <h2 className="text-2xl font-bold mb-6">{t('tokenomics_allocation_title')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {TOKEN_ALLOCATIONS.map(alloc => (
                             <div key={alloc.name} className="flex items-center space-x-3">
@@ -59,7 +61,7 @@ export default function Tokenomics() {
             </div>
 
             <div className="mt-12 bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
-                <h2 className="text-2xl font-bold font-serif mb-6">{t('tokenomics_chart_title')}</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center">{t('tokenomics_chart_title')}</h2>
                 <AllocationChart />
             </div>
         </div>

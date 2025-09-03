@@ -36,6 +36,7 @@ export default async function handler(req: any, res: any) {
         if (countryCode !== 'N/A') {
             try {
                 // Get the full country name in English from the country code
+                // FIX: The correct type for country codes is 'region'.
                 countryName = new Intl.DisplayNames(['en'], { type: 'region' }).of(countryCode) || countryCode;
             } catch (e) {
                 console.warn(`Could not get country name for code: ${countryCode}`);

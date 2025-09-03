@@ -1,33 +1,32 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
-import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2, TrendingUp, Users, Droplets, RefreshCw } from 'lucide-react';
+import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2, TrendingUp, Users, Droplets, Info } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { TokenDetails } from '../types.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import { GenericTokenIcon, SolIcon } from '../components/IconComponents.tsx';
+import { GenericTokenIcon } from '../components/IconComponents.tsx';
 import { DualProgressBar } from '../components/DualProgressBar.tsx';
+import { MOCK_TOKEN_DETAILS } from '../constants.ts';
 
-const StatCard = ({ title, value, icon, change, changeColor }: { title: string, value: string, icon: React.ReactNode, change?: string, changeColor?: string }) => (
-    <div className="bg-white/50 dark:bg-darkPrimary-800/50 backdrop-blur-sm p-5 rounded-2xl shadow-3d hover:shadow-3d-lg transition-all duration-300 group perspective-1000">
-        <div className="transform-style-3d transition-transform duration-500 group-hover:-translate-y-1">
-            <div className="flex items-center gap-3">
-                <div className="text-primary-400 dark:text-darkPrimary-500">{icon}</div>
-                <p className="text-sm font-semibold text-primary-600 dark:text-darkPrimary-400">{title}</p>
+const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 dark:text-darkPrimary-100' }: { title: string, value: string, subtext?: string, icon: React.ReactNode, valueColor?: string }) => (
+    <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
+        <div className="flex items-center space-x-3">
+            <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">{icon}</div>
+            <div>
+                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+                <div className="flex items-baseline gap-2">
+                    <p className={`text-2xl font-bold ${valueColor}`}>{value}</p>
+                </div>
+                 {subtext && <p className="text-xs font-semibold text-primary-500 dark:text-darkPrimary-500">{subtext}</p>}
             </div>
-            <p className="text-3xl font-bold mt-2 text-primary-900 dark:text-darkPrimary-100">{value}</p>
-            {change && <p className={`text-sm font-semibold mt-1 ${changeColor}`}>{change}</p>}
         </div>
     </div>
 );
 
-
 const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
-    <div className="bg-white/50 dark:bg-darkPrimary-800/50 backdrop-blur-sm p-6 rounded-2xl shadow-3d hover:shadow-3d-lg transition-all duration-300 group perspective-1000 h-full">
-       <div className="transform-style-3d transition-transform duration-500 group-hover:-translate-y-1">
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-3 text-primary-800 dark:text-darkPrimary-200">{icon}{title}</h3>
-            <div className="space-y-3">{children}</div>
-        </div>
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d h-full">
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-primary-800 dark:text-darkPrimary-200">{icon}{title}</h3>
+        <div className="space-y-3">{children}</div>
     </div>
 );
 
@@ -37,46 +36,6 @@ const InfoRow = ({ label, children }: { label: string, children: React.ReactNode
         <div className="text-sm font-semibold text-primary-800 dark:text-darkPrimary-200 text-right break-all">{children}</div>
     </div>
 );
-
-const SwapCard = ({ tokenSymbol, tokenLogo }: { tokenSymbol: string, tokenLogo: React.ReactNode }) => {
-    const { t, setWalletModalOpen } = useAppContext();
-    return (
-        <InfoCard title={t('swap')} icon={<RefreshCw size={24} />}>
-            <div className="space-y-2">
-                <div className="bg-primary-100 dark:bg-darkPrimary-700 p-3 rounded-lg">
-                    <div className="flex justify-between text-xs mb-1">
-                        <span>{t('you_pay')}</span>
-                        <span>{t('balance')}: --</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <input type="number" placeholder="0.0" className="w-full bg-transparent text-2xl font-mono focus:outline-none"/>
-                        <div className="flex items-center gap-2 bg-white dark:bg-darkPrimary-800 p-2 rounded-md">
-                            <SolIcon className="w-6 h-6" />
-                            <span className="font-bold">SOL</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="bg-primary-100 dark:bg-darkPrimary-700 p-3 rounded-lg">
-                    <div className="flex justify-between text-xs mb-1">
-                        <span>{t('you_receive')}</span>
-                        <span>{t('balance')}: --</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <input type="number" placeholder="0.0" className="w-full bg-transparent text-2xl font-mono focus:outline-none"/>
-                        <div className="flex items-center gap-2 bg-white dark:bg-darkPrimary-800 p-2 rounded-md">
-                            {React.cloneElement(tokenLogo as React.ReactElement<{ className?: string }>, { className: 'w-6 h-6' })}
-                            <span className="font-bold">{tokenSymbol}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <button onClick={() => setWalletModalOpen(true)} className="w-full mt-4 bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors btn-tactile">
-                {t('connect_wallet')}
-            </button>
-        </InfoCard>
-    )
-};
 
 
 export default function TokenDetail() {
@@ -114,15 +73,27 @@ export default function TokenDetail() {
                 const response = await fetch(`/api/token-info?mint=${mintAddress}`);
 
                 if (!response.ok) {
-                    // When the function crashes, the body is often text from Vercel, not JSON.
-                    const errorText = await response.text();
-                    // We'll throw this to be caught below and displayed to the user.
-                    throw new Error(errorText || `A server error occurred: ${response.status}`);
+                    let errorMsg = `Error: ${response.status} ${response.statusText}`;
+                    const errorText = await response.text(); // Read body once as text
+                    try {
+                        // Try parsing it as JSON
+                        const errorData = JSON.parse(errorText);
+                        errorMsg = errorData.error || errorMsg;
+                    } catch (e) {
+                         // If it's not JSON, use the raw text (or a snippet)
+                        errorMsg = errorText.substring(0, 200) || errorMsg;
+                    }
+                    throw new Error(errorMsg);
                 }
                 
                 const data: TokenDetails = await response.json();
-                setToken(data);
 
+                const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
+                if (mockDetailsKey) {
+                    const mock = MOCK_TOKEN_DETAILS[mockDetailsKey];
+                    data.description = data.description || mock.description;
+                }
+                setToken(data);
             } catch (err) {
                 console.error("Failed to fetch token details:", err);
                 setError(err instanceof Error ? err.message : "An unknown error occurred.");
@@ -151,14 +122,13 @@ export default function TokenDetail() {
     }
     
     const isPriceAvailable = (token.pricePerToken ?? 0) > 0;
-    const priceString = isPriceAvailable 
-        ? (token.pricePerToken! > 0.01 
-            ? token.pricePerToken!.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) 
-            : token.pricePerToken!.toPrecision(4))
-        : t('not_applicable');
+    const priceString = token.pricePerToken 
+        ? (token.pricePerToken > 0.01 
+            ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) 
+            : token.pricePerToken.toPrecision(4))
+        : 'N/A';
     const priceChange = token.price24hChange ?? 0;
     const priceChangeColor = priceChange >= 0 ? 'text-green-500' : 'text-red-500';
-    const tokenLogo = <GenericTokenIcon uri={token.logo as string} className="w-16 h-16 flex-shrink-0" />;
 
     return (
         <div className="space-y-8 animate-fade-in-up">
@@ -166,40 +136,28 @@ export default function TokenDetail() {
                 <ArrowLeft size={16} /> {backLinkText}
             </Link>
 
-            <section className="bg-white/50 dark:bg-darkPrimary-800/50 backdrop-blur-sm p-6 rounded-2xl shadow-3d-lg relative overflow-hidden group perspective-1000">
-                <div className="absolute -inset-24 bg-gradient-to-br from-accent-400/20 via-transparent to-primary-400/20 dark:from-darkAccent-500/20 dark:to-darkPrimary-500/20 opacity-50 blur-3xl group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative flex flex-col md:flex-row items-center gap-6">
-                    {tokenLogo}
-                    <div className="text-center md:text-left">
-                        <h1 className="text-4xl font-bold">{token.name}</h1>
-                        <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
-                    </div>
-                    <div className="md:ml-auto text-center md:text-right">
-                        <p className="text-4xl font-bold">{isPriceAvailable ? `$${priceString}`: t('not_applicable')}</p>
-                        <p className={`text-lg font-semibold ${priceChangeColor}`}>{priceChange.toFixed(2)}% (24h)</p>
-                    </div>
+            <header className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <GenericTokenIcon uri={token.logo as string} className="w-16 h-16 flex-shrink-0" />
+                <div className="flex-grow">
+                    <h1 className="text-3xl font-bold">{token.name}</h1>
+                    <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
                 </div>
-            </section>
+            </header>
 
-             <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap/1_000_000).toFixed(2)}M` : t('not_applicable')} icon={<BarChart2 />} />
-                <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h/1_000_000).toFixed(2)}M` : t('not_applicable')} icon={<TrendingUp />} />
-                <StatCard title={t('liquidity')} value={token.liquidity ? `$${(token.liquidity/1_000).toFixed(2)}k` : t('not_applicable')} icon={<Droplets />} />
-                <StatCard title={t('holders')} value={token.holders ? token.holders.toLocaleString() : t('not_applicable')} icon={<Users />} />
-            </section>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <StatCard title={t('pricePerToken')} value={isPriceAvailable ? `$${priceString}`: 'N/A'} icon={<DollarSign />} subtext={`${priceChange.toFixed(2)}% (24h)`} />
+                <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<BarChart2 />} />
+                <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<TrendingUp />} />
+            </div>
 
-
-            <section className="grid lg:grid-cols-3 gap-8">
+            <div className="grid lg:grid-cols-3 gap-8 items-start">
                 <div className="lg:col-span-2 space-y-8">
-                    <SwapCard tokenSymbol={token.symbol!} tokenLogo={tokenLogo} />
-                    {token.description && (
-                        <InfoCard title={t('token_description_title')} icon={<FileText />}>
-                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{token.description}</p>
-                        </InfoCard>
-                    )}
-                </div>
-                
-                <div className="lg:col-span-1 space-y-8">
+                    <InfoCard title={t('market_stats')} icon={<Info />}>
+                        <InfoRow label={t('fully_diluted_valuation')}>{token.fdv ? `$${token.fdv.toLocaleString(undefined, {maximumFractionDigits: 0})}` : 'N/A'}</InfoRow>
+                        <InfoRow label={t('liquidity')}>{token.liquidity ? `$${token.liquidity.toLocaleString(undefined, {maximumFractionDigits: 0})}` : 'N/A'}</InfoRow>
+                        <InfoRow label={t('holders')}>{token.holders ? token.holders.toLocaleString() : 'N/A'}</InfoRow>
+                    </InfoCard>
+
                     {token.txns && (
                         <InfoCard title={t('trading_stats')} icon={<BarChart2 />}>
                              <DualProgressBar 
@@ -211,15 +169,24 @@ export default function TokenDetail() {
                              <InfoRow label={t('total_transactions_24h')}>{ (token.txns.h24.buys + token.txns.h24.sells).toLocaleString() }</InfoRow>
                         </InfoCard>
                     )}
+                </div>
+                
+                <div className="lg:col-span-1 space-y-8">
                      <InfoCard title={t('on_chain_security')} icon={<Shield />}>
                         <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
-                        <InfoRow label={t('token_standard')}>{token.tokenStandard || t('not_applicable')}</InfoRow>
+                        <InfoRow label={t('token_standard')}>{token.tokenStandard || 'N/A'}</InfoRow>
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
-                        <AuthorityRow label={t('token_detail_update_authority')} address={token.updateAuthority} />
+                        <AuthorityRow label="Update Authority" address={token.updateAuthority} />
                     </InfoCard>
+
+                    {token.description && (
+                        <InfoCard title={t('token_description_title')} icon={<FileText />}>
+                            <p className="text-sm text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{token.description}</p>
+                        </InfoCard>
+                    )}
                 </div>
-            </section>
+            </div>
         </div>
     );
 }
