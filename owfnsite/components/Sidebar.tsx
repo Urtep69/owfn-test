@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
@@ -101,7 +102,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                     </NavGroup>
                 ))}
                  {isAdmin && (
-                    <NavGroup title="Admin" isOpen={isOpen}>
+                    <NavGroup title={t('sidebar_admin_group')} isOpen={isOpen}>
                         <NavItem 
                             to="/admin/presale" 
                             icon={<Shield size={20} />} 

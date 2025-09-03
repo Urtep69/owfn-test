@@ -22,6 +22,7 @@ export const ro = {
     sidebar_explore: `Explorare`,
     sidebar_finance: `Finanțe`,
     sidebar_engage: `Interacțiune`,
+    sidebar_admin_group: `Admin`,
 
     // General & Header
     connect_wallet: `Conectare Portofel`,
@@ -354,6 +355,12 @@ export const ro = {
     chatbot_proactive_profile: "Bun venit la profilul dumneavoastră! Anunțați-mă dacă aveți întrebări despre tokenurile sau statisticile de impact.",
     chatbot_proactive_wallet_intro: `Bine ați revenit! Văd că aveți câteva active în portofelul conectat:`,
     chatbot_proactive_wallet_outro: `Vă pot ajuta să cumpărați mai multe OWFN sau să faceți o donație. Ce vă interesează astăzi?`,
+    chatbot_open_aria_label: "Deschide Chatbot",
+    chatbot_minimize_aria_label: "Minimizează Chat",
+    chatbot_restore_aria_label: "Restaurează Chat",
+    chatbot_maximize_aria_label: "Maximizează Chat",
+    chatbot_close_aria_label: "Închide Chat",
+    chatbot_send_aria_label: "Trimite mesaj",
 
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,
@@ -376,6 +383,9 @@ export const ro = {
 
     // Footer
     footer_copyright: `© {year} Official World Family Network. Toate drepturile rezervate.`,
+    footer_social_x: "Link către pagina noastră de X",
+    footer_social_telegram: "Link către pagina noastră de Telegram",
+    footer_social_discord: "Link către pagina noastră de Discord",
 
     // Token Detail Page
     back_to_dashboard: `Înapoi la Dashboard`,
@@ -494,6 +504,7 @@ export const ro = {
     airdrop_failed_log: `❌ Eșec pentru {address}... | Eroare: {error}`,
     unique_contributors: `Contribuitori Unici`,
     airdrop_confirmation_prompt: `Sunteți sigur că doriți să porniți airdrop-ul? Acest lucru va trimite tokeni OWFN către {count} portofele unice și nu poate fi anulat.`,
+    airdrop_progress_label: `Progres Airdrop`,
     
     // Staking
     staking_title: `Staking OWFN, Câștigă Recompense`,
@@ -592,7 +603,6 @@ export const ro = {
     assets: `Active`,
     chart_tooltip_amount: `Sumă:`,
     chart_tooltip_percentage: `Procent:`,
-    airdrop_progress_label: `Progres Airdrop`,
     
     // Maintenance
     maintenance_heading: `Facem Îmbunătățiri!`,
@@ -606,7 +616,8 @@ export const ro = {
     deactivate_maintenance_mode: `Dezactivează Mentenanța`,
     maintenance_login_denied: `Conectare refuzată. Platforma este în modul de mentenanță. Doar administratorii se pot autentifica.`,
     
-    // NEW KEYS - Accessibility, Chatbot errors, etc.
+    // Accessibility & Fallbacks
+    toggle_sidebar_aria_label: "Comută bara laterală",
     theme_switcher_aria_label_light: `Treci la modul luminos`,
     theme_switcher_aria_label_dark: `Treci la modul întunecat`,
     language_switcher_aria_label: `Schimbă limba`,

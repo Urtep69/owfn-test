@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -122,6 +123,7 @@ const ConnectButton = () => {
 
 
 export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
+  const { t } = useAppContext();
   return (
     <header className="bg-primary-100/70 dark:bg-darkPrimary-950/70 backdrop-blur-lg sticky top-0 z-40 border-b border-primary-200/80 dark:border-darkPrimary-800/80">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -130,7 +132,7 @@ export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
              <button
               onClick={toggleSidebar}
               className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none hidden md:block"
-              aria-label="Toggle sidebar"
+              aria-label={t('toggle_sidebar_aria_label')}
             >
               {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>

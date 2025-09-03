@@ -22,6 +22,7 @@ export const en = {
     sidebar_explore: `Explore`,
     sidebar_finance: `Finance`,
     sidebar_engage: `Engage`,
+    sidebar_admin_group: `Admin`,
 
     // General & Header
     connect_wallet: `Connect Wallet`,
@@ -354,6 +355,12 @@ export const en = {
     chatbot_proactive_profile: "Welcome to your profile! Let me know if you have questions about your tokens or impact stats.",
     chatbot_proactive_wallet_intro: `Welcome back! I see you have some assets in your connected wallet:`,
     chatbot_proactive_wallet_outro: `I can help you purchase more OWFN or make a donation. What are you interested in today?`,
+    chatbot_open_aria_label: "Open Chatbot",
+    chatbot_minimize_aria_label: "Minimize Chat",
+    chatbot_restore_aria_label: "Restore Chat",
+    chatbot_maximize_aria_label: "Maximize Chat",
+    chatbot_close_aria_label: "Close Chat",
+    chatbot_send_aria_label: "Send message",
 
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -376,6 +383,9 @@ export const en = {
 
     // Footer
     footer_copyright: `© {year} Official World Family Network. All rights reserved.`,
+    footer_social_x: "Link to our X page",
+    footer_social_telegram: "Link to our Telegram page",
+    footer_social_discord: "Link to our Discord page",
 
     // Token Detail Page
     back_to_dashboard: `Back to Dashboard`,
@@ -494,6 +504,7 @@ export const en = {
     airdrop_failed_log: `❌ Failed for {address}... | Error: {error}`,
     unique_contributors: `Unique Contributors`,
     airdrop_confirmation_prompt: `Are you sure you want to start the airdrop? This will send OWFN tokens to {count} unique wallets and cannot be undone.`,
+    airdrop_progress_label: `Airdrop Progress`,
     
     // Staking
     staking_title: `Stake OWFN, Earn Rewards`,
@@ -592,7 +603,6 @@ export const en = {
     assets: `Assets`,
     chart_tooltip_amount: `Amount:`,
     chart_tooltip_percentage: `Percentage:`,
-    airdrop_progress_label: `Airdrop Progress`,
     
     // Maintenance
     maintenance_heading: `We're Making Improvements!`,
@@ -606,7 +616,8 @@ export const en = {
     deactivate_maintenance_mode: `Deactivate Maintenance`,
     maintenance_login_denied: `Connection denied. The platform is in maintenance mode. Only admins can log in.`,
 
-    // NEW KEYS - Accessibility, Chatbot errors, etc.
+    // Accessibility & Fallbacks
+    toggle_sidebar_aria_label: "Toggle sidebar",
     theme_switcher_aria_label_light: `Switch to light mode`,
     theme_switcher_aria_label_dark: `Switch to dark mode`,
     language_switcher_aria_label: `Change language`,

@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'wouter';
 import { Loader2, ArrowLeft, Shield, DollarSign, FileText, BarChart2, TrendingUp, Users, Droplets, RefreshCw } from 'lucide-react';

@@ -345,7 +345,7 @@ export const Chatbot = () => {
             <button
                 onClick={() => handleOpenChat()}
                 className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
-                aria-label="Open Chatbot"
+                aria-label={t('chatbot_open_aria_label')}
             >
                 <MessageCircle size={28} />
             </button>
@@ -365,13 +365,13 @@ export const Chatbot = () => {
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Minimize Chat">
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t('chatbot_minimize_aria_label')}>
                         <Minus size={20} />
                     </button>
-                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={isMaximized ? "Restore Chat" : "Maximize Chat"}>
+                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t(isMaximized ? 'chatbot_restore_aria_label' : 'chatbot_maximize_aria_label')}>
                         {isMaximized ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Close Chat">
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t('chatbot_close_aria_label')}>
                         <X size={20} />
                     </button>
                 </div>
@@ -428,7 +428,7 @@ export const Chatbot = () => {
                         onClick={handleSend}
                         disabled={isLoading || input.trim() === ''}
                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
-                        aria-label="Send message"
+                        aria-label={t('chatbot_send_aria_label')}
                     >
                        {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }
                     </button>
