@@ -18,7 +18,7 @@ export const ComingSoonWrapper: React.FC<ComingSoonWrapperProps> = ({ children, 
 
     return (
         <div className="relative rounded-lg overflow-hidden">
-            <div className="pointer-events-none" aria-hidden="true">
+            <div className="blur-md pointer-events-none" aria-hidden="true">
                 {children}
             </div>
             {showMessage ? (

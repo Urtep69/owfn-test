@@ -53,11 +53,12 @@ const ConnectButton = () => {
         return (
             <button
                 onClick={() => setVisible(true)}
-                className="group relative inline-flex items-center justify-center px-5 py-2.5 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-3d hover:shadow-3d-lg transition-all duration-300 transform hover:-translate-y-0.5 btn-tactile"
+                className="group relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-md transition-transform transform hover:scale-105"
             >
-                <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-accent-400 to-accent-500 dark:from-darkAccent-400 dark:to-darkAccent-600"></span>
-                <span className="absolute bottom-0 right-0 w-full h-full transition-all duration-500 ease-in-out transform translate-x-full translate-y-full bg-accent-500/80 dark:bg-darkAccent-500/80 group-hover:translate-x-0 group-hover:translate-y-0"></span>
-                <span className="relative font-sans">{t('connect_wallet')}</span>
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600"></span>
+                <span className="absolute bottom-0 right-0 w-full h-full transition-all duration-500 ease-in-out transform translate-x-full translate-y-full bg-accent-500 dark:bg-darkAccent-600 group-hover:translate-x-0 group-hover:translate-y-0"></span>
+                <span className="absolute inset-0 w-full h-full duration-500 ease-in-out delay-200 opacity-0 group-hover:opacity-100 group-hover:animate-glow"></span>
+                <span className="relative">{t('connect_wallet')}</span>
             </button>
         );
     }
@@ -66,17 +67,23 @@ const ConnectButton = () => {
          <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setDropdownOpen(prev => !prev)}
-                className="flex items-center bg-primary-100 dark:bg-darkPrimary-800 border border-primary-200 dark:border-darkAccent-700/50 rounded-full text-sm font-semibold text-primary-900 dark:text-darkPrimary-100 transition-all duration-300 hover:border-accent-400 dark:hover:border-darkAccent-600 shadow-3d hover:shadow-3d-lg"
+                className="flex items-center bg-[#22252A] dark:bg-darkPrimary-800 border border-green-400/30 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:border-green-400/70 shadow-lg"
             >
-                <div className="flex items-center space-x-2 pl-4 pr-3 py-1.5">
+                <div 
+                    className="bg-green-500 text-white font-bold py-[7px] pl-4 pr-5 text-xs rounded-l-full"
+                    style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)' }}
+                >
+                    NEW
+                </div>
+                <div className="flex items-center space-x-2 pl-2 pr-3">
                     <WalletManagerIcon className="w-5 h-5" />
-                    <span className="text-accent-600 dark:text-darkAccent-400 text-xs tracking-wider">{truncateAddress(address)}</span>
-                    <ChevronRight size={16} className={`text-primary-500 dark:text-darkAccent-400/70 transition-transform ${isDropdownOpen ? 'rotate-90' : ''}`} />
+                    <span className="text-green-400 text-xs tracking-wider">Wallet Manager</span>
+                    <ChevronRight size={16} className="text-green-400/70" />
                 </div>
             </button>
 
             {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-primary-50/80 dark:bg-darkPrimary-800/80 backdrop-blur-xl border border-primary-200/50 dark:border-darkPrimary-700/50 rounded-lg shadow-3d-lg animate-fade-in-up" style={{animationDuration: '200ms'}}>
+                <div className="absolute right-0 mt-2 w-56 bg-white/80 dark:bg-darkPrimary-800/80 backdrop-blur-xl border border-primary-200/50 dark:border-darkPrimary-700/50 rounded-lg shadow-3d-lg animate-fade-in-up" style={{animationDuration: '200ms'}}>
                     <div className="p-3">
                          <span className="font-semibold text-sm font-mono text-primary-800 dark:text-darkPrimary-100">{truncateAddress(address)}</span>
                     </div>
@@ -123,13 +130,13 @@ const ConnectButton = () => {
 
 export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
   return (
-    <header className="bg-primary-100/70 dark:bg-darkPrimary-950/70 backdrop-blur-lg sticky top-0 z-40 border-b border-primary-200/80 dark:border-darkPrimary-800/80">
+    <header className="bg-primary-100/80 dark:bg-darkPrimary-900/80 backdrop-blur-sm sticky top-0 z-40 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
              <button
               onClick={toggleSidebar}
-              className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none hidden md:block"
+              className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none"
               aria-label="Toggle sidebar"
             >
               {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

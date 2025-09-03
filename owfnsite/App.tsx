@@ -32,7 +32,6 @@ import Governance from './pages/Governance.tsx';
 import Maintenance from './pages/Maintenance.tsx';
 import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
-import ImpactHub from './pages/ImpactHub.tsx';
 import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
@@ -68,7 +67,6 @@ const AppContent = () => {
               <Airdrop />
             </ComingSoonWrapper>
           </Route>
-          <Route path="/hub"><ImpactHub /></Route>
           <Route path="/donations"><Donations /></Route>
           <Route path="/dashboard/token/:mint">
             <ComingSoonWrapper>
