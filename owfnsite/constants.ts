@@ -1,7 +1,7 @@
-
-import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
+import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction, HubChannel } from './types.ts';
 import React from 'react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
+import { Users, Lock, Award, Star } from 'lucide-react';
 
 
 export const OWFN_MINT_ADDRESS = 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B';
@@ -164,3 +164,13 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         circulatingSupply: 0,
     }
 };
+
+export const CHAT_HOLDERS_CIRCLE_REQUIREMENT = 1_000_000;
+
+// FIX: Replaced JSX syntax with React.createElement to resolve TypeScript errors in a .ts file, as JSX is only valid in .tsx files.
+export const HUB_CHANNELS: HubChannel[] = [
+  { id: 'general', nameKey: 'hub_public_square', level: 1, icon: React.createElement(Users, { size: 18 }), accessKey: 'hub_access_level_1' },
+  { id: 'holders', nameKey: 'hub_holders_circle', level: 2, icon: React.createElement(Lock, { size: 18 }), accessKey: 'hub_access_level_2' },
+  { id: 'council', nameKey: 'hub_impact_council', level: 3, icon: React.createElement(Award, { size: 18 }), accessKey: 'hub_access_level_3' },
+  { id: 'guardians', nameKey: 'hub_guardians_sanctuary', level: 4, icon: React.createElement(Star, { size: 18 }), accessKey: 'hub_access_level_4' },
+];

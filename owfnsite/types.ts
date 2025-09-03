@@ -162,3 +162,19 @@ export interface SiwsReturn {
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
 }
+
+export interface HubChannel {
+  id: string;
+  nameKey: string;
+  level: 1 | 2 | 3 | 4;
+  icon: React.ReactNode;
+  accessKey: string;
+}
+
+export interface HubMessage {
+  id: string;
+  authorAddress: string;
+  authorName: string; 
+  text: string;
+  timestamp: string;
+}
