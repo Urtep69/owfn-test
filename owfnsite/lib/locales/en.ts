@@ -44,6 +44,7 @@ export const en = {
     time_hours: `Hours`,
     time_minutes: `Minutes`,
     time_seconds: `Seconds`,
+    not_applicable: `N/A`,
     
     // Home Page
     home_title: `Official World Family Network`,
@@ -391,9 +392,11 @@ export const en = {
     on_chain_security: `On-Chain Security`,
     revoked: `Revoked`,
     swap: `Swap`,
-    you_pay: `You Pay`,
+    you_pay: `You pay`,
     you_receive: `You Receive`,
     token_detail_update_authority: `Update Authority`,
+    mint_authority: `Mint Authority`,
+    freeze_authority: `Freeze Authority`,
     
     // Contact Page
     contact_title: `Get in Touch`,
@@ -490,6 +493,7 @@ export const en = {
     airdrop_success_log: `✅ Success for {address}... | Sig: {signature}...`,
     airdrop_failed_log: `❌ Failed for {address}... | Error: {error}`,
     unique_contributors: `Unique Contributors`,
+    airdrop_confirmation_prompt: `Are you sure you want to start the airdrop? This will send OWFN tokens to {count} unique wallets and cannot be undone.`,
     
     // Staking
     staking_title: `Stake OWFN, Earn Rewards`,
@@ -551,7 +555,7 @@ export const en = {
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
     airdrop_info_box_title: `About this Airdrop`,
     airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors such as presale participation and engagement in community events.`,
-
+    
     // Governance
     governance_title: `Governance`,
     governance_subtitle: `Participate in the future of OWFN by voting on proposals.`,
@@ -574,7 +578,7 @@ export const en = {
     no_past_proposals: `There are no past proposals to display.`,
     no_active_cases_in_category: `There are currently no active cases in this category.`,
     
-    // Other missing from before
+    // Other
     coming_soon_title: 'Coming Soon',
     coming_soon_desc: 'This feature is currently under development. We are working hard to bring it to you soon. Thank you for your patience and support.',
     ended: `Ended`,
@@ -585,9 +589,43 @@ export const en = {
     wallet_modal_or: `or`,
     wallet_modal_connect_with: `Connect with a wallet`,
     wallet_modal_terms: `By connecting, you agree to our Terms of Service.`,
-    not_applicable: `N/A`,
     assets: `Assets`,
     chart_tooltip_amount: `Amount:`,
     chart_tooltip_percentage: `Percentage:`,
     airdrop_progress_label: `Airdrop Progress`,
+    
+    // Maintenance
+    maintenance_heading: `We're Making Improvements!`,
+    maintenance_message: `Our platform is currently undergoing scheduled maintenance to improve your experience. Thank you for your patience and understanding. We will be back online shortly.`,
+    maintenance_stay_tuned: `Stay tuned for updates on our social channels:`,
+    admin_login: `Admin Login`,
+    maintenance_status: `Status`,
+    maintenance_status_active: `Active`,
+    maintenance_status_inactive: `Inactive`,
+    activate_maintenance_mode: `Activate Maintenance`,
+    deactivate_maintenance_mode: `Deactivate Maintenance`,
+    maintenance_login_denied: `Connection denied. The platform is in maintenance mode. Only admins can log in.`,
+
+    // NEW KEYS - Accessibility, Chatbot errors, etc.
+    theme_switcher_aria_label_light: `Switch to light mode`,
+    theme_switcher_aria_label_dark: `Switch to dark mode`,
+    language_switcher_aria_label: `Change language`,
+    copy_address_aria_label: `Copy address`,
+    view_on_solscan_aria_label: `View on Solscan`,
+    alt_owfn_logo: `OWFN Logo`,
+    alt_solana_logo: `Solana Logo`,
+    alt_usdc_logo: `USD Coin Logo`,
+    alt_usdt_logo: `Tether Logo`,
+    alt_token_logo: `Token Logo`,
+    chatbot_error_connect: `I can't connect to my brain right now. Please check your internet connection.`,
+    chatbot_error_communicate: `Sorry, I encountered a communication error. Please try again.`,
+    error_no_mint_address: `No mint address provided.`,
+    error_server_config: `Server configuration error for API.`,
+    error_api_helius: `Helius API Error: {error}`,
+    error_no_token_data: `No data could be found for mint: {mintAddress}`,
+    token_name_unknown: `Unknown Token`,
+    error_unknown_server: `An unexpected server error occurred.`,
+    narrative_fallback: `Your support is making a tangible difference in the world. Thank you for being a vital part of the OWFN family!`,
+    summary_fallback: `The AI could not generate a summary for this content.`,
+    error_content_not_found: `Content element for summarization not found.`,
 };

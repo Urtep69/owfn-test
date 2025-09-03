@@ -42,6 +42,7 @@ export const it = {
     connect_wallet_first: `Per favore, connetti prima il tuo wallet.`,
     yes: `Sì`,
     no: `No`,
+    not_applicable: `N/A`,
     
     // Time Units
     time_days: `Giorni`,
@@ -308,7 +309,7 @@ export const it = {
     faq_a12: `Secondo la nostra Roadmap, dopo la conclusione positiva della prevendita, procederemo con la quotazione ufficiale del token $OWFN sugli scambi decentralizzati (DEX) all'interno dell'ecosistema di Solana. La data esatta e le piattaforme saranno annunciate sui nostri canali ufficiali.`,
     faq_q13: `Perché c'è un limite massimo di acquisto (Max Buy) nella prevendita?`,
     faq_a13: `Il limite massimo di acquisto è una misura importante per garantire una distribuzione dei token il più equa possibile e per impedire che un piccolo numero di grandi investitori ("balene") controlli una parte significativa dell'offerta. Ciò promuove una comunità più sana e decentralizzata a lungo termine.`,
-    faq_q14: `Cosa significa che il token è "portatore di interessi" con un APY del 2%? Come funziona?`,
+    faq_q14: `Cosa significa la commissione di trasferimento dello 0,5% e quando viene attivata?`,
     faq_a14: `Questa commissione è un meccanismo chiave per il finanziamento a lungo termine della nostra missione. Una commissione dello 0,5% si applicherà a tutte le transazioni con il token OWFN *dopo* la conclusione del periodo di prevendita. I fondi raccolti da questa commissione vengono automaticamente indirizzati al Tesoro dell'Impatto per finanziare continuamente i nostri progetti sociali. Pertanto, ogni transazione contribuisce al bene comune.`,
     faq_q15: `Perché avete scelto la blockchain di Solana per questo progetto?`,
     faq_a15: `Abbiamo scelto Solana per la sua eccezionale velocità, i costi di transazione molto bassi e l'alta scalabilità. Queste caratteristiche sono essenziali per un progetto globale come il nostro, consentendo micro-transazioni efficienti e garantendo un'esperienza rapida e accessibile a tutti gli utenti, che si tratti di donare, acquistare o scambiare token.`,
@@ -395,7 +396,6 @@ export const it = {
     on_chain_security: `Sicurezza On-Chain`,
     revoked: `Revocato`,
     swap: `Scambia`,
-    you_pay: `Paghi`,
     you_receive: `Ricevi`,
     token_detail_update_authority: `Autorità di Aggiornamento`,
     
@@ -494,6 +494,7 @@ export const it = {
     airdrop_success_log: `✅ Successo per {address}... | Sig: {signature}...`,
     airdrop_failed_log: `❌ Fallimento per {address}... | Errore: {error}`,
     unique_contributors: `Contributori Unici`,
+    airdrop_confirmation_prompt: `Sei sicuro di voler avviare l'airdrop? Questo invierà token OWFN a {count} portafogli unici e non potrà essere annullato.`,
     
     // Staking
     staking_title: `Staking di OWFN, Guadagna Ricompense`,
@@ -578,7 +579,7 @@ export const it = {
     no_past_proposals: `Non ci sono proposte passate da visualizzare.`,
     no_active_cases_in_category: `Al momento non ci sono casi attivi in questa categoria.`,
     
-    // Other missing from before
+    // Other
     coming_soon_title: 'Prossimamente',
     coming_soon_desc: 'Questa funzionalità è attualmente in fase di sviluppo. Stiamo lavorando sodo per portartela presto. Grazie per la tua pazienza e il tuo supporto.',
     ended: `Terminato`,
@@ -589,9 +590,31 @@ export const it = {
     wallet_modal_or: `o`,
     wallet_modal_connect_with: `Connetti con un portafoglio`,
     wallet_modal_terms: `Connettendoti, accetti i nostri Termini di Servizio.`,
-    not_applicable: `N/A`,
     assets: `Asset`,
     chart_tooltip_amount: `Importo:`,
     chart_tooltip_percentage: `Percentuale:`,
     airdrop_progress_label: `Progresso Airdrop`,
+    
+    // Maintenance
+    maintenance_heading: `Stiamo apportando miglioramenti!`,
+    maintenance_message: `La nostra piattaforma è attualmente in manutenzione programmata per migliorare la tua esperienza. Grazie per la tua pazienza e comprensione. Torneremo online a breve.`,
+    maintenance_stay_tuned: `Rimani sintonizzato per gli aggiornamenti sui nostri canali social:`,
+    admin_login: `Accesso Amministratore`,
+    maintenance_status: `Stato`,
+    maintenance_status_active: `Attivo`,
+    maintenance_status_inactive: `Inattivo`,
+    activate_maintenance_mode: `Attiva Manutenzione`,
+    deactivate_maintenance_mode: `Disattiva Manutenzione`,
+    maintenance_login_denied: `Connessione negata. La piattaforma è in modalità manutenzione. Solo gli amministratori possono accedere.`,
+
+    // New error/fallback keys
+    error_no_mint_address: `Nessun indirizzo di mint fornito.`,
+    error_server_config: `Errore di configurazione del server per l'API.`,
+    error_api_helius: `Errore API Helius: {error}`,
+    error_no_token_data: `Nessun dato trovato per il mint: {mintAddress}`,
+    token_name_unknown: `Token Sconosciuto`,
+    error_unknown_server: `Si è verificato un errore del server imprevisto.`,
+    narrative_fallback: `Il tuo sostegno sta facendo una differenza tangibile nel mondo. Grazie per essere una parte vitale della famiglia OWFN!`,
+    summary_fallback: `L'IA non è riuscita a generare un riassunto per questo contenuto.`,
+    error_content_not_found: `Elemento di contenuto per il riassunto non trovato.`,
 };

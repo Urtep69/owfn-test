@@ -44,6 +44,7 @@ export const es = {
     time_hours: `Horas`,
     time_minutes: `Minutos`,
     time_seconds: `Segundos`,
+    not_applicable: `N/A`,
     
     // Home Page
     home_title: `La Red Familiar Mundial Oficial`,
@@ -300,7 +301,7 @@ export const es = {
     faq_a10: `Sí, esto es de vital importancia. Todas las donaciones de USDC y USDT deben enviarse *exclusivamente* desde la blockchain de Solana. No envíe desde ninguna otra red (por ejemplo, Ethereum), ya que los fondos se perderán y no llegarán a su destino. Esta información también se muestra claramente en la página de donaciones.`,
     faq_q11: '¿Qué sucede exactamente después de comprar tokens en la preventa? ¿Necesito hacer algo?',
     faq_a11: 'No, después de completar con éxito la compra de tokens OWFN durante la preventa, no se requiere ninguna otra acción de tu parte. Los tokens se reservan automáticamente para la dirección de tu billetera. Al final del período de preventa, todos los tokens se distribuirán automáticamente (airdrop) a las billeteras de los compradores.',
-    faq_q12: '¿Cuándo y dónde podré tranzacționa (vinde/cumpăra) tokeni OWFN după prevânzare?',
+    faq_q12: '¿Cuándo y dónde podré comerciar (vender/comprar) tokens OWFN después de la preventa?',
     faq_a12: 'Según nuestra Hoja de ruta, después de la conclusión exitosa de la preventa, procederemos a la cotización oficial del token $OWFN en intercambios descentralizados (DEX) dentro del ecosistema de Solana. La fecha y las plataformas exactas se anunciarán en nuestros canales oficiales.',
     faq_q13: '¿Por qué hay un límite máximo de compra (Max Buy) en la preventa?',
     faq_a13: 'El límite máximo de compra es una medida importante para garantizar una distribución lo más justa posible de los tokens y para evitar que un pequeño número de grandes inversores ("ballenas") controle una porción significativa del suministro. Esto promueve una comunidad más saludable y descentralizada a largo plazo.',
@@ -391,7 +392,6 @@ export const es = {
     on_chain_security: `Seguridad en la Cadena`,
     revoked: `Revocado`,
     swap: `Intercambiar`,
-    you_pay: `Pagas`,
     you_receive: `Recibes`,
     token_detail_update_authority: `Autoridad de Actualización`,
     
@@ -490,6 +490,7 @@ export const es = {
     airdrop_success_log: `✅ Éxito para {address}... | Firma: {signature}...`,
     airdrop_failed_log: `❌ Fallo para {address}... | Error: {error}`,
     unique_contributors: `Contribuyentes Únicos`,
+    airdrop_confirmation_prompt: `¿Está seguro de que desea iniciar el airdrop? Esto enviará tokens OWFN a {count} billeteras únicas y no se puede deshacer.`,
     
     // Staking
     staking_title: `Haz Staking de OWFN, Gana Recompensas`,
@@ -574,7 +575,7 @@ export const es = {
     no_past_proposals: `No hay propuestas pasadas para mostrar.`,
     no_active_cases_in_category: `Actualmente no hay casos activos en esta categoría.`,
 
-    // Other missing from before
+    // Other
     coming_soon_title: 'Próximamente',
     coming_soon_desc: 'Esta función está actualmente en desarrollo. Estamos trabajando arduamente para ofrecértela pronto. Gracias por tu paciencia y apoyo.',
     ended: `Finalizado`,
@@ -585,9 +586,31 @@ export const es = {
     wallet_modal_or: `o`,
     wallet_modal_connect_with: `Conectar con una billetera`,
     wallet_modal_terms: `Al conectarte, aceptas nuestros Términos de Servicio.`,
-    not_applicable: `N/A`,
     assets: `Activos`,
     chart_tooltip_amount: `Cantidad:`,
     chart_tooltip_percentage: `Porcentaje:`,
     airdrop_progress_label: `Progreso del Airdrop`,
+    
+    // Maintenance
+    maintenance_heading: `¡Estamos realizando mejoras!`,
+    maintenance_message: `Nuestra plataforma está actualmente en mantenimiento programado para mejorar tu experiencia. Gracias por tu paciencia y comprensión. Volveremos a estar en línea en breve.`,
+    maintenance_stay_tuned: `Mantente atento a las actualizaciones en nuestros canales sociales:`,
+    admin_login: `Inicio de sesión de administrador`,
+    maintenance_status: `Estado`,
+    maintenance_status_active: `Activo`,
+    maintenance_status_inactive: `Inactivo`,
+    activate_maintenance_mode: `Activar Mantenimiento`,
+    deactivate_maintenance_mode: `Desactivar Mantenimiento`,
+    maintenance_login_denied: `Conexión denegada. La plataforma está en modo de mantenimiento. Solo los administradores pueden iniciar sesión.`,
+
+    // New error/fallback keys
+    error_no_mint_address: `No se proporcionó ninguna dirección de mint.`,
+    error_server_config: `Error de configuración del servidor para la API.`,
+    error_api_helius: `Error de la API de Helius: {error}`,
+    error_no_token_data: `No se pudieron encontrar datos para el mint: {mintAddress}`,
+    token_name_unknown: `Token Desconocido`,
+    error_unknown_server: `Ocurrió un error inesperado en el servidor.`,
+    narrative_fallback: `Tu apoyo está marcando una diferencia tangible en el mundo. ¡Gracias por ser una parte vital de la familia OWFN!`,
+    summary_fallback: `La IA no pudo generar un resumen para este contenido.`,
+    error_content_not_found: `No se encontró el elemento de contenido para el resumen.`,
 };

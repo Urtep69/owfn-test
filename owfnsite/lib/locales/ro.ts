@@ -44,6 +44,7 @@ export const ro = {
     time_hours: `Ore`,
     time_minutes: `Minute`,
     time_seconds: `Secunde`,
+    not_applicable: `N/A`,
     
     // Home Page
     home_title: `Official World Family Network`,
@@ -394,6 +395,8 @@ export const ro = {
     you_pay: `Plătești`,
     you_receive: `Primești`,
     token_detail_update_authority: `Autoritate de Actualizare`,
+    mint_authority: `Autoritate de Mint`,
+    freeze_authority: `Autoritate de Înghețare`,
     
     // Contact Page
     contact_title: `Contactează-ne`,
@@ -490,6 +493,7 @@ export const ro = {
     airdrop_success_log: `✅ Succes pentru {address}... | Sig: {signature}...`,
     airdrop_failed_log: `❌ Eșec pentru {address}... | Eroare: {error}`,
     unique_contributors: `Contribuitori Unici`,
+    airdrop_confirmation_prompt: `Sunteți sigur că doriți să porniți airdrop-ul? Acest lucru va trimite tokeni OWFN către {count} portofele unice și nu poate fi anulat.`,
     
     // Staking
     staking_title: `Staking OWFN, Câștigă Recompense`,
@@ -574,7 +578,7 @@ export const ro = {
     no_past_proposals: `Nu există propuneri anterioare de afișat.`,
     no_active_cases_in_category: `Momentan nu există cazuri active în această categorie.`,
     
-    // Other missing from before
+    // Other
     coming_soon_title: 'În curând',
     coming_soon_desc: 'Această funcționalitate este în curs de dezvoltare. Lucrăm din greu pentru a o aduce în curând. Vă mulțumim pentru răbdare și sprijin.',
     ended: `Încheiat`,
@@ -585,9 +589,43 @@ export const ro = {
     wallet_modal_or: `sau`,
     wallet_modal_connect_with: `Conectează-te cu un portofel`,
     wallet_modal_terms: `Prin conectare, sunteți de acord cu Termenii și Condițiile noastre.`,
-    not_applicable: `N/A`,
     assets: `Active`,
     chart_tooltip_amount: `Sumă:`,
     chart_tooltip_percentage: `Procent:`,
     airdrop_progress_label: `Progres Airdrop`,
+    
+    // Maintenance
+    maintenance_heading: `Facem Îmbunătățiri!`,
+    maintenance_message: `Platforma noastră este în prezent în mentenanță programată pentru a vă îmbunătăți experiența. Vă mulțumim pentru răbdare și înțelegere. Vom reveni online în curând.`,
+    maintenance_stay_tuned: `Rămâneți la curent cu actualizările pe canalele noastre sociale:`,
+    admin_login: `Autentificare Admin`,
+    maintenance_status: `Stare`,
+    maintenance_status_active: `Activ`,
+    maintenance_status_inactive: `Inactiv`,
+    activate_maintenance_mode: `Activează Mentenanța`,
+    deactivate_maintenance_mode: `Dezactivează Mentenanța`,
+    maintenance_login_denied: `Conectare refuzată. Platforma este în modul de mentenanță. Doar administratorii se pot autentifica.`,
+    
+    // NEW KEYS - Accessibility, Chatbot errors, etc.
+    theme_switcher_aria_label_light: `Treci la modul luminos`,
+    theme_switcher_aria_label_dark: `Treci la modul întunecat`,
+    language_switcher_aria_label: `Schimbă limba`,
+    copy_address_aria_label: `Copiază adresa`,
+    view_on_solscan_aria_label: `Vezi pe Solscan`,
+    alt_owfn_logo: `Logo OWFN`,
+    alt_solana_logo: `Logo Solana`,
+    alt_usdc_logo: `Logo USD Coin`,
+    alt_usdt_logo: `Logo Tether`,
+    alt_token_logo: `Logo Token`,
+    chatbot_error_connect: `Nu mă pot conecta la creierul meu acum. Te rog verifică-ți conexiunea la internet.`,
+    chatbot_error_communicate: `Scuze, am întâmpinat o eroare de comunicare. Te rog încearcă din nou.`,
+    error_no_mint_address: `Nu a fost furnizată nicio adresă de mint.`,
+    error_server_config: `Eroare de configurare a serverului pentru API.`,
+    error_api_helius: `Eroare API Helius: {error}`,
+    error_no_token_data: `Nu s-au găsit date pentru mint-ul: {mintAddress}`,
+    token_name_unknown: `Token Necunoscut`,
+    error_unknown_server: `A apărut o eroare neașteptată de server.`,
+    narrative_fallback: `Sprijinul dumneavoastră face o diferență tangibilă în lume. Vă mulțumim că sunteți o parte vitală a familiei OWFN!`,
+    summary_fallback: `AI-ul nu a putut genera un rezumat pentru acest conținut.`,
+    error_content_not_found: `Elementul de conținut pentru rezumat nu a fost găsit.`,
 };

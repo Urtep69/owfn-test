@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
@@ -287,7 +288,16 @@ export const Chatbot = () => {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
                     }
-                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: errorMsg }], timestamp: new Date() }]);
+
+                    // Map specific English error messages from the service to translatable keys.
+                    let translatedError = errorMsg;
+                    if (errorMsg.includes("connect to my brain")) {
+                        translatedError = t('chatbot_error_connect');
+                    } else if (errorMsg.includes("communication error")) {
+                        translatedError = t('chatbot_error_communicate');
+                    }
+                    
+                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: translatedError }], timestamp: new Date() }]);
                 },
                 location,
                 walletData

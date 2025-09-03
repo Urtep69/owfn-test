@@ -42,6 +42,7 @@ export const ru = {
     connect_wallet_first: `Пожалуйста, сначала подключите свой кошелек.`,
     yes: `Да`,
     no: `Нет`,
+    not_applicable: `Н/Д`,
     
     // Time Units
     time_days: `Дни`,
@@ -395,7 +396,6 @@ export const ru = {
     on_chain_security: `Безопасность на цепи`,
     revoked: `Отозвано`,
     swap: `Обмен`,
-    you_pay: `Вы платите`,
     you_receive: `Вы получаете`,
     token_detail_update_authority: `Право на обновление`,
     
@@ -494,6 +494,7 @@ export const ru = {
     airdrop_success_log: `✅ Успешно для {address}... | Подпись: {signature}...`,
     airdrop_failed_log: `❌ Неудачно для {address}... | Ошибка: {error}`,
     unique_contributors: `Уникальные участники`,
+    airdrop_confirmation_prompt: `Вы уверены, что хотите начать аирдроп? Это отправит токены OWFN на {count} уникальных кошельков и не может быть отменено.`,
     
     // Staking
     staking_title: `Стейкайте OWFN, получайте вознаграждения`,
@@ -578,7 +579,7 @@ export const ru = {
     no_past_proposals: `Нет прошедших предложений для отображения.`,
     no_active_cases_in_category: `В этой категории в настоящее время нет активных случаев.`,
     
-    // Other missing from before
+    // Other
     coming_soon_title: 'Скоро',
     coming_soon_desc: 'Эта функция в настоящее время находится в разработке. Мы усердно работаем, чтобы скоро представить ее вам. Спасибо за ваше терпение и поддержку.',
     ended: `Завершено`,
@@ -589,9 +590,31 @@ export const ru = {
     wallet_modal_or: `или`,
     wallet_modal_connect_with: `Подключиться с помощью кошелька`,
     wallet_modal_terms: `Подключаясь, вы соглашаетесь с нашими Условиями предоставления услуг.`,
-    not_applicable: `Н/Д`,
     assets: `Активы`,
     chart_tooltip_amount: `Сумма:`,
     chart_tooltip_percentage: `Процент:`,
     airdrop_progress_label: `Прогресс аирдропа`,
+    
+    // Maintenance
+    maintenance_heading: `Мы вносим улучшения!`,
+    maintenance_message: `Наша платформа в настоящее время находится на плановом обслуживании для улучшения вашего опыта. Спасибо за ваше терпение и понимание. Мы скоро вернемся в онлайн.`,
+    maintenance_stay_tuned: `Следите за обновлениями на наших социальных каналах:`,
+    admin_login: `Вход для администратора`,
+    maintenance_status: `Статус`,
+    maintenance_status_active: `Активен`,
+    maintenance_status_inactive: `Неактивен`,
+    activate_maintenance_mode: `Активировать обслуживание`,
+    deactivate_maintenance_mode: `Деактивировать обслуживание`,
+    maintenance_login_denied: `Подключение отклонено. Платформа находится в режиме обслуживания. Только администраторы могут войти.`,
+
+    // New error/fallback keys
+    error_no_mint_address: `Не указан адрес mint.`,
+    error_server_config: `Ошибка конфигурации сервера для API.`,
+    error_api_helius: `Ошибка API Helius: {error}`,
+    error_no_token_data: `Не удалось найти данные для mint: {mintAddress}`,
+    token_name_unknown: `Неизвестный токен`,
+    error_unknown_server: `Произошла непредвиденная ошибка сервера.`,
+    narrative_fallback: `Ваша поддержка вносит ощутимый вклад в мир. Спасибо, что являетесь важной частью семьи OWFN!`,
+    summary_fallback: `ИИ не смог сгенерировать сводку для этого контента.`,
+    error_content_not_found: `Элемент контента для сводки не найден.`,
 };

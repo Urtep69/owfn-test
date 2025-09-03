@@ -44,6 +44,7 @@ export const de = {
     time_hours: `Stunden`,
     time_minutes: `Minuten`,
     time_seconds: `Sekunden`,
+    not_applicable: `N/A`,
     
     // Home Page
     home_title: `Official World Family Network`,
@@ -391,7 +392,6 @@ export const de = {
     on_chain_security: `On-Chain-Sicherheit`,
     revoked: `Widerrufen`,
     swap: `Tauschen`,
-    you_pay: `Sie zahlen`,
     you_receive: `Sie erhalten`,
     token_detail_update_authority: `Update-Autorität`,
     
@@ -490,6 +490,7 @@ export const de = {
     airdrop_success_log: `✅ Erfolg für {address}... | Sig: {signature}...`,
     airdrop_failed_log: `❌ Fehler für {address}... | Fehler: {error}`,
     unique_contributors: `Einzigartige Beitragende`,
+    airdrop_confirmation_prompt: `Sind Sie sicher, dass Sie den Airdrop starten möchten? Dies sendet OWFN-Token an {count} einzigartige Wallets und kann nicht rückgängig gemacht werden.`,
     
     // Staking
     staking_title: `Staken Sie OWFN, verdienen Sie Belohnungen`,
@@ -574,7 +575,7 @@ export const de = {
     no_past_proposals: `Es gibt keine vergangenen Vorschläge anzuzeigen.`,
     no_active_cases_in_category: `Es gibt derzeit keine aktiven Fälle in dieser Kategorie.`,
 
-    // Other missing from before
+    // Other
     coming_soon_title: 'Demnächst',
     coming_soon_desc: 'Diese Funktion befindet sich derzeit in der Entwicklung. Wir arbeiten hart daran, sie Ihnen bald zur Verfügung zu stellen. Vielen Dank für Ihre Geduld und Unterstützung.',
     ended: `Beendet`,
@@ -585,9 +586,31 @@ export const de = {
     wallet_modal_or: `oder`,
     wallet_modal_connect_with: `Mit einer Wallet verbinden`,
     wallet_modal_terms: `Durch die Verbindung stimmen Sie unseren Nutzungsbedingungen zu.`,
-    not_applicable: `N/A`,
     assets: `Vermögenswerte`,
     chart_tooltip_amount: `Betrag:`,
     chart_tooltip_percentage: `Prozentsatz:`,
     airdrop_progress_label: `Airdrop-Fortschritt`,
+    
+    // Maintenance
+    maintenance_heading: `Wir nehmen Verbesserungen vor!`,
+    maintenance_message: `Unsere Plattform wird derzeit planmäßig gewartet, um Ihr Erlebnis zu verbessern. Vielen Dank für Ihre Geduld und Ihr Verständnis. Wir werden in Kürze wieder online sein.`,
+    maintenance_stay_tuned: `Bleiben Sie auf unseren sozialen Kanälen auf dem Laufenden:`,
+    admin_login: `Admin-Login`,
+    maintenance_status: `Status`,
+    maintenance_status_active: `Aktiv`,
+    maintenance_status_inactive: `Inaktiv`,
+    activate_maintenance_mode: `Wartung aktivieren`,
+    deactivate_maintenance_mode: `Wartung deaktivieren`,
+    maintenance_login_denied: `Verbindung verweigert. Die Plattform befindet sich im Wartungsmodus. Nur Admins können sich anmelden.`,
+
+    // New error/fallback keys
+    error_no_mint_address: `Keine Mint-Adresse angegeben.`,
+    error_server_config: `Serverkonfigurationsfehler für API.`,
+    error_api_helius: `Helius API-Fehler: {error}`,
+    error_no_token_data: `Für Mint konnten keine Daten gefunden werden: {mintAddress}`,
+    token_name_unknown: `Unbekannter Token`,
+    error_unknown_server: `Ein unerwarteter Serverfehler ist aufgetreten.`,
+    narrative_fallback: `Ihre Unterstützung macht einen greifbaren Unterschied in der Welt. Vielen Dank, dass Sie ein wichtiger Teil der OWFN-Familie sind!`,
+    summary_fallback: `Die KI konnte keine Zusammenfassung für diesen Inhalt erstellen.`,
+    error_content_not_found: `Inhaltselement für die Zusammenfassung nicht gefunden.`,
 };
