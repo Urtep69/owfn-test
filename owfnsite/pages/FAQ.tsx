@@ -61,8 +61,8 @@ export default function FAQ() {
         { qKey: 'faq_q15', aKey: 'faq_a15', category: 'technical' },
         { qKey: 'faq_q16', aKey: 'faq_a16', category: 'technical' },
         { qKey: 'faq_q17', aKey: 'faq_a17', category: 'mission' },
-        { qKey: 'faq_q18', aKey: 'faq_a18', category: 'security' },
-        { qKey: 'faq_q19', aKey: 'faq_a19', category: 'security' },
+        { qKey: 'faq_q18', aKey: 'faq_a18', category: 'mission' },
+        { qKey: 'faq_q20', aKey: 'faq_a20', category: 'security' },
     ], []);
 
     const filteredFaqData = useMemo(() => {
