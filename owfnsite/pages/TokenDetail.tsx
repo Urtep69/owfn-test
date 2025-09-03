@@ -93,7 +93,7 @@ export default function TokenDetail() {
                     const mock = MOCK_TOKEN_DETAILS[mockDetailsKey];
                     data.description = data.description || mock.description;
                     // Mock data for trading stats for demonstration
-                    data.txns = mock.txns; 
+                    data.txns = data.txns || mock.txns; 
                 }
                 setToken(data);
             } catch (err) {
@@ -147,7 +147,7 @@ export default function TokenDetail() {
             </header>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title={t('pricePerToken')} value={isPriceAvailable ? `$${priceString}`: 'N/A'} icon={<DollarSign />} subtext={`${priceChange.toFixed(2)}% (24h)`} subtextColor={priceChangeColor} />
+                <StatCard title={t('price_per_token')} value={isPriceAvailable ? `$${priceString}`: 'N/A'} icon={<DollarSign />} subtext={`${priceChange.toFixed(2)}% (24h)`} subtextColor={priceChangeColor} />
                 <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<BarChart2 />} />
                 <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<TrendingUp />} />
                 <StatCard title={t('holders')} value={token.holders ? token.holders.toLocaleString() : 'N/A'} icon={<Users />} />
@@ -177,6 +177,11 @@ export default function TokenDetail() {
                      <InfoCard title={t('on_chain_security')} icon={<Shield />}>
                         <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
                         <InfoRow label={t('token_standard')}>{token.tokenStandard || 'N/A'}</InfoRow>
+                         {token.creatorAddress && (
+                            <InfoRow label={"Creator Address"}>
+                                <AddressDisplay address={token.creatorAddress} />
+                            </InfoRow>
+                        )}
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
                         <AuthorityRow label={t('update_authority')} address={token.updateAuthority} />
