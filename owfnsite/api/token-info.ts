@@ -66,7 +66,21 @@ export default async function handler(req: any, res: any) {
 
         const decimals = tokenInfo.decimals ?? 9;
         const price = priceInfo.price_per_token || 0;
-        const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
+        
+        let supply = 0;
+        if (tokenInfo.supply && typeof tokenInfo.supply === 'string') {
+            try {
+                const rawSupplyBigInt = BigInt(tokenInfo.supply);
+                const divisor = 10n ** BigInt(decimals);
+                // Perform division with BigInt to handle large numbers, then convert the result to Number.
+                // This is safe for total supply, which is expected to be a whole number.
+                supply = Number(rawSupplyBigInt / divisor);
+            } catch (e) {
+                console.warn(`Could not parse supply string "${tokenInfo.supply}" as a valid number.`, e);
+                // Fallback to 0 if parsing fails
+                supply = 0;
+            }
+        }
         
         let mintAuthority: string | null = null;
         let freezeAuthority: string | null = null;
