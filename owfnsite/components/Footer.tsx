@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Twitter, Send } from 'lucide-react';
 import { PROJECT_LINKS } from '../constants.ts';
@@ -28,9 +27,8 @@ export const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400 transition-colors"
-                aria-label={t(`footer_social_${link.name.toLowerCase()}`)}
               >
-                <span className="sr-only">{t(`footer_social_${link.name.toLowerCase()}`)}</span>
+                <span className="sr-only">{link.name}</span>
                 {link.icon}
               </a>
             ))}

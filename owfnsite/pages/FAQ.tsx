@@ -61,8 +61,8 @@ export default function FAQ() {
         { qKey: 'faq_q15', aKey: 'faq_a15', category: 'technical' },
         { qKey: 'faq_q16', aKey: 'faq_a16', category: 'technical' },
         { qKey: 'faq_q17', aKey: 'faq_a17', category: 'mission' },
-        { qKey: 'faq_q18', aKey: 'faq_a18', category: 'security' },
-        { qKey: 'faq_q19', aKey: 'faq_a19', category: 'security' },
+        { qKey: 'faq_q18', aKey: 'faq_a18', category: 'mission' },
+        { qKey: 'faq_q20', aKey: 'faq_a20', category: 'security' },
     ], []);
 
     const filteredFaqData = useMemo(() => {
@@ -89,7 +89,7 @@ export default function FAQ() {
         <div className="animate-fade-in-up max-w-4xl mx-auto space-y-8">
             <div className="text-center">
                 <HelpCircle className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
-                <h1 className="text-4xl font-bold font-serif text-accent-600 dark:text-darkAccent-400">{t('faq_title')}</h1>
+                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('faq_title')}</h1>
                 <p className="mt-4 text-lg text-primary-600 dark:text-darkPrimary-400">
                     {t('faq_subtitle')}
                 </p>

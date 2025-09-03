@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -86,14 +85,14 @@ const ConnectButton = () => {
                             onClick={copyToClipboard}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
-                            <span>{t('copy_address')}</span>
+                            <span>{t('copy_address', {defaultValue: 'Copy Address'})}</span>
                             {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
                         </button>
                         <button
                             onClick={() => setVisible(true)}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
-                            <span>{t('change_wallet')}</span>
+                            <span>{t('change_wallet', {defaultValue: 'Change Wallet'})}</span>
                             <Repeat size={16} />
                         </button>
                         <a
@@ -102,7 +101,7 @@ const ConnectButton = () => {
                             rel="noopener noreferrer"
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
-                            <span>{t('view_on_solscan')}</span>
+                            <span>{t('view_on_solscan', {defaultValue: 'View on Solscan'})}</span>
                             <ExternalLink size={16} />
                         </a>
                     </div>
@@ -123,7 +122,6 @@ const ConnectButton = () => {
 
 
 export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
-  const { t } = useAppContext();
   return (
     <header className="bg-primary-100/70 dark:bg-darkPrimary-950/70 backdrop-blur-lg sticky top-0 z-40 border-b border-primary-200/80 dark:border-darkPrimary-800/80">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -132,7 +130,7 @@ export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
              <button
               onClick={toggleSidebar}
               className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none hidden md:block"
-              aria-label={t('toggle_sidebar_aria_label')}
+              aria-label="Toggle sidebar"
             >
               {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>

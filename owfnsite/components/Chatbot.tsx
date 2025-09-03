@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
@@ -288,16 +287,7 @@ export const Chatbot = () => {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
                     }
-
-                    // Map specific English error messages from the service to translatable keys.
-                    let translatedError = errorMsg;
-                    if (errorMsg.includes("connect to my brain")) {
-                        translatedError = t('chatbot_error_connect');
-                    } else if (errorMsg.includes("communication error")) {
-                        translatedError = t('chatbot_error_communicate');
-                    }
-                    
-                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: translatedError }], timestamp: new Date() }]);
+                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: errorMsg }], timestamp: new Date() }]);
                 },
                 location,
                 walletData
@@ -345,7 +335,7 @@ export const Chatbot = () => {
             <button
                 onClick={() => handleOpenChat()}
                 className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
-                aria-label={t('chatbot_open_aria_label')}
+                aria-label="Open Chatbot"
             >
                 <MessageCircle size={28} />
             </button>
@@ -365,13 +355,13 @@ export const Chatbot = () => {
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t('chatbot_minimize_aria_label')}>
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Minimize Chat">
                         <Minus size={20} />
                     </button>
-                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t(isMaximized ? 'chatbot_restore_aria_label' : 'chatbot_maximize_aria_label')}>
+                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={isMaximized ? "Restore Chat" : "Maximize Chat"}>
                         {isMaximized ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t('chatbot_close_aria_label')}>
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Close Chat">
                         <X size={20} />
                     </button>
                 </div>
@@ -428,7 +418,7 @@ export const Chatbot = () => {
                         onClick={handleSend}
                         disabled={isLoading || input.trim() === ''}
                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
-                        aria-label={t('chatbot_send_aria_label')}
+                        aria-label="Send message"
                     >
                        {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }
                     </button>

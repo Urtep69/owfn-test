@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Copy, Check, ExternalLink } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.tsx';
 
 interface AddressDisplayProps {
   address: string;
@@ -10,7 +9,6 @@ interface AddressDisplayProps {
 }
 
 export const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, type = 'address', className = '' }) => {
-  const { t } = useAppContext();
   const [copied, setCopied] = useState(false);
 
   const truncateAddress = (addr: string) => {
@@ -41,10 +39,10 @@ export const AddressDisplay: React.FC<AddressDisplayProps> = ({ address, type = 
   return (
     <div className={`flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 ${className}`}>
       <span className="font-mono">{truncateAddress(address)}</span>
-      <button onClick={copyToClipboard} className="hover:text-primary-700 dark:hover:text-darkPrimary-300 transition-colors" aria-label={t('copy_address_aria_label')}>
+      <button onClick={copyToClipboard} className="hover:text-primary-700 dark:hover:text-darkPrimary-300 transition-colors" aria-label="Copy address">
         {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
       </button>
-      <a href={solscanUrl} target="_blank" rel="noopener noreferrer" className="hover:text-primary-700 dark:hover:text-darkPrimary-300 transition-colors" aria-label={t('view_on_solscan_aria_label')}>
+      <a href={solscanUrl} target="_blank" rel="noopener noreferrer" className="hover:text-primary-700 dark:hover:text-darkPrimary-300 transition-colors" aria-label="View on Solscan">
         <ExternalLink className="w-4 h-4" />
       </a>
     </div>

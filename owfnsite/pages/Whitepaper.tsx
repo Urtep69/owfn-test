@@ -13,7 +13,7 @@ const Section = ({ title, icon, children }: { title: string, icon: React.ReactNo
             <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-full p-3 mr-4">
                 {icon}
             </div>
-            <h2 className="text-3xl font-bold font-serif text-primary-900 dark:text-darkPrimary-100">{title}</h2>
+            <h2 className="text-3xl font-bold text-primary-900 dark:text-darkPrimary-100">{title}</h2>
         </div>
         <div className="prose prose-lg dark:prose-invert max-w-none text-primary-700 dark:text-darkPrimary-300 leading-relaxed">
             {children}
@@ -35,7 +35,7 @@ export default function Whitepaper() {
         <div className="animate-fade-in-up">
             <header className="text-center mb-16">
                 <FileText className="mx-auto w-20 h-20 text-accent-500 dark:text-darkAccent-500 mb-4" />
-                <h1 className="text-5xl font-extrabold font-serif text-accent-600 dark:text-darkAccent-400">{t('whitepaper_title')}</h1>
+                <h1 className="text-5xl font-extrabold text-accent-600 dark:text-darkAccent-400">{t('whitepaper_title')}</h1>
                 <p className="mt-4 text-xl text-primary-600 dark:text-darkPrimary-400 max-w-3xl mx-auto">
                     {t('whitepaper_subtitle')}
                 </p>
@@ -101,7 +101,7 @@ export default function Whitepaper() {
                             <div key={phase.quarter} className="relative">
                                  <div className="absolute -left-[42px] top-1 w-6 h-6 bg-accent-400 dark:bg-darkAccent-500 rounded-full border-4 border-white dark:border-darkPrimary-800"></div>
                                 <p className="font-semibold text-accent-500 dark:text-darkAccent-400">{phase.quarter}</p>
-                                <h4 className="font-bold text-xl font-serif">{t(`${phase.key_prefix}_title`)}</h4>
+                                <h4 className="font-bold text-xl">{t(`${phase.key_prefix}_title`)}</h4>
                                 <p>{t(`${phase.key_prefix}_description`)}</p>
                             </div>
                         ))}

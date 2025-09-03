@@ -151,11 +151,11 @@ export default function TokenDetail() {
     }
     
     const isPriceAvailable = (token.pricePerToken ?? 0) > 0;
-    const priceString = isPriceAvailable 
-        ? (token.pricePerToken! > 0.01 
-            ? token.pricePerToken!.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) 
-            : token.pricePerToken!.toPrecision(4))
-        : t('not_applicable');
+    const priceString = token.pricePerToken 
+        ? (token.pricePerToken > 0.01 
+            ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) 
+            : token.pricePerToken.toPrecision(4))
+        : 'N/A';
     const priceChange = token.price24hChange ?? 0;
     const priceChangeColor = priceChange >= 0 ? 'text-green-500' : 'text-red-500';
     const tokenLogo = <GenericTokenIcon uri={token.logo as string} className="w-16 h-16 flex-shrink-0" />;
@@ -175,17 +175,17 @@ export default function TokenDetail() {
                         <p className="text-primary-500 dark:text-darkPrimary-400 font-semibold text-lg">${token.symbol}</p>
                     </div>
                     <div className="md:ml-auto text-center md:text-right">
-                        <p className="text-4xl font-bold">{isPriceAvailable ? `$${priceString}`: t('not_applicable')}</p>
+                        <p className="text-4xl font-bold">{isPriceAvailable ? `$${priceString}`: 'N/A'}</p>
                         <p className={`text-lg font-semibold ${priceChangeColor}`}>{priceChange.toFixed(2)}% (24h)</p>
                     </div>
                 </div>
             </section>
 
              <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap/1_000_000).toFixed(2)}M` : t('not_applicable')} icon={<BarChart2 />} />
-                <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h/1_000_000).toFixed(2)}M` : t('not_applicable')} icon={<TrendingUp />} />
-                <StatCard title={t('liquidity')} value={token.liquidity ? `$${(token.liquidity/1_000).toFixed(2)}k` : t('not_applicable')} icon={<Droplets />} />
-                <StatCard title={t('holders')} value={token.holders ? token.holders.toLocaleString() : t('not_applicable')} icon={<Users />} />
+                <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap/1_000_000).toFixed(2)}M` : 'N/A'} icon={<BarChart2 />} />
+                <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h/1_000_000).toFixed(2)}M` : 'N/A'} icon={<TrendingUp />} />
+                <StatCard title={t('liquidity')} value={token.liquidity ? `$${(token.liquidity/1_000).toFixed(2)}k` : 'N/A'} icon={<Droplets />} />
+                <StatCard title={t('holders')} value={token.holders ? token.holders.toLocaleString() : 'N/A'} icon={<Users />} />
             </section>
 
 
@@ -213,7 +213,7 @@ export default function TokenDetail() {
                     )}
                      <InfoCard title={t('on_chain_security')} icon={<Shield />}>
                         <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
-                        <InfoRow label={t('token_standard')}>{token.tokenStandard || t('not_applicable')}</InfoRow>
+                        <InfoRow label={t('token_standard')}>{token.tokenStandard || 'N/A'}</InfoRow>
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
                         <AuthorityRow label={t('token_detail_update_authority')} address={token.updateAuthority} />

@@ -11,11 +11,11 @@ export default function Partnerships() {
         <div className="animate-fade-in-up text-center py-8 max-w-4xl mx-auto space-y-12">
             <div>
                 <Handshake className="mx-auto w-24 h-24 text-accent-500 dark:text-darkAccent-400 mb-6" />
-                <h1 className="text-4xl font-bold font-serif text-accent-600 dark:text-darkAccent-300">{t('partnerships_title')}</h1>
+                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-300">{t('partnerships_title')}</h1>
             </div>
 
             <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d text-left">
-                <h2 className="text-2xl font-bold font-serif text-primary-800 dark:text-darkPrimary-200 mb-4">{t('partnerships_focus_title')}</h2>
+                <h2 className="text-2xl font-bold text-primary-800 dark:text-darkPrimary-200 mb-4">{t('partnerships_focus_title')}</h2>
                 <p className="text-lg text-primary-600 dark:text-darkPrimary-400 leading-relaxed">
                     {t('partnerships_focus_desc')}
                 </p>
@@ -25,7 +25,7 @@ export default function Partnerships() {
             </div>
 
             <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d text-left">
-                 <h2 className="text-2xl font-bold font-serif text-primary-800 dark:text-darkPrimary-200 mb-4">{t('partnerships_vision_title')}</h2>
+                 <h2 className="text-2xl font-bold text-primary-800 dark:text-darkPrimary-200 mb-4">{t('partnerships_vision_title')}</h2>
                 <p className="text-lg text-primary-600 dark:text-darkPrimary-400 leading-relaxed">
                     {t('partnerships_vision_desc')}
                 </p>
@@ -49,7 +49,7 @@ export default function Partnerships() {
             </div>
 
             <div className="bg-accent-100/30 dark:bg-darkAccent-900/30 border-l-4 border-accent-500 dark:border-darkAccent-500 p-6 rounded-md text-left">
-                 <h2 className="text-2xl font-bold font-serif text-accent-800 dark:text-darkAccent-200 mb-2">{t('partnerships_invitation_title')}</h2>
+                 <h2 className="text-2xl font-bold text-accent-800 dark:text-darkAccent-200 mb-2">{t('partnerships_invitation_title')}</h2>
                  <p className="text-lg text-accent-700 dark:text-darkAccent-300">
                     {t('partnerships_invitation_desc')}
                 </p>
