@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
@@ -91,7 +91,7 @@ const renderMessageContent = (text: string) => {
 
 
 export const Chatbot = () => {
-    const { t, currentLanguage } = useAppContext();
+    const { t, currentLanguage, solana } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -101,6 +101,7 @@ export const Chatbot = () => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
+    const [location, setLocation] = useLocation();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -110,12 +111,10 @@ export const Chatbot = () => {
     
     useEffect(() => {
         if (isOpen) {
-            // A small delay helps ensure the element is visible and animations are settled.
             setTimeout(() => inputRef.current?.focus(), 100);
         }
     }, [isOpen, isMaximized]);
 
-    // Cleanup interval on component unmount
     useEffect(() => {
         return () => {
             if (loadingIntervalRef.current) {
@@ -123,6 +122,109 @@ export const Chatbot = () => {
             }
         };
     }, []);
+    
+    // Proactive, contextual messaging
+    useEffect(() => {
+        if (!isOpen || messages.length > 0) return; 
+
+        const pageKey = location.split('/')[1] || 'home';
+        const storageKey = `owfn-proactive-msg-${pageKey}`;
+
+        if (sessionStorage.getItem(storageKey)) return;
+
+        let messageKey = '';
+        const comingSoonPages = ['staking', 'vesting', 'airdrop', 'governance'];
+
+        if (pageKey === 'presale') {
+            messageKey = 'chatbot_proactive_presale';
+        } else if (pageKey === 'donations') {
+            messageKey = 'chatbot_proactive_donations';
+        } else if (comingSoonPages.includes(pageKey) || (pageKey === 'dashboard' && location.includes('/token/'))) {
+             messageKey = 'chatbot_proactive_coming_soon';
+        } else if (pageKey === 'home') {
+            messageKey = 'chatbot_proactive_home';
+        } else {
+             messageKey = 'chatbot_proactive_generic';
+        }
+        
+        if (messageKey) {
+            const proactiveMessage: ChatMessage = {
+                role: 'model',
+                parts: [{ text: t(messageKey) }],
+                timestamp: new Date()
+            };
+            setTimeout(() => {
+                setMessages([proactiveMessage]);
+                sessionStorage.setItem(storageKey, 'true');
+            }, 1000);
+        }
+    }, [location, isOpen, messages.length, t]);
+
+    // Personalized, proactive messaging
+    useEffect(() => {
+        if (!isOpen || messages.length > 0 || !solana.connected || sessionStorage.getItem('owfn-proactive-staking')) return;
+        
+        const owfnToken = solana.userTokens.find(t => t.symbol === 'OWFN');
+        if (owfnToken && owfnToken.balance > 0) {
+            const proactiveMessage: ChatMessage = {
+                role: 'model',
+                parts: [{ text: t('chatbot_proactive_staking_personalized', { amount: owfnToken.balance.toLocaleString() }) }],
+                timestamp: new Date()
+            };
+            setTimeout(() => {
+                setMessages([proactiveMessage]);
+                sessionStorage.setItem('owfn-proactive-staking', 'true');
+            }, 1500);
+        }
+    }, [solana.connected, solana.userTokens, isOpen, messages.length, t]);
+
+     // Action parsing for guided flows
+    useEffect(() => {
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage && lastMessage.role === 'model' && !lastMessage.isActionProcessed) {
+            const text = lastMessage.parts[0].text;
+            const actionMatch = text.match(/^\[ACTION:([^|\]]+)\|?(.*)\]$/);
+            
+            if (actionMatch) {
+                const action = actionMatch[1];
+                const paramsStr = actionMatch[2];
+                const params = new URLSearchParams(paramsStr.replace(/\|/g, '&'));
+
+                let url = '';
+                let confirmationMessage = '';
+                
+                if (action === 'NAVIGATE_DONATE') {
+                    const token = params.get('TOKEN');
+                    const amount = params.get('AMOUNT');
+                    if (token && amount) {
+                        url = `/donations?token=${token}&amount=${amount}`;
+                        confirmationMessage = t('chatbot_donation_guide_prefilled', { amount, token });
+                    }
+                } else if (action === 'NAVIGATE_PRESALE') {
+                    const amount = params.get('AMOUNT');
+                    if (amount) {
+                        url = `/presale?amount=${amount}`;
+                        confirmationMessage = t('chatbot_presale_guide_prefilled', { amount });
+                    }
+                }
+                
+                if (url && confirmationMessage) {
+                    setMessages(prev => {
+                        const newMessages = [...prev];
+                        const processedMessage = { ...newMessages[newMessages.length - 1], isActionProcessed: true };
+                        processedMessage.parts = [{ text: confirmationMessage }];
+                        newMessages[newMessages.length - 1] = processedMessage;
+                        return newMessages;
+                    });
+                    
+                    setTimeout(() => {
+                        setLocation(url);
+                        if (window.innerWidth < 768) setIsOpen(false);
+                    }, 2000);
+                }
+            }
+        }
+    }, [messages, setLocation, t]);
 
     const formatTimestamp = (date: Date) => {
         return date.toLocaleString(currentLanguage.code, {
@@ -142,39 +244,32 @@ export const Chatbot = () => {
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
         const currentInput = input;
         const currentTime = new Date().toISOString();
+        const pageName = (location.split('/')[1] || 'home').charAt(0).toUpperCase() + (location.split('/')[1] || 'home').slice(1);
+        const walletContext = solana.connected ? {
+            address: solana.address,
+            userTokens: solana.userTokens.map(({ symbol, balance }) => ({ symbol, balance }))
+        } : null;
 
         setMessages(prev => [...prev, userMessage]);
         setInput('');
         setIsLoading(true);
 
-        const loadingMessages = [
-            t('chatbot_loading_1'),
-            t('chatbot_loading_2'),
-            t('chatbot_loading_3'),
-        ];
+        const loadingMessages = [ t('chatbot_loading_1'), t('chatbot_loading_2'), t('chatbot_loading_3') ];
         let index = 0;
+        const updateLoadingText = () => { setLoadingText(loadingMessages[index]); index = (index + 1) % loadingMessages.length; };
         
-        const updateLoadingText = () => {
-            setLoadingText(loadingMessages[index]);
-            index = (index + 1) % loadingMessages.length;
-        };
-        
-        updateLoadingText(); // Set initial text immediately
+        updateLoadingText();
         loadingIntervalRef.current = window.setInterval(updateLoadingText, 2500);
 
         try {
             let firstChunkReceived = false;
-
             await getChatbotResponse(
-                historyForApi,
-                currentInput,
-                currentLanguage.code,
-                currentTime,
-                (chunk) => { // onChunk: Append text to the last message
+                historyForApi, currentInput, currentLanguage.code, currentTime, pageName, walletContext,
+                (chunk) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
-                        setIsLoading(false); // Stop loading animation
+                        setIsLoading(false);
                     }
                     if (!firstChunkReceived) {
                         setMessages(prev => [...prev, { role: 'model', parts: [{ text: chunk }], timestamp: new Date() }]);
@@ -190,7 +285,7 @@ export const Chatbot = () => {
                         });
                     }
                 },
-                (errorMsg) => { // onError: Display error in a new message bubble
+                (errorMsg) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
@@ -200,26 +295,16 @@ export const Chatbot = () => {
             );
         } catch (error) {
             console.error("Chatbot stream failed:", error);
-            if (loadingIntervalRef.current) {
-                window.clearInterval(loadingIntervalRef.current);
-                loadingIntervalRef.current = null;
-            }
+            if (loadingIntervalRef.current) { window.clearInterval(loadingIntervalRef.current); loadingIntervalRef.current = null; }
              setMessages(prev => [...prev, { role: 'model', parts: [{ text: t('chatbot_error') }], timestamp: new Date() }]);
         } finally {
-            if (loadingIntervalRef.current) {
-                window.clearInterval(loadingIntervalRef.current);
-                loadingIntervalRef.current = null;
-            }
+            if (loadingIntervalRef.current) { window.clearInterval(loadingIntervalRef.current); loadingIntervalRef.current = null; }
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 0);
         }
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            handleSend();
-        }
-    };
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') handleSend(); };
     
     if (!isOpen) {
         return (

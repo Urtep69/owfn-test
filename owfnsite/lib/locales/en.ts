@@ -339,6 +339,15 @@ export const en = {
     chatbot_loading_1: `Connecting to my circuits...`,
     chatbot_loading_2: `Analyzing your question...`,
     chatbot_loading_3: `Formulating a response...`,
+    chatbot_proactive_home: `Welcome to the Official World Family Network! How can I help you explore our mission today?`,
+    chatbot_proactive_presale: `Hello! I see you're on our Presale page. Do you have any questions about how to participate? I'm here to help!`,
+    chatbot_proactive_donations: `Welcome to the Donations page! Your support is vital for our mission. Can I help you with the donation process?`,
+    chatbot_proactive_staking_personalized: `Welcome back! I see you're holding {amount} OWFN. Have you considered staking your tokens to earn rewards and directly support our social causes?`,
+    chatbot_proactive_generic: `Hello! How can I help you learn more about the Official World Family Network today?`,
+    chatbot_proactive_coming_soon: `This feature is currently under development. We'll announce its launch on our official channels. Is there anything else I can assist you with?`,
+    chatbot_donation_guide_start: `I can help with that! To proceed with a donation, I need to know two things: which token you'd like to use, and how much you wish to donate.`,
+    chatbot_donation_guide_prefilled: `Great! I've pre-filled the donation form for you with {amount} {token}. Please review and confirm on the Donations page.`,
+    chatbot_presale_guide_prefilled: `Perfect. I've set the purchase amount to {amount} SOL for you on the Presale page. Please go there to complete your transaction.`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -462,8 +471,6 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
-    airdrop_info_box_title: `About this Airdrop`,
-    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,

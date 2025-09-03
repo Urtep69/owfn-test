@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
@@ -15,6 +16,20 @@ export default function Donations() {
     const { t, solana, setWalletModalOpen } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
+    const [location] = useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.split('?')[1] || '');
+        const token = params.get('token');
+        const amountParam = params.get('amount');
+        
+        if (token && tokens.some(t => t.symbol === token.toUpperCase())) {
+            setSelectedToken(token.toUpperCase());
+        }
+        if (amountParam) {
+            setAmount(amountParam);
+        }
+    }, [location]);
 
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
 

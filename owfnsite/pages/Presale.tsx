@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
@@ -249,10 +249,19 @@ export default function Presale() {
   const [soldSOL, setSoldSOL] = useState(0);
   const [userContribution, setUserContribution] = useState(0);
   const [isCheckingContribution, setIsCheckingContribution] = useState(false);
+  const [location] = useLocation();
   
   const [presaleStatus, setPresaleStatus] = useState<'pending' | 'active' | 'ended'>('pending');
   const [endReason, setEndReason] = useState<'date' | 'hardcap' | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.split('?')[1] || '');
+    const amountParam = params.get('amount');
+    if (amountParam) {
+        setSolAmount(amountParam);
+    }
+  }, [location]);
 
   const fetchPresaleProgress = useCallback(async () => {
         if (new Date() < PRESALE_DETAILS.startDate) {
@@ -656,7 +665,7 @@ export default function Presale() {
                                 {isCheckingContribution ? (
                                     <div className="flex items-center justify-center gap-2">
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>Checking your contribution...</span>
+                                        <span>{t('presale_checking_contribution')}</span>
                                     </div>
                                 ) : (
                                     <>

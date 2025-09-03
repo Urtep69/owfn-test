@@ -339,7 +339,16 @@ export const ro = {
     chatbot_loading_1: `Mă conectez la circuitele mele...`,
     chatbot_loading_2: `Analizez întrebarea...`,
     chatbot_loading_3: `Formulez un răspuns...`,
-    
+    chatbot_proactive_home: `Bun venit la Official World Family Network! Cum vă pot ajuta să explorați misiunea noastră astăzi?`,
+    chatbot_proactive_presale: `Bună! Văd că sunteți pe pagina noastră de Prevânzare. Aveți întrebări despre cum puteți participa? Sunt aici să vă ajut!`,
+    chatbot_proactive_donations: `Bun venit pe pagina de Donații! Sprijinul dumneavoastră este vital pentru misiunea noastră. Vă pot ajuta cu procesul de donație?`,
+    chatbot_proactive_staking_personalized: `Bun venit înapoi! Văd că dețineți {amount} OWFN. Ați luat în considerare posibilitatea de a face staking cu tokenurile dumneavoastră pentru a câștiga recompense și a susține direct cauzele noastre sociale?`,
+    chatbot_proactive_generic: `Bună ziua! Cum vă pot ajuta astăzi să aflați mai multe despre Official World Family Network?`,
+    chatbot_proactive_coming_soon: `Această funcționalitate este în curs de dezvoltare și va fi disponibilă în curând. Vom anunța lansarea sa pe canalele noastre oficiale. Vă pot ajuta cu altceva?`,
+    chatbot_donation_guide_start: `Vă pot ajuta cu asta! Pentru a continua cu o donație, trebuie să știu două lucruri: ce token doriți să folosiți și cât doriți să donați.`,
+    chatbot_donation_guide_prefilled: `Excelent! Am pre-completat formularul de donație pentru dumneavoastră cu {amount} {token}. Vă rugăm să verificați și să confirmați pe pagina de Donații.`,
+    chatbot_presale_guide_prefilled: `Perfect. Am setat suma de achiziție la {amount} SOL pentru dumneavoastră pe pagina de Prevânzare. Vă rugăm să mergeți acolo pentru a finaliza tranzacția.`,
+
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,
     whitepaper_subtitle: `O Prezentare Detaliată a Proiectului Official World Family Network`,

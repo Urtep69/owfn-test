@@ -53,6 +53,7 @@ export interface ChatMessage {
     role: 'user' | 'model';
     parts: { text: string }[];
     timestamp?: Date;
+    isActionProcessed?: boolean;
 }
 
 export interface TokenExtensionState {
