@@ -103,6 +103,11 @@ export const Chatbot = () => {
     const loadingIntervalRef = useRef<number | null>(null);
     const [location, setLocation] = useLocation();
 
+    // State for the proactive message bubble
+    const [proactiveMessage, setProactiveMessage] = useState<string | null>(null);
+    const [isBubbleVisible, setIsBubbleVisible] = useState(false);
+    const [hasBeenOpened, setHasBeenOpened] = useState(false);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -123,60 +128,52 @@ export const Chatbot = () => {
         };
     }, []);
     
-    // Proactive, contextual messaging
+    // Proactive, contextual messaging bubble logic
     useEffect(() => {
-        if (!isOpen || messages.length > 0) return; 
-
         const pageKey = location.split('/')[1] || 'home';
         const storageKey = `owfn-proactive-msg-${pageKey}`;
 
         if (sessionStorage.getItem(storageKey)) return;
 
         let messageKey = '';
-        const comingSoonPages = ['staking', 'vesting', 'airdrop', 'governance'];
-
-        if (pageKey === 'presale') {
+        const comingSoonPages = ['staking', 'vesting', 'airdrop', 'governance', 'dashboard'];
+        
+        if(location.includes('/dashboard/token/')) {
+            messageKey = 'chatbot_proactive_coming_soon';
+        } else if (pageKey === 'presale') {
             messageKey = 'chatbot_proactive_presale';
         } else if (pageKey === 'donations') {
             messageKey = 'chatbot_proactive_donations';
-        } else if (comingSoonPages.includes(pageKey) || (pageKey === 'dashboard' && location.includes('/token/'))) {
+        } else if (comingSoonPages.includes(pageKey)) {
              messageKey = 'chatbot_proactive_coming_soon';
         } else if (pageKey === 'home') {
-            messageKey = 'chatbot_proactive_home';
+             if (solana.connected && solana.userTokens.some(t => t.symbol === 'OWFN' && t.balance > 0)) {
+                const owfnToken = solana.userTokens.find(t => t.symbol === 'OWFN');
+                const personalizedMessage = t('chatbot_proactive_staking_personalized', { amount: owfnToken!.balance.toLocaleString() });
+                setProactiveMessage(personalizedMessage);
+            } else {
+                messageKey = 'chatbot_proactive_home';
+            }
         } else {
              messageKey = 'chatbot_proactive_generic';
         }
         
-        if (messageKey) {
-            const proactiveMessage: ChatMessage = {
-                role: 'model',
-                parts: [{ text: t(messageKey) }],
-                timestamp: new Date()
-            };
-            setTimeout(() => {
-                setMessages([proactiveMessage]);
-                sessionStorage.setItem(storageKey, 'true');
-            }, 1000);
-        }
-    }, [location, isOpen, messages.length, t]);
+        const messageText = proactiveMessage || (messageKey ? t(messageKey) : null);
 
-    // Personalized, proactive messaging
-    useEffect(() => {
-        if (!isOpen || messages.length > 0 || !solana.connected || sessionStorage.getItem('owfn-proactive-staking')) return;
-        
-        const owfnToken = solana.userTokens.find(t => t.symbol === 'OWFN');
-        if (owfnToken && owfnToken.balance > 0) {
-            const proactiveMessage: ChatMessage = {
-                role: 'model',
-                parts: [{ text: t('chatbot_proactive_staking_personalized', { amount: owfnToken.balance.toLocaleString() }) }],
-                timestamp: new Date()
-            };
-            setTimeout(() => {
-                setMessages([proactiveMessage]);
-                sessionStorage.setItem('owfn-proactive-staking', 'true');
-            }, 1500);
+        if (messageText) {
+            setProactiveMessage(messageText);
+            const timer = setTimeout(() => {
+                // Only show the bubble if the chat is not already open
+                if (!isOpen) {
+                    setIsBubbleVisible(true);
+                }
+                sessionStorage.setItem(storageKey, 'true');
+            }, 2500);
+
+            return () => clearTimeout(timer);
         }
-    }, [solana.connected, solana.userTokens, isOpen, messages.length, t]);
+    }, [location, isOpen, solana.connected, solana.userTokens, t, proactiveMessage]);
+
 
      // Action parsing for guided flows
     useEffect(() => {
@@ -303,18 +300,58 @@ export const Chatbot = () => {
             setTimeout(() => inputRef.current?.focus(), 0);
         }
     };
+    
+    const openChatAndHideBubble = () => {
+        setIsOpen(true);
+        setIsBubbleVisible(false);
+
+        if (!hasBeenOpened && proactiveMessage) {
+            const proactiveChatMessage: ChatMessage = {
+                role: 'model',
+                parts: [{ text: proactiveMessage }],
+                timestamp: new Date()
+            };
+            // Add the proactive message to the start of the conversation if it's not already there
+            if (!messages.some(m => m.parts[0].text === proactiveMessage)) {
+                setMessages(prev => [proactiveChatMessage, ...prev]);
+            }
+        }
+        setHasBeenOpened(true);
+    };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') handleSend(); };
     
     if (!isOpen) {
         return (
-            <button
-                onClick={() => setIsOpen(true)}
-                className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
-                aria-label="Open Chatbot"
-            >
-                <MessageCircle size={28} />
-            </button>
+            <>
+                {isBubbleVisible && (
+                    <div 
+                        className="fixed bottom-24 right-5 max-w-[calc(100vw-40px)] sm:max-w-xs w-full bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg p-4 animate-fade-in-up z-50 cursor-pointer"
+                        onClick={openChatAndHideBubble}
+                        role="alert"
+                        aria-live="assertive"
+                    >
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setIsBubbleVisible(false); }}
+                            className="absolute top-2 right-2 p-1 text-primary-400 dark:text-darkPrimary-500 hover:text-primary-700 dark:hover:text-darkPrimary-200 rounded-full"
+                            aria-label="Dismiss message"
+                        >
+                            <X size={16} />
+                        </button>
+                        <p className="text-sm text-primary-800 dark:text-darkPrimary-200 pr-4">
+                            {proactiveMessage}
+                        </p>
+                        <div className="absolute -bottom-2 right-6 w-4 h-4 bg-white dark:bg-darkPrimary-800 transform rotate-45"></div>
+                    </div>
+                )}
+                <button
+                    onClick={openChatAndHideBubble}
+                    className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
+                    aria-label="Open Chatbot"
+                >
+                    <MessageCircle size={28} />
+                </button>
+            </>
         );
     }
 
