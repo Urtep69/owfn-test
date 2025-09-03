@@ -346,6 +346,14 @@ export const de = {
     chatbot_donation_guide_start: `Dabei kann ich Ihnen helfen! Um mit einer Spende fortzufahren, muss ich zwei Dinge wissen: welchen Token Sie verwenden möchten und wie viel Sie spenden möchten.`,
     chatbot_donation_guide_prefilled: `Großartig! Ich habe das Spendenformular für Sie mit {amount} {token} vorausgefüllt. Bitte überprüfen und bestätigen Sie auf der Spendenseite.`,
     chatbot_presale_guide_prefilled: `Perfekt. Ich habe den Kaufbetrag für Sie auf der Vorverkaufsseite auf {amount} SOL festgelegt. Bitte gehen Sie dorthin, um Ihre Transaktion abzuschließen.`,
+    chatbot_proactive_contact: "Erkunden Sie unsere Kontaktoptionen? Ich kann Ihnen helfen zu klären, welcher Kanal für Ihre Anfrage am besten geeignet ist, oder Sie beim Senden einer Nachricht anleiten.",
+    chatbot_proactive_profile: "Willkommen in Ihrem Profil! Hier können Sie Ihre Token-Guthaben und Impact-Statistiken sehen, sobald Sie verbunden sind. Wie kann ich Ihnen helfen?",
+    chatbot_proactive_profile_personalized: "Willkommen in Ihrem Dashboard! Ich sehe, Sie haben {balance} OWFN in Ihrer Wallet. Haben Sie unsere Staking-Optionen in Betracht gezogen, um Belohnungen zu verdienen?",
+    chatbot_proactive_profile_disconnected: "Willkommen auf der Profil-Seite! Verbinden Sie Ihre Wallet, um Ihre Token zu sehen und Ihren Einfluss im OWFN-Ökosystem zu verfolgen.",
+    chatbot_proactive_about: "Möchten Sie mehr über unsere Mission erfahren? Fragen Sie mich gerne alles über unsere Vision oder den Impact, den wir schaffen wollen!",
+    chatbot_proactive_tokenomics: "Tauchen Sie in unsere Tokenomics ein? Ich kann Ihnen unsere Token-Verteilung, Angebotsdetails oder den Nutzen des OWFN-Tokens erklären.",
+    chatbot_proactive_roadmap: "Schauen Sie sich unsere Zukunftspläne an? Fragen Sie mich nach jeder Phase unserer Roadmap, und ich kann Ihnen weitere Details geben!",
+    chatbot_proactive_dashboard: "Willkommen im Transparenz-Dashboard! Hier können Sie unsere offiziellen Wallets in Echtzeit überwachen. Haben Sie Fragen dazu?",
     
     // Whitepaper
     whitepaper_title: `OWFN-Whitepaper`,

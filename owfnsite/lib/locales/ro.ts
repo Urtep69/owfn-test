@@ -348,6 +348,14 @@ export const ro = {
     chatbot_donation_guide_start: `Vă pot ajuta cu asta! Pentru a continua cu o donație, trebuie să știu două lucruri: ce token doriți să folosiți și cât doriți să donați.`,
     chatbot_donation_guide_prefilled: `Excelent! Am pre-completat formularul de donație pentru dumneavoastră cu {amount} {token}. Vă rugăm să verificați și să confirmați pe pagina de Donații.`,
     chatbot_presale_guide_prefilled: `Perfect. Am setat suma de achiziție la {amount} SOL pentru dumneavoastră pe pagina de Prevânzare. Vă rugăm să mergeți acolo pentru a finaliza tranzacția.`,
+    chatbot_proactive_contact: "Explorați opțiunile noastre de contact? Vă pot ajuta să clarificați care canal este cel mai bun pentru întrebarea dumneavoastră sau să vă ghidez în trimiterea unui mesaj.",
+    chatbot_proactive_profile: "Bun venit la Profilul dumneavoastră! Aici puteți vedea soldurile token-urilor și statisticile de impact odată ce sunteți conectat. Cum vă pot ajuta?",
+    chatbot_proactive_profile_personalized: "Bun venit pe panoul de control! Văd că aveți {balance} OWFN în portofel. Ați luat în considerare opțiunile noastre de staking pentru a câștiga recompense?",
+    chatbot_proactive_profile_disconnected: "Bun venit pe pagina de Profil! Conectați-vă portofelul pentru a vedea token-urile și pentru a urmări impactul dumneavoastră în ecosistemul OWFN.",
+    chatbot_proactive_about: "Doriți să aflați mai multe despre misiunea noastră? Nu ezitați să mă întrebați orice despre viziunea noastră sau impactul pe care ne propunem să îl creăm!",
+    chatbot_proactive_tokenomics: "Analizați tokenomia noastră? Vă pot explica distribuția token-urilor, detaliile ofertei sau utilitatea token-ului OWFN.",
+    chatbot_proactive_roadmap: "Verificați planurile noastre de viitor? Întrebați-mă despre orice fază a foii de parcurs și vă pot oferi mai multe detalii!",
+    chatbot_proactive_dashboard: "Bun venit pe panoul de transparență! Aici puteți monitoriza portofelele noastre oficiale în timp real. Aveți întrebări despre ele?",
 
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,

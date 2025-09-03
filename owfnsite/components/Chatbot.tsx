@@ -130,49 +130,90 @@ export const Chatbot = () => {
     
     // Proactive, contextual messaging bubble logic
     useEffect(() => {
-        const pageKey = location.split('/')[1] || 'home';
-        const storageKey = `owfn-proactive-msg-${pageKey}`;
+        // 1. Reset bubble visibility on any change that runs this effect (like navigation)
+        setIsBubbleVisible(false);
 
+        // 2. Determine a unique key for the current page/state
+        const pageKey = location.split('/')[1] || 'home';
+        const storageKey = `owfn-proactive-msg-${pageKey}-${solana.address || 'guest'}`;
+
+        // 3. If message has been shown for this page in this session, do nothing.
         if (sessionStorage.getItem(storageKey)) return;
 
-        let messageKey = '';
-        const comingSoonPages = ['staking', 'vesting', 'airdrop', 'governance', 'dashboard'];
-        
-        if(location.includes('/dashboard/token/')) {
-            messageKey = 'chatbot_proactive_coming_soon';
-        } else if (pageKey === 'presale') {
-            messageKey = 'chatbot_proactive_presale';
-        } else if (pageKey === 'donations') {
-            messageKey = 'chatbot_proactive_donations';
-        } else if (comingSoonPages.includes(pageKey)) {
-             messageKey = 'chatbot_proactive_coming_soon';
-        } else if (pageKey === 'home') {
-             if (solana.connected && solana.userTokens.some(t => t.symbol === 'OWFN' && t.balance > 0)) {
-                const owfnToken = solana.userTokens.find(t => t.symbol === 'OWFN');
-                const personalizedMessage = t('chatbot_proactive_staking_personalized', { amount: owfnToken!.balance.toLocaleString() });
-                setProactiveMessage(personalizedMessage);
-            } else {
-                messageKey = 'chatbot_proactive_home';
-            }
-        } else {
-             messageKey = 'chatbot_proactive_generic';
-        }
-        
-        const messageText = proactiveMessage || (messageKey ? t(messageKey) : null);
+        // 4. Determine the proactive message text based on the current page.
+        let messageText = '';
+        const comingSoonPages = ['staking', 'vesting', 'airdrop', 'governance'];
 
+        switch (pageKey) {
+            case 'presale':
+                messageText = t('chatbot_proactive_presale');
+                break;
+            case 'donations':
+                messageText = t('chatbot_proactive_donations');
+                break;
+            case 'contact':
+                messageText = t('chatbot_proactive_contact');
+                break;
+            case 'about':
+                messageText = t('chatbot_proactive_about');
+                break;
+            case 'tokenomics':
+                messageText = t('chatbot_proactive_tokenomics');
+                break;
+            case 'roadmap':
+                messageText = t('chatbot_proactive_roadmap');
+                break;
+            case 'dashboard':
+                 if (location.includes('/dashboard/token/')) {
+                    messageText = t('chatbot_proactive_coming_soon');
+                 } else {
+                    messageText = t('chatbot_proactive_dashboard');
+                 }
+                break;
+            case 'profile':
+                if (solana.connected) {
+                    const owfnToken = solana.userTokens.find(t => t.symbol === 'OWFN' && t.balance > 0);
+                    if (owfnToken) {
+                        messageText = t('chatbot_proactive_profile_personalized', { balance: owfnToken.balance.toLocaleString() });
+                    } else {
+                        messageText = t('chatbot_proactive_profile');
+                    }
+                } else {
+                    messageText = t('chatbot_proactive_profile_disconnected');
+                }
+                break;
+            case 'home':
+                const homeOwfnToken = solana.userTokens.find(t => t.symbol === 'OWFN' && t.balance > 0);
+                if (solana.connected && homeOwfnToken) {
+                    messageText = t('chatbot_proactive_staking_personalized', { amount: homeOwfnToken.balance.toLocaleString() });
+                } else {
+                    messageText = t('chatbot_proactive_home');
+                }
+                break;
+            default:
+                if (comingSoonPages.includes(pageKey)) {
+                    messageText = t('chatbot_proactive_coming_soon');
+                } else {
+                    messageText = t('chatbot_proactive_generic');
+                }
+                break;
+        }
+
+        // 5. If a message was determined, set it and schedule the bubble to appear.
         if (messageText) {
             setProactiveMessage(messageText);
             const timer = setTimeout(() => {
-                // Only show the bubble if the chat is not already open
-                if (!isOpen) {
+                if (!isOpen) { // This check is crucial
                     setIsBubbleVisible(true);
+                    sessionStorage.setItem(storageKey, 'true');
                 }
-                sessionStorage.setItem(storageKey, 'true');
             }, 2500);
 
+            // Cleanup timer on re-render or unmount
             return () => clearTimeout(timer);
         }
-    }, [location, isOpen, solana.connected, solana.userTokens, t, proactiveMessage]);
+    // Dependencies: Re-run whenever the page, connection status, or user tokens change.
+    }, [location, isOpen, solana.connected, solana.userTokens, t]);
 
 
      // Action parsing for guided flows

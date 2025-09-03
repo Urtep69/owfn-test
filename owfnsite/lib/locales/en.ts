@@ -176,7 +176,6 @@ export const en = {
     presale_checking_contribution: `Checking your contribution...`,
 
     // Donations Page
-    make_donation: `Make a Donation`,
     donation_desc: `Support our social impact initiatives by donating crypto. All funds go directly to the Impact Treasury.`,
     donation_message_title: `A Bridge of Hope, Built by You`,
     donation_message_p1: `Beyond the code and the blockchain lies our true mission: humanity. Every transaction on this page is more than just a transfer of value; it's a helping hand extended across continents, a signal that no one needs to fear being forgotten.`,
@@ -348,6 +347,14 @@ export const en = {
     chatbot_donation_guide_start: `I can help with that! To proceed with a donation, I need to know two things: which token you'd like to use, and how much you wish to donate.`,
     chatbot_donation_guide_prefilled: `Great! I've pre-filled the donation form for you with {amount} {token}. Please review and confirm on the Donations page.`,
     chatbot_presale_guide_prefilled: `Perfect. I've set the purchase amount to {amount} SOL for you on the Presale page. Please go there to complete your transaction.`,
+    chatbot_proactive_contact: "Exploring our contact options? I can help clarify which channel is best for your inquiry or guide you through sending a message.",
+    chatbot_proactive_profile: "Welcome to your Profile! Here you can see your token balances and impact stats once you're connected. How can I assist?",
+    chatbot_proactive_profile_personalized: "Welcome to your dashboard! I see you have {balance} OWFN in your wallet. Have you considered our staking options to earn rewards?",
+    chatbot_proactive_profile_disconnected: "Welcome to the Profile page! Connect your wallet to see your tokens and track your impact on the OWFN ecosystem.",
+    chatbot_proactive_about: "Learning more about our mission? Feel free to ask me anything about our vision or the impact we aim to create!",
+    chatbot_proactive_tokenomics: "Delving into our tokenomics? I can explain our token distribution, supply details, or the utility of the OWFN token.",
+    chatbot_proactive_roadmap: "Checking out our future plans? Ask me about any phase of our roadmap, and I can provide more details!",
+    chatbot_proactive_dashboard: "Welcome to the transparency dashboard! Here you can monitor our official wallets in real-time. Do you have any questions about them?",
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
