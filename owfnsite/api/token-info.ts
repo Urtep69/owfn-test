@@ -30,9 +30,6 @@ export default async function handler(req: any, res: any) {
                 method: 'getAsset',
                 params: {
                     id: mintAddress,
-                    displayOptions: {
-                        showFungible: true
-                    }
                 },
             }),
         });
@@ -61,26 +58,11 @@ export default async function handler(req: any, res: any) {
         const content = asset.content || {};
         const metadata = content.metadata || {};
         const links = content.links || {};
-        const ownership = asset.ownership || {};
         const priceInfo = tokenInfo.price_info || {};
 
         const decimals = tokenInfo.decimals ?? 9;
         const price = priceInfo.price_per_token || 0;
-        
-        let supply = 0;
-        if (tokenInfo.supply && typeof tokenInfo.supply === 'string') {
-            try {
-                const rawSupplyBigInt = BigInt(tokenInfo.supply);
-                const divisor = 10n ** BigInt(decimals);
-                // Perform division with BigInt to handle large numbers, then convert the result to Number.
-                // This is safe for total supply, which is expected to be a whole number.
-                supply = Number(rawSupplyBigInt / divisor);
-            } catch (e) {
-                console.warn(`Could not parse supply string "${tokenInfo.supply}" as a valid number.`, e);
-                // Fallback to 0 if parsing fails
-                supply = 0;
-            }
-        }
+        const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
         
         let mintAuthority: string | null = null;
         let freezeAuthority: string | null = null;
@@ -95,16 +77,13 @@ export default async function handler(req: any, res: any) {
                     if (authority.scopes.includes('freeze')) {
                         freezeAuthority = authority.address;
                     }
-                     // The scope for metadata authority is typically 'metadata_update'
-                     if (authority.scopes.includes('metadata_update')) {
+                     if (authority.scopes.includes('update')) {
                         updateAuthority = authority.address;
                     }
                 }
             }
         }
-        
-        const tokenStandard = asset.interface === 'FungibleAsset' ? 'Token-2022' : 'SPL Token';
-        
+
         const responseData: Partial<TokenDetails> = {
             mintAddress: asset.id,
             name: metadata.name || 'Unknown Token',
@@ -114,25 +93,17 @@ export default async function handler(req: any, res: any) {
             pricePerToken: price,
             totalSupply: supply,
             marketCap: calculateMarketCap(price, supply),
-            fdv: calculateMarketCap(price, supply),
-            volume24h: priceInfo.total_volume_24hr || 0,
-            price24hChange: priceInfo.price_change_24hr || 0,
-            holders: ownership.owner_count || 0,
-            liquidity: priceInfo.liquidity || 0,
             
-            creatorAddress: ownership.owner,
             mintAuthority: mintAuthority,
             freezeAuthority: freezeAuthority,
             updateAuthority: updateAuthority,
-            tokenStandard: tokenStandard,
+            tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
         };
 
         // Populate description from mock if available
         const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
         if (mockDetailsKey) {
             responseData.description = MOCK_TOKEN_DETAILS[mockDetailsKey].description;
-            // Add mock trading stats if available, to fulfill the prompt
-            responseData.txns = MOCK_TOKEN_DETAILS[mockDetailsKey].txns;
         }
         
         return res.status(200).json(responseData);

@@ -8,7 +8,7 @@ import { GenericTokenIcon } from '../components/IconComponents.tsx';
 import { DualProgressBar } from '../components/DualProgressBar.tsx';
 import { MOCK_TOKEN_DETAILS } from '../constants.ts';
 
-const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 dark:text-darkPrimary-100', subtextColor }: { title: string, value: string, subtext?: string, icon: React.ReactNode, valueColor?: string, subtextColor?: string }) => (
+const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 dark:text-darkPrimary-100' }: { title: string, value: string, subtext?: string, icon: React.ReactNode, valueColor?: string }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-xl shadow-3d">
         <div className="flex items-center space-x-3">
             <div className="bg-primary-100 dark:bg-darkPrimary-700 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">{icon}</div>
@@ -17,7 +17,7 @@ const StatCard = ({ title, value, subtext, icon, valueColor = 'text-primary-900 
                 <div className="flex items-baseline gap-2">
                     <p className={`text-2xl font-bold ${valueColor}`}>{value}</p>
                 </div>
-                 {subtext && <p className={`text-xs font-semibold ${subtextColor}`}>{subtext}</p>}
+                 {subtext && <p className="text-xs font-semibold text-primary-500 dark:text-darkPrimary-500">{subtext}</p>}
             </div>
         </div>
     </div>
@@ -92,8 +92,6 @@ export default function TokenDetail() {
                 if (mockDetailsKey) {
                     const mock = MOCK_TOKEN_DETAILS[mockDetailsKey];
                     data.description = data.description || mock.description;
-                    // Mock data for trading stats for demonstration
-                    data.txns = data.txns || mock.txns; 
                 }
                 setToken(data);
             } catch (err) {
@@ -146,11 +144,10 @@ export default function TokenDetail() {
                 </div>
             </header>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title={t('price_per_token')} value={isPriceAvailable ? `$${priceString}`: 'N/A'} icon={<DollarSign />} subtext={`${priceChange.toFixed(2)}% (24h)`} subtextColor={priceChangeColor} />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <StatCard title={t('pricePerToken')} value={isPriceAvailable ? `$${priceString}`: 'N/A'} icon={<DollarSign />} subtext={`${priceChange.toFixed(2)}% (24h)`} />
                 <StatCard title={t('market_cap')} value={token.marketCap ? `$${(token.marketCap).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<BarChart2 />} />
                 <StatCard title={t('volume_24h')} value={token.volume24h ? `$${(token.volume24h).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : 'N/A'} icon={<TrendingUp />} />
-                <StatCard title={t('holders')} value={token.holders ? token.holders.toLocaleString() : 'N/A'} icon={<Users />} />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8 items-start">
@@ -158,6 +155,7 @@ export default function TokenDetail() {
                     <InfoCard title={t('market_stats')} icon={<Info />}>
                         <InfoRow label={t('fully_diluted_valuation')}>{token.fdv ? `$${token.fdv.toLocaleString(undefined, {maximumFractionDigits: 0})}` : 'N/A'}</InfoRow>
                         <InfoRow label={t('liquidity')}>{token.liquidity ? `$${token.liquidity.toLocaleString(undefined, {maximumFractionDigits: 0})}` : 'N/A'}</InfoRow>
+                        <InfoRow label={t('holders')}>{token.holders ? token.holders.toLocaleString() : 'N/A'}</InfoRow>
                     </InfoCard>
 
                     {token.txns && (
@@ -177,14 +175,9 @@ export default function TokenDetail() {
                      <InfoCard title={t('on_chain_security')} icon={<Shield />}>
                         <InfoRow label={t('total_supply')}>{token.totalSupply?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</InfoRow>
                         <InfoRow label={t('token_standard')}>{token.tokenStandard || 'N/A'}</InfoRow>
-                         {token.creatorAddress && (
-                            <InfoRow label={"Creator Address"}>
-                                <AddressDisplay address={token.creatorAddress} />
-                            </InfoRow>
-                        )}
                         <AuthorityRow label={t('mint_authority')} address={token.mintAuthority} />
                         <AuthorityRow label={t('freeze_authority')} address={token.freezeAuthority} />
-                        <AuthorityRow label={t('update_authority')} address={token.updateAuthority} />
+                        <AuthorityRow label="Update Authority" address={token.updateAuthority} />
                     </InfoCard>
 
                     {token.description && (
