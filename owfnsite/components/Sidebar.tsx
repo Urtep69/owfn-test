@@ -4,7 +4,7 @@ import { Link, useRoute } from 'wouter';
 import { 
     Home, Info, FileText, Map, Handshake, HelpCircle, Mail,
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
-    Heart, TrendingUp, Lock, Award, User, Vote, Shield
+    Heart, TrendingUp, Lock, Award, User, Vote, Shield, Users
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
@@ -74,6 +74,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         {
             title: t('sidebar_engage'),
             links: [
+                { to: '/community', label: 'Comunitate', icon: <Users size={20} /> },
                 { to: '/staking', label: t('staking'), icon: <TrendingUp size={20} /> },
                 { to: '/vesting', label: t('vesting'), icon: <Lock size={20} /> },
                 { to: '/airdrop', label: t('airdrop'), icon: <Award size={20} /> },

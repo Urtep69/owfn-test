@@ -162,3 +162,32 @@ export interface SiwsReturn {
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
 }
+
+// Types for the new Community Hub
+export interface CommunityUser {
+  id: string; // Wallet Address
+  username: string;
+  avatar: string;
+  isOnline: boolean;
+  isBot?: boolean;
+}
+
+export interface CommunityMessage {
+  id: string;
+  senderId: string;
+  content: string;
+  timestamp: Date;
+  reactions?: { [emoji: string]: string[] }; // emoji -> array of user IDs
+}
+
+export interface ChatConversation {
+  id: string;
+  type: 'dm' | 'group';
+  participants: string[]; // Array of user IDs
+  name?: string; // For groups
+  image?: string; // For groups
+  description?: string; // For groups
+  isTokenGated?: boolean;
+  requiredTokenAmount?: number;
+  messages: CommunityMessage[];
+}

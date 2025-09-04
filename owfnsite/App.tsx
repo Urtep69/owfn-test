@@ -32,6 +32,7 @@ import Governance from './pages/Governance.tsx';
 import Maintenance from './pages/Maintenance.tsx';
 import AdminPresale from './pages/AdminPresale.tsx';
 import Contact from './pages/Contact.tsx';
+import CommunityHub from './pages/CommunityHub.tsx';
 import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
@@ -81,6 +82,8 @@ const AppContent = () => {
           <Route path="/partnerships"><Partnerships /></Route>
           <Route path="/faq"><FAQ /></Route>
           <Route path="/contact"><Contact /></Route>
+          <Route path="/community/:id"><CommunityHub /></Route>
+          <Route path="/community"><CommunityHub /></Route>
           <Route path="/governance">
             <ComingSoonWrapper>
               <Governance />
