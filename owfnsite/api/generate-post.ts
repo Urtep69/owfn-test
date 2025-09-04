@@ -39,24 +39,27 @@ export default async function handler(req: any, res: any) {
         const ai = new GoogleGenAI({ apiKey });
 
         const themes = [
-            "the core mission of transparent humanitarian aid and helping those in need",
-            "the power of the OWFN global community coming together for good",
-            "the benefits of using the fast and transparent Solana blockchain",
-            "the ongoing presale and how participation directly fuels social projects",
-            "the project's vision for a more connected and compassionate world",
-            "an emotional appeal about making a real-world difference together",
-            "the 2% automatic APY for holders as a thank you for their support"
+            "our mission of transparent humanitarian aid and helping those in need, focusing on the human connection",
+            "the power of our global community uniting for a common good, emphasizing collective strength",
+            "the speed and transparency of the Solana blockchain, making every donation count",
+            "the importance of the presale in funding our first life-changing social projects",
+            "our vision for a world without borders for compassion, a world connected by kindness",
+            "an emotional story about how a small contribution can lead to a huge real-world difference",
+            "the automatic 2% APY for holders as a symbol of gratitude and shared growth",
+            "a focus on a specific impact area like providing medical care or building a school",
+            "the concept of being part of a global family, not just an investment",
+            "a call to action, inviting people to join the movement and spread the word"
         ];
         const randomTheme = themes[Math.floor(Math.random() * themes.length)];
 
-        const prompt = `Act as an eloquent and empathetic community ambassador for a humanitarian crypto project called Official World Family Network (OWFN). Your task is to generate a single, unique, ready-to-share social media post (like a tweet, under 280 characters). The post's tone should be inspiring, emotional, and respectful. It must encourage community growth and support for the project's presale and humanitarian mission.
+        const prompt = `Act as an eloquent and empathetic community ambassador for a humanitarian crypto project called Official World Family Network (OWFN). Your task is to generate a single, unique, and emotionally resonant social media post (like a tweet, under 280 characters). The post's tone must be inspiring, authentic, and heartfelt. Avoid generic marketing language. Focus on storytelling and human connection.
 
 The post MUST be in ${languageName}.
 Focus this specific post on the theme of: "${randomTheme}".
 
-Crucially, your entire response MUST be ONLY the text of the social media post itself. Do NOT include any prefixes, titles, labels like "Post:", markdown formatting like asterisks or quotes, or any other explanatory text. The post must include relevant and powerful hashtags like #OWFN, #Solana, #CryptoForGood, and #SocialImpact.
+Crucially, your entire response MUST be ONLY the text of the social media post itself. Do NOT include any prefixes, titles, labels like "Post:", markdown formatting like asterisks or quotes, or any other explanatory text. The post must include powerful, relevant hashtags like #OWFN, #Solana, #CryptoForGood, #SocialImpact, and #Family.
 
-Generate the post now.`;
+Generate a completely unique post now.`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',

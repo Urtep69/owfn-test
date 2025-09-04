@@ -22,9 +22,9 @@ export default async function handler(req: any, res: any) {
 
         const ai = new GoogleGenAI({ apiKey });
 
-        const systemInstruction = `You are a creative and heartfelt storyteller for the "Official World Family Network" (OWFN) project. Your task is to generate a short (2-3 sentences), personalized, and emotional narrative based on a user's impact statistics. The story should make the user feel valued and connected to the real-world good they've accomplished. The narrative MUST be in ${langName}.
+        const systemInstruction = `You are a deeply creative and empathetic storyteller for the "Official World Family Network" (OWFN) project. Your task is to craft a completely unique, short (2-3 sentences), personalized, and emotional narrative based on a user's impact statistics. The story must make the user feel profoundly valued and connected to the real-world good they've accomplished. Avoid generic statements and clichés. The narrative MUST be in ${langName}.
 
-The response should ONLY be the narrative text itself. Do not include salutations like "Hello," or any other conversational filler. Just the story.`;
+Your response MUST ONLY be the narrative text. Do not include salutations, filler text, or repeat previous stories. Each response must be fresh and original. Just the story.`;
 
         const prompt = `Generate an impact story for a user with the following stats: ${statsString}. Emphasize how their actions translate into real-world help, like building schools or providing medical care.`;
 

@@ -250,7 +250,7 @@ export const fr = {
     case_update_1: `Les matériaux sont arrivés sur le site. La construction commencera la semaine prochaine !`,
     case_update_2: `Les plans architecturaux ont été finalisés et approuvés par les autorités locales.`,
     case_update_3: `Le financement du projet a officiellement commencé. Nous sommes reconnaissants pour la première vague de soutien de la communauté OWFN.`,
-    no_active_cases_in_category: `Il n'y a actuellement aucun cas actif dans cette catégorie.`,
+    no_active_cases_in_category: `Il n'y a currently aucun cas actif dans cette catégorie.`,
     
     // Partnerships Page
     partnerships_title: `Partenariats et collaborations futures`,
@@ -342,7 +342,7 @@ export const fr = {
     chatbot_guided_contact_start: "Je peux vous aider avec ça. Pour vous diriger au bon endroit, pourriez-vous me dire la raison de votre contact ? Par exemple, 'partenariats', 'support technique' ou une 'question générale'.",
     chatbot_guided_contact_prepare: "Compris. Je vais vous rediriger vers la page de contact avec '{reason}' déjà sélectionné pour vous. Veuillez utiliser le bouton ci-dessous.",
     chatbot_guided_contact_button: "Aller au formulaire de contact",
-    chatbot_personalized_apy_reminder: `En tant que détenteur de jetons OWFN, merci de faire partie de notre mission ! N'oubliez pas que vous gagnez automatiquement 2% d'APY simplement en détenant les jetons dans votre portefeuille.`,
+    chatbot_personalized_apy_reminder: `En tant que détenteur de jetons OWFN, merci de faire partie de notre mission ! N'oubliez pas que vous gagnez automatiquement 2% d'APY simplemente en détenant les jetons dans votre portefeuille.`,
     chatbot_proactive_staking: "Bienvenue ! Bien que la détention d'OWFN vous rapporte automatiquement 2 % d'APY, je peux répondre à toutes vos questions sur son fonctionnement.",
     chatbot_proactive_vesting: "Vous vérifiez votre calendrier de vesting ? Je peux vous aider à trouver les informations dont vous avez besoin.",
     chatbot_proactive_airdrop: "Curieux de connaître l'éligibilité à l'airdrop ? Dites-moi comment je peux vous aider.",
@@ -400,6 +400,7 @@ export const fr = {
     contact_how_can_we_help: `Comment pouvons-nous vous aider ?`,
     contact_general_inquiries: `Demandes générales`,
     contact_general_desc: `Pour toute question générale sur le projet.`,
+    contact_partnerships: `Partenariats`,
     contact_press_media: `Presse et médias`,
     contact_press_desc: `Pour les journalistes, les blogueurs et les demandes des médias.`,
     contact_technical_support: `Support technique`,
@@ -538,7 +539,7 @@ export const fr = {
     
     // Coming Soon
     coming_soon_title: `Bientôt disponible`,
-    coming_soon_desc: `Cette fonctionnalité est actuellement en développement. Nous travaillons dur pour vous la proposer bientôt. Merci de votre patience et de votre soutien.`,
+    coming_soon_desc: `Cette fonctionnalité est currently en développement. Nous travaillons dur pour vous la proposer bientôt. Merci de votre patience et de votre soutien.`,
     
     // Admin
     presale_admin_title: `Admin de la prévente`,

@@ -425,6 +425,7 @@ export const ro = {
     contact_error_message: `A apărut o eroare. Vă rugăm să încercați din nou mai târziu.`,
     contact_faq_title: `Aveți o întrebare rapidă?`,
     contact_faq_desc: `Multe răspunsuri pot fi găsite deja în secțiunea noastră de Întrebări Frecvente. Economisiți timp și consultați-o acum!`,
+    contact_faq_button: `Vezi Întrebările Frecvente`,
     contact_required_fields: `Câmpurile marcate cu asterisc (*) sunt obligatorii.`,
     contact_disclaimer_title: `Notă privind Politica Noastră de Comunicare`,
     contact_disclaimer_message: `Pentru a ne asigura că echipa noastră poate sprijini eficient comunitatea și poate avansa proiectul, prioritizăm solicitările direct legate de Official World Family Network. Mesajele care nu au legătură cu subiectul, sunt spam sau nesolicitate s-ar putea să nu primească un răspuns. Vă mulțumim pentru înțelegere și pentru că ne ajutați să rămânem concentrați pe misiunea noastră.`,
