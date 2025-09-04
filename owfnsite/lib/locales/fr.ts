@@ -46,7 +46,7 @@ export const fr = {
     
     // Home Page
     home_title: `Le Réseau Familial Mondial Officiel`,
-    home_subtitle: `Un réseau mondial uni par la vision de construire un monde meilleur grâce à la technologie et à l'humanité. Nous construisons un mouvement qui connecte les familles du monde entier via la blockchain pour contribuer à un impact social réel.`,
+    home_subtitle: `Un réseau mondial uni par la vision de construire un monde meilleur grâce à la technologie et à l'humanité. Nous construisons un mouvement qui connecte les familles du monde entier via la blockchain pour contribuir à un impact social réel.`,
     core_message_title: `Un mouvement que nous construisons ensemble`,
     home_message: `La grande vision de ce projet ne peut être réalisée qu'avec le soutien de l'humanité. En achetant notre jeton et en le promouvant auprès de vos amis, de votre famille et de vos collègues, vous devenez un élément essentiel d'un mouvement mondial pour le changement. Ce n'est pas seulement un projet ; c'est une force vivante et agissante pour le bien que nous construisons ensemble.`,
     home_feature_impact_title: `Impact Réel`,
@@ -401,6 +401,7 @@ export const fr = {
     contact_general_inquiries: `Demandes générales`,
     contact_general_desc: `Pour toute question générale sur le projet.`,
     contact_partnerships: `Partenariats`,
+    contact_partnerships_desc: `Pour les propositions de collaboration et les partenariats stratégiques.`,
     contact_press_media: `Presse et médias`,
     contact_press_desc: `Pour les journalistes, les blogueurs et les demandes des médias.`,
     contact_technical_support: `Support technique`,
@@ -528,7 +529,7 @@ export const fr = {
     status_passed: `Adopté`,
     status_failed: `Rejeté`,
     you_voted: `Vous avez voté`,
-    no_active_proposals: `Il n'y a actuellement aucune proposition active.`,
+    no_active_proposals: `Il n'y a currently aucune proposition active.`,
     no_past_proposals: `Il n'y a aucune proposition passée à afficher.`,
 
     // Maintenance
