@@ -3,10 +3,9 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.ts';
 import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, CommunityUser, ChatConversation, CommunityMessage } from '../types.ts';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, CommunityUser, ChatConversation, CommunityMessage, GroupPermissions, Attachment } from '../types.ts';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
-import { set } from 'wouter/use-location';
 
 // --- MOCK DATA FOR COMMUNITY HUB ---
 const MOCK_USERS: CommunityUser[] = [
@@ -26,27 +25,45 @@ const MOCK_CHAT_CONVERSATIONS: ChatConversation[] = [
         participants: MOCK_USERS.map(u => u.id),
         ownerId: '1',
         moderatorIds: [],
+        permissions: {
+            canSendMessage: 'member',
+            canAddMembers: 'moderator',
+            canPinMessages: 'moderator',
+            canChangeGroupInfo: 'moderator',
+            canDeleteMessages: 'moderator',
+        },
         messages: [
-            { id: 'msg-g1-1', senderId: 'OWFN_Bot', content: 'Bun venit în hub-ul comunitar OWFN! Vă rugăm să fiți respectuoși.', timestamp: new Date(Date.now() - 1000 * 60 * 5), reactions: { '❤️': ['1', '2', '3'] } },
-            { id: 'msg-g1-2', senderId: '2', content: 'Salutare tuturor! Încântată să fiu aici.', timestamp: new Date(Date.now() - 1000 * 60 * 4), reactions: { '👍': ['1', '3'] } },
+            { id: 'msg-g1-1', senderId: 'OWFN_Bot', content: 'Bun venit în hub-ul comunitar OWFN! Vă rugăm să fiți respectuoși.', timestamp: new Date(Date.now() - 1000 * 60 * 5), reactions: { '❤️': ['1', '2', '3'] }, status: 'read' },
+            { id: 'msg-g1-2', senderId: '2', content: 'Salutare tuturor! Încântată să fiu aici.', timestamp: new Date(Date.now() - 1000 * 60 * 4), reactions: { '👍': ['1', '3'] }, status: 'read' },
+            { id: 'msg-g1-3', senderId: '3', content: 'Hey Alice! Ce mai faci?', timestamp: new Date(Date.now() - 1000 * 60 * 3), replyToMessageId: 'msg-g1-2', status: 'read' },
 
         ],
+        typingUserIds: [],
     },
     {
-        id: 'group-2',
-        type: 'group',
+        id: 'channel-1',
+        type: 'channel',
         name: '#announcements',
         description: 'Anunțuri oficiale de la echipa OWFN.',
         image: '/assets/owfn.png',
         participants: MOCK_USERS.map(u => u.id),
         ownerId: '1',
         moderatorIds: [],
+        permissions: {
+            canSendMessage: 'owner', // Only owner can post
+            canAddMembers: 'owner',
+            canPinMessages: 'owner',
+            canChangeGroupInfo: 'owner',
+            canDeleteMessages: 'owner',
+        },
         messages: [
-            { id: 'msg-g2-1', senderId: '1', content: 'Prevânzarea este LIVE! Participați acum pe pagina de prevânzare.', timestamp: new Date(Date.now() - 1000 * 60 * 10) },
+            { id: 'msg-c1-1', senderId: '1', content: 'Prevânzarea este LIVE! Participați acum pe pagina de prevânzare.', timestamp: new Date(Date.now() - 1000 * 60 * 10), status: 'read' },
         ],
+        pinnedMessageId: 'msg-c1-1',
+        typingUserIds: [],
     },
     {
-        id: 'group-3',
+        id: 'group-2',
         type: 'group',
         name: '#owfn-holders-club',
         description: 'Grup exclusiv pentru deținătorii a peste 100.000 OWFN.',
@@ -56,18 +73,27 @@ const MOCK_CHAT_CONVERSATIONS: ChatConversation[] = [
         requiredTokenAmount: 100000,
         ownerId: '1',
         moderatorIds: [],
+        permissions: {
+            canSendMessage: 'member',
+            canAddMembers: 'member',
+            canPinMessages: 'moderator',
+            canChangeGroupInfo: 'moderator',
+            canDeleteMessages: 'moderator',
+        },
         messages: [
-            { id: 'msg-g3-1', senderId: 'OWFN_Bot', content: 'Bun venit în clubul exclusiv al deținătorilor! Aici discutăm strategii și viitorul proiectului.', timestamp: new Date() },
-        ]
+            { id: 'msg-g2-1', senderId: 'OWFN_Bot', content: 'Bun venit în clubul exclusiv al deținătorilor! Aici discutăm strategii și viitorul proiectului.', timestamp: new Date(), status: 'read' },
+        ],
+        typingUserIds: [],
     },
     {
         id: 'dm-1',
         type: 'dm',
         participants: ['2', '3'], // Alice and Bob
         messages: [
-            { id: 'msg-dm1-1', senderId: '2', content: 'Salut Bob! Ai văzut ultimele noutăți?', timestamp: new Date(Date.now() - 1000 * 60 * 2), reactions: { '👍': ['3'] } },
-            { id: 'msg-dm1-2', senderId: '3', content: 'Salut Alice! Da, pare promițător!', timestamp: new Date(Date.now() - 1000 * 60 * 1) },
+            { id: 'msg-dm1-1', senderId: '2', content: 'Salut Bob! Ai văzut ultimele noutăți?', timestamp: new Date(Date.now() - 1000 * 60 * 2), reactions: { '👍': ['3'] }, status: 'read' },
+            { id: 'msg-dm1-2', senderId: '3', content: 'Salut Alice! Da, pare promițător!', timestamp: new Date(Date.now() - 1000 * 60 * 1), status: 'read' },
         ],
+        typingUserIds: [],
     },
 ];
 
@@ -91,15 +117,28 @@ interface AppContextType {
   // Community Hub State
   communityUsers: CommunityUser[];
   chats: ChatConversation[];
-  sendMessageToChat: (chatId: string, content: string) => void;
+  sendMessage: (chatId: string, content: string, attachment?: Attachment, replyToMessageId?: string) => void;
   isProfileModalOpen: boolean;
   viewingProfileId: string | null;
   openProfileModal: (userId: string) => void;
   closeProfileModal: () => void;
+  isGroupSettingsModalOpen: boolean;
+  openGroupSettingsModal: () => void;
+  closeGroupSettingsModal: () => void;
   toggleFollow: (userIdToFollow: string) => void;
   startDirectMessage: (otherUserId: string) => string | null;
   toggleMessageReaction: (chatId: string, messageId: string, emoji: string) => void;
   updateUserBio: (userId: string, newBio: string) => void;
+  updateGroupInfo: (chatId: string, newInfo: { name: string; description: string; image: string }) => void;
+  updateGroupPermissions: (chatId: string, newPermissions: GroupPermissions) => void;
+  promoteToModerator: (chatId: string, userId: string) => void;
+  demoteToMember: (chatId: string, userId: string) => void;
+  removeUserFromGroup: (chatId: string, userId: string) => void;
+  pinMessage: (chatId: string, messageId: string) => void;
+  editMessage: (chatId: string, messageId: string, newContent: string) => void;
+  deleteMessage: (chatId: string, messageId: string) => void;
+  markMessagesAsRead: (chatId: string) => void;
+  setUserTyping: (chatId: string, isTyping: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -120,56 +159,86 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [chats, setChats] = useState<ChatConversation[]>(MOCK_CHAT_CONVERSATIONS);
   const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   const [viewingProfileId, setViewingProfileId] = useState<string | null>(null);
+  const [isGroupSettingsModalOpen, setGroupSettingsModalOpen] = useState(false);
   
   const openProfileModal = (userId: string) => {
     setViewingProfileId(userId);
     setProfileModalOpen(true);
   };
   const closeProfileModal = () => setProfileModalOpen(false);
+  const openGroupSettingsModal = () => setGroupSettingsModalOpen(true);
+  const closeGroupSettingsModal = () => setGroupSettingsModalOpen(false);
 
-  const sendMessageToChat = useCallback((chatId: string, content: string) => {
-      if (!solana.address) return; // Must be connected
+  const sendMessage = useCallback((chatId: string, content: string, attachment?: Attachment, replyToMessageId?: string) => {
+      if (!solana.address) return;
 
-      setChats(prevChats => {
-          return prevChats.map(chat => {
+      const newMessage: CommunityMessage = {
+          id: `msg-${Date.now()}`,
+          senderId: solana.address!,
+          content,
+          timestamp: new Date(),
+          replyToMessageId,
+          attachment,
+          status: 'sending',
+      };
+
+      setChats(prevChats => prevChats.map(chat => 
+          chat.id === chatId ? { ...chat, messages: [...chat.messages, newMessage] } : chat
+      ));
+
+      // Simulate sending
+      setTimeout(() => {
+          setChats(prevChats => prevChats.map(chat => {
               if (chat.id === chatId) {
-                  const newMessage: CommunityMessage = {
-                      id: `msg-${Date.now()}`,
-                      senderId: solana.address!, // Use wallet address as sender ID
-                      content,
-                      timestamp: new Date(),
+                  return {
+                      ...chat,
+                      messages: chat.messages.map(msg => 
+                          msg.id === newMessage.id ? { ...msg, status: 'sent' } : msg
+                      )
                   };
-                  return { ...chat, messages: [...chat.messages, newMessage] };
               }
               return chat;
-          });
-      });
+          }));
+      }, 500);
+
   }, [solana.address]);
+
+  const editMessage = useCallback((chatId: string, messageId: string, newContent: string) => {
+      setChats(prev => prev.map(chat => {
+          if (chat.id !== chatId) return chat;
+          return {
+              ...chat,
+              messages: chat.messages.map(msg => 
+                  msg.id === messageId ? { ...msg, content: newContent, isEdited: true } : msg
+              )
+          }
+      }))
+  }, []);
+
+  const deleteMessage = useCallback((chatId: string, messageId: string) => {
+     setChats(prev => prev.map(chat => {
+          if (chat.id !== chatId) return chat;
+          return {
+              ...chat,
+              messages: chat.messages.map(msg => 
+                  msg.id === messageId ? { ...msg, content: 'Acest mesaj a fost șters.', attachment: undefined, isDeleted: true } : msg
+              )
+          }
+      }))
+  }, []);
 
   const toggleFollow = useCallback((userIdToFollow: string) => {
     if (!solana.address) return;
     const currentUserId = solana.address;
 
     setCommunityUsers(prev => prev.map(user => {
-        // Add/remove follower from the target user
         if (user.id === userIdToFollow) {
             const isFollowing = user.followers.includes(currentUserId);
-            return {
-                ...user,
-                followers: isFollowing 
-                    ? user.followers.filter(id => id !== currentUserId)
-                    : [...user.followers, currentUserId]
-            };
+            return { ...user, followers: isFollowing ? user.followers.filter(id => id !== currentUserId) : [...user.followers, currentUserId] };
         }
-        // Add/remove following from the current user
         if (user.id === currentUserId) {
             const isFollowing = user.following.includes(userIdToFollow);
-            return {
-                ...user,
-                following: isFollowing
-                    ? user.following.filter(id => id !== userIdToFollow)
-                    : [...user.following, userIdToFollow]
-            };
+            return { ...user, following: isFollowing ? user.following.filter(id => id !== userIdToFollow) : [...user.following, userIdToFollow] };
         }
         return user;
     }));
@@ -188,7 +257,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           return existingDm.id;
       }
       
-      // Create new DM
       const newDm: ChatConversation = {
           id: `dm-${Date.now()}`,
           type: 'dm',
@@ -206,26 +274,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setChats(prevChats => prevChats.map(chat => {
         if (chat.id !== chatId) return chat;
-
         return {
             ...chat,
             messages: chat.messages.map(message => {
                 if (message.id !== messageId) return message;
-                
                 const reactions = { ...(message.reactions || {}) };
                 const userList = reactions[emoji] || [];
-
                 if (userList.includes(userId)) {
-                    // User is removing their reaction
                     reactions[emoji] = userList.filter(id => id !== userId);
-                    if (reactions[emoji].length === 0) {
-                        delete reactions[emoji];
-                    }
+                    if (reactions[emoji].length === 0) delete reactions[emoji];
                 } else {
-                    // User is adding a reaction
                     reactions[emoji] = [...userList, userId];
                 }
-                
                 return { ...message, reactions };
             })
         };
@@ -233,42 +293,90 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [solana.address]);
 
   const updateUserBio = useCallback((userId: string, newBio: string) => {
-    setCommunityUsers(prev => prev.map(user => 
-        user.id === userId ? { ...user, bio: newBio } : user
-    ));
-  }, []);
-
-  // Effect to simulate bot messages in general chat
-  useEffect(() => {
-    const interval = setInterval(() => {
-        setChats(prev => {
-            return prev.map(chat => {
-                if (chat.id === 'group-1') {
-                     const newMessage: CommunityMessage = {
-                        id: `msg-bot-${Date.now()}`,
-                        senderId: 'OWFN_Bot',
-                        content: 'Amintiți-vă să verificați pagina de roadmap pentru ultimele noutăți!',
-                        timestamp: new Date(),
-                    };
-                    return {...chat, messages: [...chat.messages, newMessage]};
-                }
-                return chat;
-            })
-        })
-    }, 30000); // every 30 seconds
-
-    return () => clearInterval(interval);
+    setCommunityUsers(prev => prev.map(user => user.id === userId ? { ...user, bio: newBio } : user));
   }, []);
   
+  const updateGroupInfo = useCallback((chatId: string, newInfo: { name: string; description: string; image: string }) => {
+      setChats(prev => prev.map(chat => chat.id === chatId ? { ...chat, ...newInfo } : chat));
+  }, []);
+
+  const updateGroupPermissions = useCallback((chatId: string, newPermissions: GroupPermissions) => {
+      setChats(prev => prev.map(chat => chat.id === chatId ? { ...chat, permissions: newPermissions } : chat));
+  }, []);
+
+  const promoteToModerator = useCallback((chatId: string, userId: string) => {
+      setChats(prev => prev.map(chat => {
+          if (chat.id === chatId && chat.ownerId !== userId) {
+              return { ...chat, moderatorIds: [...(chat.moderatorIds || []), userId] };
+          }
+          return chat;
+      }));
+  }, []);
+
+  const demoteToMember = useCallback((chatId: string, userId: string) => {
+       setChats(prev => prev.map(chat => {
+          if (chat.id === chatId) {
+              return { ...chat, moderatorIds: (chat.moderatorIds || []).filter(id => id !== userId) };
+          }
+          return chat;
+      }));
+  }, []);
+
+  const removeUserFromGroup = useCallback((chatId: string, userId: string) => {
+      setChats(prev => prev.map(chat => {
+          if (chat.id === chatId && chat.ownerId !== userId) {
+              return {
+                  ...chat,
+                  participants: chat.participants.filter(id => id !== userId),
+                  moderatorIds: (chat.moderatorIds || []).filter(id => id !== userId),
+              };
+          }
+          return chat;
+      }));
+  }, []);
+  
+  const pinMessage = useCallback((chatId: string, messageId: string) => {
+      setChats(prev => prev.map(chat => chat.id === chatId ? { ...chat, pinnedMessageId: messageId } : chat));
+  }, []);
+
+  const markMessagesAsRead = useCallback((chatId: string) => {
+    if (!solana.address) return;
+    const userId = solana.address;
+    setChats(prev => prev.map(chat => {
+        if (chat.id !== chatId) return chat;
+        return {
+            ...chat,
+            messages: chat.messages.map(msg => 
+                (msg.senderId !== userId && msg.status !== 'read') ? { ...msg, status: 'read' } : msg
+            )
+        };
+    }));
+  }, [solana.address]);
+
+  const setUserTyping = useCallback((chatId: string, isTyping: boolean) => {
+    if (!solana.address) return;
+    const userId = solana.address;
+    setChats(prev => prev.map(chat => {
+        if (chat.id !== chatId) return chat;
+        const typingIds = chat.typingUserIds || [];
+        const isAlreadyTyping = typingIds.includes(userId);
+        if (isTyping && !isAlreadyTyping) {
+            return { ...chat, typingUserIds: [...typingIds, userId] };
+        }
+        if (!isTyping && isAlreadyTyping) {
+            return { ...chat, typingUserIds: typingIds.filter(id => id !== userId) };
+        }
+        return chat;
+    }));
+  }, [solana.address]);
+
   // Effect to add the connected user to the mock users list
    useEffect(() => {
     if (solana.connected && solana.address) {
       setCommunityUsers(prevUsers => {
         if (prevUsers.some(u => u.id === solana.address)) {
-          // Update online status if user already exists
           return prevUsers.map(u => u.id === solana.address ? { ...u, isOnline: true } : u);
         }
-        // Add new user if not present
         const newUser: CommunityUser = {
           id: solana.address,
           username: `${solana.address.slice(0, 4)}...${solana.address.slice(-4)}`,
@@ -281,12 +389,54 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return [...prevUsers, newUser];
       });
     } else if (solana.address) {
-        // Handle disconnect: set user to offline
          setCommunityUsers(prevUsers => {
             return prevUsers.map(u => u.id === solana.address ? { ...u, isOnline: false } : u);
          });
     }
   }, [solana.connected, solana.address]);
+
+  // Effect for Bot simulation
+  useEffect(() => {
+    if (!solana.address) return;
+    
+    const lastMessageInGeneralChat = chats.find(c => c.id === 'group-1')?.messages.slice(-1)[0];
+    
+    if (lastMessageInGeneralChat && lastMessageInGeneralChat.senderId === solana.address) {
+        const botId = 'OWFN_Bot';
+        const chatId = 'group-1';
+
+        // 1. Mark as read
+        setTimeout(() => {
+            markMessagesAsRead(chatId);
+        }, 800);
+
+        // 2. Simulate typing
+        setTimeout(() => {
+             setChats(prev => prev.map(c => c.id === chatId ? { ...c, typingUserIds: [...(c.typingUserIds || []), botId] } : c));
+        }, 1200);
+
+        // 3. Send reply & stop typing
+        setTimeout(() => {
+            const botMessage: CommunityMessage = {
+                id: `msg-bot-${Date.now()}`,
+                senderId: botId,
+                content: 'Mulțumim pentru mesaj! Comunitatea apreciază contribuția ta.',
+                timestamp: new Date(),
+                status: 'sent',
+            };
+             setChats(prev => prev.map(c => {
+                 if (c.id === chatId) {
+                     return { 
+                         ...c, 
+                         messages: [...c.messages, botMessage],
+                         typingUserIds: (c.typingUserIds || []).filter(id => id !== botId)
+                     };
+                 }
+                 return c;
+             }));
+        }, 2500 + Math.random() * 1000); // random delay
+    }
+  }, [chats, solana.address]);
 
 
   const addSocialCase = (newCase: SocialCase) => {
@@ -370,15 +520,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Community Hub values
     communityUsers,
     chats,
-    sendMessageToChat,
+    sendMessage,
     isProfileModalOpen,
     viewingProfileId,
     openProfileModal,
     closeProfileModal,
+    isGroupSettingsModalOpen,
+    openGroupSettingsModal,
+    closeGroupSettingsModal,
     toggleFollow,
     startDirectMessage,
     toggleMessageReaction,
     updateUserBio,
+    updateGroupInfo,
+    updateGroupPermissions,
+    promoteToModerator,
+    demoteToMember,
+    removeUserFromGroup,
+    pinMessage,
+    editMessage,
+    deleteMessage,
+    markMessagesAsRead,
+    setUserTyping,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

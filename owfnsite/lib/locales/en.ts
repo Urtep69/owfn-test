@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -46,6 +45,8 @@ export const en = {
     connect_wallet_first: `Please connect your wallet first.`,
     yes: `Yes`,
     no: `No`,
+    cancel: `Cancel`,
+    save_changes: `Save Changes`,
 
     // Time Units
     time_days: `Days`,
@@ -574,7 +575,7 @@ export const en = {
     contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
     contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
-    send_direct_message: 'Send a Direct Message',
+    send_direct_message: `Send a Direct Message`,
 
     // Community Hub
     community: 'Community',
@@ -584,6 +585,7 @@ export const en = {
     community_select_conversation_desc: 'Choose a group or a direct message to get started.',
     community_private_messages: 'Private Messages',
     community_groups: 'Groups',
+    community_channels: 'Channels',
     community_requires_owfn: 'Requires {amount} OWFN',
     community_online: 'Online',
     community_offline: 'Offline',
@@ -608,4 +610,38 @@ export const en = {
     community_profile_modal_bio_fail: 'Could not generate bio.',
     community_profile_modal_bio_error: 'Error generating bio.',
     community_impact_badges: 'Impact Badges',
+    community_is_typing: 'is typing...',
+    community_add_caption: 'Add a caption...',
+    community_sending_image: 'Sending an image',
+    community_sending_file: 'Sending a file',
+    community_upload_file: 'Upload File / Image',
+    community_take_photo: 'Take Photo',
+    
+    // Group Settings
+    group_settings_title: 'Group Settings',
+    tab_info: 'Info',
+    tab_members: 'Members',
+    tab_permissions: 'Permissions',
+    group_name: 'Group Name',
+    group_description: 'Group Description',
+    group_image_url: 'Group Image URL',
+    role_owner: 'Owner',
+    role_moderator: 'Moderator',
+    role_member: 'Member',
+    action_promote: 'Promote to Moderator',
+    action_demote: 'Demote to Member',
+    action_remove: 'Remove from Group',
+    permissions_title: 'Permissions',
+    permission_send_messages: 'Send Messages',
+    permission_add_members: 'Add Members',
+    permission_pin_messages: 'Pin Messages',
+    permission_change_info: 'Change Group Info',
+    permission_delete_messages: 'Delete Messages',
+
+    // Message Actions
+    action_reply: 'Reply',
+    action_pin: 'Pin',
+    action_edit: 'Edit',
+    action_delete: 'Delete',
+    message_deleted: 'This message was deleted.',
 };

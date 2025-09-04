@@ -1,20 +1,38 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Redirect } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import ChatList from '../components/chat/ChatList.tsx';
 import ChatView from '../components/chat/ChatView.tsx';
 import ChatInfoPanel from '../components/chat/ChatInfoPanel.tsx';
 import UserProfileModal from '../components/chat/UserProfileModal.tsx';
+import GroupSettingsModal from '../components/chat/GroupSettingsModal.tsx';
 import { MessageSquare } from 'lucide-react';
 
 export default function CommunityHub() {
-    const { chats, solana, isProfileModalOpen, viewingProfileId, closeProfileModal, t, openProfileModal } = useAppContext();
+    const { 
+        chats, 
+        solana, 
+        isProfileModalOpen, 
+        viewingProfileId, 
+        closeProfileModal, 
+        t, 
+        isGroupSettingsModalOpen, 
+        closeGroupSettingsModal,
+        markMessagesAsRead
+    } = useAppContext();
     const params = useParams<{ id?: string }>();
     const activeChatId = params?.id;
     
+    useEffect(() => {
+        if (activeChatId) {
+            markMessagesAsRead(activeChatId);
+        }
+    }, [activeChatId, chats, markMessagesAsRead]);
+
     // Redirect to the first chat if no specific chat is selected
     if (!activeChatId && chats.length > 0) {
-        return <Redirect to={`/community/${chats[0].id}`} />;
+        const firstChat = chats.find(c => c.type === 'channel' || c.type === 'group') || chats[0];
+        return <Redirect to={`/community/${firstChat.id}`} />;
     }
 
     const activeChat = chats.find(c => c.id === activeChatId);
@@ -51,6 +69,10 @@ export default function CommunityHub() {
 
             {isProfileModalOpen && viewingProfileId && (
                 <UserProfileModal userId={viewingProfileId} onClose={closeProfileModal} />
+            )}
+            
+            {isGroupSettingsModalOpen && activeChat && (activeChat.type === 'group' || activeChat.type === 'channel') && (
+                 <GroupSettingsModal chat={activeChat} onClose={closeGroupSettingsModal} />
             )}
         </div>
     );

@@ -45,6 +45,8 @@ export const ro = {
     connect_wallet_first: `Vă rugăm să vă conectați mai întâi portofelul.`,
     yes: `Da`,
     no: `Nu`,
+    cancel: `Anulează`,
+    save_changes: `Salvează Modificările`,
 
     // Time Units
     time_days: `Zile`,
@@ -585,6 +587,7 @@ export const ro = {
     community_select_conversation_desc: 'Alege un grup sau un mesaj direct pentru a începe.',
     community_private_messages: 'Mesaje Private',
     community_groups: 'Grupuri',
+    community_channels: 'Canale',
     community_requires_owfn: 'Necesită {amount} OWFN',
     community_online: 'Online',
     community_offline: 'Offline',
@@ -609,4 +612,32 @@ export const ro = {
     community_profile_modal_bio_fail: 'Nu s-a putut genera biografia.',
     community_profile_modal_bio_error: 'Eroare la generarea biografiei.',
     community_impact_badges: 'Insigne de Impact',
+
+    // Group Settings
+    group_settings_title: 'Setări Grup',
+    tab_info: 'Info',
+    tab_members: 'Membri',
+    tab_permissions: 'Permisiuni',
+    group_name: 'Nume Grup',
+    group_description: 'Descriere Grup',
+    group_image_url: 'URL Imagine Grup',
+    role_owner: 'Proprietar',
+    role_moderator: 'Moderator',
+    role_member: 'Membru',
+    action_promote: 'Promovează la Moderator',
+    action_demote: 'Retrogradează la Membru',
+    action_remove: 'Elimină din Grup',
+    permissions_title: 'Permisiuni',
+    permission_send_messages: 'Trimite Mesaje',
+    permission_add_members: 'Adaugă Membri',
+    permission_pin_messages: 'Fixează Mesaje',
+    permission_change_info: 'Modifică Info Grup',
+    permission_delete_messages: 'Șterge Mesaje',
+    
+    // Message Actions
+    action_reply: 'Răspunde',
+    action_pin: 'Fixează',
+    action_edit: 'Editează',
+    action_delete: 'Șterge',
+    message_deleted: 'Acest mesaj a fost șters.',
 };

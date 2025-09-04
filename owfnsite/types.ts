@@ -175,24 +175,48 @@ export interface CommunityUser {
   following: string[]; // Array of user IDs
 }
 
+export interface Attachment {
+    type: 'image' | 'file';
+    url: string; // data URL or a remote URL
+    name: string;
+    size: number;
+}
+
 export interface CommunityMessage {
   id: string;
   senderId: string;
-  content: string;
+  content: string; // This will be the caption for attachments
   timestamp: Date;
   reactions?: { [emoji: string]: string[] }; // emoji -> array of user IDs
+  replyToMessageId?: string;
+  isEdited?: boolean;
+  isDeleted?: boolean;
+  attachment?: Attachment;
+  status?: 'sending' | 'sent' | 'read';
+}
+
+export interface GroupPermissions {
+  // Who can perform actions? 'owner' | 'moderator' | 'member'
+  canSendMessage: 'owner' | 'moderator' | 'member';
+  canAddMembers: 'owner' | 'moderator' | 'member';
+  canPinMessages: 'owner' | 'moderator';
+  canChangeGroupInfo: 'owner' | 'moderator';
+  canDeleteMessages: 'owner' | 'moderator';
 }
 
 export interface ChatConversation {
   id: string;
-  type: 'dm' | 'group';
+  type: 'dm' | 'group' | 'channel';
   participants: string[]; // Array of user IDs
-  name?: string; // For groups
-  image?: string; // For groups
-  description?: string; // For groups
+  name?: string; // For groups/channels
+  image?: string; // For groups/channels
+  description?: string; // For groups/channels
   isTokenGated?: boolean;
   requiredTokenAmount?: number;
   messages: CommunityMessage[];
-  ownerId?: string; // For groups
-  moderatorIds?: string[]; // For groups
+  ownerId?: string; // For groups/channels
+  moderatorIds?: string[]; // For groups/channels
+  permissions?: GroupPermissions; // For groups/channels
+  pinnedMessageId?: string; // For groups/channels
+  typingUserIds?: string[]; // Array of user IDs currently typing
 }
