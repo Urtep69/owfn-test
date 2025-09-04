@@ -5,6 +5,8 @@ import { ProgressBar } from '../components/ProgressBar.tsx';
 import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
+import { AiSummary } from '../components/AiSummary.tsx';
+import { NftReward } from '../components/NftReward.tsx';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -96,11 +98,11 @@ export default function ImpactCaseDetail() {
     const categoryName = t(`category_${socialCase.category.toLowerCase().replace(/\s+/g, '_')}`);
 
     return (
-        <div className="animate-fade-in-up space-y-8">
-            <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
+        <div className="space-y-8">
+            <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline animate-fade-in-up">
                 <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
             </Link>
-            <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden">
+            <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden animate-scroll" style={{animationDelay: '100ms'}}>
                 <img src={socialCase.imageUrl} alt={title} className="w-full h-64 md:h-96 object-cover" />
                 <div className="p-6 md:p-10">
                     <span className="text-lg font-semibold text-accent-600 dark:text-darkAccent-500 mb-2 inline-block">{t(`category_${socialCase.category.toLowerCase().replace(' ', '_')}`, { defaultValue: socialCase.category })}</span>
@@ -119,7 +121,8 @@ export default function ImpactCaseDetail() {
 
             <div className="grid lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-3 space-y-8">
-                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                     <div id="case-details-content" className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '200ms'}}>
+                        <AiSummary contentId="case-details-content" />
                         <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Newspaper /> {t('live_updates')}</h3>
                         <div className="space-y-4">
                             {mockUpdates.map(update => (
@@ -133,7 +136,7 @@ export default function ImpactCaseDetail() {
                     </div>
 
                      {details && (
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '300ms'}}>
                             <h3 className="text-2xl font-bold mb-4">{t('case_details_title')}</h3>
                             <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed whitespace-pre-wrap">{details}</p>
                         </div>
@@ -142,7 +145,7 @@ export default function ImpactCaseDetail() {
 
                 <div className="lg:col-span-2">
                     <div className="lg:sticky top-24 space-y-8">
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '400ms'}}>
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
                                 <Heart className="text-red-500" />
                                 <span>{t('support_this_cause')}</span>
@@ -224,12 +227,14 @@ export default function ImpactCaseDetail() {
                                     </div>
                                 )}
 
-                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50">
+                                <button onClick={handleDonate} disabled={solana.loading || !solana.connected || !(parseFloat(amount) > 0)} className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 btn-tactile">
                                     {solana.loading ? t('processing') : (solana.connected ? t('donate') : t('connect_wallet'))}
                                 </button>
+                                
+                                <NftReward caseTitle={title} donationAmountUsd={usdValue} />
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '500ms'}}>
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Milestone /> {t('funding_milestones')}</h3>
                              <div className="relative pl-4">
                                 <div className="absolute top-0 left-4 h-full w-0.5 bg-primary-200 dark:bg-darkPrimary-700"></div>

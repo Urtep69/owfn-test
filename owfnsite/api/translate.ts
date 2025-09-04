@@ -26,17 +26,11 @@ export default async function handler(req: any, res: any) {
         
         const ai = new GoogleGenAI({ apiKey });
 
-        const systemInstructionParts = [
-            'You are a highly skilled translator. Translate any text you receive into ' + targetLanguage + '.',
-            'Respond with ONLY the translated text. Do not add any extra formatting, notes, or explanations.'
-        ];
-        const systemInstruction = systemInstructionParts.join(' ');
-
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: text,
             config: {
-                systemInstruction: systemInstruction,
+                systemInstruction: `You are a highly skilled translator. Translate any text you receive into ${targetLanguage}. Respond with ONLY the translated text. Do not add any extra formatting, notes, or explanations.`,
                 temperature: 0.2,
                 thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for faster, direct translation
             },
