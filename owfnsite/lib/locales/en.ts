@@ -1,5 +1,4 @@
 
-
 export const en = {
     // Navigation & Sidebar
     home: `Home`,
@@ -311,13 +310,12 @@ export const en = {
     faq_a15: 'We chose Solana for its exceptional speed, very low transaction costs, and high scalability. These features are essential for a global project like ours, allowing for efficient micro-transactions and ensuring a fast and accessible experience for all users, whether they are donating, buying, or trading tokens.',
     faq_q16: 'How can I be sure that my donations reach the causes you support?',
     faq_a16: 'Transparency is fundamental to us. All funds intended for social causes are managed through the Impact Treasury, whose wallet address is public. You can monitor all incoming and outgoing transactions on a Solana block explorer, such as Solscan. In addition, on the Impact Portal, we will provide regular updates and detailed reports on the funded projects.',
-    faq_q17: 'Can I propose a social case or a cause to be funded by OWFN?',
-    faq_a17: 'In the initial phase, projects are selected by our team based on strict criteria of impact and feasibility. As the project progresses, we will implement a governance system (DAO) that will allow community members to propose and vote on future initiatives, giving you a direct role in directing the funds.',
+    faq_q17: `Can I propose a social case or a cause to be funded by OWFN?`,
+    faq_a17: `In the initial phase, projects are selected by our team based on strict criteria of impact and feasibility. As the project progresses, we will implement a governance system (DAO) that will allow community members to propose and vote on future initiatives, giving you a direct role in directing the funds.`,
     faq_q18: 'Who is behind the OWFN project? Is the team anonymous?',
     faq_a18: 'Details about our team\'s vision and values are presented on the website. As we get closer to the public launch, we will provide more transparency regarding the key members and advisors who contribute to the project\'s success, while respecting their safety and privacy.',
     faq_q19: 'What security measures have you taken to protect the project\'s and investors\' funds?',
     faq_a19: 'Security is our top priority. We use multi-signature wallets for managing critical funds, which means no single transaction can be approved by one person. The token\'s smart contract will be audited by reputable security firms to identify and correct any potential vulnerabilities before launch.',
-    faq_q20: 'What is the 0.5% transfer fee and when is it activated?',
     
     // Chatbot
     chatbot_title: `OWFN Assistant`,
@@ -393,7 +391,6 @@ export const en = {
     on_chain_security: `On-Chain Security`,
     revoked: `Revoked`,
     swap: `Swap`,
-    you_pay: `You Pay`,
     you_receive: `You Receive`,
     token_detail_update_authority: `Update Authority`,
     
@@ -458,4 +455,6 @@ export const en = {
     // Admin
     presale_admin_title: `Presale Admin`,
     unique_contributors: `Unique Contributors`,
+    airdrop_info_box_title: `About this Airdrop`,
+    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like presale participation and community event engagement.`,
 };

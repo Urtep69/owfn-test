@@ -305,18 +305,18 @@ export const ro = {
     faq_q13: 'De ce există o limită maximă de cumpărare (Max Buy) în prevânzare?',
     faq_a13: 'Limita maximă de cumpărare este o măsură importantă pentru a asigura o distribuție cât mai echitabilă a tokenilor și pentru a preveni ca un număr mic de investitori mari ("whales") să controleze o parte semnificativă din ofertă. Acest lucru promovează o comunitate mai sănătoasă și mai descentralizată pe termen lung.',
     faq_q14: 'Ce este taxa de transfer de 0,5% și când se activează?',
-    faq_a15: 'Această taxă este un mecanism cheie pentru finanțarea pe termen lung a misiunii noastre. O taxă de 0.5% se va aplica tuturor tranzacțiilor cu tokenul OWFN *după* finalizarea perioadei de prevânzare. Fondurile colectate din această taxă sunt direcționate automat către Trezoreria de Impact pentru a finanța continuu proiectele noastre sociale. Astfel, fiecare tranzacție contribuie la binele comun.',
-    faq_q16: 'De ce ați ales blockchain-ul Solana pentru acest proiect?',
-    faq_a16: 'Am ales Solana datorită vitezei sale excepționale, costurilor de tranzacție foarte scăzute și scalabilității ridicate. Aceste caracteristici sunt esențiale pentru un proiect global ca al nostru, permițând micro-tranzacții eficiente și asigurând o experiență rapidă și accesibilă pentru toți utilizatorii, fie că donează, cumpără sau tranzacționează tokeni.',
-    faq_q17: 'Cum pot fi sigur că donațiile mele ajung la cauzele pe care le susțineți?',
-    faq_a17: 'Transparența este fundamentală pentru noi. Toate fondurile destinate cauzelor sociale sunt gestionate prin Trezoreria de Impact, a cărei adresă de portofel este publică. Puteți monitoriza toate tranzacțiile de intrare și ieșire pe un explorator de blocuri Solana, cum ar fi Solscan. În plus, pe Portalul de Impact vom oferi actualizări regulate și rapoarte detaliate despre proiectele finanțate.',
-    faq_q18: 'Pot să propun un caz social sau o cauză pentru a fi finanțată de OWFN?',
-    faq_a18: 'În faza inițială, proiectele sunt selectate de echipa noastră pe baza unor criterii stricte de impact și fezabilitate. Pe măsură ce proiectul avansează, vom implementa un sistem de guvernanță (DAO) care va permite membrilor comunității să propună și să voteze asupra viitoarelor inițiative, oferindu-vă un rol direct în direcționarea fondurilor.',
-    faq_q19: 'Cine se află în spatele proiectului OWFN? Este echipa anonimă?',
-    faq_a19: 'Detalii despre viziunea și valorile echipei noastre sunt prezentate pe site. Pe măsură ce ne apropiem de lansarea publică, vom oferi mai multă transparență cu privire la membrii cheie și consilierii care contribuie la succesul proiectului, respectând în același timp siguranța și confidențialitatea acestora.',
-    faq_q20: 'Ce măsuri de securitate ați luat pentru a proteja fondurile proiectului și ale investitorilor?',
-    faq_a20: 'Securitatea este prioritatea noastră principală. Folosim portofele multi-semnătură pentru gestionarea fondurilor critice, ceea ce înseamnă că nicio tranzacție nu poate fi aprobată de o singură persoană. Contractul inteligent al tokenului va fi auditat de firme de securitate de renume pentru a identifica și corecta eventuale vulnerabilități înainte de lansare.',
-
+    faq_a14: 'Această taxă este un mecanism cheie pentru finanțarea pe termen lung a misiunii noastre. O taxă de 0.5% se va aplica tuturor tranzacțiilor cu tokenul OWFN *după* finalizarea perioadei de prevânzare. Fondurile colectate din această taxă sunt direcționate automat către Trezoreria de Impact pentru a finanța continuu proiectele noastre sociale. Astfel, fiecare tranzacție contribuie la binele comun.',
+    faq_q15: 'De ce ați ales blockchain-ul Solana pentru acest proiect?',
+    faq_a15: 'Am ales Solana datorită vitezei sale excepționale, costurilor de tranzacție foarte scăzute și scalabilității ridicate. Aceste caracteristici sunt esențiale pentru un proiect global ca al nostru, permițând micro-tranzacții eficiente și asigurând o experiență rapidă și accesibilă pentru toți utilizatorii, fie că donează, cumpără sau tranzacționează tokeni.',
+    faq_q16: 'Cum pot fi sigur că donațiile mele ajung la cauzele pe care le susțineți?',
+    faq_a16: 'Transparența este fundamentală pentru noi. Toate fondurile destinate cauzelor sociale sunt gestionate prin Trezoreria de Impact, a cărei adresă de portofel este publică. Puteți monitoriza toate tranzacțiile de intrare și ieșire pe un explorator de blocuri Solana, cum ar fi Solscan. În plus, pe Portalul de Impact vom oferi actualizări regulate și rapoarte detaliate despre proiectele finanțate.',
+    faq_q17: 'Pot să propun un caz social sau o cauză pentru a fi finanțată de OWFN?',
+    faq_a17: 'În faza inițială, proiectele sunt selectate de echipa noastră pe baza unor criterii stricte de impact și fezabilitate. Pe măsură ce proiectul avansează, vom implementa un sistem de guvernanță (DAO) care va permite membrilor comunității să propună și să voteze asupra viitoarelor inițiative, oferindu-vă un rol direct în direcționarea fondurilor.',
+    faq_q18: 'Cine se află în spatele proiectului OWFN? Este echipa anonimă?',
+    faq_a18: 'Detalii despre viziunea și valorile echipei noastre sunt prezentate pe site. Pe măsură ce ne apropiem de lansarea publică, vom oferi mai multă transparență cu privire la membrii cheie și consilierii care contribuie la succesul proiectului, respectând în același timp siguranța și confidențialitatea acestora.',
+    faq_q19: 'Ce măsuri de securitate ați luat pentru a proteja fondurile proiectului și ale investitorilor?',
+    faq_a19: 'Securitatea este prioritatea noastră principală. Folosim portofele multi-semnătură pentru gestionarea fondurilor critice, ceea ce înseamnă că nicio tranzacție nu poate fi aprobată de o singură persoană. Contractul inteligent al tokenului va fi auditat de firme de securitate de renume pentru a identifica și corecta eventuale vulnerabilități înainte de lansare.',
+    
     // Chatbot
     chatbot_title: `Asistent OWFN`,
     chatbot_placeholder: `Pune o întrebare...`,
@@ -456,4 +456,6 @@ export const ro = {
     // Admin
     presale_admin_title: `Admin Prevânzare`,
     unique_contributors: `Contribuitori Unici`,
+    airdrop_info_box_title: `Despre acest Airdrop`,
+    airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunitare.`,
 };
