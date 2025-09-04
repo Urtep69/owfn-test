@@ -3,9 +3,16 @@ import type { CommunityMessage } from '../../types.ts';
 import { useAppContext } from '../../contexts/AppContext.tsx';
 import { translateText } from '../../services/geminiService.ts';
 import { Languages, Loader2 } from 'lucide-react';
+import MessageReactions from './MessageReactions.tsx';
 
-export default function ChatMessage({ message }: { message: CommunityMessage }) {
-    const { communityUsers, solana } = useAppContext();
+interface ChatMessageProps {
+    message: CommunityMessage;
+    chatId: string;
+    onAvatarClick: () => void;
+}
+
+export default function ChatMessage({ message, chatId, onAvatarClick }: ChatMessageProps) {
+    const { communityUsers, solana, t } = useAppContext();
     const [translatedText, setTranslatedText] = useState<string | null>(null);
     const [isTranslating, setIsTranslating] = useState(false);
 
@@ -28,17 +35,23 @@ export default function ChatMessage({ message }: { message: CommunityMessage }) 
 
     return (
         <div className={`flex items-start gap-4 ${isCurrentUser ? 'flex-row-reverse' : ''}`}>
-            <img src={sender.avatar} alt={sender.username} className="w-10 h-10 rounded-full flex-shrink-0 mt-1" />
+            <button onClick={onAvatarClick} className="flex-shrink-0 mt-1 focus:outline-none focus:ring-2 focus:ring-accent-500 rounded-full">
+                 <img src={sender.avatar} alt={sender.username} className="w-10 h-10 rounded-full" />
+            </button>
             <div className={`flex flex-col gap-1 max-w-lg ${isCurrentUser ? 'items-end' : 'items-start'}`}>
                 <div className="flex items-baseline gap-3">
-                    {!isCurrentUser && <span className="font-bold text-sm text-primary-800 dark:text-darkPrimary-200">{sender.username}</span>}
+                    {!isCurrentUser && 
+                        <button onClick={onAvatarClick} className="font-bold text-sm text-primary-800 dark:text-darkPrimary-200 hover:underline">
+                            {sender.username}
+                        </button>
+                    }
                     <span className="text-xs text-primary-400 dark:text-darkPrimary-500">{formattedTime}</span>
                 </div>
                  <div className={`relative group px-4 py-2.5 rounded-xl text-sm ${isCurrentUser ? 'bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-white text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
                     <p className="whitespace-pre-wrap">{message.content}</p>
                     {translatedText && (
                         <div className="mt-2 pt-2 border-t border-black/10 dark:border-white/10">
-                            <p className="text-xs font-semibold opacity-70">Translation:</p>
+                            <p className="text-xs font-semibold opacity-70">{t('community_translation_label')}</p>
                             <p className="text-sm italic">{translatedText}</p>
                         </div>
                     )}
@@ -47,12 +60,13 @@ export default function ChatMessage({ message }: { message: CommunityMessage }) 
                             onClick={handleTranslate} 
                             disabled={isTranslating}
                             className="p-1.5 bg-primary-200 hover:bg-primary-300 dark:bg-darkPrimary-600 dark:hover:bg-darkPrimary-500 rounded-full"
-                            title="Translate"
+                            title={t('community_translate')}
                         >
                             {isTranslating ? <Loader2 size={16} className="animate-spin" /> : <Languages size={16} />}
                         </button>
                     </div>
                 </div>
+                 <MessageReactions chatId={chatId} message={message} isCurrentUser={isCurrentUser} />
             </div>
         </div>
     );

@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -577,4 +576,37 @@ export const ro = {
     contact_social_discord_title: `Server Discord`,
     contact_social_discord_desc: `Deveniți parte a comunității noastre active pentru discuții și suport.`,
     send_direct_message: 'Trimite un Mesaj Direct',
+
+    // Community Hub
+    community: 'Comunitate',
+    community_hub_welcome_title: 'Bun venit în Hub-ul Comunitar',
+    community_hub_welcome_desc: 'Conectează-ți portofelul pentru a te alătura conversației, a discuta cu alți membri și a accesa grupuri exclusive.',
+    community_select_conversation_title: 'Selectează o conversație',
+    community_select_conversation_desc: 'Alege un grup sau un mesaj direct pentru a începe.',
+    community_private_messages: 'Mesaje Private',
+    community_groups: 'Grupuri',
+    community_requires_owfn: 'Necesită {amount} OWFN',
+    community_online: 'Online',
+    community_offline: 'Offline',
+    community_summarize: 'Rezumă',
+    community_ai_summary_title: 'Rezumat AI:',
+    community_close: 'Închide',
+    community_summary_fail: 'Rezumatul nu a putut fi generat.',
+    community_summary_none: 'Nu s-a putut genera un rezumat.',
+    community_summary_error: 'Eroare la generarea rezumatului.',
+    community_members: 'Membri',
+    community_about: 'Despre',
+    community_message_to: 'Mesaj către {name}...',
+    community_translate: 'Traducere',
+    community_translation_label: 'Traducere:',
+    community_profile_modal_following: 'Urmăriri',
+    community_profile_modal_followers: 'Urmăritori',
+    community_profile_modal_message: 'Mesaj',
+    community_profile_modal_follow: 'Urmărește',
+    community_profile_modal_unfollow: 'Nu mai urmări',
+    community_profile_modal_no_bio: 'Acest utilizator nu a adăugat încă o biografie.',
+    community_profile_modal_generate_bio: 'Generează Bio cu AI',
+    community_profile_modal_bio_fail: 'Nu s-a putut genera biografia.',
+    community_profile_modal_bio_error: 'Eroare la generarea biografiei.',
+    community_impact_badges: 'Insigne de Impact',
 };

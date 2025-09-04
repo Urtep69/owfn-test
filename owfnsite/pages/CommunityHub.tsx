@@ -4,13 +4,14 @@ import { useAppContext } from '../contexts/AppContext.tsx';
 import ChatList from '../components/chat/ChatList.tsx';
 import ChatView from '../components/chat/ChatView.tsx';
 import ChatInfoPanel from '../components/chat/ChatInfoPanel.tsx';
+import UserProfileModal from '../components/chat/UserProfileModal.tsx';
 import { MessageSquare } from 'lucide-react';
 
 export default function CommunityHub() {
-    const { chats, solana } = useAppContext();
-    const params = useParams();
-    // FIX: Destructuring `id` from `useParams` can cause type inference issues. Accessing it directly is safer and more consistent with other components in the project.
-    const activeChatId = params?.id;
+    const { chats, solana, isProfileModalOpen, viewingProfileId, closeProfileModal, t } = useAppContext();
+    // FIX: The `id` parameter from the URL is optional because this component handles both `/community` and `/community/:id`.
+    // We use a type assertion to inform TypeScript that the object from `useParams` may optionally have an `id` property.
+    const { id: activeChatId } = useParams() as { id?: string };
     
     // Redirect to the first chat if no specific chat is selected
     if (!activeChatId && chats.length > 0) {
@@ -23,8 +24,8 @@ export default function CommunityHub() {
         return (
              <div className="flex-grow flex flex-col items-center justify-center text-center p-4">
                 <MessageSquare className="w-24 h-24 text-primary-300 dark:text-darkPrimary-600 mb-6" />
-                <h2 className="text-2xl font-bold text-primary-800 dark:text-darkPrimary-200">Bun venit în Hub-ul Comunitar</h2>
-                <p className="text-primary-600 dark:text-darkPrimary-400 max-w-md mt-2">Conectează-ți portofelul pentru a te alătura conversației, a discuta cu alți membri și a accesa grupuri exclusive.</p>
+                <h2 className="text-2xl font-bold text-primary-800 dark:text-darkPrimary-200">{t('community_hub_welcome_title')}</h2>
+                <p className="text-primary-600 dark:text-darkPrimary-400 max-w-md mt-2">{t('community_hub_welcome_desc')}</p>
             </div>
         )
     }
@@ -40,14 +41,18 @@ export default function CommunityHub() {
                     <div className="flex-grow flex items-center justify-center text-center">
                         <div className="text-primary-500 dark:text-darkPrimary-400">
                             <MessageSquare size={48} className="mx-auto mb-4"/>
-                            <p className="font-semibold">Selectează o conversație</p>
-                            <p className="text-sm">Alege un grup sau un mesaj direct pentru a începe.</p>
+                            <p className="font-semibold">{t('community_select_conversation_title')}</p>
+                            <p className="text-sm">{t('community_select_conversation_desc')}</p>
                         </div>
                     </div>
                 )}
             </main>
 
             {activeChat && <ChatInfoPanel chat={activeChat} />}
+
+            {isProfileModalOpen && viewingProfileId && (
+                <UserProfileModal userId={viewingProfileId} onClose={closeProfileModal} />
+            )}
         </div>
     );
 }

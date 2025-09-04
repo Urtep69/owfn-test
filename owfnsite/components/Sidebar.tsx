@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
@@ -74,7 +75,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         {
             title: t('sidebar_engage'),
             links: [
-                { to: '/community', label: 'Comunitate', icon: <Users size={20} /> },
+                { to: '/community', label: t('community'), icon: <Users size={20} /> },
                 { to: '/staking', label: t('staking'), icon: <TrendingUp size={20} /> },
                 { to: '/vesting', label: t('vesting'), icon: <Lock size={20} /> },
                 { to: '/airdrop', label: t('airdrop'), icon: <Award size={20} /> },

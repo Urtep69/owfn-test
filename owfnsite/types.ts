@@ -170,6 +170,9 @@ export interface CommunityUser {
   avatar: string;
   isOnline: boolean;
   isBot?: boolean;
+  bio?: string;
+  followers: string[]; // Array of user IDs
+  following: string[]; // Array of user IDs
 }
 
 export interface CommunityMessage {

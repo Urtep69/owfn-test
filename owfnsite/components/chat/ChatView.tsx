@@ -3,8 +3,10 @@ import type { ChatConversation } from '../../types.ts';
 import ChatHeader from './ChatHeader.tsx';
 import ChatMessage from './ChatMessage.tsx';
 import MessageInput from './MessageInput.tsx';
+import { useAppContext } from '../../contexts/AppContext.tsx';
 
 export default function ChatView({ chat }: { chat: ChatConversation }) {
+    const { openProfileModal } = useAppContext();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -21,7 +23,12 @@ export default function ChatView({ chat }: { chat: ChatConversation }) {
             <div className="flex-1 overflow-y-auto p-6">
                 <div className="space-y-6">
                     {chat.messages.map(message => (
-                        <ChatMessage key={message.id} message={message} />
+                        <ChatMessage 
+                            key={message.id} 
+                            message={message} 
+                            chatId={chat.id}
+                            onAvatarClick={() => openProfileModal(message.senderId)}
+                        />
                     ))}
                     <div ref={messagesEndRef} />
                 </div>

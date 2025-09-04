@@ -6,13 +6,14 @@ import { useSolana } from '../hooks/useSolana.ts';
 import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, CommunityUser, ChatConversation, CommunityMessage } from '../types.ts';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
+import { set } from 'wouter/use-location';
 
 // --- MOCK DATA FOR COMMUNITY HUB ---
 const MOCK_USERS: CommunityUser[] = [
-    { id: '1', username: 'Admin', avatar: '/assets/owfn.png', isOnline: true },
-    { id: '2', username: 'Alice', avatar: 'https://i.pravatar.cc/150?u=alice', isOnline: true },
-    { id: '3', username: 'Bob', avatar: 'https://i.pravatar.cc/150?u=bob', isOnline: false },
-    { id: 'OWFN_Bot', username: 'OWFN Bot', avatar: '/assets/owfn.png', isOnline: true, isBot: true },
+    { id: '1', username: 'Admin', avatar: '/assets/owfn.png', isOnline: true, bio: 'Administrator and guardian of the OWFN Community.', followers: ['2', '3'], following: ['2', '3'] },
+    { id: '2', username: 'Alice', avatar: 'https://i.pravatar.cc/150?u=alice', isOnline: true, bio: 'Early supporter & active community member. Believer in a better world.', followers: ['1'], following: ['1', '3'] },
+    { id: '3', username: 'Bob', avatar: 'https://i.pravatar.cc/150?u=bob', isOnline: false, bio: 'Here to learn and contribute to social causes.', followers: ['1', '2'], following: ['1'] },
+    { id: 'OWFN_Bot', username: 'OWFN Bot', avatar: '/assets/owfn.png', isOnline: true, isBot: true, bio: 'I am the official bot for the Official World Family Network.', followers: [], following: [] },
 ];
 
 const MOCK_CHAT_CONVERSATIONS: ChatConversation[] = [
@@ -24,7 +25,7 @@ const MOCK_CHAT_CONVERSATIONS: ChatConversation[] = [
         image: '/assets/owfn.png',
         participants: MOCK_USERS.map(u => u.id),
         messages: [
-            { id: 'msg-g1-1', senderId: 'OWFN_Bot', content: 'Bun venit în hub-ul comunitar OWFN! Vă rugăm să fiți respectuoși.', timestamp: new Date(Date.now() - 1000 * 60 * 5) },
+            { id: 'msg-g1-1', senderId: 'OWFN_Bot', content: 'Bun venit în hub-ul comunitar OWFN! Vă rugăm să fiți respectuoși.', timestamp: new Date(Date.now() - 1000 * 60 * 5), reactions: { '❤️': ['1', '2', '3'] } },
         ],
     },
     {
@@ -56,7 +57,7 @@ const MOCK_CHAT_CONVERSATIONS: ChatConversation[] = [
         type: 'dm',
         participants: ['2', '3'], // Alice and Bob
         messages: [
-            { id: 'msg-dm1-1', senderId: '2', content: 'Salut Bob! Ai văzut ultimele noutăți?', timestamp: new Date(Date.now() - 1000 * 60 * 2) },
+            { id: 'msg-dm1-1', senderId: '2', content: 'Salut Bob! Ai văzut ultimele noutăți?', timestamp: new Date(Date.now() - 1000 * 60 * 2), reactions: { '👍': ['3'] } },
             { id: 'msg-dm1-2', senderId: '3', content: 'Salut Alice! Da, pare promițător!', timestamp: new Date(Date.now() - 1000 * 60 * 1) },
         ],
     },
@@ -83,6 +84,14 @@ interface AppContextType {
   communityUsers: CommunityUser[];
   chats: ChatConversation[];
   sendMessageToChat: (chatId: string, content: string) => void;
+  isProfileModalOpen: boolean;
+  viewingProfileId: string | null;
+  openProfileModal: (userId: string) => void;
+  closeProfileModal: () => void;
+  toggleFollow: (userIdToFollow: string) => void;
+  startDirectMessage: (otherUserId: string) => string | null;
+  toggleMessageReaction: (chatId: string, messageId: string, emoji: string) => void;
+  updateUserBio: (userId: string, newBio: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -101,6 +110,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // --- Community Hub State Management ---
   const [communityUsers, setCommunityUsers] = useState<CommunityUser[]>(MOCK_USERS);
   const [chats, setChats] = useState<ChatConversation[]>(MOCK_CHAT_CONVERSATIONS);
+  const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+  const [viewingProfileId, setViewingProfileId] = useState<string | null>(null);
+  
+  const openProfileModal = (userId: string) => {
+    setViewingProfileId(userId);
+    setProfileModalOpen(true);
+  };
+  const closeProfileModal = () => setProfileModalOpen(false);
 
   const sendMessageToChat = useCallback((chatId: string, content: string) => {
       if (!solana.address) return; // Must be connected
@@ -120,6 +137,98 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           });
       });
   }, [solana.address]);
+
+  const toggleFollow = useCallback((userIdToFollow: string) => {
+    if (!solana.address) return;
+    const currentUserId = solana.address;
+
+    setCommunityUsers(prev => prev.map(user => {
+        // Add/remove follower from the target user
+        if (user.id === userIdToFollow) {
+            const isFollowing = user.followers.includes(currentUserId);
+            return {
+                ...user,
+                followers: isFollowing 
+                    ? user.followers.filter(id => id !== currentUserId)
+                    : [...user.followers, currentUserId]
+            };
+        }
+        // Add/remove following from the current user
+        if (user.id === currentUserId) {
+            const isFollowing = user.following.includes(userIdToFollow);
+            return {
+                ...user,
+                following: isFollowing
+                    ? user.following.filter(id => id !== userIdToFollow)
+                    : [...user.following, userIdToFollow]
+            };
+        }
+        return user;
+    }));
+  }, [solana.address]);
+
+  const startDirectMessage = useCallback((otherUserId: string): string | null => {
+      if (!solana.address || solana.address === otherUserId) return null;
+      
+      const existingDm = chats.find(c => 
+          c.type === 'dm' &&
+          c.participants.includes(solana.address!) &&
+          c.participants.includes(otherUserId)
+      );
+      
+      if (existingDm) {
+          return existingDm.id;
+      }
+      
+      // Create new DM
+      const newDm: ChatConversation = {
+          id: `dm-${Date.now()}`,
+          type: 'dm',
+          participants: [solana.address, otherUserId],
+          messages: [],
+      };
+      
+      setChats(prev => [newDm, ...prev]);
+      return newDm.id;
+  }, [solana.address, chats]);
+
+  const toggleMessageReaction = useCallback((chatId: string, messageId: string, emoji: string) => {
+    if (!solana.address) return;
+    const userId = solana.address;
+
+    setChats(prevChats => prevChats.map(chat => {
+        if (chat.id !== chatId) return chat;
+
+        return {
+            ...chat,
+            messages: chat.messages.map(message => {
+                if (message.id !== messageId) return message;
+                
+                const reactions = { ...(message.reactions || {}) };
+                const userList = reactions[emoji] || [];
+
+                if (userList.includes(userId)) {
+                    // User is removing their reaction
+                    reactions[emoji] = userList.filter(id => id !== userId);
+                    if (reactions[emoji].length === 0) {
+                        delete reactions[emoji];
+                    }
+                } else {
+                    // User is adding a reaction
+                    reactions[emoji] = [...userList, userId];
+                }
+                
+                return { ...message, reactions };
+            })
+        };
+    }));
+  }, [solana.address]);
+
+  const updateUserBio = useCallback((userId: string, newBio: string) => {
+    setCommunityUsers(prev => prev.map(user => 
+        user.id === userId ? { ...user, bio: newBio } : user
+    ));
+  }, []);
 
   // Effect to simulate bot messages in general chat
   useEffect(() => {
@@ -157,6 +266,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           username: `${solana.address.slice(0, 4)}...${solana.address.slice(-4)}`,
           avatar: `https://i.pravatar.cc/150?u=${solana.address}`,
           isOnline: true,
+          bio: 'Exploring the OWFN universe!',
+          followers: [],
+          following: [],
         };
         return [...prevUsers, newUser];
       });
@@ -251,6 +363,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     communityUsers,
     chats,
     sendMessageToChat,
+    isProfileModalOpen,
+    viewingProfileId,
+    openProfileModal,
+    closeProfileModal,
+    toggleFollow,
+    startDirectMessage,
+    toggleMessageReaction,
+    updateUserBio,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
