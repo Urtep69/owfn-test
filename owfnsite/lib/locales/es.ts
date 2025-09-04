@@ -313,9 +313,8 @@ export const es = {
     faq_a17: `En la fase inicial, los proyectos son seleccionados por nuestro equipo basándose en criterios estrictos de impacto y viabilidad. A medida que el proyecto avance, implementaremos un sistema de gobernanza (DAO) que permitirá a los miembros de la comunidad proponer y votar sobre futuras iniciativas, dándote un papel directo en la dirección de los fondos.`,
     faq_q18: `¿Quién está detrás del proyecto OWFN? ¿El equipo es anónimo?`,
     faq_a18: `Los detalles sobre la visión y los valores de nuestro equipo se presentan en el sitio web. A medida que nos acerquemos al lanzamiento público, proporcionaremos más transparencia sobre los miembros clave y los asesores que contribuyen al éxito del proyecto, respetando al mismo tiempo su seguridad y privacidad.`,
-    faq_q19: `¿Qué medidas de seguridad han tomado para proteger los fondos del proyecto y de los inversores?`,
-    faq_a19: `La seguridad es nuestra máxima prioridad. Usamos billeteras de firmas múltiples para gestionar fondos críticos, lo que significa que ninguna transacción puede ser aprobada por una sola persona. El contrato inteligente del token será auditado por firmas de seguridad de renombre para identificar y corregir cualquier vulnerabilidad potencial antes del lanzamiento.`,
-    faq_q20: `¿Qué es la tarifa de transferencia del 0.5% y cuándo se activa?`,
+    faq_q20: `¿Qué medidas de seguridad han tomado para proteger los fondos del proyecto y de los inversores?`,
+    faq_a20: `La seguridad es nuestra máxima prioridad. Usamos billeteras de firmas múltiples para gestionar fondos críticos, lo que significa que ninguna transacción puede ser aprobada por una sola persona. El contrato inteligente del token será auditado por firmas de seguridad de renombre para identificar y corregir cualquier vulnerabilidad potencial antes del lanzamiento.`,
     
     // Chatbot
     chatbot_title: `Asistente de OWFN`,
@@ -391,7 +390,6 @@ export const es = {
     on_chain_security: `Seguridad en Cadena`,
     revoked: `Revocado`,
     swap: `Intercambiar`,
-    you_pay: `Pagas`,
     you_receive: `Recibes`,
     token_detail_update_authority: `Autoridad de Actualización`,
     

@@ -1,4 +1,3 @@
-
 export const hu = {
     // Navigation
     home: `Kezdőlap`,
@@ -317,18 +316,16 @@ export const hu = {
     faq_a12: `Útitervünk szerint, az előértékesítés sikeres lezárása után folytatjuk az $OWFN token hivatalos listázását a Solana ökoszisztéma decentralizált tőzsdéin (DEX). A pontos dátumot és platformokat a hivatalos csatornáinkon fogjuk bejelenteni.`,
     faq_q13: `Miért van maximális vásárlási limit (Max Buy) az előértékesítés során?`,
     faq_a13: `A maximális vásárlási limit egy fontos intézkedés a tokenek lehető legigazságosabb elosztásának biztosítására, és annak megakadályozására, hogy néhány nagy befektető ("bálna") a kínálat jelentős részét ellenőrizze. Ez hosszú távon egy egészségesebb és decentralizáltabb közösséget támogat.`,
-    faq_q14: `Mit jelent az, hogy a token "kamatozó" 2% APY-vel? Hogyan működik?`,
-    faq_a14: `Ez azt jelenti, hogy az OWFN token úgy van programozva, hogy automatikusan kamatot generáljon. Csak azzal, hogy a tokeneket a Solana-kompatibilis pénztárcájában tartja, a tokenjeinek mennyisége idővel 2%-os éves hozammal (APY) növekszik. Nem kell őket stakelnie vagy bármilyen további műveletet végeznie; a jutalmak automatikusan felhalmozódnak.`,
-    faq_q15: `Mi az a 0,5%-os átutalási díj és mikor aktiválódik?`,
-    faq_a15: `Ez a díj a küldetésünk hosszú távú finanszírozásának egyik kulcsmechanizmusa. Az előértékesítési időszak lezárulta *után* az OWFN tokennel végzett minden tranzakcióra 0,5%-os díjat számítunk fel. Ebből a díjból származó pénzeszközök automatikusan a Hatás Kincstárba kerülnek, hogy folyamatosan finanszírozzák társadalmi projektjeinket. Így minden tranzakció hozzájárul a közjóhoz.`,
-    faq_q16: `Miért a Solana blokkláncot választották ehhez a projekthez?`,
-    faq_a16: `A Solana-t a kivételes sebessége, nagyon alacsony tranzakciós költségei és magas skálázhatósága miatt választottuk. Ezek a tulajdonságok elengedhetetlenek egy olyan globális projekthez, mint a miénk, lehetővé téve a hatékony mikrotranzakciókat és gyors, hozzáférhető élményt biztosítva minden felhasználó számára, legyen szó adományozásról, vásárlásról vagy token kereskedelemről.`,
-    faq_q17: `Hogyan lehetek biztos abban, hogy az adományaim eljutnak a támogatott ügyekhez?`,
-    faq_a17: `Az átláthatóság alapvető számunkra. Minden társadalmi célra szánt pénzeszközt a Hatás Kincstárán keresztül kezelünk, amelynek pénztárca címe nyilvános. Minden bejövő és kimenő tranzakciót figyelemmel kísérhet egy Solana blokk-felfedezőn, például a Solscan-en. Ezenkívül a Hatás Portálon rendszeres frissítéseket és részletes jelentéseket fogunk nyújtani a finanszírozott projektekről.`,
-    faq_q18: `Javasolhatok-e társadalmi ügyet vagy célt, amelyet az OWFN finanszírozhat?`,
-    faq_a18: `A kezdeti szakaszban a projekteket a csapatunk választja ki a hatás és a megvalósíthatóság szigorú kritériumai alapján. A projekt előrehaladtával bevezetünk egy irányítási rendszert (DAO), amely lehetővé teszi a közösség tagjainak, hogy javaslatokat tegyenek és szavazzanak a jövőbeli kezdeményezésekről, így közvetlen szerepet kapnak a pénzeszközök irányításában.`,
-    faq_q19: `Ki áll az OWFN projekt mögött? A csapat névtelen?`,
-    faq_a19: `A csapatunk víziójáról és értékeiről a weboldalon talál részleteket. Ahogy közeledünk a nyilvános induláshoz, több átláthatóságot fogunk biztosítani a projekt sikeréhez hozzájáruló kulcsfontosságú tagokról és tanácsadókról, miközben tiszteletben tartjuk biztonságukat és magánéletüket.`,
+    faq_q14: `Mi az a 0,5%-os átutalási díj és mikor aktiválódik?`,
+    faq_a14: `Ez a díj a küldetésünk hosszú távú finanszírozásának egyik kulcsmechanizmusa. Az előértékesítési időszak lezárulta *után* az OWFN tokennel végzett minden tranzakcióra 0,5%-os díjat számítunk fel. Ebből a díjból származó pénzeszközök automatikusan a Hatás Kincstárba kerülnek, hogy folyamatosan finanszírozzák társadalmi projektjeinket. Így minden tranzakció hozzájárul a közjóhoz.`,
+    faq_q15: `Miért a Solana blokkláncot választották ehhez a projekthez?`,
+    faq_a15: `A Solana-t a kivételes sebessége, nagyon alacsony tranzakciós költségei és magas skálázhatósága miatt választottuk. Ezek a tulajdonságok elengedhetetlenek egy olyan globális projekthez, mint a miénk, lehetővé téve a hatékony mikrotranzakciókat és gyors, hozzáférhető élményt biztosítva minden felhasználó számára, legyen szó adományozásról, vásárlásról vagy token kereskedelemről.`,
+    faq_q16: `Hogyan lehetek biztos abban, hogy az adományaim eljutnak a támogatott ügyekhez?`,
+    faq_a16: `Az átláthatóság alapvető számunkra. Minden társadalmi célra szánt pénzeszközt a Hatás Kincstárán keresztül kezelünk, amelynek pénztárca címe nyilvános. Minden bejövő és kimenő tranzakciót figyelemmel kísérhet egy Solana blokk-felfedezőn, például a Solscan-en. Ezenkívül a Hatás Portálon rendszeres frissítéseket és részletes jelentéseket fogunk nyújtani a finanszírozott projektekről.`,
+    faq_q17: `Javasolhatok-e társadalmi ügyet vagy célt, amelyet az OWFN finanszírozhat?`,
+    faq_a17: `A kezdeti szakaszban a projekteket a csapatunk választja ki a hatás és a megvalósíthatóság szigorú kritériumai alapján. A projekt előrehaladtával bevezetünk egy irányítási rendszert (DAO), amely lehetővé teszi a közösség tagjainak, hogy javaslatokat tegyenek és szavazzanak a jövőbeli kezdeményezésekről, így közvetlen szerepet kapnak a pénzeszközök irányításában.`,
+    faq_q18: `Ki áll az OWFN projekt mögött? A csapat névtelen?`,
+    faq_a18: `A csapatunk víziójáról és értékeiről a weboldalon talál részleteket. Ahogy közeledünk a nyilvános induláshoz, több átláthatóságot fogunk biztosítani a projekt sikeréhez hozzájáruló kulcsfontosságú tagokról és tanácsadókról, miközben tiszteletben tartjuk biztonságukat és magánéletüket.`,
     faq_q20: `Milyen biztonsági intézkedéseket tettek a projekt és a befektetők pénzeszközeinek védelme érdekében?`,
     faq_a20: `A biztonság a legfőbb prioritásunk. Kritikus pénzeszközök kezeléséhez többaláírásos pénztárcákat használunk, ami azt jelenti, hogy egyetlen tranzakciót sem hagyhat jóvá egyetlen személy. A token okosszerződését neves biztonsági cégek fogják auditálni a lehetséges sebezhetőségek azonosítása és kijavítása érdekében a bevezetés előtt.`,
 

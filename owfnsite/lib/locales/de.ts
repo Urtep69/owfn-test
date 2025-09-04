@@ -311,11 +311,10 @@ export const de = {
     faq_a16: `Transparenz ist für uns von grundlegender Bedeutung. Alle für soziale Zwecke bestimmten Mittel werden über die Impact Treasury verwaltet, deren Wallet-Adresse öffentlich ist. Sie können alle eingehenden und ausgehenden Transaktionen auf einem Solana-Block-Explorer wie Solscan verfolgen. Darüber hinaus werden wir auf dem Impact-Portal regelmäßige Updates und detaillierte Berichte über die finanzierten Projekte bereitstellen.`,
     faq_q17: `Kann ich einen sozialen Fall oder einen Zweck vorschlagen, der von OWFN finanziert werden soll?`,
     faq_a17: `In der Anfangsphase werden Projekte von unserem Team nach strengen Kriterien für Wirkung und Machbarkeit ausgewählt. Im weiteren Verlauf des Projekts werden wir ein Governance-System (DAO) implementieren, das es den Community-Mitgliedern ermöglicht, zukünftige Initiativen vorzuschlagen und darüber abzustimmen, wodurch Sie eine direkte Rolle bei der Steuerung der Mittel erhalten.`,
-    faq_q18: `Wer steckt hinter dem OWFN-Projekt? Ist das Team anonym?`,
-    faq_a18: `Details zur Vision und den Werten unseres Teams werden auf der Website vorgestellt. Wenn wir uns dem öffentlichen Start nähern, werden wir mehr Transparenz über die Schlüsselmitglieder und Berater schaffen, die zum Erfolg des Projekts beitragen, während wir ihre Sicherheit und Privatsphäre respektieren.`,
-    faq_q19: `Welche Sicherheitsmaßnahmen haben Sie getroffen, um die Gelder des Projekts und der Investoren zu schützen?`,
-    faq_a19: `Sicherheit hat für uns oberste Priorität. Wir verwenden Multi-Signatur-Wallets zur Verwaltung kritischer Mittel, was bedeutet, dass keine einzelne Transaktion von einer Person genehmigt werden kann. Der Smart Contract des Tokens wird von renommierten Sicherheitsfirmen auditiert, um potenzielle Schwachstellen vor dem Start zu identifizieren und zu beheben.`,
-    faq_q20: `Was ist die Überweisungsgebühr von 0,5% und wann wird sie aktiviert?`,
+    faq_q18: 'Wer steckt hinter dem OWFN-Projekt? Ist das Team anonym?',
+    faq_a18: 'Details über die Vision und Werte unseres Teams werden auf der Website vorgestellt. Wenn wir uns dem öffentlichen Start nähern, werden wir mehr Transparenz über die Schlüsselmitglieder und Berater schaffen, die zum Erfolg des Projekts beitragen, während wir ihre Sicherheit und Privatsphäre respektieren.',
+    faq_q20: `Welche Sicherheitsmaßnahmen haben Sie getroffen, um die Gelder des Projekts und der Investoren zu schützen?`,
+    faq_a20: `Sicherheit hat für uns oberste Priorität. Wir verwenden Multi-Signatur-Wallets zur Verwaltung kritischer Mittel, was bedeutet, dass keine einzelne Transaktion von einer Person genehmigt werden kann. Der Smart Contract des Tokens wird von renommierten Sicherheitsfirmen auditiert, um potenzielle Schwachstellen vor dem Start zu identifizieren und zu beheben.`,
     
     // Chatbot
     chatbot_title: `OWFN-Assistent`,
@@ -391,7 +390,6 @@ export const de = {
     on_chain_security: `On-Chain-Sicherheit`,
     revoked: `Widerrufen`,
     swap: `Tauschen`,
-    you_pay: `Sie zahlen`,
     you_receive: `Sie erhalten`,
     token_detail_update_authority: `Update-Autorität`,
     

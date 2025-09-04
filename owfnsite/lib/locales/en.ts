@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation & Sidebar
     home: `Home`,
@@ -314,8 +313,9 @@ export const en = {
     faq_a17: `In the initial phase, projects are selected by our team based on strict criteria of impact and feasibility. As the project progresses, we will implement a governance system (DAO) that will allow community members to propose and vote on future initiatives, giving you a direct role in directing the funds.`,
     faq_q18: 'Who is behind the OWFN project? Is the team anonymous?',
     faq_a18: 'Details about our team\'s vision and values are presented on the website. As we get closer to the public launch, we will provide more transparency regarding the key members and advisors who contribute to the project\'s success, while respecting their safety and privacy.',
-    faq_q19: 'What security measures have you taken to protect the project\'s and investors\' funds?',
-    faq_a19: 'Security is our top priority. We use multi-signature wallets for managing critical funds, which means no single transaction can be approved by one person. The token\'s smart contract will be audited by reputable security firms to identify and correct any potential vulnerabilities before launch.',
+// FIX: Correctly escape apostrophes in the following strings to fix parsing errors.
+    faq_q20: 'What security measures have you taken to protect the project\'s and investors\' funds?',
+    faq_a20: 'Security is our top priority. We use multi-signature wallets for managing critical funds, which means no single transaction can be approved by one person. The token\'s smart contract will be audited by reputable security firms to identify and correct any potential vulnerabilities before launch.',
     
     // Chatbot
     chatbot_title: `OWFN Assistant`,

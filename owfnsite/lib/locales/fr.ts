@@ -128,7 +128,7 @@ export const fr = {
     // Presale Page
     presale_join_title: `Rejoignez la prévente`,
     presale_ends_in: `La prévente se termine dans`,
-    presale_purchase_success_alert: `Achat réussi ! Vous avez contribué avec {amount} SOL. Vos {owfnAmount} jetons OWFN sont réservés et seront automatiquement distribués (airdrop) sur votre portefeuille à la fin de la prévente.`,
+    presale_purchase_success_alert: `Achat réussi ! Vous avez contribué avec {amount} SOL. Vos {owfnAmount} jetons OWFN sont réservés et seront automatically distribués (airdrop) sur votre portefeuille à la fin de la prévente.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `{progress}% vendus`,
     presale_buy_info: `Acheter (Min: {min} SOL, Max: {max} SOL)`,
@@ -291,6 +291,7 @@ export const fr = {
     faq_a6: `Vous pouvez trouver le livre blanc détaillé de l'OWFN en cliquant sur le bouton "Livre Blanc" dans l'en-tête ou la section principale de notre site web.`,
     faq_q7: `Comment l'OWFN fait-elle une différence dans le monde réel ?`,
     faq_a7: `L'OWFN finance directement des initiatives dans des domaines critiques comme la santé (par exemple, couvrir les frais de chirurgie, moderniser les hôpitaux), l'éducation (par exemple, construire et rénover des écoles, des jardins d'enfants) et les besoins de base (par exemple, fournir de la nourriture, un abri, des vêtements aux sans-abri, établir des maisons de retraite). Nous répondons également aux secours en cas de catastrophe et investissons dans des projets de développement communautaire durable. Chaque jeton contribue à ces actions concrètes, garantissant un soutien 100% réel à l'humanité.`,
-    // FIX: Removed erroneous backslash that was causing a syntax error.
     faq_a8: `Votre contribution aide de deux manières fondamentales. Premièrement, lorsque vous achetez des jetons pendant la prévente, une partie importante des fonds va directement à la Trésorerie d'Impact pour lancer nos projets sociaux. Deuxièmement, pour créer une source de financement durable à long terme, une petite commission de transfert de 0,5% sera activée sur toutes les transactions *après* la fin de la période de prévente. Cette commission est conçue comme un micro-don automatique à la Trésorerie d'Impact. Cela signifie que chaque fois que le jeton sera utilisé à l'avenir, il générera un soutien continu pour nos causes humanitaires, transformant l'ensemble de l'écosystème en une force perpétuelle pour le bien. Tous ces flux financiers sont entièrement transparents sur la blockchain.`,
+    faq_q20: `Quelles mesures de sécurité avez-vous prises pour protéger les fonds du projet et des investisseurs ?`,
+    faq_a20: `La sécurité est notre priorité absolue. Nous utilisons des portefeuilles à signatures multiples pour gérer les fonds critiques, ce qui signifie qu'aucune transaction ne peut être approuvée par une seule personne. Le contrat intelligent du jeton sera audité par des entreprises de sécurité réputées pour identifier et corriger toute vulnérabilité potentielle avant le lancement.`,
 };
