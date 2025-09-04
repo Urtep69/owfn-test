@@ -15,9 +15,12 @@ export default function MessageReactions({ chatId, message, isCurrentUser }: Mes
 
     if (!solana.address) return null;
 
+    const existingReactions = Object.keys(message.reactions || {});
+
     return (
         <div className={`flex items-center gap-1.5 mt-1.5 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
-            {AVAILABLE_REACTIONS.map(emoji => {
+            {existingReactions.map(emoji => {
+                if (!AVAILABLE_REACTIONS.includes(emoji)) return null;
                 const reactionsForEmoji = message.reactions?.[emoji] || [];
                 const userHasReacted = reactionsForEmoji.includes(solana.address!);
                 const count = reactionsForEmoji.length;
@@ -31,7 +34,7 @@ export default function MessageReactions({ chatId, message, isCurrentUser }: Mes
                         className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-colors ${
                             userHasReacted 
                                 ? 'bg-accent-500/30 dark:bg-darkAccent-500/30 border border-accent-500 dark:border-darkAccent-400'
-                                : 'bg-primary-200/70 dark:bg-darkPrimary-600/70 border border-transparent'
+                                : 'bg-primary-200/70 dark:bg-darkPrimary-600/70 border border-transparent hover:border-primary-300 dark:hover:border-darkPrimary-500'
                         }`}
                      >
                         <span>{emoji}</span>

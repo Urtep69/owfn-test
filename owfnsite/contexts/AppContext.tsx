@@ -24,8 +24,12 @@ const MOCK_CHAT_CONVERSATIONS: ChatConversation[] = [
         description: 'Discuții generale despre proiectul OWFN și comunitate.',
         image: '/assets/owfn.png',
         participants: MOCK_USERS.map(u => u.id),
+        ownerId: '1',
+        moderatorIds: [],
         messages: [
             { id: 'msg-g1-1', senderId: 'OWFN_Bot', content: 'Bun venit în hub-ul comunitar OWFN! Vă rugăm să fiți respectuoși.', timestamp: new Date(Date.now() - 1000 * 60 * 5), reactions: { '❤️': ['1', '2', '3'] } },
+            { id: 'msg-g1-2', senderId: '2', content: 'Salutare tuturor! Încântată să fiu aici.', timestamp: new Date(Date.now() - 1000 * 60 * 4), reactions: { '👍': ['1', '3'] } },
+
         ],
     },
     {
@@ -35,6 +39,8 @@ const MOCK_CHAT_CONVERSATIONS: ChatConversation[] = [
         description: 'Anunțuri oficiale de la echipa OWFN.',
         image: '/assets/owfn.png',
         participants: MOCK_USERS.map(u => u.id),
+        ownerId: '1',
+        moderatorIds: [],
         messages: [
             { id: 'msg-g2-1', senderId: '1', content: 'Prevânzarea este LIVE! Participați acum pe pagina de prevânzare.', timestamp: new Date(Date.now() - 1000 * 60 * 10) },
         ],
@@ -48,6 +54,8 @@ const MOCK_CHAT_CONVERSATIONS: ChatConversation[] = [
         participants: ['1', 'OWFN_Bot'],
         isTokenGated: true,
         requiredTokenAmount: 100000,
+        ownerId: '1',
+        moderatorIds: [],
         messages: [
             { id: 'msg-g3-1', senderId: 'OWFN_Bot', content: 'Bun venit în clubul exclusiv al deținătorilor! Aici discutăm strategii și viitorul proiectului.', timestamp: new Date() },
         ]

@@ -193,4 +193,6 @@ export interface ChatConversation {
   isTokenGated?: boolean;
   requiredTokenAmount?: number;
   messages: CommunityMessage[];
+  ownerId?: string; // For groups
+  moderatorIds?: string[]; // For groups
 }

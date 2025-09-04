@@ -38,7 +38,7 @@ export default function ChatMessage({ message, chatId, onAvatarClick }: ChatMess
             <button onClick={onAvatarClick} className="flex-shrink-0 mt-1 focus:outline-none focus:ring-2 focus:ring-accent-500 rounded-full">
                  <img src={sender.avatar} alt={sender.username} className="w-10 h-10 rounded-full" />
             </button>
-            <div className={`flex flex-col gap-1 max-w-lg ${isCurrentUser ? 'items-end' : 'items-start'}`}>
+            <div className={`group relative flex flex-col gap-1 max-w-lg ${isCurrentUser ? 'items-end' : 'items-start'}`}>
                 <div className="flex items-baseline gap-3">
                     {!isCurrentUser && 
                         <button onClick={onAvatarClick} className="font-bold text-sm text-primary-800 dark:text-darkPrimary-200 hover:underline">
@@ -47,7 +47,7 @@ export default function ChatMessage({ message, chatId, onAvatarClick }: ChatMess
                     }
                     <span className="text-xs text-primary-400 dark:text-darkPrimary-500">{formattedTime}</span>
                 </div>
-                 <div className={`relative group px-4 py-2.5 rounded-xl text-sm ${isCurrentUser ? 'bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-white text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
+                 <div className={`relative px-4 py-2.5 rounded-xl text-sm ${isCurrentUser ? 'bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-white text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
                     <p className="whitespace-pre-wrap">{message.content}</p>
                     {translatedText && (
                         <div className="mt-2 pt-2 border-t border-black/10 dark:border-white/10">

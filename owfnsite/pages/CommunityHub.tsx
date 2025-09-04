@@ -8,10 +8,9 @@ import UserProfileModal from '../components/chat/UserProfileModal.tsx';
 import { MessageSquare } from 'lucide-react';
 
 export default function CommunityHub() {
-    const { chats, solana, isProfileModalOpen, viewingProfileId, closeProfileModal, t } = useAppContext();
-    // FIX: The `id` parameter from the URL is optional because this component handles both `/community` and `/community/:id`.
-    // We use a type assertion to inform TypeScript that the object from `useParams` may optionally have an `id` property.
-    const { id: activeChatId } = useParams() as { id?: string };
+    const { chats, solana, isProfileModalOpen, viewingProfileId, closeProfileModal, t, openProfileModal } = useAppContext();
+    const params = useParams<{ id?: string }>();
+    const activeChatId = params?.id;
     
     // Redirect to the first chat if no specific chat is selected
     if (!activeChatId && chats.length > 0) {
