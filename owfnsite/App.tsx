@@ -23,7 +23,6 @@ import Profile from './pages/Profile.tsx';
 import ImpactPortal from './pages/ImpactPortal.tsx';
 import ImpactCaseDetail from './pages/ImpactCaseDetail.tsx';
 import ImpactCategory from './pages/ImpactCategory.tsx';
-import ImpactAtlas from './pages/ImpactAtlas.tsx';
 import Partnerships from './pages/Partnerships.tsx';
 import FAQ from './pages/FAQ.tsx';
 import TokenDetail from './pages/TokenDetail.tsx';
@@ -79,7 +78,6 @@ const AppContent = () => {
           <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
           <Route path="/impact/category/:category"><ImpactCategory /></Route>
           <Route path="/impact"><ImpactPortal /></Route>
-          <Route path="/impact-atlas"><ImpactAtlas /></Route>
           <Route path="/partnerships"><Partnerships /></Route>
           <Route path="/faq"><FAQ /></Route>
           <Route path="/contact"><Contact /></Route>
