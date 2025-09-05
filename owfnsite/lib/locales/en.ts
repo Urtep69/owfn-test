@@ -12,6 +12,7 @@ export const en = {
     dashboard: `Dashboard`,
     profile: `Profile`,
     impact_portal: `Impact Portal`,
+    impact_atlas: `Impact Atlas`,
     partnerships: `Partnerships`,
     faq: `FAQ`,
     airdrop: `Airdrop`,
@@ -237,6 +238,7 @@ export const en = {
     case_donation_success_alert: `Thank you for your donation to "{title}"!`,
     admin_saving_case: `Translating & Saving...`,
     admin_fill_fields_alert: `Please fill out all required fields.`,
+    generate_random_coords: `Generate Random Coords`,
     category_health: `Health`,
     category_education: `Education`,
     category_basic_needs: `Basic Needs`,
@@ -251,6 +253,17 @@ export const en = {
     case_update_2: `Architectural plans have been finalized and approved by local authorities.`,
     case_update_3: `Project funding has officially begun. We are grateful for the first wave of support from the OWFN community.`,
     no_active_cases_in_category: `There are currently no active cases in this category.`,
+    
+    // Impact Atlas
+    impact_atlas_title: `The Living World of Impact`,
+    impact_atlas_subtitle: `An interactive, real-time visualization of our community's global generosity. Every flash of light is a donation, every new bloom is a completed project.`,
+    legend: `Legend`,
+    active_project: `Active Project`,
+    completed_project: `Completed Project`,
+    recent_donation: `Recent Donation`,
+    ecosystem_health: `Ecosystem Health`,
+    vibrant: `Vibrant`,
+    calm: `Calm`,
     
     // Partnerships Page
     partnerships_title: `Partnerships & Future Collaborations`,

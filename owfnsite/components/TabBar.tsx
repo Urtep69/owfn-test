@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useRoute } from 'wouter';
-import { Home, ShoppingCart, Heart, User, BarChart2 } from 'lucide-react';
+import { Home, ShoppingCart, User, BarChart2, Globe } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 
 const TabBarItem = ({ to, icon, label }: { to: string, icon: React.ReactNode, label: string }) => {
@@ -26,7 +26,7 @@ export const TabBar = () => {
     const navItems = [
         { to: '/', label: t('home'), icon: <Home /> },
         { to: '/presale', label: t('presale'), icon: <ShoppingCart /> },
-        { to: '/impact', label: t('impact_portal'), icon: <Heart /> },
+        { to: '/impact-atlas', label: t('impact_atlas'), icon: <Globe /> },
         { to: '/dashboard', label: t('dashboard'), icon: <BarChart2 /> },
         { to: '/profile', label: t('profile'), icon: <User /> },
     ];

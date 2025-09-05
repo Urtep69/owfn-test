@@ -39,6 +39,8 @@ export interface SocialCase {
   goal: number;
   donated: number;
   details: Record<string, string>;
+  lat: number;
+  lng: number;
 }
 
 export interface Language {

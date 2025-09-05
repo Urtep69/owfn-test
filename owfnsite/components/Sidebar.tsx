@@ -3,7 +3,7 @@ import { Link, useRoute } from 'wouter';
 import { 
     Home, Info, FileText, Map, Handshake, HelpCircle, Mail,
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
-    Heart, TrendingUp, Lock, Award, User, Vote, Shield
+    Heart, TrendingUp, Lock, Award, User, Vote, Shield, Globe
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
@@ -77,6 +77,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 { to: '/vesting', label: t('vesting'), icon: <Lock size={20} /> },
                 { to: '/airdrop', label: t('airdrop'), icon: <Award size={20} /> },
                 { to: '/impact', label: t('impact_portal'), icon: <Heart size={20} /> },
+                { to: '/impact-atlas', label: t('impact_atlas'), icon: <Globe size={20} /> },
                 { to: '/governance', label: t('governance'), icon: <Vote size={20} /> },
                 { to: '/contact', label: t('contact'), icon: <Mail size={20} /> },
             ]

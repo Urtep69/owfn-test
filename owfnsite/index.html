@@ -106,6 +106,9 @@
               'aurora': 'aurora 20s ease-in-out infinite alternate',
               'press-in': 'pressIn 0.2s ease-out forwards',
               'scroll-fade-in': 'scrollFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'globe-spin': 'globeSpin 60s linear infinite',
+              'marker-pulse': 'markerPulse 1.5s ease-out infinite',
+              'donation-glow': 'donationGlow 2s ease-out forwards',
             },
             keyframes: {
               fadeInUp: {
@@ -132,6 +135,19 @@
               scrollFadeIn: {
                 from: { opacity: 0, transform: 'translateY(30px) scale(0.98)' },
                 to: { opacity: 1, transform: 'translateY(0) scale(1)' },
+              },
+              globeSpin: {
+                'from': { transform: 'rotateY(0deg) rotateX(10deg)' },
+                'to': { transform: 'rotateY(360deg) rotateX(10deg)' },
+              },
+              markerPulse: {
+                '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+                '50%': { transform: 'scale(1.2)', opacity: '0.7' },
+              },
+              donationGlow: {
+                '0%': { 'box-shadow': '0 0 0 0 rgba(251, 191, 36, 0.7)', transform: 'scale(1)' },
+                '50%': { 'box-shadow': '0 0 20px 20px rgba(251, 191, 36, 0.3)', transform: 'scale(1.5)' },
+                '100%': { 'box-shadow': '0 0 30px 40px rgba(251, 191, 36, 0)', transform: 'scale(1)' },
               },
             },
           },
@@ -184,6 +200,9 @@
                         radial-gradient(circle at 20% 80%, rgba(221, 201, 167, 0.05), transparent 40%),
                         radial-gradient(circle at 80% 30%, rgba(199, 177, 145, 0.05), transparent 40%);
             background-size: 200% 200%;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
         }
     </style>
     <link rel="stylesheet" href="https://esm.sh/@solana/wallet-adapter-react-ui@^0.9.39/styles.css" />
