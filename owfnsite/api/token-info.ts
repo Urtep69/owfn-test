@@ -21,26 +21,32 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
-        const response = await fetch(HELIUS_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 'owfn-token-info',
-                method: 'getAsset',
-                params: {
-                    id: mintAddress,
-                },
+        const [assetResponse, jupResponse] = await Promise.all([
+             fetch(HELIUS_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    id: 'owfn-token-info',
+                    method: 'getAsset',
+                    params: {
+                        id: mintAddress,
+                        displayOptions: {
+                          showFungible: true
+                        }
+                    },
+                }),
             }),
-        });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Helius API error for getAsset: ${response.status}`, errorText);
-            return res.status(response.status).json({ error: `Helius API Error: ${errorText}` });
+            fetch(`https://token.jup.ag/v6/token-info?address=${mintAddress}`)
+        ]);
+
+        if (!assetResponse.ok) {
+            const errorText = await assetResponse.text();
+            console.error(`Helius API error for getAsset: ${assetResponse.status}`, errorText);
+            return res.status(assetResponse.status).json({ error: `Helius API Error: ${errorText}` });
         }
         
-        const jsonResponse = await response.json();
+        const jsonResponse = await assetResponse.json();
 
         if (jsonResponse.error) {
             console.error(`Helius API returned an error object for getAsset`, jsonResponse.error);
@@ -53,80 +59,53 @@ export default async function handler(req: any, res: any) {
             return res.status(404).json({ error: `No data could be found for mint: ${mintAddress}.` });
         }
         
+        // Defensively access nested properties
         const tokenInfo = asset.token_info || {};
+        const fungibleInfo = asset.fungible_info || {};
         const content = asset.content || {};
         const metadata = content.metadata || {};
         const links = content.links || {};
-        const priceInfo = tokenInfo.price_info || {};
-
-        const decimals = tokenInfo.decimals ?? 9;
-        const price = priceInfo.price_per_token || 0;
         
-        const rawSupply = tokenInfo.supply;
-        let supply = 0;
-        if (rawSupply !== null && rawSupply !== undefined) {
-            try {
-                const supplyAsString = String(rawSupply);
-                const parsedNum = parseFloat(supplyAsString);
-
-                if (isNaN(parsedNum) || !isFinite(parsedNum)) {
-                    console.warn(`Supply value '${rawSupply}' could not be parsed to a valid number for mint ${mintAddress}. Defaulting to 0.`);
-                    supply = 0;
-                } else {
-                    const calculatedSupply = parsedNum / (10 ** decimals);
-                    if (isFinite(calculatedSupply)) {
-                        supply = calculatedSupply;
-                    } else {
-                        console.warn(`Supply calculation resulted in non-finite number for mint ${mintAddress}. Defaulting to 0.`);
-                        supply = 0;
-                    }
-                }
-            } catch (e) {
-                console.error(`Unexpected error while parsing supply '${rawSupply}' for mint ${mintAddress}:`, e);
-                supply = 0;
-            }
+        let jupData: any = {};
+        if (jupResponse.ok) {
+            jupData = await jupResponse.json();
+        } else {
+            console.warn(`Jupiter API failed for mint ${mintAddress} with status ${jupResponse.status}`);
         }
+        
+        const price = jupData.price || 0;
+        const decimals = tokenInfo.decimals ?? 9;
+        const supply = fungibleInfo.supply ? Number(BigInt(fungibleInfo.supply)) / (10 ** decimals) : 0;
+        
+        const mintAuthority: string | null = fungibleInfo.mint_authority || null;
+        const freezeAuthority: string | null = fungibleInfo.freeze_authority || null;
+        const updateAuthority: string | null = (asset.authorities || []).find((a: any) => a.scopes.includes('update'))?.address || null;
 
-
-        let mintAuthority: string | null = null;
-        let freezeAuthority: string | null = null;
-        let updateAuthority: string | null = null;
-
-        if (Array.isArray(asset.authorities)) {
-             for (const authority of asset.authorities) {
-                if (authority && typeof authority === 'object' && Array.isArray(authority.scopes)) {
-                    if (authority.scopes.includes('mint')) {
-                        mintAuthority = authority.address;
-                    }
-                    if (authority.scopes.includes('freeze')) {
-                        freezeAuthority = authority.address;
-                    }
-                     if (authority.scopes.includes('update')) {
-                        updateAuthority = authority.address;
-                    }
-                }
-            }
-        }
 
         const responseData: Partial<TokenDetails> = {
             mintAddress: asset.id,
-            name: metadata.name || 'Unknown Token',
-            symbol: metadata.symbol || `${asset.id.slice(0, 4)}...`,
-            logo: links.image || null,
+            name: metadata.name || jupData.name || 'Unknown Token',
+            symbol: metadata.symbol || jupData.symbol || `${asset.id.slice(0, 4)}...`,
+            logo: content.links?.image || jupData.logoURI || null,
             decimals: decimals,
             pricePerToken: price,
             totalSupply: supply,
             marketCap: calculateMarketCap(price, supply),
-            
+            fdv: jupData.tags?.includes('raydium') ? jupData.fdv : calculateMarketCap(price, supply), // Use Jup FDV if available, else calculate
+            volume24h: jupData.volume24h,
+
             mintAuthority: mintAuthority,
             freezeAuthority: freezeAuthority,
             updateAuthority: updateAuthority,
             tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
         };
 
+        // Populate description from mock if available
         const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
         if (mockDetailsKey) {
             responseData.description = MOCK_TOKEN_DETAILS[mockDetailsKey].description;
+        } else if (metadata.description) {
+            responseData.description = metadata.description;
         }
         
         return res.status(200).json(responseData);

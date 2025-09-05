@@ -1,15 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat } from 'lucide-react';
+import { Link, useRoute } from 'wouter';
+import { LogOut, Loader2, Copy, Check, ExternalLink, X, Menu, Repeat } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
-import { ThemeSwitcher } from './ThemeSwitcher.tsx';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { WalletManagerIcon } from './IconComponents.tsx';
+import { OwfnIcon } from './IconComponents.tsx';
 
-interface HeaderProps {
-    toggleSidebar: () => void;
-    isSidebarOpen: boolean;
-}
+const navLinks = [
+    { to: '/', labelKey: 'home' },
+    { to: '/presale', labelKey: 'presale' },
+    { to: '/dashboard', labelKey: 'dashboard' },
+    { to: '/donations', labelKey: 'donations' },
+    { to: '/about', labelKey: 'about' },
+    { to: '/impact', labelKey: 'impact_portal' },
+];
+
+const NavLink = ({ to, label, onClick }: { to: string, label: string, onClick: () => void }) => {
+    const [isActive] = useRoute(to);
+    return (
+        <Link to={to} onClick={onClick}>
+            <a className={`px-3 py-2 text-sm font-semibold rounded-md transition-colors ${isActive ? 'text-text-primary bg-surface' : 'text-text-secondary hover:text-text-primary'}`}>
+                {label}
+            </a>
+        </Link>
+    );
+};
+
 
 const ConnectButton = () => {
     const { t, solana } = useAppContext();
@@ -40,12 +56,12 @@ const ConnectButton = () => {
 
     if (connecting) {
         return (
-            <div className="flex items-center space-x-3 px-4 py-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
-                <Loader2 size={18} className="animate-spin text-primary-600 dark:text-darkPrimary-400" />
-                <span className="font-semibold text-sm text-primary-700 dark:text-darkPrimary-200">
+            <button className="flex items-center space-x-2 px-4 py-2 bg-surface rounded-lg border border-border" disabled>
+                <Loader2 size={18} className="animate-spin text-text-secondary" />
+                <span className="font-semibold text-sm text-text-secondary">
                     {t('connecting')}
                 </span>
-            </div>
+            </button>
         );
     }
 
@@ -53,11 +69,9 @@ const ConnectButton = () => {
         return (
             <button
                 onClick={() => setVisible(true)}
-                className="group relative inline-flex items-center justify-center px-5 py-2.5 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-3d hover:shadow-3d-lg transition-all duration-300 transform hover:-translate-y-0.5 btn-tactile"
+                className="bg-primary hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-lg transition-colors"
             >
-                <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-accent-400 to-accent-500 dark:from-darkAccent-400 dark:to-darkAccent-600"></span>
-                <span className="absolute bottom-0 right-0 w-full h-full transition-all duration-500 ease-in-out transform translate-x-full translate-y-full bg-accent-500/80 dark:bg-darkAccent-500/80 group-hover:translate-x-0 group-hover:translate-y-0"></span>
-                <span className="relative font-sans">{t('connect_wallet')}</span>
+                {t('connect_wallet')}
             </button>
         );
     }
@@ -66,49 +80,42 @@ const ConnectButton = () => {
          <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setDropdownOpen(prev => !prev)}
-                className="flex items-center bg-primary-100 dark:bg-darkPrimary-800 border border-primary-200 dark:border-darkAccent-700/50 rounded-full text-sm font-semibold text-primary-900 dark:text-darkPrimary-100 transition-all duration-300 hover:border-accent-400 dark:hover:border-darkAccent-600 shadow-3d hover:shadow-3d-lg"
+                className="flex items-center bg-surface border border-border rounded-lg text-sm font-semibold text-text-primary transition-colors hover:border-primary px-4 py-2"
             >
-                <div className="flex items-center space-x-2 pl-4 pr-3 py-1.5">
-                    <WalletManagerIcon className="w-5 h-5" />
-                    <span className="text-accent-600 dark:text-darkAccent-400 text-xs tracking-wider">{truncateAddress(address)}</span>
-                    <ChevronRight size={16} className={`text-primary-500 dark:text-darkAccent-400/70 transition-transform ${isDropdownOpen ? 'rotate-90' : ''}`} />
-                </div>
+                <span>{truncateAddress(address)}</span>
             </button>
 
             {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-primary-50/80 dark:bg-darkPrimary-800/80 backdrop-blur-xl border border-primary-200/50 dark:border-darkPrimary-700/50 rounded-lg shadow-3d-lg animate-fade-in-up" style={{animationDuration: '200ms'}}>
-                    <div className="p-3">
-                         <span className="font-semibold text-sm font-mono text-primary-800 dark:text-darkPrimary-100">{truncateAddress(address)}</span>
-                    </div>
-                    <div className="p-2 space-y-1 border-t border-primary-200 dark:border-darkPrimary-700">
+                <div className="absolute right-0 mt-2 w-56 bg-surface border border-border rounded-lg shadow-lg animate-fade-in-up" style={{animationDuration: '200ms'}}>
+                    <div className="p-2 space-y-1">
                          <button
                             onClick={copyToClipboard}
-                            className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
+                            className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-text-primary hover:bg-background transition-colors"
                         >
-                            <span>{t('copy_address', {defaultValue: 'Copy Address'})}</span>
-                            {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+                            <span>{t('copy_address')}</span>
+                            {copied ? <Check size={16} className="text-secondary" /> : <Copy size={16} />}
                         </button>
                         <button
                             onClick={() => setVisible(true)}
-                            className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
+                            className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-text-primary hover:bg-background transition-colors"
                         >
-                            <span>{t('change_wallet', {defaultValue: 'Change Wallet'})}</span>
+                            <span>{t('change_wallet')}</span>
                             <Repeat size={16} />
                         </button>
                         <a
                             href={`https://solscan.io/account/${address}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
+                            className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-text-primary hover:bg-background transition-colors"
                         >
-                            <span>{t('view_on_solscan', {defaultValue: 'View on Solscan'})}</span>
+                            <span>{t('view_on_solscan')}</span>
                             <ExternalLink size={16} />
                         </a>
                     </div>
-                    <div className="p-2 border-t border-primary-200 dark:border-darkPrimary-700">
+                    <div className="p-2 border-t border-border">
                          <button
                             onClick={disconnectWallet}
-                            className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-red-600 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10 font-semibold transition-colors"
+                            className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-destructive hover:bg-destructive/10 font-semibold transition-colors"
                         >
                             <span>{t('disconnect_wallet')}</span>
                             <LogOut size={16} />
@@ -121,28 +128,50 @@ const ConnectButton = () => {
 };
 
 
-export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
-  return (
-    <header className="bg-primary-100/70 dark:bg-darkPrimary-950/70 backdrop-blur-lg sticky top-0 z-40 border-b border-primary-200/80 dark:border-darkPrimary-800/80">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-             <button
-              onClick={toggleSidebar}
-              className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none hidden md:block"
-              aria-label="Toggle sidebar"
-            >
-              {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <ThemeSwitcher />
-            <LanguageSwitcher />
-            <ConnectButton />
-          </div>
-        </div>
-      </div>
-    </header>
-  );
+export const Header = () => {
+    const { t } = useAppContext();
+    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const closeMobileMenu = () => setMobileMenuOpen(false);
+
+    return (
+        <header className="bg-surface/80 backdrop-blur-sm sticky top-0 z-40 border-b border-border">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16">
+                    {/* Left side: Logo */}
+                    <div className="flex-shrink-0">
+                        <Link to="/" onClick={closeMobileMenu} className="flex items-center gap-2">
+                            <OwfnIcon className="w-8 h-8"/>
+                            <span className="font-bold text-lg text-text-primary">OWFN</span>
+                        </Link>
+                    </div>
+
+                    {/* Center: Desktop Navigation */}
+                    <nav className="hidden md:flex items-center space-x-2">
+                        {navLinks.map(link => <NavLink key={link.to} to={link.to} label={t(link.labelKey)} onClick={closeMobileMenu} />)}
+                    </nav>
+
+                    {/* Right side: Actions */}
+                    <div className="flex items-center space-x-2">
+                        <LanguageSwitcher />
+                        <ConnectButton />
+                        <div className="md:hidden">
+                            <button onClick={() => setMobileMenuOpen(prev => !prev)} className="p-2 rounded-md hover:bg-border text-text-secondary">
+                                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Mobile Navigation */}
+            {isMobileMenuOpen && (
+                 <div className="md:hidden bg-surface border-t border-border animate-fade-in-up" style={{animationDuration: '200ms'}}>
+                    <nav className="flex flex-col space-y-2 p-4">
+                        {navLinks.map(link => <NavLink key={link.to} to={link.to} label={t(link.labelKey)} onClick={closeMobileMenu} />)}
+                    </nav>
+                </div>
+            )}
+        </header>
+    );
 };

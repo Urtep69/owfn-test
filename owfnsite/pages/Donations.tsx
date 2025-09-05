@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
@@ -14,25 +13,8 @@ const tokens = [
 
 export default function Donations() {
     const { t, solana, setWalletModalOpen } = useAppContext();
-    const [location, setLocation] = useLocation();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const tokenFromQuery = params.get('token');
-        const amountFromQuery = params.get('amount');
-        if (tokenFromQuery && tokens.some(t => t.symbol === tokenFromQuery)) {
-            setSelectedToken(tokenFromQuery);
-        }
-        if (amountFromQuery) {
-            setAmount(amountFromQuery);
-        }
-         // Clean the URL after reading params
-        if (tokenFromQuery || amountFromQuery) {
-             window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }, [location]);
 
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
 
@@ -88,52 +70,52 @@ export default function Donations() {
     return (
         <div className="animate-fade-in-up space-y-12">
             <div className="text-center">
-                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('make_donation')}</h1>
-                <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">
+                <h1 className="text-4xl font-bold text-primary">{t('make_donation')}</h1>
+                <p className="mt-4 max-w-2xl mx-auto text-lg text-text-secondary">
                     {t('donation_desc')}
                 </p>
             </div>
             
-            <div className="bg-white dark:bg-darkPrimary-800 p-8 md:p-12 rounded-2xl shadow-3d-lg transform hover:scale-[1.02] transition-transform duration-300">
+            <div className="bg-surface border border-border p-8 md:p-12 rounded-lg">
                 <div className="max-w-4xl mx-auto text-center space-y-4">
-                    <h2 className="text-3xl font-bold text-primary-800 dark:text-darkPrimary-200">{t('donation_message_title')}</h2>
-                    <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{t('donation_message_p1')}</p>
-                    <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed">
+                    <h2 className="text-3xl font-bold text-text-primary">{t('donation_message_title')}</h2>
+                    <p className="text-text-secondary leading-relaxed">{t('donation_message_p1')}</p>
+                    <p className="text-text-secondary leading-relaxed">
                         {t('donation_message_p2_part1')}
-                        <span className="font-bold text-accent-600 dark:text-darkAccent-400">
+                        <span className="font-bold text-primary">
                             {t('donation_message_p2_project_name')}
                         </span>
                         {t('donation_message_p2_part2')}
                     </p>
-                    <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed">{t('donation_message_p3')}</p>
-                    <p className="font-bold text-primary-800 dark:text-darkPrimary-200 pt-2">{t('donation_message_thanks')}</p>
+                    <p className="text-text-secondary leading-relaxed">{t('donation_message_p3')}</p>
+                    <p className="font-bold text-text-primary pt-2">{t('donation_message_thanks')}</p>
                 </div>
             </div>
 
-            <div className="bg-accent-100/30 dark:bg-darkAccent-900/30 border-l-4 border-accent-500 dark:border-darkAccent-500 text-accent-800 dark:text-darkAccent-200 p-4 rounded-md shadow-md flex items-start space-x-3">
-                <AlertTriangle className="h-6 w-6 text-accent-500 dark:text-darkAccent-500 flex-shrink-0 mt-0.5" />
+            <div className="border-l-4 border-yellow-500 text-yellow-300 p-4 rounded-md bg-yellow-500/10 flex items-start space-x-3">
+                <AlertTriangle className="h-6 w-6 text-yellow-500 flex-shrink-0 mt-0.5" />
                 <p className="font-semibold">
                     {t('donation_solana_warning')}
                 </p>
             </div>
             
-            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d max-w-2xl mx-auto">
+            <div className="bg-surface border border-border p-8 rounded-lg max-w-2xl mx-auto">
                 <h2 className="text-2xl font-bold mb-6 text-center">{t('donations_form_title')}</h2>
 
-                <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-3 rounded-lg text-sm text-primary-700 dark:text-darkPrimary-300 mb-6 flex items-start gap-2">
-                    <Info size={18} className="flex-shrink-0 mt-0.5 text-primary-500 dark:text-darkPrimary-400" />
+                <div className="bg-background p-3 rounded-lg text-sm text-text-secondary mb-6 flex items-start gap-2 border border-border">
+                    <Info size={18} className="flex-shrink-0 mt-0.5 text-text-secondary" />
                     <span>{t('donation_fee_info')}</span>
                 </div>
 
                 <div className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-primary-600 dark:text-darkPrimary-400 mb-2">{t('select_token')}</label>
+                        <label className="block text-sm font-medium text-text-secondary mb-2">{t('select_token')}</label>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {tokens.map(token => (
                                 <button
                                     key={token.symbol}
                                     onClick={() => setSelectedToken(token.symbol)}
-                                    className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-accent-500 bg-accent-100/50 dark:bg-darkAccent-900/50' : 'border-primary-200 dark:border-darkPrimary-600'}`}
+                                    className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg transition-all ${selectedToken === token.symbol ? 'border-primary bg-primary/10' : 'border-border bg-background'}`}
                                 >
                                     <div className="w-8 h-8 mb-2">{token.icon}</div>
                                     <span className="font-semibold">{token.symbol}</span>
@@ -142,14 +124,14 @@ export default function Donations() {
                         </div>
                     </div>
                     <div>
-                        <label htmlFor="amount" className="block text-sm font-medium text-primary-600 dark:text-darkPrimary-400 mb-1">{t('amount')}</label>
+                        <label htmlFor="amount" className="block text-sm font-medium text-text-secondary mb-1">{t('amount')}</label>
                         <input
                             type="number"
                             id="amount"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder="0.0"
-                            className="w-full p-3 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg text-lg font-semibold focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
+                            className="w-full p-3 bg-background border border-border rounded-lg text-lg font-semibold focus:ring-2 focus:ring-primary focus:outline-none"
                         />
                          <div className="flex flex-wrap gap-2 mt-3">
                             {percentages.map(p => (
@@ -157,7 +139,7 @@ export default function Donations() {
                                     key={p}
                                     onClick={() => handlePercentageClick(p)}
                                     disabled={!solana.connected || !currentUserToken || currentUserToken.balance <= 0}
-                                    className="flex-grow text-xs bg-primary-200/50 hover:bg-primary-200 dark:bg-darkPrimary-700/50 dark:hover:bg-darkPrimary-700 py-1 px-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-grow text-xs bg-background hover:bg-border border border-border py-1 px-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {p === 100 ? 'MAX' : `${p}%`}
                                 </button>
@@ -169,13 +151,13 @@ export default function Donations() {
                         <div className="py-2 animate-fade-in-up" style={{animationDuration: '300ms'}}>
                             {currentUserToken ? (
                                  <div className="text-center">
-                                    <p className="text-xl font-bold text-primary-800 dark:text-darkPrimary-200">
+                                    <p className="text-xl font-bold text-text-primary">
                                         {t('balance')}: {currentUserToken.balance.toLocaleString(undefined, { maximumFractionDigits: 6 })} {currentUserToken.symbol}
                                     </p>
                                 </div>
                             ) : (
-                                <div className="text-center py-3 px-4 bg-accent-100/20 dark:bg-darkAccent-900/20 border border-accent-400/30 dark:border-darkAccent-500/30 rounded-lg">
-                                    <div className="flex items-center justify-center space-x-2 text-accent-700 dark:text-darkAccent-200">
+                                <div className="text-center py-3 px-4 bg-primary/10 border border-primary/20 rounded-lg">
+                                    <div className="flex items-center justify-center space-x-2 text-primary">
                                         {React.cloneElement(tokens.find(t => t.symbol === selectedToken)!.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                                         <p className="font-semibold">
                                             {t('donation_no_token_balance', { symbol: selectedToken })}
@@ -187,16 +169,16 @@ export default function Donations() {
                     )}
 
                      {parseFloat(amount) > 0 && (
-                        <div className="p-4 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg text-center animate-fade-in-up" style={{animationDuration: '300ms'}}>
-                            <p className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">
+                        <div className="p-4 bg-background border border-border rounded-lg text-center animate-fade-in-up" style={{animationDuration: '300ms'}}>
+                            <p className="text-2xl font-bold text-text-primary">
                                 {parseFloat(amount).toLocaleString(undefined, {maximumFractionDigits: 4})} {selectedToken}
                             </p>
-                            <p className="text-md text-primary-700 dark:text-darkPrimary-300 font-semibold">
+                            <p className="text-md text-text-secondary font-semibold">
                                 ~ ${usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                             </p>
                         </div>
                     )}
-                     <button onClick={handleDonate} disabled={solana.loading || (solana.connected && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                     <button onClick={handleDonate} disabled={solana.loading || (solana.connected && !(parseFloat(amount) > 0))} className="w-full bg-primary text-white font-bold py-3 rounded-lg text-xl hover:bg-opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                          {buttonText}
                     </button>
                 </div>

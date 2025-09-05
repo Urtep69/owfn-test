@@ -95,6 +95,21 @@ User's Original Message:
 ${message}
 ---`;
 
+        const subjectDescription = [
+            'A concise email subject line. Start with \'[OWFN Contact]\'',
+            'followed by the reason for contact and the sender\'s name.'
+        ].join(' ');
+
+        const htmlBodyDescription = [
+            'The full, formatted body of the email in HTML.',
+            'It MUST contain the following sections in this exact order:',
+            '1. A styled \'Submission Details\' block with all provided metadata including the detected language.',
+            '2. A section titled \'AI Summary (Romanian)\' with your concise summary.',
+            '3. A section titled \'AI Translation (Romanian)\' with your full translation.',
+            '4. A horizontal rule (<hr>).',
+            '5. The \'Original Message\' section with the user\'s verbatim message.'
+        ].join(' ');
+
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: prompt,
@@ -105,11 +120,11 @@ ${message}
                     properties: {
                         subject: {
                             type: Type.STRING,
-                            description: "A concise email subject line. Start with '[OWFN Contact]' followed by the reason for contact and the sender's name."
+                            description: subjectDescription
                         },
                         htmlBody: {
                             type: Type.STRING,
-                            description: "The full, formatted body of the email in HTML. It MUST contain the following sections in this exact order: 1. A styled 'Submission Details' block with all provided metadata including the detected language. 2. A section titled 'AI Summary (Romanian)' with your concise summary. 3. A section titled 'AI Translation (Romanian)' with your full translation. 4. A horizontal rule (<hr>). 5. The 'Original Message' section with the user's verbatim message."
+                            description: htmlBodyDescription
                         }
                     },
                     propertyOrdering: ["subject", "htmlBody"],

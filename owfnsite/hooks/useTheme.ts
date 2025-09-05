@@ -1,41 +1,19 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import type { Theme } from '../types.ts';
 
 export const useTheme = (): [Theme, () => void] => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    try {
-      if (typeof window !== 'undefined') {
-        const savedTheme = window.localStorage.getItem('owfn-theme') as Theme;
-        if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
-          return savedTheme;
-        }
-      }
-    } catch (e) {
-      console.warn("Could not read theme from localStorage", e);
-    }
-    // Default to dark theme as requested
-    return 'dark';
-  });
+  const [theme] = useState<Theme>('dark');
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === 'light') {
-      root.classList.remove('dark');
-    } else {
+    // Always ensure the dark class is present
+    if (!root.classList.contains('dark')) {
       root.classList.add('dark');
     }
-  }, [theme]);
+  }, []);
 
-  const toggleTheme = useCallback(() => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    try {
-      window.localStorage.setItem('owfn-theme', newTheme);
-    } catch (error) {
-      console.warn("Could not save theme to localStorage", error);
-    }
-  }, [theme]);
+  // The toggle function is now a no-op as the theme is fixed to dark.
+  const toggleTheme = useCallback(() => {}, []);
 
   return [theme, toggleTheme];
 };

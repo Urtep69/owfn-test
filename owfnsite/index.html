@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/assets/owfn.png" />
@@ -22,170 +22,42 @@
     <meta name="twitter:url" content="https://www.owfn.org/" />
     <meta name="twitter:site" content="@OWFN_Official" />
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
-        darkMode: 'class',
         theme: {
           extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              serif: ['Lora', 'serif'],
-            },
             colors: {
-              // Light theme palettes remain unchanged
-              'primary': { 
-                '50': '#fafaf9',
-                '100': '#f5f5f4',
-                '200': '#e7e5e4',
-                '300': '#d6d3d1',
-                '400': '#a8a29e',
-                '500': '#78716c',
-                '600': '#57534e',
-                '700': '#44403c',
-                '800': '#292524',
-                '900': '#1c1917',
-                '950': '#0c0a09',
-              },
-              'accent': {
-                '50': '#fffbeb',
-                '100': '#fef3c7',
-                '200': '#fde68a',
-                '300': '#fcd34d',
-                '400': '#fbbf24',
-                '500': '#f59e0b',
-                '600': '#d97706',
-                '700': '#b45309',
-                '800': '#92400e',
-                '900': '#78350f',
-                '950': '#451a03',
-              },
-              // Updated Dark theme palettes to match the screenshot
-              'darkPrimary': { // Dark Theme -> Custom Charcoal/Brown from screenshot
-                '50': '#FCFAF7',
-                '100': '#F5F2ED',
-                '200': '#EBE5DB', // Main text color
-                '300': '#C8BFB5',
-                '400': '#A59D94',
-                '500': '#837C73',
-                '600': '#645F58',
-                '700': '#494540', // Borders
-                '800': '#302D29', // Card BG
-                '900': '#211F1C', // Footer BG
-                '950': '#141311', // Page BG
-              },
-              'darkAccent': { // Dark Theme -> Custom Muted Beige/Gold from screenshot
-                '50': '#FEFCFA',
-                '100': '#FBF6EE',
-                '200': '#F5E9D6',
-                '300': '#EEDBBD',
-                '400': '#E4D5A8', // Accent Text
-                '500': '#DDC9A7', // Buttons
-                '600': '#C7B191', // Button hover/gradient
-                '700': '#A59176',
-                '800': '#86725A',
-                '900': '#695844',
-                '950': '#3A3126', // Text on buttons
-              }
+              background: '#0D111C',
+              surface: '#161B22',
+              primary: '#C026D3',
+              secondary: '#4ADE80',
+              destructive: '#F75274',
+              border: '#30363D',
+              'text-primary': '#F0F6FC',
+              'text-secondary': '#8B949E',
             },
             boxShadow: {
-              // Softer, more layered shadows for a premium "floating" effect
-              '3d': '0 2.8px 2.2px rgba(0, 0, 0, 0.02), 0 6.7px 5.3px rgba(0, 0, 0, 0.028), 0 12.5px 10px rgba(0, 0, 0, 0.035), 0 22.3px 17.9px rgba(0, 0, 0, 0.042), 0 41.8px 33.4px rgba(0, 0, 0, 0.05), 0 100px 80px rgba(0, 0, 0, 0.07)',
-              '3d-lg': '0 5px 15px rgba(0, 0, 0, 0.05), 0 15px 35px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0,0,0,0.03)',
-              'inner-3d': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
-              'inner-press': 'inset 0 3px 6px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)',
+              'glow-primary': '0 0 15px 0 rgba(192, 38, 211, 0.3)',
             },
             animation: {
-              'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
-              'slide-in': 'slideIn 0.5s ease-out forwards',
-              'glow': 'glow 2.5s ease-in-out infinite alternate',
-              'aurora': 'aurora 20s ease-in-out infinite alternate',
-              'press-in': 'pressIn 0.2s ease-out forwards',
-              'scroll-fade-in': 'scrollFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'fade-in-up': 'fadeInUp 0.3s ease-out forwards',
+              'slide-in': 'slideIn 0.3s ease-out forwards',
             },
             keyframes: {
               fadeInUp: {
-                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               },
               slideIn: {
                 '0%': { transform: 'translateX(100%)' },
                 '100%': { transform: 'translateX(0)' },
               },
-              glow: {
-                'from': { 'box-shadow': '0 0 5px -5px #fbbf24' },
-                'to': { 'box-shadow': '0 0 10px 5px #f59e0b' }
-              },
-              aurora: {
-                '0%': { 'background-position': '0% 50%' },
-                '50%': { 'background-position': '100% 50%' },
-                '100%': { 'background-position': '0% 50%' },
-              },
-              pressIn: {
-                '0%': { transform: 'scale(1)', boxShadow: '0 2.8px 2.2px rgba(0, 0, 0, 0.02)' },
-                '100%': { transform: 'scale(0.97)', boxShadow: 'inset 0 3px 6px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)' },
-              },
-              scrollFadeIn: {
-                from: { opacity: 0, transform: 'translateY(30px) scale(0.98)' },
-                to: { opacity: 1, transform: 'translateY(0) scale(1)' },
-              },
             },
           },
         },
       };
     </script>
-    <style>
-        html {
-            font-size: 16px;
-            scroll-behavior: smooth;
-        }
-        .perspective-1000 {
-            perspective: 1000px;
-        }
-        .transform-style-3d {
-            transform-style: preserve-3d;
-        }
-        .btn-tactile:active {
-            animation: pressIn 0.15s ease-out forwards;
-        }
-        .animate-scroll {
-            animation-range-start: entry 0%;
-            animation-range-end: entry 40%;
-            animation-timeline: view(block);
-            animation-name: scrollFadeIn;
-            animation-fill-mode: both;
-        }
-        .aurora-bg {
-            position: relative;
-            overflow: hidden;
-        }
-        .aurora-bg::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 150%;
-            height: 150%;
-            z-index: 0;
-            background: radial-gradient(circle at center, rgba(251, 191, 36, 0.1), transparent 40%),
-                        radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.1), transparent 40%),
-                        radial-gradient(circle at 80% 30%, rgba(180, 83, 9, 0.1), transparent 40%);
-            background-size: 200% 200%;
-            animation: aurora 20s ease-in-out infinite alternate;
-            will-change: background-position;
-        }
-        .dark .aurora-bg::before {
-            background: radial-gradient(circle at center, rgba(228, 213, 168, 0.05), transparent 40%),
-                        radial-gradient(circle at 20% 80%, rgba(221, 201, 167, 0.05), transparent 40%),
-                        radial-gradient(circle at 80% 30%, rgba(199, 177, 145, 0.05), transparent 40%);
-            background-size: 200% 200%;
-        }
-    </style>
     <link rel="stylesheet" href="https://esm.sh/@solana/wallet-adapter-react-ui@^0.9.39/styles.css" />
 <script type="importmap">
 {
@@ -211,7 +83,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-primary-100 dark:bg-darkPrimary-950 font-sans">
+  <body class="bg-background text-text-primary font-sans">
     <div id="root"></div>
     <script type="module" src="/bundle.js"></script>
   <script type="module" src="/index.tsx"></script>
