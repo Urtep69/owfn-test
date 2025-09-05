@@ -41,6 +41,7 @@ export interface SocialCase {
   details: Record<string, string>;
   lat: number;
   lng: number;
+  status: 'active' | 'urgent' | 'completed' | 'urgent-active';
 }
 
 export interface Language {
@@ -161,6 +162,4 @@ export interface SiwsReturn {
   isLoading: boolean;
   isSessionLoading: boolean;
   session: SiwsSession | null;
-  signIn: () => Promise<boolean>;
-  signOut: () => Promise<void>;
 }

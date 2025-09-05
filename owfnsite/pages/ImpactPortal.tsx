@@ -5,7 +5,7 @@ import type { SocialCase } from '../types.ts';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 import { SUPPORTED_LANGUAGES } from '../constants.ts';
-import { HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
+import { HeartHandshake, BookOpen, HomeIcon, Loader2 } from 'lucide-react';
 
 const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }) => {
     const { t } = useAppContext();
@@ -17,12 +17,12 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
     const [goal, setGoal] = useState('');
     const [lat, setLat] = useState('');
     const [lng, setLng] = useState('');
+    const [status, setStatus] = useState<SocialCase['status']>('active');
     const [isTranslating, setIsTranslating] = useState(false);
 
     const generateRandomCoords = () => {
-        // Generate coordinates within a plausible range, avoiding oceans as much as possible
-        const randomLat = (Math.random() * 140 - 60).toFixed(6); // Approx -60 to 80
-        const randomLng = (Math.random() * 360 - 180).toFixed(6); // -180 to 180
+        const randomLat = (Math.random() * 140 - 60).toFixed(6);
+        const randomLng = (Math.random() * 360 - 180).toFixed(6);
         setLat(randomLat);
         setLng(randomLng);
     };
@@ -57,6 +57,7 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
                 donated: 0,
                 lat: parseFloat(lat),
                 lng: parseFloat(lng),
+                status,
             };
             
             languagesToTranslate.forEach((lang, index) => {
@@ -67,7 +68,6 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
 
             onAddCase(newCase);
             
-            // Reset form
             setTitle('');
             setDescription('');
             setDetails('');
@@ -76,6 +76,7 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
             setGoal('');
             setLat('');
             setLng('');
+            setStatus('active');
 
         } catch (error) {
             console.error("Translation failed for one or more languages:", error);
@@ -93,21 +94,27 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
                 <textarea placeholder={t('case_description')} value={description} onChange={e => setDescription(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md h-32"></textarea>
                 <textarea placeholder={t('case_details')} value={details} onChange={e => setDetails(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md h-24"></textarea>
                 <input type="text" placeholder={t('image_url')} value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md">
                         <option value="Health">{t('category_health')}</option>
                         <option value="Education">{t('category_education')}</option>
                         <option value="Basic Needs">{t('category_basic_needs')}</option>
                     </select>
                     <input type="number" placeholder={t('funding_goal_usd')} value={goal} onChange={e => setGoal(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" min="1" />
+                     <select value={status} onChange={e => setStatus(e.target.value as SocialCase['status'])} className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md">
+                        <option value="active">{t('status_active', { defaultValue: 'Active' })}</option>
+                        <option value="urgent">{t('status_urgent', { defaultValue: 'Urgent' })}</option>
+                        <option value="urgent-active">{t('status_urgent_active', { defaultValue: 'Urgent & Active' })}</option>
+                        <option value="completed">{t('status_completed', { defaultValue: 'Completed' })}</option>
+                    </select>
                 </div>
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <input type="number" placeholder="Latitude (-90 to 90)" value={lat} onChange={e => setLat(e.target.value)} required className="md:col-span-1 w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" step="any" min="-90" max="90" />
                     <input type="number" placeholder="Longitude (-180 to 180)" value={lng} onChange={e => setLng(e.target.value)} required className="md:col-span-1 w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" step="any" min="-180" max="180" />
                     <button type="button" onClick={generateRandomCoords} className="md:col-span-1 w-full bg-primary-200 dark:bg-darkPrimary-600 py-2 rounded-lg font-semibold hover:bg-primary-300 dark:hover:bg-darkPrimary-500 transition-colors">{t('generate_random_coords')}</button>
                 </div>
-                <button type="submit" disabled={isTranslating} className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 py-3 rounded-lg font-bold hover:bg-accent-500 dark:hover:bg-darkAccent-600 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 transition-colors">
-                    {isTranslating ? t('admin_saving_case') : t('save_case')}
+                <button type="submit" disabled={isTranslating} className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 py-3 rounded-lg font-bold hover:bg-accent-500 dark:hover:bg-darkAccent-600 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 transition-colors flex items-center justify-center gap-2">
+                    {isTranslating ? <><Loader2 className="w-5 h-5 animate-spin" /> {t('admin_saving_case')}</> : t('save_case')}
                 </button>
             </form>
         </div>
