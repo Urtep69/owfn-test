@@ -35,13 +35,10 @@ export interface SocialCase {
   title: Record<string, string>;
   description: Record<string, string>;
   category: string;
-  imageUrl: string; // Will be used as cover image
-  galleryImageUrls?: string[]; // For additional images
+  imageUrl: string;
   goal: number;
   donated: number;
   details: Record<string, string>;
-  countryCode: string; // e.g., 'RO'
-  city: string;
 }
 
 export interface Language {

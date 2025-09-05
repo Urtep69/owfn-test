@@ -2,12 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { ProgressBar } from '../components/ProgressBar.tsx';
-import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle, Globe } from 'lucide-react';
+import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { AiSummary } from '../components/AiSummary.tsx';
 import { NftReward } from '../components/NftReward.tsx';
-import { getFlagEmoji } from '../lib/utils.ts';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -95,23 +94,18 @@ export default function ImpactCaseDetail() {
         }
     };
     
-    const categoryName = t(`category_${socialCase.category.toLowerCase().replace(/[\s&]+/g, '_')}`, { defaultValue: socialCase.category });
+    const categorySlug = socialCase.category.toLowerCase().replace(/\s+/g, '-');
+    const categoryName = t(`category_${socialCase.category.toLowerCase().replace(/\s+/g, '_')}`);
 
     return (
         <div className="space-y-8">
-            <Link to={`/impact`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline animate-fade-in-up">
-                <ArrowLeft size={16} /> {t('back_to_all_cases')}
+            <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline animate-fade-in-up">
+                <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
             </Link>
             <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg overflow-hidden animate-scroll" style={{animationDelay: '100ms'}}>
                 <img src={socialCase.imageUrl} alt={title} className="w-full h-64 md:h-96 object-cover" />
                 <div className="p-6 md:p-10">
-                    <div className="flex justify-between items-start mb-2">
-                        <span className="text-lg font-semibold text-accent-600 dark:text-darkAccent-500">{categoryName}</span>
-                         <div className="flex items-center gap-2 text-primary-600 dark:text-darkPrimary-400 font-semibold">
-                            <span className="text-2xl">{getFlagEmoji(socialCase.countryCode)}</span>
-                            {socialCase.city}
-                        </div>
-                    </div>
+                    <span className="text-lg font-semibold text-accent-600 dark:text-darkAccent-500 mb-2 inline-block">{t(`category_${socialCase.category.toLowerCase().replace(' ', '_')}`, { defaultValue: socialCase.category })}</span>
                     <h1 className="text-3xl md:text-5xl font-bold mb-6">{title}</h1>
                     <p className="text-lg text-primary-700 dark:text-darkPrimary-300 leading-relaxed mb-8">{description}</p>
                     
@@ -127,19 +121,7 @@ export default function ImpactCaseDetail() {
 
             <div className="grid lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-3 space-y-8">
-                     {socialCase.galleryImageUrls && socialCase.galleryImageUrls.length > 0 && (
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{ animationDelay: '200ms' }}>
-                            <h3 className="text-2xl font-bold mb-4">{t('case_gallery_title', { defaultValue: 'Gallery' })}</h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                {socialCase.galleryImageUrls.map((url, index) => (
-                                    <a key={index} href={url} target="_blank" rel="noopener noreferrer">
-                                        <img src={url} alt={`Gallery image ${index + 1}`} className="w-full h-40 object-cover rounded-lg" />
-                                    </a>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                     <div id="case-details-content" className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '300ms'}}>
+                     <div id="case-details-content" className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '200ms'}}>
                         <AiSummary contentId="case-details-content" />
                         <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Newspaper /> {t('live_updates')}</h3>
                         <div className="space-y-4">
@@ -154,7 +136,7 @@ export default function ImpactCaseDetail() {
                     </div>
 
                      {details && (
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '400ms'}}>
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '300ms'}}>
                             <h3 className="text-2xl font-bold mb-4">{t('case_details_title')}</h3>
                             <p className="text-primary-700 dark:text-darkPrimary-300 leading-relaxed whitespace-pre-wrap">{details}</p>
                         </div>
@@ -163,7 +145,7 @@ export default function ImpactCaseDetail() {
 
                 <div className="lg:col-span-2">
                     <div className="lg:sticky top-24 space-y-8">
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '500ms'}}>
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '400ms'}}>
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
                                 <Heart className="text-red-500" />
                                 <span>{t('support_this_cause')}</span>
@@ -252,7 +234,7 @@ export default function ImpactCaseDetail() {
                                 <NftReward caseTitle={title} donationAmountUsd={usdValue} />
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '600ms'}}>
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d animate-scroll" style={{animationDelay: '500ms'}}>
                             <h3 className="text-2xl font-bold mb-4 flex items-center gap-3"><Milestone /> {t('funding_milestones')}</h3>
                              <div className="relative pl-4">
                                 <div className="absolute top-0 left-4 h-full w-0.5 bg-primary-200 dark:bg-darkPrimary-700"></div>

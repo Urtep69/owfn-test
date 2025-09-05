@@ -1,3 +1,4 @@
+
 export const zh = {
     // Navigation
     home: `首页`,
@@ -293,6 +294,7 @@ export const zh = {
     faq_q1: `OWFN 是什么？`,
     faq_a1: `OWFN（官方世界家庭网络）是一个基于 Solana 的代币，旨在通过区块链技术将全球家庭团结起来，重点关注社会影响、教育、健康和人道主义援助，并实现完全透明。`,
     faq_q2: `如何购买 OWFN 代币？`,
+
     faq_a2: `您可以直接通过我们网站“预售”部分提供的链接参与 OWFN 代币预售。请确保您的钱包中有 SOL（Solana）以进行购买。`,
     faq_q3: `OWFN 代币的总供应量是多少？`,
     faq_a3: `OWFN 代币的总供应量为 18,000,000,000（180亿）OWFN。`,
