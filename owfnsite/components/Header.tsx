@@ -83,7 +83,7 @@ const NavDropdown = ({ group, closeMobileMenu }: { group: { labelKey: string, li
                 <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
             {isOpen && (
-                <div className="md:absolute md:top-full md:left-0 mt-2 md:w-48 bg-surface border border-border rounded-lg md:shadow-lg animate-fade-in-up" style={{animationDuration: '150ms'}}>
+                <div className="md:absolute md:top-full md:left-0 md:w-48 bg-surface border border-border rounded-lg md:shadow-lg animate-fade-in-up" style={{animationDuration: '150ms'}}>
                     <div className="flex flex-col md:p-2">
                         {group.links.map(link => (
                             <NavLink key={link.to} to={link.to} label={t(link.labelKey)} onClick={closeMobileMenu} />
