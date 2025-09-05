@@ -16,3 +16,19 @@ export const formatNumber = (num: number): string => {
 
     return num.toLocaleString(undefined, options);
 };
+
+export const getFlagEmoji = (countryCode: string): string => {
+  if (!countryCode || countryCode.length !== 2) {
+    return '🌍'; // Default globe emoji for invalid codes
+  }
+  try {
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt(0));
+    return String.fromCodePoint(...codePoints);
+  } catch (error) {
+    console.error("Failed to get flag emoji for:", countryCode, error);
+    return '🌍';
+  }
+};

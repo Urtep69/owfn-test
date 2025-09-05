@@ -1,9 +1,10 @@
 
+
 import React from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { CaseCard } from '../components/CaseCard.tsx';
-import { ArrowLeft, HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
+import { ArrowLeft, HeartHandshake, BookOpen, HomeIcon, Building, Users, Activity, UtensilsCrossed, Hammer } from 'lucide-react';
 
 const categoryDetails: { [key: string]: { icon: React.ReactNode, titleKey: string, descKey: string } } = {
     'Health': {
@@ -20,6 +21,31 @@ const categoryDetails: { [key: string]: { icon: React.ReactNode, titleKey: strin
         icon: <HomeIcon className="w-12 h-12 text-accent-600 dark:text-darkAccent-600" />,
         titleKey: 'about_impact_needs_title',
         descKey: 'about_impact_needs_desc'
+    },
+    'Modernization': {
+        icon: <Building className="w-12 h-12 text-blue-500 dark:text-blue-400" />,
+        titleKey: 'category_modernization',
+        descKey: 'category_modernization_desc'
+    },
+    'Social Support': {
+        icon: <Users className="w-12 h-12 text-purple-500 dark:text-purple-400" />,
+        titleKey: 'category_social_support',
+        descKey: 'category_social_support_desc'
+    },
+    'Hospital & Surgery': {
+        icon: <Activity className="w-12 h-12 text-red-500 dark:text-red-400" />,
+        titleKey: 'category_hospital_surgery',
+        descKey: 'category_hospital_surgery_desc'
+    },
+    'Food & Clothing Aid': {
+        icon: <UtensilsCrossed className="w-12 h-12 text-orange-500 dark:text-orange-400" />,
+        titleKey: 'category_food_clothing',
+        descKey: 'category_food_clothing_desc'
+    },
+    'House Construction': {
+        icon: <Hammer className="w-12 h-12 text-yellow-600 dark:text-yellow-500" />,
+        titleKey: 'category_house_construction',
+        descKey: 'category_house_construction_desc'
     }
 };
 
