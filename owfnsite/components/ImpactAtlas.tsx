@@ -88,12 +88,39 @@ export const ImpactAtlasComponent = () => {
                             <div 
                                 className="absolute inset-0 rounded-full"
                                 style={{
+                                    // A base deep space blue for the ocean, visible at the edges
+                                    background: '#1a3a5b',
+                                    // Layered gradients for continents, clouds, and ocean depth
                                     backgroundImage: `
-                                        radial-gradient(circle at 20% 20%, #58a6f033, transparent 40%),
-                                        radial-gradient(circle at 80% 70%, #387fc033, transparent 40%),
-                                        radial-gradient(circle at 50% 90%, #60b0ff33, transparent 50%)
+                                        /* Clouds Layer 1 (wispy) */
+                                        radial-gradient(ellipse at 15% 80%, #ffffff20 0%, transparent 40%),
+                                        radial-gradient(ellipse at 70% 20%, #ffffff25 0%, transparent 35%),
+                                        
+                                        /* Continents (Americas) */
+                                        radial-gradient(ellipse at 35% 65%, #6a9a6a 5%, #8aaA8a 15%, transparent 35%),
+                                        radial-gradient(ellipse at 30% 35%, #7baba7 10%, #9bc19b 20%, transparent 45%),
+                                        
+                                        /* Continents (Afro-Eurasia) */
+                                        radial-gradient(ellipse at 70% 50%, #c9b38e 12%, #e9d3ae 22%, transparent 40%),
+                                        radial-gradient(ellipse at 80% 30%, #7baba7 18%, #9bc19b 28%, transparent 55%),
+                                        
+                                        /* Australia & Islands */
+                                        radial-gradient(ellipse at 85% 80%, #c9b38e 6%, #e9d3ae 12%, transparent 25%),
+                                        
+                                        /* Clouds Layer 2 (denser patches) */
+                                        radial-gradient(circle at 50% 20%, #ffffff30 0%, transparent 20%),
+                                        radial-gradient(circle at 80% 90%, #ffffff25 0%, transparent 15%),
+
+                                        /* Ocean Water with sun reflection */
+                                        radial-gradient(circle at 50% 50%, #80b4e4, #366591 60%, #1e4262 100%)
                                     `,
-                                    boxShadow: 'inset 0 0 80px 20px #0c0a09, 0 0 20px -5px #60b0ff'
+                                    // Enhanced 3D effect with inner shadow for night side and outer glow for atmosphere
+                                    boxShadow: `
+                                        inset 10px 0 80px 20px #0c0a09, 
+                                        inset -2px 0 15px 5px #000000cc,
+                                        0 0 40px -5px #a0d0ff,
+                                        0 0 80px -20px #ffffff88
+                                    `
                                 }}
                             ></div>
                             
