@@ -69,6 +69,47 @@ export const ImpactAtlasComponent = () => {
         if (ecosystemHealth > 25) return { text: t('calm'), color: 'text-yellow-400' };
         return { text: 'Quiet', color: 'text-blue-400' };
     }, [ecosystemHealth, t]);
+    
+    const globeStyles: React.CSSProperties = {
+        width: `${GLOBE_RADIUS * 2}px`,
+        height: `${GLOBE_RADIUS * 2}px`,
+        backgroundImage: `
+            /* SPECULAR HIGHLIGHT */
+            radial-gradient(circle at 40% 35%, #fff 0%, #fff0 8%),
+            
+            /* CLOUDS */
+            radial-gradient(ellipse at 15% 20%, #fff8 0%, #fff0 25%),
+            radial-gradient(ellipse at 25% 75%, #fff6 0%, #fff0 20%),
+            radial-gradient(ellipse at 80% 85%, #fff5 0%, #fff0 15%),
+            radial-gradient(ellipse at 70% 20%, #fff6 0%, #fff0 20%),
+            
+            /* LANDMASSES - MORE DETAILED */
+            /* South America */
+            radial-gradient(ellipse at 30% 70%, #2a9d8f 10%, #26465300 40%),
+            /* North America */
+            radial-gradient(ellipse at 25% 40%, #8ab17d 20%, #26465300 50%),
+            /* Africa */
+            radial-gradient(ellipse at 55% 55%, #e9c46a 15%, #f4a261 25%, #26465300 45%),
+            radial-gradient(ellipse at 53% 65%, #2a9d8f 10%, #26465300 30%),
+            /* Europe/Asia */
+            radial-gradient(ellipse at 70% 30%, #a3b18a 25%, #26465300 55%),
+            /* Australia */
+            radial-gradient(ellipse at 85% 75%, #e76f51 8%, #26465300 25%),
+            
+            /* POLAR ICE CAPS */
+            radial-gradient(ellipse at 50% 98%, #fff 2%, #fff0 20%),
+            radial-gradient(ellipse at 50% 2%, #fff 3%, #fff0 25%),
+            
+            /* OCEAN BASE */
+            radial-gradient(circle at 50% 50%, #0077b6, #023e8a 80%, #001d3d 100%)
+        `,
+        boxShadow: `
+            inset 20px 0 50px 10px #03045e, 
+            inset -10px 0 20px 5px #000,
+            0 0 80px -20px #48cae4,
+            0 0 120px -30px #ade8f4
+        `
+    };
 
     return (
         <div className="relative bg-darkPrimary-950 p-4 rounded-2xl shadow-3d-lg overflow-hidden">
@@ -87,48 +128,7 @@ export const ImpactAtlasComponent = () => {
                         >
                             <div 
                                 className="absolute inset-0 rounded-full"
-                                style={{
-                                    background: '#001d3d', // Deep space
-                                    backgroundImage: `
-                                        /* Sun glint */
-                                        radial-gradient(circle at 40% 40%, #ffffff66 0%, #ffffff00 10%),
-                                        
-                                        /* Clouds Layer 1 */
-                                        radial-gradient(ellipse at 20% 80%, #ffffff22 0%, transparent 40%),
-                                        radial-gradient(ellipse at 75% 25%, #ffffff28 0%, transparent 35%),
-
-                                        /* Ice Caps */
-                                        radial-gradient(ellipse at 50% 5%, #ffffff 2%, #f0f8ff 8%, transparent 25%),
-                                        radial-gradient(ellipse at 50% 95%, #ffffff 5%, #f0f8ff 15%, transparent 35%),
-                                        
-                                        /* Clouds Layer 2 */
-                                        radial-gradient(circle at 55% 55%, #ffffff33 0%, transparent 20%),
-                                        
-                                        /* Continents (Green & Desert) */
-                                        /* South America (Green) */
-                                        radial-gradient(ellipse at 35% 70%, #228B22 8%, #55a630 18%, transparent 35%),
-                                        /* North America (Mixed) */
-                                        radial-gradient(ellipse at 25% 35%, #80b918 10%, #55a630 20%, transparent 40%),
-                                        radial-gradient(ellipse at 20% 50%, #c9b38e 5%, transparent 20%),
-                                        /* Africa (Desert & Green) */
-                                        radial-gradient(ellipse at 65% 35%, #e76f51 5%, #f4a261 15%, transparent 30%),
-                                        radial-gradient(ellipse at 60% 55%, #228B22 10%, #55a630 20%, transparent 40%),
-                                        /* Europe/Asia (Mixed) */
-                                        radial-gradient(ellipse at 75% 25%, #80b918 15%, #55a630 25%, transparent 50%),
-                                        radial-gradient(ellipse at 85% 45%, #f4a261 8%, transparent 25%),
-                                        /* Australia (Desert) */
-                                        radial-gradient(ellipse at 85% 75%, #e76f51 5%, #f4a261 10%, transparent 20%),
-                                        
-                                        /* Ocean Base */
-                                        radial-gradient(circle at 50% 50%, #0077b6, #023e8a 70%, #001d3d 100%)
-                                    `,
-                                    boxShadow: `
-                                        inset 20px 0 80px 20px #03071e, 
-                                        inset -5px 0 15px 5px #000000,
-                                        0 0 50px -10px #60a5fa,
-                                        0 0 100px -20px #ffffffaa
-                                    `
-                                }}
+                                style={globeStyles}
                             ></div>
                             
                             {projects.map(p => {
