@@ -89,7 +89,7 @@ export default function Whitepaper() {
                     <DetailItem label={t('wallet_name_marketing')} value={<AddressDisplay address={DISTRIBUTION_WALLETS.marketing} />} />
                     <DetailItem label={t('wallet_name_advisors')} value={<AddressDisplay address={DISTRIBUTION_WALLETS.advisors} />} />
                 </div>
-            </section>
+            </Section>
 
             <Section title={t('roadmap_title')} icon={<MapIcon />}>
                 <div className="relative border-l-2 border-border ml-4 pl-8 space-y-8">

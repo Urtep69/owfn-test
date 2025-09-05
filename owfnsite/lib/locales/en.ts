@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -318,8 +317,6 @@ export const en = {
     faq_q13: 'Why is there a maximum purchase limit (Max Buy) in the presale?',
     faq_a13: 'The maximum purchase limit is an important measure to ensure the fairest possible distribution of tokens and to prevent a small number of large investors ("whales") from controlling a significant portion of the supply. This promotes a healthier and more decentralized community in the long run.',
     faq_q14: 'What does it mean that the token is "Interest-Bearing" with 2% APY? How does it work?',
-    faq_a14: 'It means the OWFN token is programmed to automatically generate interest. Just by holding the tokens in your Solana-compatible wallet, the amount of your tokens will increase over time, with a 2% Annual Percentage Yield (APY). You do not need to stake them or take any additional action; the rewards accumulate automatically.',
-    faq_q15: 'What is the 0.5% transfer fee and when will it be activated?',
     faq_a15: 'This fee is a key mechanism for the long-term funding of our mission. A 0.5% fee will apply to all transactions with the OWFN token *after* the presale period concludes. The funds collected from this fee are automatically directed to the Impact Treasury to continuously fund our social projects. Thus, every transaction contributes to the common good.',
     faq_q16: 'Why did you choose the Solana blockchain for this project?',
     faq_a16: 'We chose Solana for its exceptional speed, very low transaction costs, and high scalability. These features are essential for a global project like ours, allowing for efficient micro-transactions and ensuring a fast and accessible experience for all users, whether they are donating, buying, or trading tokens.',
@@ -462,8 +459,6 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
-    airdrop_info_box_title: `About this Airdrop`,
-    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -573,7 +568,7 @@ export const en = {
     contact_social_telegram_channel_title: `Telegram Channel`,
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
-    contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
+    contact_social_telegram_group_desc: `Join our community group to discuss and interact with other members.`,
     contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
     send_direct_message: `Send a Direct Message`,

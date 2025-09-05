@@ -1,28 +1,97 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useRoute } from 'wouter';
-import { LogOut, Loader2, Copy, Check, ExternalLink, X, Menu, Repeat } from 'lucide-react';
+import { LogOut, Loader2, Copy, Check, ExternalLink, X, Menu, Repeat, ChevronDown } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
 
-const navLinks = [
-    { to: '/', labelKey: 'home' },
-    { to: '/presale', labelKey: 'presale' },
-    { to: '/dashboard', labelKey: 'dashboard' },
-    { to: '/donations', labelKey: 'donations' },
-    { to: '/about', labelKey: 'about' },
-    { to: '/impact', labelKey: 'impact_portal' },
+const navStructure = [
+    { labelKey: 'home', to: '/' },
+    { labelKey: 'presale', to: '/presale' },
+    {
+      labelKey: 'sidebar_explore',
+      links: [
+        { to: '/about', labelKey: 'about' },
+        { to: '/whitepaper', labelKey: 'whitepaper' },
+        { to: '/tokenomics', labelKey: 'tokenomics' },
+        { to: '/roadmap', labelKey: 'roadmap' },
+        { to: '/partnerships', labelKey: 'partnerships' },
+        { to: '/faq', labelKey: 'faq' },
+        { to: '/contact', labelKey: 'contact' },
+      ]
+    },
+    {
+      labelKey: 'sidebar_finance',
+      links: [
+        { to: '/dashboard', labelKey: 'dashboard' },
+        { to: '/staking', labelKey: 'staking' },
+        { to: '/vesting', labelKey: 'vesting' },
+        { to: '/airdrop', labelKey: 'airdrop' },
+      ]
+    },
+    {
+      labelKey: 'sidebar_engage',
+      links: [
+        { to: '/donations', labelKey: 'donations' },
+        { to: '/impact', labelKey: 'impact_portal' },
+        { to: '/governance', labelKey: 'governance' },
+      ]
+    }
 ];
 
-const NavLink = ({ to, label, onClick }: { to: string, label: string, onClick: () => void }) => {
+
+const NavLink = ({ to, label, onClick, className = '' }: { to: string, label: string, onClick?: () => void, className?: string }) => {
     const [isActive] = useRoute(to);
     return (
         <Link to={to} onClick={onClick}>
-            <a className={`px-3 py-2 text-sm font-semibold rounded-md transition-colors ${isActive ? 'text-text-primary bg-surface' : 'text-text-secondary hover:text-text-primary'}`}>
+            <a className={`px-3 py-2 text-sm font-semibold rounded-md transition-colors ${isActive ? 'text-text-primary bg-surface' : 'text-text-secondary hover:text-text-primary'} ${className}`}>
                 {label}
             </a>
         </Link>
+    );
+};
+
+const NavDropdown = ({ group, closeMobileMenu }: { group: { labelKey: string, links: { to: string, labelKey: string }[] }, closeMobileMenu: () => void }) => {
+    const { t } = useAppContext();
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const [isMobile] = useState(() => window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+    
+    return (
+        <div 
+            ref={dropdownRef}
+            className="relative" 
+            onMouseEnter={!isMobile ? () => setIsOpen(true) : undefined}
+            onMouseLeave={!isMobile ? () => setIsOpen(false) : undefined}
+        >
+            <button
+                onClick={() => setIsOpen(prev => !prev)}
+                className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-text-secondary hover:text-text-primary transition-colors"
+            >
+                {t(group.labelKey)}
+                <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isOpen && (
+                <div className="md:absolute md:top-full md:left-0 mt-2 md:w-48 bg-surface border border-border rounded-lg md:shadow-lg animate-fade-in-up" style={{animationDuration: '150ms'}}>
+                    <div className="flex flex-col md:p-2">
+                        {group.links.map(link => (
+                            <NavLink key={link.to} to={link.to} label={t(link.labelKey)} onClick={closeMobileMenu} />
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 
@@ -147,8 +216,14 @@ export const Header = () => {
                     </div>
 
                     {/* Center: Desktop Navigation */}
-                    <nav className="hidden md:flex items-center space-x-2">
-                        {navLinks.map(link => <NavLink key={link.to} to={link.to} label={t(link.labelKey)} onClick={closeMobileMenu} />)}
+                    <nav className="hidden md:flex items-center space-x-1">
+                        {navStructure.map(item =>
+                            'to' in item ? (
+                                <NavLink key={item.to} to={item.to} label={t(item.labelKey)} />
+                            ) : (
+                                <NavDropdown key={item.labelKey} group={item} closeMobileMenu={closeMobileMenu} />
+                            )
+                        )}
                     </nav>
 
                     {/* Right side: Actions */}
@@ -168,7 +243,13 @@ export const Header = () => {
             {isMobileMenuOpen && (
                  <div className="md:hidden bg-surface border-t border-border animate-fade-in-up" style={{animationDuration: '200ms'}}>
                     <nav className="flex flex-col space-y-2 p-4">
-                        {navLinks.map(link => <NavLink key={link.to} to={link.to} label={t(link.labelKey)} onClick={closeMobileMenu} />)}
+                        {navStructure.map(item =>
+                            'to' in item ? (
+                                <NavLink key={item.to} to={item.to} label={t(item.labelKey)} onClick={closeMobileMenu} />
+                            ) : (
+                                <NavDropdown key={item.labelKey} group={item} closeMobileMenu={closeMobileMenu} />
+                            )
+                        )}
                     </nav>
                 </div>
             )}
