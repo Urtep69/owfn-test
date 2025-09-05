@@ -1,4 +1,3 @@
-
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
 import React from 'react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
@@ -85,7 +84,47 @@ export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
 ];
 
-export const INITIAL_SOCIAL_CASES: SocialCase[] = [];
+export const INITIAL_SOCIAL_CASES: SocialCase[] = [
+  {
+    id: 'case-1',
+    title: { en: 'Hospital Modernization in Rural Africa', ro: 'Modernizarea Spitalului în Africa Rurală' },
+    description: { en: 'Providing modern medical equipment and renovating facilities for a community hospital.', ro: 'Furnizarea de echipamente medicale moderne și renovarea facilităților pentru un spital comunitar.' },
+    details: { en: 'This project aims to equip the main operating theater with new surgical tools, replace outdated diagnostic equipment, and improve the sanitation systems to provide better healthcare for over 50,000 people in the region.', ro: 'Acest proiect urmărește dotarea sălii principale de operație cu instrumentar chirurgical nou, înlocuirea echipamentelor de diagnosticare învechite și îmbunătățirea sistemelor de salubritate pentru a oferi asistență medicală mai bună pentru peste 50.000 de persoane din regiune.' },
+    category: 'Health',
+    imageUrl: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&auto=format&fit=crop',
+    goal: 75000,
+    donated: 32000,
+    lat: 5.6037, // Accra, Ghana
+    lng: -0.1870,
+    status: 'urgent-active',
+  },
+  {
+    id: 'case-2',
+    title: { en: 'Build a School in Southeast Asia', ro: 'Construirea unei Școli în Asia de Sud-Est' },
+    description: { en: 'Constructing a new primary school building to provide education for 200 children.', ro: 'Construirea unei noi clădiri de școală primară pentru a oferi educație pentru 200 de copii.' },
+    details: { en: 'The current school is a temporary structure that is unsafe during the rainy season. This project will build a permanent, earthquake-resistant building with 5 classrooms, a library, and proper sanitation facilities, giving children a safe space to learn and grow.', ro: 'Școala actuală este o structură temporară, nesigură în timpul sezonului ploios. Acest proiect va construi o clădire permanentă, rezistentă la cutremure, cu 5 săli de clasă, o bibliotecă și facilități sanitare adecvate, oferind copiilor un spațiu sigur pentru a învăța și a se dezvolta.' },
+    category: 'Education',
+    imageUrl: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800&auto=format&fit=crop',
+    goal: 50000,
+    donated: 45000,
+    lat: 13.7563, // Bangkok, Thailand
+    lng: 100.5018,
+    status: 'active',
+  },
+  {
+    id: 'case-3',
+    title: { en: 'Clean Water Initiative in South America', ro: 'Inițiativă pentru Apă Curată în America de Sud' },
+    description: { en: 'Installation of water purification systems for a remote village.', ro: 'Instalarea de sisteme de purificare a apei pentru un sat izolat.' },
+    details: { en: 'This village currently relies on a contaminated river for their water supply, leading to widespread illness. We will install three high-capacity water filters and train local community members on their maintenance, providing a sustainable source of clean drinking water.', ro: 'Acest sat se bazează în prezent pe un râu contaminat pentru aprovizionarea cu apă, ceea ce duce la îmbolnăviri pe scară largă. Vom instala trei filtre de apă de mare capacitate și vom instrui membrii comunității locale cu privire la întreținerea acestora, oferind o sursă durabilă de apă potabilă curată.' },
+    category: 'Basic Needs',
+    imageUrl: 'https://images.unsplash.com/photo-1599395123999-98096a77a6f2?q=80&w=800&auto=format&fit=crop',
+    goal: 25000,
+    donated: 25000,
+    lat: -12.0464, // Lima, Peru
+    lng: -77.0428,
+    status: 'completed',
+  },
+];
 
 export const KNOWN_TOKEN_MINT_ADDRESSES: { [key: string]: string } = {
   OWFN: 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B',
