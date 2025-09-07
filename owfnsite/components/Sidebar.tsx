@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
@@ -84,8 +85,8 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     ];
 
     return (
-        <aside className={`fixed top-0 left-0 h-full bg-primary-100/80 dark:bg-darkPrimary-800/80 backdrop-blur-lg border-r border-primary-200/80 dark:border-darkPrimary-700/80 z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-             <div className="flex items-center justify-between h-16 px-4 border-b border-primary-200/80 dark:border-darkPrimary-700/80 flex-shrink-0">
+        <aside className={`fixed top-0 left-0 h-full bg-primary-50 dark:bg-darkPrimary-800 shadow-lg z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+             <div className="flex items-center justify-between h-16 px-4 border-b border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
                 <Link to="/" onClick={handleLinkClick} className={`flex items-center space-x-3 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
                     <OwfnIcon className="h-9 w-9" />
                     <span className={`font-bold text-xl text-primary-900 dark:text-darkPrimary-100 ${isOpen ? 'inline' : 'hidden'}`}>OWFN</span>
@@ -113,7 +114,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 )}
             </nav>
             
-            <div className="px-2 py-4 border-t border-primary-200/80 dark:border-darkPrimary-700/80 flex-shrink-0">
+            <div className="px-2 py-4 border-t border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
                  <NavItem to="/profile" icon={<User size={20} />} label={t('profile')} isOpen={isOpen} onClick={handleLinkClick} />
             </div>
         </aside>

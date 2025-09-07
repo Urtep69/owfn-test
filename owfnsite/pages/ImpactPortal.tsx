@@ -1,11 +1,54 @@
-import React, { useState } from 'react';
-import { Link } from 'wouter';
+import React, { useState, useMemo } from 'react';
+import { Link, useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { SocialCase } from '../types.ts';
-import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import { ADMIN_WALLET_ADDRESS, SUPPORTED_LANGUAGES } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
-import { SUPPORTED_LANGUAGES } from '../constants.ts';
-import { HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
+import { Globe, HeartHandshake, BookOpen, HomeIcon, Image as ImageIcon, Sparkles, Loader2 } from 'lucide-react';
+import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
+import { CaseCard } from '../components/CaseCard.tsx';
+
+const WORLD_MAP_GEODATA_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+
+const WorldImpactMap = ({ cases }: { cases: SocialCase[] }) => {
+    const { t } = useAppContext();
+    const [, navigate] = useLocation();
+
+    return (
+        <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d-lg border border-primary-200 dark:border-darkPrimary-700 h-[500px]">
+            <ComposableMap projectionConfig={{ scale: 180, center: [10, 20] }}>
+                <Geographies geography={WORLD_MAP_GEODATA_URL}>
+                    {({ geographies }) =>
+                        geographies.map((geo) => (
+                            <Geography
+                                key={geo.rsmKey}
+                                geography={geo}
+                                className="fill-primary-200 dark:fill-darkPrimary-700 stroke-primary-100 dark:stroke-darkPrimary-800"
+                                style={{
+                                    default: { outline: 'none' },
+                                    hover: { outline: 'none' },
+                                    pressed: { outline: 'none' },
+                                }}
+                            />
+                        ))
+                    }
+                </Geographies>
+                {cases.map((socialCase) => (
+                    <Marker key={socialCase.id} coordinates={socialCase.coordinates}>
+                        <g
+                            className="cursor-pointer group"
+                            onClick={() => navigate(`/impact/case/${socialCase.id}`)}
+                        >
+                            <circle r={8} className="fill-accent-500 dark:fill-darkAccent-500 opacity-70 group-hover:opacity-100 transition-opacity" />
+                            <circle r={8} className="stroke-accent-400 dark:stroke-darkAccent-400 animate-ping" />
+                        </g>
+                    </Marker>
+                ))}
+            </ComposableMap>
+        </div>
+    );
+};
+
 
 const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }) => {
     const { t } = useAppContext();
@@ -16,6 +59,34 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
     const [category, setCategory] = useState('Health');
     const [goal, setGoal] = useState('');
     const [isTranslating, setIsTranslating] = useState(false);
+    const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+
+    const handleGenerateImage = async () => {
+        if (!title.trim() || !description.trim()) {
+            alert("Please enter a title and description first to generate a relevant image.");
+            return;
+        }
+        setIsGeneratingImage(true);
+        try {
+            const prompt = `A social impact project for ${category}: ${title}. ${description}`;
+            const response = await fetch('/api/generate-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt }),
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                setImageUrl(`data:image/jpeg;base64,${data.base64Image}`);
+            } else {
+                throw new Error(data.error || "Failed to generate image.");
+            }
+        } catch (error) {
+            console.error("Image generation failed:", error);
+            alert(`Image generation failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+        } finally {
+            setIsGeneratingImage(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -45,6 +116,7 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
                 imageUrl: imageUrl || `https://picsum.photos/seed/${Date.now()}/400/300`,
                 goal: parseFloat(goal),
                 donated: 0,
+                coordinates: [0,0] // Placeholder, should be set by admin
             };
             
             languagesToTranslate.forEach((lang, index) => {
@@ -78,7 +150,16 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
                 <input type="text" placeholder={t('case_title')} value={title} onChange={e => setTitle(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
                 <textarea placeholder={t('case_description')} value={description} onChange={e => setDescription(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md h-32"></textarea>
                 <textarea placeholder={t('case_details')} value={details} onChange={e => setDetails(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md h-24"></textarea>
-                <input type="text" placeholder={t('image_url')} value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
+                
+                 <div className="relative">
+                    <input type="text" placeholder={t('image_url')} value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md pr-40" />
+                    <button type="button" onClick={handleGenerateImage} disabled={isGeneratingImage} className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-accent-500 text-white text-xs font-bold py-1.5 px-3 rounded-md hover:bg-accent-600 disabled:opacity-50">
+                        {isGeneratingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                        Generate with AI
+                    </button>
+                </div>
+                {imageUrl && <img src={imageUrl} alt="Preview" className="w-full h-auto rounded-md max-h-48 object-cover"/>}
+
                 <div className="grid grid-cols-2 gap-4">
                     <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md">
                         <option value="Health">{t('category_health')}</option>
@@ -99,53 +180,46 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
 export default function ImpactPortal() {
     const { t, solana, socialCases, addSocialCase } = useAppContext();
     const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
+    const [activeCategory, setActiveCategory] = useState('All');
     
-    const categories = [
-        { 
-            name: 'Health',
-            icon: <HeartHandshake className="mx-auto text-accent-500 dark:text-darkAccent-400 w-12 h-12 mb-4" />,
-            titleKey: 'about_impact_health_title',
-            descKey: 'about_impact_health_desc',
-            casesCount: socialCases.filter(c => c.category === 'Health').length
-        },
-        { 
-            name: 'Education',
-            icon: <BookOpen className="mx-auto text-accent-500 dark:text-darkAccent-500 w-12 h-12 mb-4" />,
-            titleKey: 'about_impact_education_title',
-            descKey: 'about_impact_education_desc',
-            casesCount: socialCases.filter(c => c.category === 'Education').length
-        },
-        { 
-            name: 'Basic Needs',
-            icon: <HomeIcon className="mx-auto text-accent-600 dark:text-darkAccent-600 w-12 h-12 mb-4" />,
-            titleKey: 'about_impact_needs_title',
-            descKey: 'about_impact_needs_desc',
-            casesCount: socialCases.filter(c => c.category === 'Basic Needs').length
-        }
-    ];
+    const categories = ['All', 'Health', 'Education', 'Basic Needs'];
+
+    const filteredCases = useMemo(() => {
+        if (activeCategory === 'All') return socialCases;
+        return socialCases.filter(c => c.category === activeCategory);
+    }, [socialCases, activeCategory]);
 
     return (
-        <div className="animate-fade-in-up space-y-8">
+        <div className="animate-fade-in-up space-y-12">
             <div className="text-center">
-                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('about_impact_areas_title')}</h1>
+                <Globe className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
+                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('impact_portal')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">
                     {t('social_cases_desc')}
                 </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-                {categories.map(category => (
-                    <Link 
-                        key={category.name}
-                        href={`/impact/category/${category.name.toLowerCase().replace(' ', '-')}`}
-                    >
-                       <a className="block text-center p-8 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d hover:shadow-3d-lg hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent-500">
-                            {category.icon}
-                            <h2 className="text-2xl font-bold">{t(category.titleKey)}</h2>
-                            <p className="text-primary-600 dark:text-darkPrimary-400 mt-2">{t(category.descKey)}</p>
-                       </a>
-                    </Link>
-                ))}
+            <WorldImpactMap cases={socialCases} />
+            
+            <div>
+                 <div className="flex justify-center flex-wrap gap-2 mb-8">
+                    {categories.map(cat => (
+                        <button
+                            key={cat}
+                            onClick={() => setActiveCategory(cat)}
+                            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-200 ${
+                                activeCategory === cat
+                                    ? 'bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950'
+                                    : 'bg-primary-100 text-primary-700 hover:bg-primary-200 dark:bg-darkPrimary-700 dark:text-darkPrimary-300 dark:hover:bg-darkPrimary-600'
+                            }`}
+                        >
+                            {cat === 'All' ? cat : t(`category_${cat.toLowerCase().replace(' ', '_')}`)}
+                        </button>
+                    ))}
+                </div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredCases.map(c => <CaseCard key={c.id} socialCase={c} />)}
+                </div>
             </div>
 
             {isAdmin && <AdminPortal onAddCase={addSocialCase} />}
