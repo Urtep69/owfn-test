@@ -1,4 +1,3 @@
-
 export const it = {
     // Navigation
     home: `Home`,
@@ -227,6 +226,7 @@ export const it = {
     badge_diverse_donor: `Donatore Diverso`,
     badge_diverse_donor_desc: `Conferito per aver donato a progetti in 3 diverse categorie.`,
     asset: `Asset`,
+    balance: `Saldo`,
     value_usd: `Valore (USD)`,
 
     // Impact Portal
@@ -317,7 +317,7 @@ export const it = {
     faq_a12: `Secondo la nostra Roadmap, dopo la conclusione positiva della prevendita, procederemo con la quotazione ufficiale del token $OWFN sugli scambi decentralizzati (DEX) all'interno dell'ecosistema di Solana. La data esatta e le piattaforme saranno annunciate sui nostri canali ufficiali.`,
     faq_q13: `Perché c'è un limite massimo di acquisto (Max Buy) nella prevendita?`,
     faq_a13: `Il limite massimo di acquisto è una misura importante per garantire una distribuzione dei token il più equa possibile e per impedire che un piccolo numero di grandi investitori ("balene") controlli una parte significativa dell'offerta. Ciò promuove una comunità più sana e decentralizzata a lungo termine.`,
-    faq_q14: `Cosa significa che il token è "portatore di interessi" con un APY del 2%? Come funziona?`,
+    faq_q14: `Cosa significa che il token è "portatore di interessi" (Interest-Bearing) con 2% APY? Come funziona?`,
     faq_a15: `Questa commissione è un meccanismo chiave per il finanziamento a lungo termine della nostra missione. Una commissione dello 0,5% si applicherà a tutte le transazioni con il token OWFN *dopo* la conclusione del periodo di prevendita. I fondi raccolti da questa commissione vengono automaticamente indirizzati al Tesoro dell'Impatto per finanziare continuamente i nostri progetti sociali. Pertanto, ogni transazione contribuisce al bene comune.`,
     faq_q16: `Perché avete scelto la blockchain di Solana per questo progetto?`,
     faq_a16: `Abbiamo scelto Solana per la sua eccezionale velocità, i costi di transazione molto bassi e l'alta scalabilità. Queste caratteristiche sono essenziali per un progetto globale come il nostro, consentendo micro-transazioni efficienti e garantendo un'esperienza rapida e accessibile a tutti gli utenti, che si tratti di donare, acquistare o scambiare token.`,
@@ -411,7 +411,6 @@ export const it = {
     my_staked_balance: `Il Mio Saldo in Staking`,
     stake: `Staking`,
     unstake: `Unstake`,
-    balance: `Saldo`,
     stake_owfn: `Staking di OWFN`,
     unstake_owfn: `Unstake di OWFN`,
     my_rewards: `Le Mie Ricompense`,

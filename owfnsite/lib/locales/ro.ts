@@ -172,7 +172,7 @@ export const ro = {
     just_now: `Chiar acum`,
     presale_you_contributed: `Ați contribuit deja cu: {amount} SOL.`,
     presale_you_can_buy: `Puteți contribui cu până la încă {amount} SOL.`,
-    presale_bonus_offer: `BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!`,
+    presale_tiered_bonus_title: `Oferte Bonus pe Niveluri`,
     presale_checking_contribution: `Se verifică contribuția...`,
 
     // Donations Page
@@ -182,7 +182,7 @@ export const ro = {
     donation_message_p1: `Dincolo de cod și de blockchain, se află adevărata noastră misiune: umanitatea. Fiecare tranzacție de pe această pagină este mai mult decât un simplu transfer de valoare; este o mână de ajutor întinsă peste continente, un semnal că nimănui nu trebuie să-i fie teamă că a fost uitat.`,
     donation_message_p2_part1: `Contribuția ta, indiferent de criptomoneda aleasă, se transformă. Devine fundația unei noi școli, un adăpost sigur unde potențialul unui copil poate înflori. Se transformă în îngrijire medicală vitală pentru o familie care își pierduse orice speranță. Devine o masă caldă pentru cineva marginalizat de societate, o casă demnă pentru un bătrân sau materialele necesare pentru a reconstrui o comunitate devastată de un dezastru. Prin transparența oferită de blockchain-ul Solana, `,
     donation_message_p2_project_name: `Official World Family Network`,
-    donation_message_p2_part2: ` se asigură că generozitatea ta ajunge la destinație cu integritate și scop.`,
+    donation_message_p2_part2: `ensures your generosity reaches its destination with integrity and purpose.`,
     donation_message_p3: `Contribuția ta, indiferent de mărime, este o declarație puternică de solidaritate. Este dovada că o familie globală, unită de compasiune, poate schimba lumea. Nu faci doar o donație; te alături unei mișcări dedicate construirii unui viitor mai bun.`,
     donation_message_thanks: `Pentru acest lucru, îți suntem profund recunoscători.`,
     donation_solana_warning: `IMPORTANT: Donațiile în USDC și USDT sunt acceptate momentan DOAR din rețeaua Solana. Nu trimiteți din altă rețea (de ex. Ethereum), deoarece tokenii se vor pierde și nu vor ajunge ca donație.`,
@@ -227,6 +227,7 @@ export const ro = {
     badge_diverse_donor: `Donator Divers`,
     badge_diverse_donor_desc: `Acordat pentru donații la proiecte din 3 categorii diferite.`,
     asset: `Activ`,
+    balance: `Sold`,
     value_usd: `Valoare (USD)`,
 
     // Impact Portal
@@ -318,8 +319,6 @@ export const ro = {
     faq_q13: `De ce există o limită maximă de cumpărare (Max Buy) în prevânzare?`,
     faq_a13: `Limita maximă de cumpărare este o măsură importantă pentru a asigura o distribuție cât mai echitabilă a tokenilor și pentru a preveni ca un număr mic de investitori mari ("whales") să controleze o parte semnificativă din ofertă. Acest lucru promovează o comunitate mai sănătoasă și mai descentralizată pe termen lung.`,
     faq_q14: `Ce înseamnă că tokenul este "Purtător de Dobândă" (Interest-Bearing) cu 2% APY? Cum funcționează?`,
-    faq_a14: `Înseamnă că tokenul OWFN este programat să genereze automat o dobândă. Doar prin deținerea tokenilor în portofelul dumneavoastră compatibil cu Solana, cantitatea de tokeni va crește în timp, cu un randament procentual anual (APY) de 2%. Nu este necesar să îi puneți în staking sau să faceți vreo acțiune suplimentară; recompensele se acumulează automat.`,
-    faq_q15: `Ce este taxa de transfer de 0.5% și când se va activa?`,
     faq_a15: `Această taxă este un mecanism cheie pentru finanțarea pe termen lung a misiunii noastre. O taxă de 0.5% se va aplica tuturor tranzacțiilor cu tokenul OWFN *după* finalizarea perioadei de prevânzare. Fondurile colectate din această taxă sunt direcționate automat către Trezoreria de Impact pentru a finanța continuu proiectele noastre sociale. Astfel, fiecare tranzacție contribuie la binele comun.`,
     faq_q16: `De ce ați ales blockchain-ul Solana pentru acest proiect?`,
     faq_a16: `Am ales Solana datorită vitezei sale excepționale, costurilor de tranzacție foarte scăzute și scalabilității ridicate. Aceste caracteristici sunt esențiale pentru un proiect global ca al nostru, permițând micro-tranzacții eficiente și asigurând o experiență rapidă și accesibilă pentru toți utilizatorii, fie că donează, cumpără sau tranzacționează tokeni.`,
@@ -413,7 +412,6 @@ export const ro = {
     my_staked_balance: `Soldul Meu Depus`,
     stake: `Depune`,
     unstake: `Retrage`,
-    balance: `Sold`,
     stake_owfn: `Depune OWFN`,
     unstake_owfn: `Retrage OWFN`,
     my_rewards: `Recompensele Mele`,

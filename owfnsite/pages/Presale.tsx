@@ -419,44 +419,32 @@ export default function Presale() {
   const calculation = useMemo(() => {
     const numAmount = parseFloat(solAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
-        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
+        return { base: 0, bonus: 0, total: 0, bonusApplied: false, bonusPercentage: 0 };
     }
 
     try {
-        const LAMPORTS_PER_SOL_BIGINT = 1000000000n;
-        const owfnDecimals = BigInt(TOKEN_DETAILS.decimals);
-        const owfnDecimalsMultiplier = 10n ** owfnDecimals;
+        const baseOwfn = numAmount * PRESALE_DETAILS.rate;
+        let bonusOwfn = 0;
+        let appliedBonusPercentage = 0;
 
-        const parts = solAmount.split('.');
-        const integerPart = BigInt(parts[0] || '0');
-        const fractionalPart = (parts[1] || '').slice(0, 9).padEnd(9, '0');
-        const lamports = integerPart * LAMPORTS_PER_SOL_BIGINT + BigInt(fractionalPart);
+        // Find the applicable bonus tier. Tiers should be sorted from highest to lowest threshold.
+        const applicableTier = PRESALE_DETAILS.bonusTiers.find(tier => numAmount >= tier.threshold);
 
-        const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * LAMPORTS_PER_SOL_BIGINT;
-        
-        const baseOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
-        let bonusOwfnSmallestUnit = 0n;
-        let isBonus = false;
-
-        if (lamports >= bonusThresholdLamports) {
-            bonusOwfnSmallestUnit = (baseOwfnSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
-            isBonus = true;
+        if (applicableTier) {
+            bonusOwfn = (baseOwfn * applicableTier.percentage) / 100;
+            appliedBonusPercentage = applicableTier.percentage;
         }
 
-        const totalOwfnSmallestUnit = baseOwfnSmallestUnit + bonusOwfnSmallestUnit;
-
-        const toDisplayAmount = (amountInSmallestUnit: bigint) => Number(amountInSmallestUnit) / Number(owfnDecimalsMultiplier);
-        
         return {
-            base: toDisplayAmount(baseOwfnSmallestUnit),
-            bonus: toDisplayAmount(bonusOwfnSmallestUnit),
-            total: toDisplayAmount(totalOwfnSmallestUnit),
-            bonusApplied: isBonus,
+            base: baseOwfn,
+            bonus: bonusOwfn,
+            total: baseOwfn + bonusOwfn,
+            bonusApplied: !!applicableTier,
+            bonusPercentage: appliedBonusPercentage,
         };
     } catch (e) {
         console.error("Error calculating OWFN amount:", e);
-        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
+        return { base: 0, bonus: 0, total: 0, bonusApplied: false, bonusPercentage: 0 };
     }
   }, [solAmount]);
 
@@ -512,6 +500,12 @@ export default function Presale() {
   };
   
   const saleStartDate = PRESALE_DETAILS.startDate;
+
+  const bonusTiersDisplay = [
+      { range: "4 - 5 SOL", percentage: 30 },
+      { range: "2 - 3.99 SOL", percentage: 20 },
+      { range: "0.5 - 1.99 SOL", percentage: 10 },
+  ]
 
   return (
     <div className="bg-primary-50 dark:bg-darkPrimary-950 text-primary-700 dark:text-darkPrimary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
@@ -693,7 +687,7 @@ export default function Presale() {
                             
                             {calculation.bonusApplied && (
                                 <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
-                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> Bonus ({PRESALE_DETAILS.bonusPercentage}%)</span>
+                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> Bonus ({calculation.bonusPercentage}%)</span>
                                     <span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
                                 </div>
                             )}
@@ -717,10 +711,17 @@ export default function Presale() {
                             {buttonText}
                         </button>
 
-                         <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center">
-                            <p className="font-bold text-accent-700 dark:text-darkAccent-200 flex items-center justify-center gap-2">
-                                <Gift size={18} /> {t('presale_bonus_offer', { threshold: PRESALE_DETAILS.bonusThreshold, percentage: PRESALE_DETAILS.bonusPercentage })}
-                            </p>
+                         <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center space-y-2">
+                            <h4 className="font-bold text-accent-700 dark:text-darkAccent-200 flex items-center justify-center gap-2">
+                                <Gift size={18} /> {t('presale_tiered_bonus_title', {defaultValue: 'Tiered Bonus Offers'})}
+                            </h4>
+                            <ul className="text-sm text-accent-800 dark:text-darkAccent-300">
+                                {bonusTiersDisplay.map(tier => (
+                                    <li key={tier.percentage}>
+                                        <span className="font-semibold">{tier.range}:</span> +{tier.percentage}% Bonus
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     </div>
                     {/* Live Feed */}
