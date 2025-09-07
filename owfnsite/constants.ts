@@ -85,52 +85,7 @@ export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'tr', name: 'Turkish', flag: '🇹🇷' },
 ];
 
-export const INITIAL_SOCIAL_CASES: SocialCase[] = [
-  {
-    id: 'case-1',
-    title: { en: 'Build a New School in Rural Kenya' },
-    description: { en: 'Help us construct a new primary school for 200 children, providing them with a safe and modern learning environment.' },
-    details: { en: 'Project includes 4 classrooms, a library, and sanitation facilities. We have partnered with local builders to ensure community involvement and sustainable construction practices.' },
-    category: 'Education',
-    imageUrl: 'https://images.unsplash.com/photo-1594432213904-924a43a05445?q=80&w=1740&auto=format&fit=crop',
-    goal: 50000,
-    donated: 12500,
-    coordinates: [36.706, -1.304], // Nairobi, Kenya area
-  },
-  {
-    id: 'case-2',
-    title: { en: 'Provide Clean Water Access in a Village in India' },
-    description: { en: 'Fund the installation of a solar-powered water well and purification system to provide clean, safe drinking water for an entire community.' },
-    details: { en: 'This project will eliminate the need for women and children to walk several kilometers each day to fetch contaminated water, drastically improving health and freeing up time for education.' },
-    category: 'Basic Needs',
-    imageUrl: 'https://images.unsplash.com/photo-1598433200924-a4220cde0f13?q=80&w=1740&auto=format&fit=crop',
-    goal: 15000,
-    donated: 9800,
-    coordinates: [78.9629, 20.5937], // Central India
-  },
-  {
-    id: 'case-3',
-    title: { en: 'Fund Life-Saving Heart Surgery for a Child' },
-    description: { en: 'A young child requires urgent open-heart surgery to correct a congenital defect. Your donation can give them a chance at a healthy life.' },
-    details: { en: 'Funds will cover all medical expenses, including the surgical procedure, hospital stay, and post-operative care. We are working directly with the hospital to ensure transparency.' },
-    category: 'Health',
-    imageUrl: 'https://images.unsplash.com/photo-1582719202448-6a3a4835e54c?q=80&w=1740&auto=format&fit=crop',
-    goal: 25000,
-    donated: 24100,
-    coordinates: [-43.2096, -22.9035], // Rio de Janeiro, Brazil area
-  },
-  {
-    id: 'case-4',
-    title: { en: 'Emergency Shelter & Food for Disaster Relief' },
-    description: { en: 'Provide immediate relief to families displaced by a recent natural disaster, offering temporary shelter, food, and essential supplies.' },
-    details: { en: 'This is an ongoing emergency response. Donations are used to purchase tents, blankets, clean water, and non-perishable food items for immediate distribution by our partners on the ground.' },
-    category: 'Basic Needs',
-    imageUrl: 'https://images.unsplash.com/photo-1623948631118-a35985b5d848?q=80&w=1548&auto=format&fit=crop',
-    goal: 100000,
-    donated: 45000,
-    coordinates: [121.7740, 12.8797], // Philippines area
-  },
-];
+export const INITIAL_SOCIAL_CASES: SocialCase[] = [];
 
 export const KNOWN_TOKEN_MINT_ADDRESSES: { [key: string]: string } = {
   OWFN: 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B',

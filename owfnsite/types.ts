@@ -30,15 +30,6 @@ export interface RoadmapPhase {
   key_prefix: string;
 }
 
-export interface LiveUpdate {
-  id: string;
-  caseId: string;
-  date: string; // ISO string
-  rawNotes: string; // Admin's raw notes
-  story: Record<string, string>; // AI-generated, translated story
-  imageUrl?: string;
-}
-
 export interface SocialCase {
   id: string;
   title: Record<string, string>;
@@ -48,7 +39,6 @@ export interface SocialCase {
   goal: number;
   donated: number;
   details: Record<string, string>;
-  coordinates: [number, number]; // [longitude, latitude]
 }
 
 export interface Language {
@@ -157,12 +147,6 @@ export interface PresaleTransaction {
   solAmount: number;
   owfnAmount: number;
   time: Date;
-}
-
-export interface UserDonation {
-    signature: string;
-    amount: number;
-    timestamp: number; // Unix timestamp
 }
 
 export interface SiwsSession {
