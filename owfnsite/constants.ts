@@ -61,13 +61,10 @@ export const PRESALE_DETAILS = {
   minBuy: 0.1,
   maxBuy: 5,
   rate: 10000000,
-  bonusTiers: [
-    { threshold: 4, percentage: 30 }, // Highest tier first for easier logic
-    { threshold: 2, percentage: 20 },
-    { threshold: 0.5, percentage: 10 },
-  ],
-  startDate: new Date('2025-10-15T00:00:00Z'),
-  endDate: new Date('2025-11-15T00:00:00Z')
+  bonusThreshold: 2, // Minimum SOL to get the bonus
+  bonusPercentage: 10, // 10% bonus
+  startDate: new Date('2025-08-13T00:00:00Z'),
+  endDate: new Date('2025-09-12T00:00:00Z')
 };
 
 export const SUPPORTED_LANGUAGES: Language[] = [
