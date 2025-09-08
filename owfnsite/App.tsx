@@ -9,7 +9,6 @@ import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
-import { Toaster } from 'sonner';
 
 import Home from './pages/Home.tsx';
 import Presale from './pages/Presale.tsx';
@@ -124,7 +123,6 @@ function App() {
   return (
     <WalletWrapper>
       <AppProvider>
-        <Toaster richColors position="bottom-right" />
         <AppContent />
         <Analytics />
       </AppProvider>

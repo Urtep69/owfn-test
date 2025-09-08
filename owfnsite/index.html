@@ -106,16 +106,11 @@
               'aurora': 'aurora 20s ease-in-out infinite alternate',
               'press-in': 'pressIn 0.2s ease-out forwards',
               'scroll-fade-in': 'scrollFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-              'list-item-in': 'listItemIn 0.4s ease-out forwards',
             },
             keyframes: {
               fadeInUp: {
                 '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              listItemIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px) scale(0.98)' },
-                '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
               },
               slideIn: {
                 '0%': { transform: 'translateX(100%)' },
@@ -164,13 +159,6 @@
             animation-name: scrollFadeIn;
             animation-fill-mode: both;
         }
-        .card-lift-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card-lift-hover:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.07), 0 3px 6px rgba(0,0,0,0.05);
-        }
         .aurora-bg {
             position: relative;
             overflow: hidden;
@@ -217,7 +205,6 @@
     "react/": "https://esm.sh/react@18.3.1/",
     "recharts": "https://esm.sh/recharts@^3.1.2?deps=react@18.3.1,react-dom@18.3.1",
     "wouter": "https://esm.sh/wouter@^3.7.1?deps=react@18.3.1",
-    "sonner": "https://esm.sh/sonner@^1.5.0?deps=react@18.3.1",
     "@vercel/analytics/": "https://aistudiocdn.com/@vercel/analytics@^1.5.0/"
   }
 }
