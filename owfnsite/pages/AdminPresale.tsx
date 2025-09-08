@@ -227,7 +227,6 @@ export default function AdminPresale() {
 
         for (let i = 0; i < contributorsToProcess.length; i += BATCH_SIZE) {
             const batch = contributorsToProcess.slice(i, i + BATCH_SIZE);
-// FIX: Removed extraneous text '--- START OF FILE api/chatbot.ts ---' that caused a syntax error.
             setAirdropLogs(prev => [...prev, t('processing_batch', { current: Math.floor(i / BATCH_SIZE) + 1, total: Math.ceil(contributorsToProcess.length / BATCH_SIZE) })]);
             
             try {
