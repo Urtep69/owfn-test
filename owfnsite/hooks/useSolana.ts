@@ -5,7 +5,6 @@ import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID,
 import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
-import { toast } from 'sonner';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
 export interface UseSolanaReturn {
@@ -26,12 +25,12 @@ export interface UseSolanaReturn {
   connection: Connection;
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
-  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
+  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; error?: string; params?: Record<string, string | number> }>;
   stakeTokens: (amount: number) => Promise<any>;
   unstakeTokens: (amount: number) => Promise<any>;
   claimRewards: () => Promise<any>;
   claimVestedTokens: (amount: number) => Promise<any>;
-  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<{ success: boolean; messageKey: string }>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
@@ -203,7 +202,7 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, address, getWalletBalances]);
 
- const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
+ const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; error?: string; params?: Record<string, string | number>}> => {
     if (!connected || !publicKey || !signTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
@@ -296,13 +295,12 @@ export const useSolana = (): UseSolanaReturn => {
     } catch (error) {
         console.error("Transaction failed:", error);
         setLoading(false);
-        return { success: false, messageKey: 'transaction_failed_alert' };
+        return { success: false, messageKey: 'transaction_failed_alert', error: (error as Error).message };
     }
   }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
-      toast.warning("This feature is coming soon and requires on-chain programs to be deployed.");
       return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
   }
 
@@ -329,10 +327,6 @@ export const useSolana = (): UseSolanaReturn => {
     unstakeTokens: notImplemented,
     claimRewards: notImplemented,
     claimVestedTokens: notImplemented,
-    voteOnProposal: async (..._args: any[]): Promise<{ success: boolean; messageKey: string }> => {
-        console.warn("This feature is a placeholder and not implemented on-chain yet.");
-        // Simulate a successful vote for UI purposes
-        return Promise.resolve({ success: true, messageKey: 'vote_success_alert'});
-    },
+    voteOnProposal: notImplemented,
   };
 };

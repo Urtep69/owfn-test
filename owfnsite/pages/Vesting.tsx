@@ -60,7 +60,7 @@ const VestingScheduleDetails = ({ schedule }: { schedule: VestingSchedule }) => 
             // Simulate updating the claimed amount locally
             setClaimedAmount(prev => prev + claimableNow);
         } else {
-            toast.error(t(result.messageKey));
+            toast.info(t(result.messageKey));
         }
     };
 

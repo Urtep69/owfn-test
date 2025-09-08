@@ -1,7 +1,6 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { Link } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { Info, Handshake, Newspaper, Wrench, Loader2, CheckCircle, HelpCircle, Mail, Twitter, Send } from 'lucide-react';
 import { DiscordIcon } from '../components/IconComponents.tsx';
 import { PROJECT_LINKS } from '../constants.ts';
@@ -63,6 +62,7 @@ const SocialLinkCard = ({ icon, title, description, href }: { icon: React.ReactN
 
 export default function Contact() {
     const { t } = useAppContext();
+    const [location] = useLocation();
     const formRef = useRef<HTMLElement>(null);
 
     const reasonOptions = [
@@ -79,6 +79,17 @@ export default function Contact() {
     const [reason, setReason] = useState(reasonOptions[0].key);
     const [message, setMessage] = useState('');
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const reasonFromQuery = params.get('reason');
+        if (reasonFromQuery && reasonOptions.some(opt => opt.key === reasonFromQuery)) {
+            setReason(reasonFromQuery);
+            formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+             // Clean the URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, [location]);
 
     const handleCardButtonClick = (reasonKey: string) => {
         setReason(reasonKey);

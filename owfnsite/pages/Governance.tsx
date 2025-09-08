@@ -47,10 +47,21 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
     const hasVoted = userStats.votedProposalIds.includes(proposal.id);
 
     const handleVote = async (vote: 'for' | 'against') => {
-        const result = await hookVote(proposal.id, vote);
-        if (result.success) {
-            contextVote(proposal.id, vote);
-            toast.success(t(result.messageKey));
+        // Optimistic UI update
+        contextVote(proposal.id, vote);
+
+        try {
+            const result = await hookVote(proposal.id, vote);
+            if (result.success) {
+                toast.success(t(result.messageKey));
+            } else {
+                // On-chain call failed, revert the UI change
+                toast.error(t(result.messageKey));
+                contextVote(proposal.id, vote, true); // Revert the vote
+            }
+        } catch (error) {
+            toast.error("An unexpected error occurred while voting.");
+            contextVote(proposal.id, vote, true); // Revert on unexpected errors too
         }
     }
 

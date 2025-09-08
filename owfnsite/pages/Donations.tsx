@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
@@ -14,8 +15,25 @@ const tokens = [
 
 export default function Donations() {
     const { t, solana, setWalletModalOpen } = useAppContext();
+    const [location, setLocation] = useLocation();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const tokenFromQuery = params.get('token');
+        const amountFromQuery = params.get('amount');
+        if (tokenFromQuery && tokens.some(t => t.symbol === tokenFromQuery)) {
+            setSelectedToken(tokenFromQuery);
+        }
+        if (amountFromQuery) {
+            setAmount(amountFromQuery);
+        }
+         // Clean the URL after reading params
+        if (tokenFromQuery || amountFromQuery) {
+             window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, [location]);
 
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
 
@@ -56,7 +74,7 @@ export default function Donations() {
             toast.success(t('donation_success_alert', result.params));
             setAmount('');
         } else {
-            toast.error(t(result.messageKey, result.params));
+            toast.error(`${t(result.messageKey)} ${result.error ? ` (${result.error.substring(0, 60)}...)` : ''}`);
         }
     };
     

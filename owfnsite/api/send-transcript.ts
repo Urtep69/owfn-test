@@ -1,78 +1,194 @@
-// This is a new file: api/send-transcript.ts
 import type { ChatMessage } from '../types.ts';
+import { translations } from '../lib/locales/index.ts';
 
-// Helper to sanitize HTML content
-const escapeHtml = (unsafe: string) => {
-    return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+// --- Translation Helper ---
+function t(key: string, langCode: string): string {
+    const lang = translations[langCode] || translations['en'];
+    const translation = lang[key] || translations['en'][key] || key;
+    return translation;
+}
+
+// --- Email Theme ---
+const THEME = {
+    dark: {
+        bg: '#141311', // darkPrimary-950
+        cardBg: '#211F1C', // darkPrimary-900
+        text: '#EBE5DB', // darkPrimary-200
+        subtleText: '#837C73', // darkPrimary-500
+        modelBubble: '#302D29', // darkPrimary-800
+        userBubble: '#DDC9A7', // darkAccent-500
+        userBubbleText: '#3A3126', // darkAccent-950
+        borderColor: '#494540', // darkPrimary-700
+        accent: '#E4D5A8', // darkAccent-400
+        actionButtonBg: '#C7B191', // darkAccent-600
+    }
 };
 
-// Helper to format a single message into an HTML row
-const formatMessageToHtml = (msg: ChatMessage): string => {
-    const isUser = msg.role === 'user';
-    const align = isUser ? 'right' : 'left';
-    const bgColor = isUser ? '#fcd34d' : '#f4f4f5'; // accent-300, primary-100
-    const textColor = isUser ? '#451a03' : '#18181b'; // accent-950, primary-900
-    const borderRadius = isUser ? '18px 4px 18px 18px' : '4px 18px 18px 18px';
-    const timestamp = msg.timestamp ? new Date(msg.timestamp).toLocaleString() : '';
+// --- Server-side Content Renderer ---
+// This function parses special syntax in messages and converts it to styled HTML for the email.
+function renderMessageContentForEmail(text: string): string {
+    const regex = /\[(Visit Page): (.*?)\]|\[(Social Link): (.*?)\|(.*?)\]|\[(Action: Navigate)\|(.*?)\|(.*?)\]/g;
+    
+    const escapeHtml = (unsafe: string) => 
+        unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
 
-    const iconHtml = isUser
-        ? `<div style="width: 32px; height: 32px; border-radius: 50%; background-color: #fbbf24; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 12px;"><span style="font-size: 16px; color: #451a03;">👤</span></div>`
-        : `<img src="https://www.owfn.org/assets/owfn.png" alt="OWFN" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 12px; flex-shrink: 0;" />`;
+    let result = '';
+    let lastIndex = 0;
+    let match;
+    const baseUrl = 'https://www.owfn.org';
+    
+    // Manual iteration to build the result string piece by piece
+    while ((match = regex.exec(text)) !== null) {
+        // Append the plain text part before the current match
+        result += escapeHtml(text.substring(lastIndex, match.index)).replace(/\n/g, '<br>');
 
-    // A more robust regex to handle various action/link formats
-    const linkRegex = /\[(?:Visit Page|Social Link|Action: Navigate): (.*?)(?:\|(.*?))?\]/g;
-    const messageText = escapeHtml(msg.parts[0].text).replace(linkRegex, (match, part1, part2) => {
-        // Part 2 usually contains the URL or path
-        const url = part2 || `https://www.owfn.org/${part1.toLowerCase()}`;
-        return `<a href="${url}" target="_blank" style="color: #b45309; font-weight: bold; text-decoration: underline;">${escapeHtml(part1)}</a>`;
-    });
+        const [fullMatch, visitPage, pageName, socialLink, platformName, url, actionNavigate, buttonText, path] = match;
 
-    const messageHtml = `
-        <div style="text-align: ${align}; margin-bottom: 4px;">
-            <span style="font-size: 11px; color: #71717a;">${timestamp}</span>
-        </div>
-        <div style="display: flex; justify-content: ${isUser ? 'flex-end' : 'flex-start'};">
-            ${!isUser ? iconHtml : ''}
-            <div style="background-color: ${bgColor}; color: ${textColor}; padding: 12px 16px; border-radius: ${borderRadius}; max-width: 80%; line-height: 1.5;">
-                <p style="margin: 0; white-space: pre-wrap; word-wrap: break-word;">${messageText}</p>
-            </div>
-            ${isUser ? iconHtml : ''}
-        </div>
-    `;
+        if (visitPage === 'Visit Page') {
+            const pageNameToPath: { [key: string]: string } = {
+                'Home': '/', 'Presale': '/presale', 'About': '/about', 'Whitepaper': '/whitepaper', 'Tokenomics': '/tokenomics',
+                'Roadmap': '/roadmap', 'Staking': '/staking', 'Vesting': '/vesting', 'Donations': '/donations', 'Dashboard': '/dashboard',
+                'Profile': '/profile', 'Impact Portal': '/impact', 'Partnerships': '/partnerships', 'FAQ': '/faq', 'Contact': '/contact'
+            };
+            const resolvedPath = pageNameToPath[pageName] || '/';
+            result += `<a href="${baseUrl}${resolvedPath}" style="color: ${THEME.dark.accent}; font-weight: bold; text-decoration: underline;">${escapeHtml(pageName)}</a>`;
+        } else if (socialLink === 'Social Link') {
+            result += `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="color: ${THEME.dark.accent}; font-weight: bold; text-decoration: underline;">${escapeHtml(platformName)}</a>`;
+        } else if (actionNavigate === 'Action: Navigate') {
+             result += `
+                <div style="margin-top: 10px; margin-bottom: 4px;">
+                    <a href="${baseUrl}${escapeHtml(path)}" target="_blank" style="
+                        display: inline-block;
+                        padding: 10px 18px;
+                        background-color: ${THEME.dark.actionButtonBg};
+                        color: ${THEME.dark.userBubbleText};
+                        text-decoration: none;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        font-size: 14px;
+                    ">${escapeHtml(buttonText)}</a>
+                </div>`;
+        }
+        
+        lastIndex = regex.lastIndex;
+    }
 
-    return `<div style="margin-bottom: 24px;">${messageHtml}</div>`;
-};
+    // Append any remaining plain text after the last match
+    result += escapeHtml(text.substring(lastIndex)).replace(/\n/g, '<br>');
 
-const getTranslatedFooter = (langCode: string, email: string): string => {
-    const translations: Record<string, { line1: string, line2: string, line3: string, line4: string }> = {
-        'ro': { line1: `Transcriere Conversație pentru:`, line2: `Aceasta este o transcriere generată automat.`, line3: `Vă mulțumim că folosiți Asistentul AI OWFN.`, line4: `Vizitați-ne la` },
-        'de': { line1: `Gesprächsprotokoll für:`, line2: `Dies ist ein automatisch generiertes Protokoll.`, line3: `Vielen Dank, dass Sie den OWFN AI Assistant verwenden.`, line4: `Besuchen Sie uns unter` },
-        'es': { line1: `Transcripción de la Conversación para:`, line2: `Esta es una transcripción generada automáticamente.`, line3: `Gracias por usar el Asistente de IA de OWFN.`, line4: `Visítenos en` },
-        // ... add all other languages from your app
-        'en': { line1: `Conversation Transcript for:`, line2: `This is an auto-generated transcript.`, line3: `Thank you for using the OWFN AI Assistant.`, line4: `Visit us at` },
+    return result;
+}
+
+// --- Main HTML Formatter ---
+function formatHistoryToHtml(history: ChatMessage[], langCode: string, email: string): string {
+    const OWFN_LOGO_URL = 'https://www.owfn.org/assets/owfn.png';
+    const USER_ICON_URL = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5YWEzYWYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgMjF2LTItMyAxLTEgNCA0LTEgMSAzeiIvPjxwYXRoIGQ9Ik0xMiA1di4wMUE1IDUgMCAwIDAgMTIgMTVhNSA1IDAgMCAwIDAtOS45OVY1eiIvPjwvc3ZnPg==';
+
+    const formatTimestamp = (dateStr?: Date): string => {
+        if (!dateStr) return '';
+        try {
+            return new Date(dateStr).toLocaleString(langCode || 'en-US', { hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+            return new Date().toUTCString();
+        }
     };
-    const t = translations[langCode] || translations['en'];
+
+    const messagesHtml = history.map(msg => {
+        const timestamp = formatTimestamp(msg.timestamp);
+        const isUser = msg.role === 'user';
+        
+        const avatarHtml = `
+            <img src="${isUser ? USER_ICON_URL : OWFN_LOGO_URL}" alt="${isUser ? 'User' : 'OWFN'}" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;">
+        `;
+
+        const messageBubbleHtml = `
+            <div style="display: flex; flex-direction: column; align-items: ${isUser ? 'flex-end' : 'flex-start'};">
+                <div style="
+                    max-width: 80%;
+                    padding: 10px 14px;
+                    border-radius: 18px;
+                    background-color: ${isUser ? THEME.dark.userBubble : THEME.dark.modelBubble};
+                    color: ${isUser ? THEME.dark.userBubbleText : THEME.dark.text};
+                    border-bottom-left-radius: ${!isUser ? '4px' : '18px'};
+                    border-bottom-right-radius: ${isUser ? '4px' : '18px'};
+                ">
+                    <div style="white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5;">${renderMessageContentForEmail(msg.parts[0].text)}</div>
+                </div>
+                ${timestamp ? `<p style="font-size: 11px; color: ${THEME.dark.subtleText}; margin: 4px 8px 0;">${timestamp}</p>` : ''}
+            </div>
+        `;
+
+        return `
+            <div style="display: flex; justify-content: ${isUser ? 'flex-end' : 'flex-start'}; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
+                ${!isUser ? avatarHtml : ''}
+                ${messageBubbleHtml}
+                ${isUser ? avatarHtml : ''}
+            </div>
+        `;
+    }).join('');
 
     return `
-        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e4e4e7;">
-            <p style="color: #a1a1aa; font-size: 12px; margin: 0;">${t.line1} <strong>${email}</strong></p>
-            <p style="color: #a1a1aa; font-size: 12px; margin: 4px 0 0 0;">${t.line2} ${t.line3}</p>
-            <p style="color: #a1a1aa; font-size: 12px; margin: 4px 0 0 0;">${t.line4} <a href="https://www.owfn.org" style="color: #b45309; text-decoration: none;">owfn.org</a></p>
-        </div>
+        <!DOCTYPE html>
+        <html lang="${langCode}" style="color-scheme: dark; supported-color-schemes: dark;">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="color-scheme" content="light dark">
+            <meta name="supported-color-schemes" content="light dark">
+            <title>Your OWFN Chat Transcript</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                    background-color: ${THEME.dark.bg};
+                    color: ${THEME.dark.text};
+                    margin: 0;
+                    padding: 0;
+                    -webkit-font-smoothing: antialiased;
+                    -moz-osx-font-smoothing: grayscale;
+                }
+                .container { max-width: 600px; margin: 20px auto; padding: 24px; background-color: ${THEME.dark.cardBg}; border: 1px solid ${THEME.dark.borderColor}; border-radius: 16px; }
+                .header { text-align: center; border-bottom: 1px solid ${THEME.dark.borderColor}; padding-bottom: 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+                .header h1 { font-size: 22px; color: ${THEME.dark.text}; margin: 0; }
+                .signature { font-size: 12px; color: ${THEME.dark.subtleText}; margin-top: 30px; padding-top: 20px; border-top: 1px solid ${THEME.dark.borderColor}; }
+                .footer { text-align: center; font-size: 12px; color: ${THEME.dark.subtleText}; margin-top: 20px; padding-top: 20px; border-top: 1px solid ${THEME.dark.borderColor}; }
+                .footer a { color: ${THEME.dark.accent}; text-decoration: none; font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <img src="${OWFN_LOGO_URL}" alt="OWFN Logo" style="width: 36px; height: 36px; border-radius: 50%;">
+                    <h1>Your OWFN Chat Transcript</h1>
+                </div>
+                <div>
+                    ${messagesHtml}
+                </div>
+                <div class="signature">
+                    <p style="margin: 0 0 4px 0; font-weight: bold;">${t('email_transcript_for', langCode)}</p>
+                    <p style="margin: 0; color: ${THEME.dark.text};">${email}</p>
+                </div>
+                <div class="footer">
+                    <p>${t('email_transcript_sent_from', langCode)} Official World Family Network (OWFN).</p>
+                    <p><a href="https://www.owfn.org/">${t('email_transcript_visit_us', langCode)}</a></p>
+                </div>
+            </div>
+        </body>
+        </html>
     `;
-};
+}
 
-
+// --- API Handler ---
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Method Not Allowed' });
     }
-    
+
     const resendApiKey = process.env.RESEND_API_KEY;
     if (!resendApiKey) {
         console.error("CRITICAL: RESEND_API_KEY environment variable is not set.");
@@ -80,50 +196,16 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
-        const { history, toEmail, langCode } = req.body;
+        const { history, email, langCode } = req.body;
 
+        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+            return res.status(400).json({ success: false, error: 'Invalid email address provided.' });
+        }
         if (!Array.isArray(history) || history.length === 0) {
             return res.status(400).json({ success: false, error: 'Chat history is empty or invalid.' });
         }
-        if (!toEmail || typeof toEmail !== 'string' || !/^\S+@\S+\.\S+$/.test(toEmail)) {
-             return res.status(400).json({ success: false, error: 'Invalid email address provided.' });
-        }
 
-        const chatHtml = history.map(formatMessageToHtml).join('');
-        const footerHtml = getTranslatedFooter(langCode || 'en', toEmail);
-
-        const fullHtmlBody = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>OWFN Chat Transcript</title>
-                <style>
-                    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #0c0a09; color: #e7e5e4; margin: 0; padding: 0; }
-                    .container { max-width: 600px; margin: 0 auto; padding: 32px; }
-                    .header { text-align: center; margin-bottom: 32px; }
-                    .header img { width: 64px; height: 64px; }
-                    .header h1 { color: #f0d090; margin: 12px 0 0; font-size: 24px; }
-                    .chat-box { background-color: #1c1917; border: 1px solid #44403c; border-radius: 12px; padding: 24px; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="header">
-                        <img src="https://www.owfn.org/assets/owfn.png" alt="OWFN Logo">
-                        <h1>OWFN Chat Transcript</h1>
-                    </div>
-                    <div class="chat-box">
-                        ${chatHtml}
-                    </div>
-                    ${footerHtml}
-                </div>
-            </body>
-            </html>
-        `;
-
-        const subject = `Your OWFN AI Assistant Chat Transcript (${new Date().toLocaleDateString()})`;
+        const htmlBody = formatHistoryToHtml(history, langCode, email);
 
         const sendEmailResponse = await fetch('https://api.resend.com/emails', {
             method: 'POST',
@@ -132,10 +214,10 @@ export default async function handler(req: any, res: any) {
                 'Authorization': `Bearer ${resendApiKey}`
             },
             body: JSON.stringify({
-                from: 'OWFN AI Assistant <transcript@email.owfn.org>',
-                to: toEmail,
-                subject: subject,
-                html: fullHtmlBody,
+                from: 'OWFN Assistant <transcript@email.owfn.org>',
+                to: email,
+                subject: 'Your OWFN Chat Transcript',
+                html: htmlBody,
             })
         });
 
@@ -149,6 +231,6 @@ export default async function handler(req: any, res: any) {
 
     } catch (error) {
         console.error('Send transcript API error:', error);
-        return res.status(500).json({ success: false, error: 'An error occurred while processing your request.' });
+        return res.status(500).json({ success: false, error: 'An error occurred while sending the transcript.' });
     }
 }

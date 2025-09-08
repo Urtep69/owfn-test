@@ -6,6 +6,7 @@ import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { translateText } from '../services/geminiService.ts';
 import { SUPPORTED_LANGUAGES } from '../constants.ts';
 import { HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
 const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }) => {
     const { t } = useAppContext();
@@ -20,7 +21,7 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!title || !description || !details || !goal) {
-            alert(t('admin_fill_fields_alert'));
+            toast.error(t('admin_fill_fields_alert'));
             return;
         }
         setIsTranslating(true);
@@ -65,7 +66,7 @@ const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }
 
         } catch (error) {
             console.error("Translation failed for one or more languages:", error);
-            alert(t('translation_error_alert'));
+            toast.error(t('translation_error_alert'));
         } finally {
             setIsTranslating(false);
         }

@@ -64,7 +64,7 @@ const StakingInterface = () => {
             toast.success(t(result.messageKey, result.params));
             setAmount('');
         } else {
-            toast.error(t(result.messageKey));
+             toast.info(t(result.messageKey));
         }
     };
     
@@ -73,7 +73,7 @@ const StakingInterface = () => {
          if (result.success) {
             toast.success(t(result.messageKey, result.params));
         } else {
-            toast.error(t(result.messageKey));
+            toast.info(t(result.messageKey));
         }
     }
 
