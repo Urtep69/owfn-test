@@ -5,6 +5,7 @@ import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID,
 import type { Token } from '../types.ts';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
+import { toast } from 'sonner';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
 export interface UseSolanaReturn {
@@ -30,7 +31,7 @@ export interface UseSolanaReturn {
   unstakeTokens: (amount: number) => Promise<any>;
   claimRewards: () => Promise<any>;
   claimVestedTokens: (amount: number) => Promise<any>;
-  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<{ success: boolean; messageKey: string }>;
 }
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
@@ -301,7 +302,7 @@ export const useSolana = (): UseSolanaReturn => {
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
-      alert("This feature is coming soon and requires on-chain programs to be deployed.");
+      toast.warning("This feature is coming soon and requires on-chain programs to be deployed.");
       return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
   }
 
@@ -328,6 +329,10 @@ export const useSolana = (): UseSolanaReturn => {
     unstakeTokens: notImplemented,
     claimRewards: notImplemented,
     claimVestedTokens: notImplemented,
-    voteOnProposal: notImplemented,
+    voteOnProposal: async (..._args: any[]): Promise<{ success: boolean; messageKey: string }> => {
+        console.warn("This feature is a placeholder and not implemented on-chain yet.");
+        // Simulate a successful vote for UI purposes
+        return Promise.resolve({ success: true, messageKey: 'vote_success_alert'});
+    },
   };
 };

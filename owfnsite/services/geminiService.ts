@@ -1,4 +1,5 @@
 import type { ChatMessage } from '../types.ts';
+import { toast } from 'sonner';
 
 // This is the new "ultramodern" service function that understands the JSON stream protocol.
 export async function getChatbotResponse(
@@ -129,4 +130,35 @@ export const translateText = async (text: string, targetLanguage: string): Promi
     console.error("Failed to fetch translation:", error);
     return text;
   }
+};
+
+export const sendChatTranscript = async (
+    history: ChatMessage[],
+    toEmail: string,
+    langCode: string,
+    t: (key: string, replacements?: Record<string, any>) => string
+): Promise<void> => {
+    const promise = fetch('/api/send-transcript', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history, toEmail, langCode }),
+    }).then(async (res) => {
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({ error: 'An unknown error occurred.' }));
+            throw new Error(errorData.error);
+        }
+        return res.json();
+    });
+
+    toast.promise(promise, {
+        loading: t('chatbot_sending_email', { defaultValue: 'Sending transcript...' }),
+        success: t('chatbot_send_success', { email: toEmail, defaultValue: `Transcript sent to ${toEmail}!` }),
+        error: (err) => t('chatbot_send_error', { error: err.message, defaultValue: `Failed to send: ${err.message}` }),
+    });
+
+    try {
+        await promise;
+    } catch (e) {
+        console.error("Failed to send chat transcript:", e);
+    }
 };

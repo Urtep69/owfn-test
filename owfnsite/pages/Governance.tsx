@@ -3,6 +3,7 @@ import { useAppContext } from '../contexts/AppContext.tsx';
 import { Vote, PlusCircle, CheckCircle, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { GovernanceProposal } from '../types.ts';
+import { toast } from 'sonner';
 
 const Countdown = ({ endDate }: { endDate: Date }) => {
     const { t } = useAppContext();
@@ -49,7 +50,7 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
         const result = await hookVote(proposal.id, vote);
         if (result.success) {
             contextVote(proposal.id, vote);
-            alert(t(result.messageKey));
+            toast.success(t(result.messageKey));
         }
     }
 

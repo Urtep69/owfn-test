@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, TrendingUp, Gift, Database, HeartHandshake } from 'lucide-react';
 import { OwfnIcon } from '../components/IconComponents.tsx';
+import { toast } from 'sonner';
 
 const StatCard = ({ icon, title, value, subtext }: { icon: React.ReactNode, title: string, value: string, subtext?: string }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d">
@@ -48,7 +49,7 @@ const StakingInterface = () => {
     const handleAction = async () => {
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
-            alert(t('invalid_amount_generic'));
+            toast.error(t('invalid_amount_generic'));
             return;
         }
 
@@ -60,19 +61,19 @@ const StakingInterface = () => {
         }
         
         if (result.success) {
-            alert(t(result.messageKey, result.params));
+            toast.success(t(result.messageKey, result.params));
             setAmount('');
         } else {
-            // Error is handled inside the hook for now
+            toast.error(t(result.messageKey));
         }
     };
     
     const handleClaim = async () => {
         const result = await solana.claimRewards();
          if (result.success) {
-            alert(t(result.messageKey, result.params));
+            toast.success(t(result.messageKey, result.params));
         } else {
-            // Error is handled inside the hook for now
+            toast.error(t(result.messageKey));
         }
     }
 
