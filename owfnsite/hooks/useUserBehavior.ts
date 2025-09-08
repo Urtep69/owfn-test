@@ -40,7 +40,7 @@ export const useUserBehavior = ({ onTrigger, enabled }: UseUserBehaviorProps) =>
         }
 
         // --- Exit Intent Logic ---
-        const handleMouseOut = (e: MouseEvent) => {
+        const handleMouseLeave = (e: MouseEvent) => {
             if (e.clientY <= 0 && !hasTriggeredForPage.current.has(pageKey('exit'))) {
                 onTrigger({ type: 'exit-intent' });
                 hasTriggeredForPage.current.add(pageKey('exit'));
@@ -70,7 +70,8 @@ export const useUserBehavior = ({ onTrigger, enabled }: UseUserBehaviorProps) =>
             }
         };
 
-        document.addEventListener('mouseout', handleMouseOut);
+        // Use 'mouseleave' on the root element for reliable exit-intent detection
+        document.documentElement.addEventListener('mouseleave', handleMouseLeave);
         window.addEventListener('scroll', handleScroll, { passive: true });
         // Any interaction should cancel the dwell timer for this page
         window.addEventListener('click', clearDwellTimer);
@@ -78,7 +79,7 @@ export const useUserBehavior = ({ onTrigger, enabled }: UseUserBehaviorProps) =>
 
         return () => {
             clearDwellTimer();
-            document.removeEventListener('mouseout', handleMouseOut);
+            document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('click', clearDwellTimer);
             window.removeEventListener('keydown', clearDwellTimer);
