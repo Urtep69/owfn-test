@@ -21,7 +21,7 @@ interface AppContextType {
   addVestingSchedule: (schedule: VestingSchedule) => void;
   proposals: GovernanceProposal[];
   addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
-  voteOnProposal: (proposalId: string, vote: 'for' | 'against', revert?: boolean) => void;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
   isMaintenanceActive: boolean;
   setWalletModalOpen: (open: boolean) => void;
 }
@@ -86,15 +86,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setProposals(prev => [newProposal, ...prev]);
   }, [solana.address]);
   
-  const voteOnProposal = useCallback((proposalId: string, vote: 'for' | 'against', revert: boolean = false) => {
+  const voteOnProposal = useCallback((proposalId: string, vote: 'for' | 'against') => {
     setProposals(prev => prev.map(p => {
         if (p.id === proposalId) {
             const votePower = 1000000;
-            const change = revert ? -votePower : votePower;
             return {
                 ...p,
-                votesFor: vote === 'for' ? p.votesFor + change : p.votesFor,
-                votesAgainst: vote === 'against' ? p.votesAgainst + change : p.votesAgainst,
+                votesFor: vote === 'for' ? p.votesFor + votePower : p.votesFor,
+                votesAgainst: vote === 'against' ? p.votesAgainst + votePower : p.votesAgainst,
             }
         }
         return p;
