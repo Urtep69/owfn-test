@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'wouter';
-import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
+import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2, Mail } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, DiscordIcon } from './IconComponents.tsx';
 import { useUserBehavior } from '../hooks/useUserBehavior.ts';
+import { toast } from 'sonner';
 
 const MAX_HISTORY_MESSAGES = 8; // Keep last 4 user/model pairs for context to prevent memory errors on the server.
 
@@ -102,6 +103,9 @@ export const Chatbot = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
     const [proactiveMessage, setProactiveMessage] = useState<string | null>(null);
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+    const [email, setEmail] = useState('');
+    const [isSendingEmail, setIsSendingEmail] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
@@ -343,6 +347,42 @@ export const Chatbot = () => {
             handleSend();
         }
     };
+
+    const handleSendTranscript = async () => {
+        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+            toast.error(t('chatbot_email_invalid_toast'));
+            return;
+        }
+    
+        setIsSendingEmail(true);
+    
+        try {
+            const response = await fetch('/api/send-transcript', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    history: messages,
+                    email: email,
+                    langCode: currentLanguage.code,
+                }),
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok && data.success) {
+                toast.success(t('chatbot_email_success_toast', { email }));
+                setIsEmailModalOpen(false);
+                setEmail('');
+            } else {
+                throw new Error(data.error || 'Unknown error');
+            }
+        } catch (error) {
+            console.error("Failed to send transcript:", error);
+            toast.error(t('chatbot_email_error_toast'));
+        } finally {
+            setIsSendingEmail(false);
+        }
+    };
     
     if (!isOpen) {
         return (
@@ -377,6 +417,7 @@ export const Chatbot = () => {
         : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50";
 
     return (
+        <>
         <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
             <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
                 <div className="flex items-center space-x-2">
@@ -384,6 +425,9 @@ export const Chatbot = () => {
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
+                    <button onClick={() => setIsEmailModalOpen(true)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={t('chatbot_send_transcript')}>
+                        <Mail size={20} />
+                    </button>
                     <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Minimize Chat">
                         <Minus size={20} />
                     </button>
@@ -454,5 +498,40 @@ export const Chatbot = () => {
                 </div>
             </div>
         </div>
+        {isEmailModalOpen && (
+            <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 animate-fade-in-up" style={{ animationDuration: '200ms' }}>
+                <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-xl p-6 w-full max-w-sm relative" onClick={(e) => e.stopPropagation()}>
+                    <h3 className="text-lg font-bold mb-2">{t('chatbot_email_modal_title')}</h3>
+                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400 mb-4">{t('chatbot_email_modal_desc')}</p>
+                    
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={t('chatbot_email_modal_placeholder')}
+                        className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md border border-primary-300 dark:border-darkPrimary-600 focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
+                    />
+                    
+                    <div className="flex justify-end gap-3 mt-4">
+                        <button
+                            onClick={() => setIsEmailModalOpen(false)}
+                            disabled={isSendingEmail}
+                            className="px-4 py-2 text-sm font-semibold rounded-md hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
+                        >
+                            {t('chatbot_email_modal_cancel')}
+                        </button>
+                        <button
+                            onClick={handleSendTranscript}
+                            disabled={isSendingEmail}
+                            className="px-4 py-2 text-sm font-bold bg-accent-500 text-white dark:bg-darkAccent-600 dark:text-darkPrimary-950 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-colors disabled:opacity-60 flex items-center gap-2"
+                        >
+                            {isSendingEmail && <Loader2 className="w-4 h-4 animate-spin" />}
+                            {isSendingEmail ? t('chatbot_email_modal_sending') : t('chatbot_email_modal_send')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 };

@@ -353,6 +353,16 @@ export const de = {
     chatbot_proactive_profile: "Willkommen in Ihrem Profil! Lassen Sie mich wissen, ob Sie Fragen zu Ihren Token oder Impact-Statistiken haben.",
     chatbot_proactive_wallet_intro: `Willkommen zurück! Ich sehe, Sie haben einige Vermögenswerte in Ihrer verbundenen Wallet:`,
     chatbot_proactive_wallet_outro: `Ich kann Ihnen helfen, mehr OWFN zu kaufen oder eine Spende zu tätigen. Woran sind Sie heute interessiert?`,
+    chatbot_send_transcript: 'Chat-Protokoll per E-Mail senden',
+    chatbot_email_modal_title: 'Chat-Protokoll senden',
+    chatbot_email_modal_desc: 'Geben Sie unten Ihre E-Mail-Adresse ein, um eine Kopie dieses Gesprächs zu erhalten.',
+    chatbot_email_modal_placeholder: 'ihre.email@beispiel.com',
+    chatbot_email_modal_send: 'Senden',
+    chatbot_email_modal_cancel: 'Abbrechen',
+    chatbot_email_modal_sending: 'Senden...',
+    chatbot_email_success_toast: 'Protokoll erfolgreich an {email} gesendet.',
+    chatbot_email_error_toast: 'Protokoll konnte nicht gesendet werden. Bitte versuchen Sie es erneut.',
+    chatbot_email_invalid_toast: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
 
     // Whitepaper
     whitepaper_title: `OWFN-Whitepaper`,

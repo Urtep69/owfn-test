@@ -353,6 +353,16 @@ export const ro = {
     chatbot_proactive_profile: "Bun venit la profilul dumneavoastră! Anunțați-mă dacă aveți întrebări despre token-urile sau statisticile de impact.",
     chatbot_proactive_wallet_intro: `Bun venit înapoi! Văd că aveți câteva active în portofelul conectat:`,
     chatbot_proactive_wallet_outro: `Vă pot ajuta să cumpărați mai mulți tokeni OWFN sau să faceți o donație. Ce vă interesează astăzi?`,
+    chatbot_send_transcript: 'Trimite Conversația pe Email',
+    chatbot_email_modal_title: 'Trimite Conversația pe Email',
+    chatbot_email_modal_desc: 'Introdu adresa de email mai jos pentru a primi o copie a acestei conversații.',
+    chatbot_email_modal_placeholder: 'emailul.tau@exemplu.com',
+    chatbot_email_modal_send: 'Trimite',
+    chatbot_email_modal_cancel: 'Anulează',
+    chatbot_email_modal_sending: 'Se trimite...',
+    chatbot_email_success_toast: 'Conversația a fost trimisă cu succes la {email}.',
+    chatbot_email_error_toast: 'Trimiterea conversației a eșuat. Vă rugăm să încercați din nou.',
+    chatbot_email_invalid_toast: 'Vă rugăm să introduceți o adresă de email validă.',
 
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,
