@@ -2,80 +2,100 @@ import type { ChatMessage } from '../types.ts';
 
 // Helper function to format chat history into a styled HTML string.
 function formatHistoryToHtml(history: ChatMessage[], langCode: string): string {
+    const OWFN_LOGO_URL = 'https://www.owfn.org/assets/owfn.png';
+    // A self-contained, base64 encoded SVG for the user icon to avoid external requests and ensure compatibility.
+    const USER_ICON_URL = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM5YWEzYWYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgMjF2LTItMyAxLTEgNCA0LTEgMSAzeiIvPjxwYXRoIGQ9Ik0xMiA1di4wMUE1IDUgMCAwIDAgMTIgMTVhNSA1IDAgMCAwIDAtOS45OVY1eiIvPjwvc3ZnPg==';
+
+    const THEME = {
+        dark: {
+            bg: '#141311', // darkPrimary-950
+            cardBg: '#211F1C', // darkPrimary-900
+            text: '#EBE5DB', // darkPrimary-200
+            subtleText: '#837C73', // darkPrimary-500
+            modelBubble: '#302D29', // darkPrimary-800
+            userBubble: '#DDC9A7', // darkAccent-500
+            userBubbleText: '#3A3126', // darkAccent-950
+            borderColor: '#494540', // darkPrimary-700
+            accent: '#E4D5A8', // darkAccent-400
+        }
+    };
+    
     const formatTimestamp = (dateStr?: Date): string => {
         if (!dateStr) return '';
         try {
             return new Date(dateStr).toLocaleString(langCode || 'en-US', {
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
+                hour: '2-digit', minute: '2-digit'
             });
         } catch (e) {
-            return new Date(dateStr).toUTCString(); // Fallback
+            return new Date(dateStr).toUTCString();
         }
     };
 
     const messagesHtml = history.map(msg => {
         const timestamp = formatTimestamp(msg.timestamp);
         const isUser = msg.role === 'user';
-        const alignment = isUser ? 'right' : 'left';
         
-        const bubbleStyle = `
-            display: inline-block;
-            max-width: 75%;
-            padding: 10px 14px;
-            border-radius: 18px;
-            text-align: left;
-            margin-bottom: 2px;
-        `;
-        
-        const userStyle = `
-            background-color: #fcd34d; /* accent-300 */
-            color: #451a03; /* accent-950 */
-            border-bottom-right-radius: 4px;
+        const avatarHtml = `
+            <img src="${isUser ? USER_ICON_URL : OWFN_LOGO_URL}" alt="${isUser ? 'User' : 'OWFN'}" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;">
         `;
 
-        const modelStyle = `
-            background-color: #f3f4f6; /* primary-100 */
-            color: #1f2937; /* primary-800 */
-            border-bottom-left-radius: 4px;
-        `;
-
-        const timestampStyle = `
-            font-size: 10px;
-            color: #6b7280;
-            margin-top: 4px;
+        const messageBubbleHtml = `
+            <div style="display: flex; flex-direction: column; align-items: ${isUser ? 'flex-end' : 'flex-start'};">
+                <div style="
+                    max-width: 80%;
+                    padding: 10px 14px;
+                    border-radius: 18px;
+                    background-color: ${isUser ? THEME.dark.userBubble : THEME.dark.modelBubble};
+                    color: ${isUser ? THEME.dark.userBubbleText : THEME.dark.text};
+                    border-bottom-left-radius: ${!isUser ? '4px' : '18px'};
+                    border-bottom-right-radius: ${isUser ? '4px' : '18px'};
+                ">
+                    <p style="margin: 0; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.5;">${msg.parts[0].text}</p>
+                </div>
+                ${timestamp ? `<p style="font-size: 11px; color: ${THEME.dark.subtleText}; margin: 4px 8px 0;">${timestamp}</p>` : ''}
+            </div>
         `;
 
         return `
-            <div style="text-align: ${alignment}; margin-bottom: 12px;">
-                <div style="${bubbleStyle} ${isUser ? userStyle : modelStyle}">
-                    <p style="margin: 0; white-space: pre-wrap; word-wrap: break-word;">${msg.parts[0].text}</p>
-                </div>
-                ${timestamp ? `<p style="${timestampStyle}">${timestamp}</p>` : ''}
+            <div style="display: flex; justify-content: ${isUser ? 'flex-end' : 'flex-start'}; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
+                ${!isUser ? avatarHtml : ''}
+                ${messageBubbleHtml}
+                ${isUser ? avatarHtml : ''}
             </div>
         `;
     }).join('');
 
-    // Full HTML document structure for better email client compatibility.
     return `
         <!DOCTYPE html>
-        <html lang="${langCode}">
+        <html lang="${langCode}" style="color-scheme: dark; supported-color-schemes: dark;">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="color-scheme" content="light dark">
+            <meta name="supported-color-schemes" content="light dark">
             <title>Your OWFN Chat Transcript</title>
             <style>
-                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; background-color: #f9fafb; color: #374151; margin: 0; padding: 0; }
-                .container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; }
-                .header { text-align: center; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 25px; }
-                .header h1 { font-size: 24px; color: #111827; margin: 0; }
-                .footer { text-align: center; font-size: 12px; color: #9ca3af; margin-top: 25px; padding-top: 15px; border-top: 1px solid #e5e7eb; }
-                .footer a { color: #b45309; text-decoration: none; }
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                    background-color: ${THEME.dark.bg};
+                    color: ${THEME.dark.text};
+                    margin: 0;
+                    padding: 0;
+                    -webkit-font-smoothing: antialiased;
+                    -moz-osx-font-smoothing: grayscale;
+                }
+                .container { max-width: 600px; margin: 20px auto; padding: 24px; background-color: ${THEME.dark.cardBg}; border: 1px solid ${THEME.dark.borderColor}; border-radius: 16px; }
+                .header { text-align: center; border-bottom: 1px solid ${THEME.dark.borderColor}; padding-bottom: 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+                .header h1 { font-size: 22px; color: ${THEME.dark.text}; margin: 0; }
+                .footer { text-align: center; font-size: 12px; color: ${THEME.dark.subtleText}; margin-top: 30px; padding-top: 20px; border-top: 1px solid ${THEME.dark.borderColor}; }
+                .footer a { color: ${THEME.dark.accent}; text-decoration: none; font-weight: bold; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
+                    <img src="${OWFN_LOGO_URL}" alt="OWFN Logo" style="width: 36px; height: 36px; border-radius: 50%;">
                     <h1>Your OWFN Chat Transcript</h1>
                 </div>
                 <div>
