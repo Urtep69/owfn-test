@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -46,6 +45,8 @@ export const ro = {
     connect_wallet_first: `Vă rugăm să vă conectați mai întâi portofelul.`,
     yes: `Da`,
     no: `Nu`,
+    cancel: `Anulează`,
+    send: `Trimite`,
 
     // Time Units
     time_days: `Zile`,
@@ -318,8 +319,6 @@ export const ro = {
     faq_q13: `De ce există o limită maximă de cumpărare (Max Buy) în prevânzare?`,
     faq_a13: `Limita maximă de cumpărare este o măsură importantă pentru a asigura o distribuție cât mai echitabilă a tokenilor și pentru a preveni ca un număr mic de investitori mari ("whales") să controleze o parte semnificativă din ofertă. Acest lucru promovează o comunitate mai sănătoasă și mai descentralizată pe termen lung.`,
     faq_q14: `Ce înseamnă că tokenul este "Purtător de Dobândă" (Interest-Bearing) cu 2% APY? Cum funcționează?`,
-    faq_a14: `Înseamnă că tokenul OWFN este programat să genereze automat o dobândă. Doar prin deținerea tokenilor în portofelul dumneavoastră compatibil cu Solana, cantitatea de tokeni va crește în timp, cu un randament procentual anual (APY) de 2%. Nu este necesar să îi puneți în staking sau să faceți vreo acțiune suplimentară; recompensele se acumulează automat.`,
-    faq_q15: `Ce este taxa de transfer de 0.5% și când se va activa?`,
     faq_a15: `Această taxă este un mecanism cheie pentru finanțarea pe termen lung a misiunii noastre. O taxă de 0.5% se va aplica tuturor tranzacțiilor cu tokenul OWFN *după* finalizarea perioadei de prevânzare. Fondurile colectate din această taxă sunt direcționate automat către Trezoreria de Impact pentru a finanța continuu proiectele noastre sociale. Astfel, fiecare tranzacție contribuie la binele comun.`,
     faq_q16: `De ce ați ales blockchain-ul Solana pentru acest proiect?`,
     faq_a16: `Am ales Solana datorită vitezei sale excepționale, costurilor de tranzacție foarte scăzute și scalabilității ridicate. Aceste caracteristici sunt esențiale pentru un proiect global ca al nostru, permițând micro-tranzacții eficiente și asigurând o experiență rapidă și accesibilă pentru toți utilizatorii, fie că donează, cumpără sau tranzacționează tokeni.`,
@@ -339,6 +338,15 @@ export const ro = {
     chatbot_loading_1: `Mă conectez la circuitele mele...`,
     chatbot_loading_2: `Analizez întrebarea...`,
     chatbot_loading_3: `Formulez un răspuns...`,
+    chatbot_sending_email: `Se trimite transcrierea...`,
+    chatbot_send_success: `Transcriere trimisă la {email}!`,
+    chatbot_send_error: `Trimitere eșuată: {error}`,
+    chatbot_send_email_title: `Trimite Conversația pe Email`,
+    chatbot_send_email_desc: `Introdu adresa ta de email pentru a primi o copie a acestei conversații.`,
+    chatbot_proactive_presale: `Bun venit pe pagina de Prevânzare! Aveți întrebări despre cum să participați sau despre bonusul la token?`,
+    chatbot_proactive_donations: `Văd că sunteți interesat să susțineți misiunea noastră. Vă pot ajuta cu informații despre cum să donați sau despre Trezoreria noastră de Impact?`,
+    chatbot_proactive_roadmap: `Explorați planurile noastre de viitor? Anunțați-mă dacă aveți întrebări despre roadmap!`,
+    chatbot_proactive_exit: `Înainte de a pleca, vă pot ajuta cu ceva? Pot răspunde la întrebări despre prevânzare, tokenomics sau misiunea noastră.`,
     
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,

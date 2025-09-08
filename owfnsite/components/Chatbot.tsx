@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'wouter';
-import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
-import { getChatbotResponse } from '../services/geminiService.ts';
+import { Link, useLocation } from 'wouter';
+import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2, Mail } from 'lucide-react';
+import { getChatbotResponse, sendChatTranscript } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, DiscordIcon } from './IconComponents.tsx';
@@ -36,20 +36,15 @@ const socialIconMap: { [key: string]: React.ReactNode } = {
 
 
 const renderMessageContent = (text: string) => {
-    const regex = /\[(Visit Page): (.*?)\]|\[(Social Link): (.*?)\|(.*?)\]/g;
+    const regex = /\[(Visit Page): (.*?)\]|\[(Social Link): (.*?)\|(.*?)\]|\[(Action: Navigate)\|(.*?)\|(.*?)\]/g;
     const result: (string | JSX.Element)[] = [];
     let lastIndex = 0;
     let match;
 
     while ((match = regex.exec(text)) !== null) {
-        // Push the text before the match
         if (match.index > lastIndex) {
             result.push(text.substring(lastIndex, match.index));
         }
-        
-        // match[1] is 'Visit Page', match[2] is page name
-        // OR
-        // match[3] is 'Social Link', match[4] is platform, match[5] is URL
 
         if (match[1] === 'Visit Page') {
             const pageName = match[2];
@@ -61,7 +56,7 @@ const renderMessageContent = (text: string) => {
                     </Link>
                 );
             } else {
-                result.push(`[Visit Page: ${pageName}]`); // Fallback
+                result.push(`[Visit Page: ${pageName}]`);
             }
         } else if (match[3] === 'Social Link') {
             const platformName = match[4];
@@ -74,19 +69,68 @@ const renderMessageContent = (text: string) => {
                     </a>
                 );
             } else {
-                 result.push(`[Social Link: ${platformName}|${url}]`); // Fallback
+                 result.push(`[Social Link: ${platformName}|${url}]`);
+            }
+        } else if (match[6] === 'Action: Navigate') {
+            const buttonText = match[7];
+            const path = match[8];
+            if (buttonText && path) {
+                result.push(
+                     <Link key={match.index} to={path}>
+                        <a className="inline-block bg-accent-400 hover:bg-accent-500 text-accent-950 font-bold py-2 px-4 rounded-lg my-2 transition-colors">
+                           {buttonText}
+                        </a>
+                    </Link>
+                )
             }
         }
 
         lastIndex = regex.lastIndex;
     }
 
-    // Push the remaining text after the last match
     if (lastIndex < text.length) {
         result.push(text.substring(lastIndex));
     }
 
     return <>{result.map((part, i) => <React.Fragment key={i}>{part}</React.Fragment>)}</>;
+};
+
+const EmailTranscriptModal = ({ isOpen, onClose, onSend, t }: { isOpen: boolean, onClose: () => void, onSend: (email: string) => void, t: (key: string, options?: any) => string }) => {
+    const [email, setEmail] = useState('');
+
+    if (!isOpen) return null;
+
+    const handleSendClick = () => {
+        if (email.trim() && /^\S+@\S+\.\S+$/.test(email)) {
+            onSend(email);
+            setEmail('');
+        } else {
+            alert('Please enter a valid email address.');
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4" onClick={onClose}>
+            <div className="bg-white dark:bg-darkPrimary-800 rounded-lg shadow-xl p-6 w-full max-w-sm relative animate-fade-in-up" style={{ animationDuration: '300ms' }} onClick={e => e.stopPropagation()}>
+                <button onClick={onClose} className="absolute top-3 right-3 text-primary-500 hover:text-primary-800 dark:text-darkPrimary-400 dark:hover:text-darkPrimary-100">
+                    <X size={20} />
+                </button>
+                <h3 className="text-lg font-bold text-primary-900 dark:text-darkPrimary-100 mb-4">{t('chatbot_send_email_title', {defaultValue: 'Send Transcript via Email'})}</h3>
+                <p className="text-sm text-primary-600 dark:text-darkPrimary-400 mb-4">{t('chatbot_send_email_desc', {defaultValue: 'Enter your email address to receive a copy of this conversation.'})}</p>
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your.email@example.com"
+                    className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md border border-primary-300 dark:border-darkPrimary-600 focus:ring-2 focus:ring-accent-500 focus:outline-none"
+                />
+                <div className="flex justify-end gap-3 mt-5">
+                    <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-primary-700 dark:text-darkPrimary-200 bg-primary-200 dark:bg-darkPrimary-700 hover:bg-primary-300 dark:hover:bg-darkPrimary-600 rounded-md">{t('cancel', {defaultValue: 'Cancel'})}</button>
+                    <button onClick={handleSendClick} className="px-4 py-2 text-sm font-semibold text-accent-950 bg-accent-400 hover:bg-accent-500 dark:text-darkPrimary-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 rounded-md">{t('send', {defaultValue: 'Send'})}</button>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 
@@ -98,9 +142,12 @@ export const Chatbot = () => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+    const [hasSentProactive, setHasSentProactive] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
+    const [location] = useLocation();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -110,12 +157,10 @@ export const Chatbot = () => {
     
     useEffect(() => {
         if (isOpen) {
-            // A small delay helps ensure the element is visible and animations are settled.
             setTimeout(() => inputRef.current?.focus(), 100);
         }
     }, [isOpen, isMaximized]);
 
-    // Cleanup interval on component unmount
     useEffect(() => {
         return () => {
             if (loadingIntervalRef.current) {
@@ -159,7 +204,7 @@ export const Chatbot = () => {
             index = (index + 1) % loadingMessages.length;
         };
         
-        updateLoadingText(); // Set initial text immediately
+        updateLoadingText();
         loadingIntervalRef.current = window.setInterval(updateLoadingText, 2500);
 
         try {
@@ -170,11 +215,11 @@ export const Chatbot = () => {
                 currentInput,
                 currentLanguage.code,
                 currentTime,
-                (chunk) => { // onChunk: Append text to the last message
+                (chunk) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
-                        setIsLoading(false); // Stop loading animation
+                        setIsLoading(false);
                     }
                     if (!firstChunkReceived) {
                         setMessages(prev => [...prev, { role: 'model', parts: [{ text: chunk }], timestamp: new Date() }]);
@@ -190,7 +235,7 @@ export const Chatbot = () => {
                         });
                     }
                 },
-                (errorMsg) => { // onError: Display error in a new message bubble
+                (errorMsg) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
@@ -221,6 +266,52 @@ export const Chatbot = () => {
         }
     };
     
+    const handleSendTranscript = (email: string) => {
+        sendChatTranscript(messages, email, currentLanguage.code, t);
+        setIsEmailModalOpen(false);
+    };
+
+    const sendProactiveMessage = (messageKey: string) => {
+        if (isLoading || hasSentProactive || messages.length > 0 || !isOpen) return;
+
+        const proactiveMessage: ChatMessage = {
+            role: 'model',
+            parts: [{ text: t(messageKey) }],
+            timestamp: new Date()
+        };
+        setMessages([proactiveMessage]);
+        setHasSentProactive(true);
+    };
+
+    useEffect(() => {
+        setHasSentProactive(false); // Reset on page change
+    }, [location]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        
+        const dwellTimeTimer = setTimeout(() => {
+            switch (location) {
+                case '/presale': sendProactiveMessage('chatbot_proactive_presale'); break;
+                case '/donations': sendProactiveMessage('chatbot_proactive_donations'); break;
+                case '/roadmap': sendProactiveMessage('chatbot_proactive_roadmap'); break;
+            }
+        }, 8000); // 8 seconds dwell time
+
+        const handleMouseLeave = (e: MouseEvent) => {
+            if (e.clientY <= 10) { // Check if mouse is near the top of the viewport
+                sendProactiveMessage('chatbot_proactive_exit');
+            }
+        };
+
+        document.documentElement.addEventListener('mouseleave', handleMouseLeave);
+        
+        return () => {
+            clearTimeout(dwellTimeTimer);
+            document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
+        };
+    }, [location, isOpen, hasSentProactive, messages, isLoading]);
+    
     if (!isOpen) {
         return (
             <button
@@ -238,6 +329,13 @@ export const Chatbot = () => {
         : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50";
 
     return (
+        <>
+        <EmailTranscriptModal
+            isOpen={isEmailModalOpen}
+            onClose={() => setIsEmailModalOpen(false)}
+            onSend={handleSendTranscript}
+            t={t}
+        />
         <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
             <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
                 <div className="flex items-center space-x-2">
@@ -245,8 +343,8 @@ export const Chatbot = () => {
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Minimize Chat">
-                        <Minus size={20} />
+                     <button onClick={() => setIsEmailModalOpen(true)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Send Transcript">
+                        <Mail size={20} />
                     </button>
                     <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={isMaximized ? "Restore Chat" : "Maximize Chat"}>
                         {isMaximized ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
@@ -270,7 +368,7 @@ export const Chatbot = () => {
                                     )}
                                     <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
                                        <div className="text-sm whitespace-pre-wrap">
-                                           {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
+                                           {renderMessageContent(msg.parts[0].text)}
                                        </div>
                                     </div>
                                 </div>
@@ -315,5 +413,6 @@ export const Chatbot = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };

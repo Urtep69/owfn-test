@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -46,6 +45,8 @@ export const en = {
     connect_wallet_first: `Please connect your wallet first.`,
     yes: `Yes`,
     no: `No`,
+    cancel: `Cancel`,
+    send: `Send`,
 
     // Time Units
     time_days: `Days`,
@@ -318,8 +319,6 @@ export const en = {
     faq_q13: 'Why is there a maximum purchase limit (Max Buy) in the presale?',
     faq_a13: 'The maximum purchase limit is an important measure to ensure the fairest possible distribution of tokens and to prevent a small number of large investors ("whales") from controlling a significant portion of the supply. This promotes a healthier and more decentralized community in the long run.',
     faq_q14: 'What does it mean that the token is "Interest-Bearing" with 2% APY? How does it work?',
-    faq_a14: 'It means the OWFN token is programmed to automatically generate interest. Just by holding the tokens in your Solana-compatible wallet, the amount of your tokens will increase over time, with a 2% Annual Percentage Yield (APY). You do not need to stake them or take any additional action; the rewards accumulate automatically.',
-    faq_q15: 'What is the 0.5% transfer fee and when will it be activated?',
     faq_a15: 'This fee is a key mechanism for the long-term funding of our mission. A 0.5% fee will apply to all transactions with the OWFN token *after* the presale period concludes. The funds collected from this fee are automatically directed to the Impact Treasury to continuously fund our social projects. Thus, every transaction contributes to the common good.',
     faq_q16: 'Why did you choose the Solana blockchain for this project?',
     faq_a16: 'We chose Solana for its exceptional speed, very low transaction costs, and high scalability. These features are essential for a global project like ours, allowing for efficient micro-transactions and ensuring a fast and accessible experience for all users, whether they are donating, buying, or trading tokens.',
@@ -339,6 +338,15 @@ export const en = {
     chatbot_loading_1: `Connecting to my circuits...`,
     chatbot_loading_2: `Analyzing your question...`,
     chatbot_loading_3: `Formulating a response...`,
+    chatbot_sending_email: `Sending transcript...`,
+    chatbot_send_success: `Transcript sent to {email}!`,
+    chatbot_send_error: `Failed to send: {error}`,
+    chatbot_send_email_title: `Send Transcript via Email`,
+    chatbot_send_email_desc: `Enter your email address to receive a copy of this conversation.`,
+    chatbot_proactive_presale: `Welcome to the Presale page! Do you have any questions about how to participate or about the token bonus?`,
+    chatbot_proactive_donations: `I see you're interested in supporting our mission. Can I help you with information about how to donate or about our Impact Treasury?`,
+    chatbot_proactive_roadmap: `Exploring our future plans? Let me know if you have any questions about our roadmap!`,
+    chatbot_proactive_exit: `Before you go, is there anything I can help you with? I can answer questions about the presale, tokenomics, or our mission.`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -462,8 +470,6 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
-    airdrop_info_box_title: `About this Airdrop`,
-    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
