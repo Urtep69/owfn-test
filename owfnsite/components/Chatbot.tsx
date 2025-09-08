@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, DiscordIcon } from './IconComponents.tsx';
+import { useUserBehavior } from '../hooks/useUserBehavior.ts';
 
 const MAX_HISTORY_MESSAGES = 8; // Keep last 4 user/model pairs for context to prevent memory errors on the server.
 
@@ -105,6 +106,34 @@ export const Chatbot = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
 
+     const showProactiveMessage = useCallback((messageKey: string, context: string) => {
+        const key = `owfn-proactive-${context}`;
+        if (sessionStorage.getItem(key) || isOpen) {
+            return;
+        }
+        const message = t(messageKey, { defaultValue: '' });
+        if (message && message !== messageKey) {
+            setProactiveMessage(message);
+            sessionStorage.setItem(key, 'true');
+        }
+    }, [t, isOpen]);
+
+    // Behavior-driven triggers
+    useUserBehavior({
+        enabled: !isOpen && !proactiveMessage,
+        onTrigger: (trigger) => {
+            if (trigger.type === 'exit-intent') {
+                showProactiveMessage('chatbot_proactive_exit_intent', 'exit-intent');
+            } else if (trigger.type === 'dwell-time' && trigger.details?.page) {
+                const page = trigger.details.page;
+                if (page === '/presale') showProactiveMessage('chatbot_proactive_dwell_presale', 'dwell-presale');
+            } else if (trigger.type === 'scroll-depth' && trigger.details?.page) {
+                const page = trigger.details.page;
+                if (page === '/roadmap') showProactiveMessage('chatbot_proactive_scroll_roadmap', 'scroll-roadmap');
+            }
+        },
+    });
+    
      useEffect(() => {
         // Immediately hide the previous message when navigating to a new page.
         setProactiveMessage(null);

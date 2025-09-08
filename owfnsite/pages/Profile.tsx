@@ -9,6 +9,7 @@ import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
 import { formatNumber } from '../lib/utils.ts';
 import { AnimatedNumber } from '../components/AnimatedNumber.tsx';
 import { ImpactNarrative } from '../components/ImpactNarrative.tsx';
+import { TokenRowSkeleton } from '../components/SkeletonLoaders.tsx';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -111,9 +112,8 @@ export default function Profile() {
                 <div className="md:col-span-3 bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d">
                     <h2 className="text-2xl font-bold mb-4">{t('my_tokens')}</h2>
                     {loading ? (
-                        <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
-                            <Loader2 className="w-6 h-6 animate-spin" />
-                            <span>{t('profile_loading_tokens')}</span>
+                         <div className="space-y-1">
+                            {[...Array(3)].map((_, i) => <TokenRowSkeleton key={i} />)}
                         </div>
                     ) : userTokens.length > 0 ? (
                         <div className="space-y-1">

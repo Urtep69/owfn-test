@@ -6,17 +6,15 @@ import { OWFN_LOGO_URL } from '../constants.ts';
 import { CommunityToolkit } from '../components/CommunityToolkit.tsx';
 
 const FeatureCard = ({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) => (
-    <div className="bg-white/50 dark:bg-darkPrimary-800/50 backdrop-blur-sm p-6 rounded-xl shadow-3d hover:shadow-3d-lg transition-all duration-300 group perspective-1000">
+    <div className="bg-white/50 dark:bg-darkPrimary-800/50 backdrop-blur-sm p-6 rounded-xl shadow-3d transition-all duration-300 card-lift-hover">
         <div 
-            className="transform-style-3d transition-transform duration-500 group-hover:rotate-x-[10deg] group-hover:-translate-y-2"
-            style={{ transform: 'translateZ(20px)'}}
+            className="transition-transform duration-500"
         >
-            <div className="flex items-center justify-center w-16 h-16 mb-4 bg-primary-100 dark:bg-darkPrimary-700 rounded-full text-accent-500 dark:text-darkAccent-400 transition-all duration-300 group-hover:scale-110 group-hover:bg-accent-100 dark:group-hover:bg-darkAccent-900">
+            <div className="flex items-center justify-center w-16 h-16 mb-4 bg-primary-100 dark:bg-darkPrimary-700 rounded-full text-accent-500 dark:text-darkAccent-400">
                 {icon}
             </div>
             <h3 
-                className="mb-2 text-xl font-bold font-serif text-primary-900 dark:text-darkPrimary-100 transition-transform duration-500 group-hover:translate-z-1"
-                style={{ transform: 'translateZ(30px)'}}
+                className="mb-2 text-xl font-bold font-serif text-primary-900 dark:text-darkPrimary-100"
             >
                 {title}
             </h3>

@@ -5,6 +5,7 @@ import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 import { ProgressBar } from '../components/ProgressBar.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { VestingSchedule } from '../types.ts';
+import { toast } from 'sonner';
 
 
 const ConnectWalletPrompt = () => {
@@ -55,11 +56,11 @@ const VestingScheduleDetails = ({ schedule }: { schedule: VestingSchedule }) => 
     const handleClaim = async () => {
         const result = await solana.claimVestedTokens(claimableNow);
         if (result.success) {
-            alert(t(result.messageKey, result.params));
+            toast.success(t(result.messageKey, result.params));
             // Simulate updating the claimed amount locally
             setClaimedAmount(prev => prev + claimableNow);
         } else {
-            alert(t(result.messageKey));
+            toast.info(t(result.messageKey));
         }
     };
 
@@ -123,7 +124,7 @@ const AdminPortal = () => {
             cliffDate: new Date(new Date().setMonth(new Date().getMonth() + parseInt(cliff))),
         };
         addVestingSchedule(newSchedule);
-        alert(t('vesting_schedule_created'));
+        toast.success(t('vesting_schedule_created'));
         // Reset form
         setRecipient(''); setAmount(''); setDuration(''); setCliff('');
     };

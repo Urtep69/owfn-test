@@ -4,6 +4,7 @@ import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
 import { AlertTriangle, Info } from 'lucide-react';
+import { toast } from 'sonner';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -63,17 +64,17 @@ export default function Donations() {
     
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
-            alert(t('invalid_amount_generic'));
+            toast.error(t('invalid_amount_generic'));
             return;
         }
         
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
 
         if (result.success) {
-            alert(t('donation_success_alert', result.params));
+            toast.success(t('donation_success_alert', result.params));
             setAmount('');
         } else {
-            alert(t(result.messageKey, result.params));
+            toast.error(`${t(result.messageKey)} ${result.error ? ` (${result.error.substring(0, 60)}...)` : ''}`);
         }
     };
     

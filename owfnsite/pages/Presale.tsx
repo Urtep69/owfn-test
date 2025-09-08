@@ -19,25 +19,40 @@ import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import type { PresaleTransaction } from '../types.ts';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
+import { toast } from 'sonner';
+
+type LiveFeedTransaction = PresaleTransaction & { isNew?: boolean };
 
 const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransaction | null }) => {
     const { t } = useAppContext();
-    const [transactions, setTransactions] = useState<PresaleTransaction[]>([]);
+    const [transactions, setTransactions] = useState<LiveFeedTransaction[]>([]);
     const [loading, setLoading] = useState(true);
     const wsRef = useRef<WebSocket | null>(null);
+
+    const addNewTransaction = useCallback((tx: PresaleTransaction) => {
+        setTransactions(prev => {
+            if (prev.some(p => p.id === tx.id)) {
+                return prev;
+            }
+            const newTxWithFlag: LiveFeedTransaction = { ...tx, isNew: true };
+            const updatedList = [newTxWithFlag, ...prev.slice(0, 19)];
+            
+            setTimeout(() => {
+                setTransactions(currentList => currentList.map(item => 
+                    item.id === newTxWithFlag.id ? { ...item, isNew: false } : item
+                ));
+            }, 500);
+
+            return updatedList;
+        });
+    }, []);
 
     // Effect to handle the user's own new transaction for immediate feedback
     useEffect(() => {
         if (newTransaction) {
-            setTransactions(prev => {
-                // Prevent adding a duplicate if the transaction arrived via WebSocket first
-                if (prev.some(tx => tx.id === newTransaction.id)) {
-                    return prev;
-                }
-                return [newTransaction, ...prev.slice(0, 19)];
-            });
+           addNewTransaction(newTransaction);
         }
-    }, [newTransaction]);
+    }, [newTransaction, addNewTransaction]);
     
     // Effect to fetch initial transactions and set up WebSocket connection
     useEffect(() => {
@@ -82,7 +97,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         setTransactions(prev => {
                             const existingIds = new Set(prev.map(p => p.id));
                             const uniqueFetched = sortedTxs.filter(p => !existingIds.has(p.id));
-                            return [...prev, ...uniqueFetched].slice(0, 20);
+                            return [...prev, ...uniqueFetched.map(tx => ({...tx, isNew: false }))].slice(0, 20);
                         });
                     }
                 }
@@ -135,14 +150,8 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                                 owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
                                 time: new Date(), // Use current time for live feed
                             };
-
-                            if (isMounted) {
-                                setTransactions(prev => {
-                                    if (prev.some(t => t.id === newTx.id)) {
-                                        return prev; // Already have this one
-                                    }
-                                    return [newTx, ...prev.slice(0, 19)];
-                                });
+                             if (isMounted) {
+                                addNewTransaction(newTx);
                             }
                         }
                     }
@@ -175,7 +184,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                 console.log("WebSocket disconnected on component unmount.");
             }
         };
-    }, []);
+    }, [addNewTransaction]);
 
 
     return (
@@ -195,7 +204,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         <Loader2 className="w-6 h-6 animate-spin text-accent-500 dark:text-darkAccent-500" />
                     </div>
                 ) : transactions.length > 0 ? transactions.map((tx) => (
-                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 10000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
+                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md ${tx.isNew ? 'animate-list-item-in bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
                         <div className="col-span-2 flex items-center gap-2">
                            <AddressDisplay address={tx.address} className="text-xs" />
                         </div>
@@ -490,7 +499,7 @@ export default function Presale() {
     const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numSolAmount, 'SOL');
 
     if (result.success && result.signature) {
-        alert(t('presale_purchase_success_alert', { 
+        toast.success(t('presale_purchase_success_alert', { 
             amount: numSolAmount.toFixed(2), 
             owfnAmount: calculation.total.toLocaleString() 
         }));
@@ -507,7 +516,7 @@ export default function Presale() {
         setSoldSOL(prev => prev + numSolAmount);
         fetchPresaleProgress(); // Re-fetch progress immediately
     } else {
-        alert(t(result.messageKey));
+        toast.error(`${t(result.messageKey)} ${result.error ? ` (${result.error.substring(0, 60)}...)` : ''}`);
     }
   };
 

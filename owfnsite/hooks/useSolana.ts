@@ -25,7 +25,7 @@ export interface UseSolanaReturn {
   connection: Connection;
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
-  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
+  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; error?: string; params?: Record<string, string | number> }>;
   stakeTokens: (amount: number) => Promise<any>;
   unstakeTokens: (amount: number) => Promise<any>;
   claimRewards: () => Promise<any>;
@@ -202,7 +202,7 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, address, getWalletBalances]);
 
- const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
+ const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; error?: string; params?: Record<string, string | number>}> => {
     if (!connected || !publicKey || !signTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
@@ -295,13 +295,12 @@ export const useSolana = (): UseSolanaReturn => {
     } catch (error) {
         console.error("Transaction failed:", error);
         setLoading(false);
-        return { success: false, messageKey: 'transaction_failed_alert' };
+        return { success: false, messageKey: 'transaction_failed_alert', error: (error as Error).message };
     }
   }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
-      alert("This feature is coming soon and requires on-chain programs to be deployed.");
       return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
   }
 

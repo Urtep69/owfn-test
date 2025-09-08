@@ -7,6 +7,7 @@ import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconCompone
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { AiSummary } from '../components/AiSummary.tsx';
 import { NftReward } from '../components/NftReward.tsx';
+import { toast } from 'sonner';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -80,17 +81,17 @@ export default function ImpactCaseDetail() {
 
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
-            alert(t('invalid_amount_generic'));
+            toast.error(t('invalid_amount_generic'));
             return;
         }
 
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
         
         if (result.success) {
-            alert(t('case_donation_success_alert', { title }));
+            toast.success(t('case_donation_success_alert', { title }));
             setAmount('');
         } else {
-            alert(t(result.messageKey, result.params));
+            toast.error(`${t(result.messageKey)} ${result.error ? ` (${result.error.substring(0, 60)}...)` : ''}`);
         }
     };
     

@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount, ACCOUNT_SIZE } from '@solana/spl-token';
+import { toast } from 'sonner';
 
 import { 
     DISTRIBUTION_WALLETS, 
@@ -30,6 +30,8 @@ interface AggregatedContributor {
     totalSol: number;
     totalOwfn: bigint; // Use BigInt for precision
 }
+
+const AIRDROP_PROGRESS_KEY = 'owfn-airdrop-processed-addresses';
 
 const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md flex items-center space-x-4">
@@ -63,6 +65,10 @@ export default function AdminPresale() {
     const [rentExemption, setRentExemption] = useState(0);
 
     useEffect(() => {
+        const savedProgress = localStorage.getItem(AIRDROP_PROGRESS_KEY);
+        if (savedProgress) {
+            setProcessedAddresses(new Set(JSON.parse(savedProgress)));
+        }
         if (connection) {
             connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE)
                 .then(rent => {
@@ -145,34 +151,25 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        // A map to store the final aggregated data for each contributor.
         const contributorMap = new Map<string, { totalLamports: bigint; totalOwfn: bigint }>();
 
         const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
         const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * LAMPORTS_PER_SOL));
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
 
-        // Process each transaction individually to calculate the correct OWFN amount with bonus.
         transactions.forEach(tx => {
             const lamports = BigInt(tx.lamports);
-            
-            // Calculate base OWFN for this single transaction
             let owfnForThisTx = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
-
-            // Check if this single transaction qualifies for a bonus
             if (lamports >= bonusThresholdLamports) {
                 const bonusAmount = (owfnForThisTx * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
                 owfnForThisTx += bonusAmount;
             }
-
-            // Aggregate the results for the contributor.
             const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n, totalOwfn: 0n };
             existing.totalLamports += lamports;
             existing.totalOwfn += owfnForThisTx;
             contributorMap.set(tx.from, existing);
         });
 
-        // Convert the map to the final array structure.
         return Array.from(contributorMap.entries()).map(([address, data]) => {
             const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
             return { address, totalSol, totalOwfn: data.totalOwfn };
@@ -204,7 +201,8 @@ export default function AdminPresale() {
         const contributorsToProcess = aggregatedContributors.filter(c => !processedAddresses.has(c.address));
 
         if (contributorsToProcess.length === 0 && aggregatedContributors.length > 0) {
-            alert("All contributors have been processed.");
+            toast.info(t('airdrop_all_processed'));
+            localStorage.removeItem(AIRDROP_PROGRESS_KEY);
             return;
         }
 
@@ -212,11 +210,12 @@ export default function AdminPresale() {
         if (!confirmation) return;
 
         setIsAirdropping(true);
-        if (processedAddresses.size === 0) {
+        const initialProcessedCount = processedAddresses.size;
+        if (initialProcessedCount === 0) {
             setAirdropLogs([]);
         }
-        setAirdropLogs(prev => [...prev, `--- Starting airdrop run for ${contributorsToProcess.length} wallets. ---`]);
-        setAirdropProgress({ current: processedAddresses.size, total: aggregatedContributors.length });
+        setAirdropLogs(prev => [...prev, t('airdrop_run_start_log', { count: contributorsToProcess.length })]);
+        setAirdropProgress({ current: initialProcessedCount, total: aggregatedContributors.length });
 
         const BATCH_SIZE = 10;
         const sourceOwner = wallet.publicKey;
@@ -224,9 +223,11 @@ export default function AdminPresale() {
         const sourceAta = await getAssociatedTokenAddress(tokenMint, sourceOwner);
         
         let successfulInThisRun = 0;
+        let currentProcessed = new Set(processedAddresses);
 
         for (let i = 0; i < contributorsToProcess.length; i += BATCH_SIZE) {
             const batch = contributorsToProcess.slice(i, i + BATCH_SIZE);
+// FIX: Removed extraneous text '--- START OF FILE api/chatbot.ts ---' that caused a syntax error.
             setAirdropLogs(prev => [...prev, t('processing_batch', { current: Math.floor(i / BATCH_SIZE) + 1, total: Math.ceil(contributorsToProcess.length / BATCH_SIZE) })]);
             
             try {
@@ -267,39 +268,46 @@ export default function AdminPresale() {
                     try {
                         const signature = await connection.sendRawTransaction(tx.serialize());
                         await connection.confirmTransaction({ signature, ...latestBlockhash }, 'confirmed');
-                        setProcessedAddresses(prev => new Set(prev).add(contributor.address));
-                        setAirdropLogs(prev => [...prev, `✅ Success for ${contributor.address.slice(0,6)}... | Sig: ${signature.slice(0,10)}...`]);
+                        setProcessedAddresses(prev => {
+                            const newSet = new Set(prev);
+                            newSet.add(contributor.address);
+                            currentProcessed = newSet;
+                            localStorage.setItem(AIRDROP_PROGRESS_KEY, JSON.stringify(Array.from(newSet)));
+                            return newSet;
+                        });
+                        setAirdropLogs(prev => [...prev, t('airdrop_success_log', { address: contributor.address.slice(0,6), signature: signature.slice(0,10) })]);
                         successfulInThisRun++;
                     } catch (err) {
                         console.error(`Airdrop failed for ${contributor.address}:`, err);
-                        setAirdropLogs(prev => [...prev, `❌ Failed for ${contributor.address.slice(0,6)}... | Error: ${(err as Error).message}`]);
+                        setAirdropLogs(prev => [...prev, t('airdrop_failed_log', { address: contributor.address.slice(0,6), error: (err as Error).message })]);
                     } finally {
-                        setAirdropProgress(prev => ({ ...prev, current: prev.current + 1 }));
+                        setAirdropProgress(prev => ({ ...prev, current: initialProcessedCount + i + j + 1 }));
                     }
                 }
             } catch (batchError) {
                  console.error(`Error processing batch starting at index ${i}:`, batchError);
                  const failedAddresses = batch.map(b => b.address.slice(0,6)).join(', ');
-                 setAirdropLogs(prev => [...prev, `❌ Critical error in batch (signing failed?): ${(batchError as Error).message}. Failed addresses: ${failedAddresses}`]);
+                 setAirdropLogs(prev => [...prev, t('airdrop_batch_error_log', { error: (batchError as Error).message, addresses: failedAddresses })]);
                  setAirdropProgress(prev => ({ ...prev, current: prev.current + batch.length }));
             }
         }
         
         setIsAirdropping(false);
         const totalFailed = contributorsToProcess.length - successfulInThisRun;
-        setAirdropLogs(prev => [...prev, `--- Airdrop run complete. Success: ${successfulInThisRun}, Failed: ${totalFailed}. Total processed: ${processedAddresses.size + successfulInThisRun}/${aggregatedContributors.length} ---`]);
+        setAirdropLogs(prev => [...prev, t('airdrop_run_complete_log', { success: successfulInThisRun, failed: totalFailed, processed: currentProcessed.size, total: aggregatedContributors.length })]);
 
     }, [wallet, connection, aggregatedContributors, t, processedAddresses]);
 
     const handleClearProgress = () => {
         if (isAirdropping) {
-            alert("Cannot clear progress while an airdrop is in progress.");
+            toast.error("Cannot clear progress while an airdrop is in progress.");
             return;
         }
-        if (window.confirm("Are you sure you want to clear the airdrop progress and logs? This cannot be undone and is only for emergency resets.")) {
+        if (window.confirm(t('airdrop_clear_progress_confirm'))) {
             setProcessedAddresses(new Set());
             setAirdropLogs([]);
             setAirdropProgress({ current: 0, total: 0 });
+            localStorage.removeItem(AIRDROP_PROGRESS_KEY);
         }
     };
     
@@ -326,7 +334,7 @@ export default function AdminPresale() {
     const isResuming = processedAddresses.size > 0 && processedAddresses.size < aggregatedContributors.length;
     const airdropButtonText = isAirdropping 
         ? t('airdrop_in_progress') 
-        : (isResuming ? 'Resume Airdrop' : t('start_airdrop'));
+        : (isResuming ? t('airdrop_resume') : t('start_airdrop'));
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -389,7 +397,7 @@ export default function AdminPresale() {
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold">{t('airdrop_tool_title')}</h2>
                             <button onClick={handleClearProgress} disabled={isAirdropping} className="flex items-center gap-2 text-xs bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 px-3 py-1.5 rounded-lg font-semibold hover:bg-red-200 dark:hover:bg-red-900 disabled:opacity-50">
-                                <RotateCcw size={14} /> Clear Progress & Logs
+                                <RotateCcw size={14} /> {t('airdrop_clear_progress')}
                             </button>
                         </div>
                          <div className="bg-red-500/10 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 rounded-r-lg flex items-start gap-3">

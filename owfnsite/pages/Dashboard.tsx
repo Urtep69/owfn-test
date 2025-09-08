@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -10,6 +8,7 @@ import { AddressDisplay } from '../components/AddressDisplay.tsx';
 import { formatNumber } from '../lib/utils.ts';
 import { ArrowRight, DollarSign, Users, PieChart } from 'lucide-react';
 import { AnimatedNumber } from '../components/AnimatedNumber.tsx';
+import { WalletCardSkeleton } from '../components/SkeletonLoaders.tsx';
 
 const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'>, gridClass?: string }) => {
     const { t, solana } = useAppContext();
@@ -39,6 +38,10 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
         fetchBalances();
     }, [walletInfo.address, solana.getWalletBalances]);
 
+    if (loading) {
+        return <WalletCardSkeleton />;
+    }
+
     return (
         <div className={`bg-white dark:bg-darkPrimary-800 p-6 rounded-2xl shadow-3d transition-all duration-300 hover:shadow-3d-lg hover:-translate-y-1 transform-style-3d group perspective-1000 flex flex-col ${gridClass}`}>
             <div className="transition-transform duration-500 group-hover:rotate-x-[5deg] flex flex-col flex-grow">
@@ -46,51 +49,39 @@ const WalletCard = ({ walletInfo, gridClass = '' }: { walletInfo: Omit<Wallet, '
                 <div className="mb-4">
                     <AddressDisplay address={walletInfo.address} />
                 </div>
-                {loading ? (
-                    <>
-                        <div className="h-16 bg-primary-200 dark:bg-darkPrimary-700 rounded-lg animate-pulse"></div>
-                        <div className="h-4 mt-2 w-28 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
-                        <div className="mt-4 pt-4 border-t border-primary-200 dark:border-darkPrimary-700/50 space-y-3 flex-grow">
-                            <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
-                            <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded animate-pulse"></div>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div>
-                            <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('total_value')}</p>
-                            <p className="text-4xl font-bold text-green-600 dark:text-green-400">
-                               $<AnimatedNumber value={totalValue} />
-                            </p>
-                            <p className="text-sm text-primary-500 dark:text-darkPrimary-500 mt-1">
-                                {t('token_types')}: {tokenTypesCount}
-                            </p>
-                        </div>
-                        <div className="mt-4 pt-4 border-t border-primary-200 dark:border-darkPrimary-700/50 flex-grow flex flex-col">
-                            <h4 className="text-xs font-bold uppercase text-primary-500 dark:text-darkPrimary-500 mb-2">Assets</h4>
-                            {balances.length > 0 ? (
-                                <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-                                    {balances.map(token => (
-                                        <div key={token.mintAddress} className="flex items-center justify-between text-sm">
-                                            <div className="flex items-center gap-3">
-                                                {React.isValidElement(token.logo) ? React.cloneElement(token.logo as React.ReactElement<{ className?: string }>, { className: 'w-6 h-6' }) : null}
-                                                <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{token.symbol}</span>
-                                            </div>
-                                            <div className="text-right font-mono">
-                                                <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
-                                                <p className="text-xs text-primary-500 dark:text-darkPrimary-400">${token.usdValue.toFixed(2)}</p>
-                                            </div>
-                                        </div>
-                                    ))}
+                
+                <div>
+                    <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('total_value')}</p>
+                    <p className="text-4xl font-bold text-green-600 dark:text-green-400">
+                       $<AnimatedNumber value={totalValue} />
+                    </p>
+                    <p className="text-sm text-primary-500 dark:text-darkPrimary-500 mt-1">
+                        {t('token_types')}: {tokenTypesCount}
+                    </p>
+                </div>
+                <div className="mt-4 pt-4 border-t border-primary-200 dark:border-darkPrimary-700/50 flex-grow flex flex-col">
+                    <h4 className="text-xs font-bold uppercase text-primary-500 dark:text-darkPrimary-500 mb-2">Assets</h4>
+                    {balances.length > 0 ? (
+                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                            {balances.map(token => (
+                                <div key={token.mintAddress} className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-3">
+                                        {React.isValidElement(token.logo) ? React.cloneElement(token.logo as React.ReactElement<{ className?: string }>, { className: 'w-6 h-6' }) : null}
+                                        <span className="font-semibold text-primary-800 dark:text-darkPrimary-200">{token.symbol}</span>
+                                    </div>
+                                    <div className="text-right font-mono">
+                                        <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
+                                        <p className="text-xs text-primary-500 dark:text-darkPrimary-400">${token.usdValue.toFixed(2)}</p>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="flex-grow flex items-center justify-center">
-                                    <p className="text-sm text-center text-primary-500 dark:text-darkPrimary-400">{t('dashboard_wallet_empty')}</p>
-                                </div>
-                            )}
+                            ))}
                         </div>
-                    </>
-                )}
+                    ) : (
+                        <div className="flex-grow flex items-center justify-center">
+                            <p className="text-sm text-center text-primary-500 dark:text-darkPrimary-400">{t('dashboard_wallet_empty')}</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
