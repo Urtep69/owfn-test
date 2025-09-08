@@ -435,7 +435,6 @@ export const ro = {
     contact_error_message: `A apărut o eroare. Vă rugăm să încercați din nou mai târziu.`,
     contact_faq_title: `Aveți o întrebare rapidă?`,
     contact_faq_desc: `Multe răspunsuri pot fi găsite deja în secțiunea noastră de Întrebări Frecvente. Economisiți timp și consultați-o acum!`,
-    contact_faq_button: `Vezi Întrebările Frecvente`,
     contact_required_fields: `Câmpurile marcate cu asterisc (*) sunt obligatorii.`,
     contact_disclaimer_title: `Notă privind Politica Noastră de Comunicare`,
     contact_disclaimer_message: `Pentru a ne asigura că echipa noastră poate sprijini eficient comunitatea și poate avansa proiectul, prioritizăm solicitările direct legate de Official World Family Network. Mesajele care nu au legătură cu subiectul, sunt spam sau nesolicitate s-ar putea să nu primească un răspuns. Vă mulțumim pentru înțelegere și pentru că ne ajutați să rămânem concentrați pe misiunea noastră.`,
@@ -590,4 +589,9 @@ export const ro = {
     airdrop_resume: `Continuă Airdrop`,
     airdrop_clear_progress_confirm: `Ești sigur că vrei să ștergi progresul și jurnalele airdrop-ului? Această acțiune nu poate fi anulată și este doar pentru resetări de urgență.`,
     airdrop_clear_progress: `Șterge Progresul și Jurnalele`,
+
+    // New keys for email transcript signature
+    email_transcript_for: `Transcrierea pentru:`,
+    email_transcript_sent_from: `Această transcriere a fost trimisă automat de la`,
+    email_transcript_visit_us: `Vizitează owfn.org`,
 };

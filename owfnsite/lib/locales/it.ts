@@ -1,5 +1,5 @@
 export const it = {
-    // Navigation
+    // Navigation & Sidebar
     home: `Home`,
     presale: `Prevendita`,
     about: `Chi siamo`,
@@ -18,13 +18,11 @@ export const it = {
     governance: `Governance`,
     maintenance_mode: `Modalità Manutenzione`,
     contact: `Contatti`,
-
-    // Sidebar Groups
     sidebar_explore: `Esplora`,
     sidebar_finance: `Finanza`,
     sidebar_engage: `Partecipa`,
 
-    // General
+    // General & Header
     connect_wallet: `Connetti Wallet`,
     disconnect_wallet: `Disconnetti Wallet`,
     copy_address: `Copia Indirizzo`,
@@ -41,8 +39,6 @@ export const it = {
     connect_wallet_first: `Per favore, connetti prima il tuo wallet.`,
     yes: `Sì`,
     no: `No`,
-    
-    // Time Units
     time_days: `Giorni`,
     time_hours: `Ore`,
     time_minutes: `Minuti`,
@@ -56,15 +52,25 @@ export const it = {
     home_feature_impact_title: `Impatto Reale`,
     home_feature_impact_desc: `Sfruttare la blockchain per un aiuto trasparente al 100% in sanità, istruzione e bisogni di base.`,
     home_feature_community_title: `Guidato dalla Comunità`,
-    home_feature_community_desc: `La nostra forza è la nostra comunità. Il tuo sostegno alimenta direttamente le iniziative sociali in tutto il mondo.`,
+    home_feature_community_desc: `La nostra forza è la nostra comunità. Il tuo sostegno alimenta directamente le iniziative sociali in tutto il mondo.`,
     home_feature_solana_title: `Powered by Solana`,
     home_feature_solana_desc: `Utilizzare la velocità e i bassi costi della blockchain di Solana per operazioni efficienti e scalabili.`,
     
+    // Community Toolkit
+    community_toolkit_title: `Kit dell'Ambasciatore della Comunità`,
+    community_toolkit_subtitle: `Aiuta a diffondere la parola di OWFN! Usa il nostro strumento basato sull'IA per generare post unici sui social media e condividere la nostra missione con il mondo.`,
+    community_toolkit_generate_button: `Genera un Altro Post`,
+    community_toolkit_copy_button: `Copia Post`,
+    community_toolkit_copied_button: `Copiato!`,
+    community_toolkit_share_button: `Condividi su X`,
+    community_toolkit_error_message: `Impossibile generare il post. Riprova.`,
+    community_toolkit_error_message_network: `Si è verificato un errore. Riprova.`,
+
     // About Page
     about_title: `Riguardo a OWFN`,
     about_subtitle: `Costruire una famiglia globale unita per il bene sociale.`,
     about_mission_title: `La Nostra Missione`,
-    about_mission_desc: `L'Official World Family Network (OWFN) ha la missione di costruire una rete globale che fornisca un supporto reale e trasparente al 100% all'umanità. Assistiamo le persone ovunque, in qualsiasi momento, con bisogni essenziali sfruttando la potenza della tecnologia blockchain. Il nostro obiettivo è creare un sistema di aiuti decentralizzato che sia efficiente, responsabile e accessibile a tutti. Crediamo che collegando direttamente le persone alle cause, possiamo eliminare le inefficienze e garantire che l'aiuto raggiunga coloro che ne hanno più bisogno.`,
+    about_mission_desc: `L'Official World Family Network (OWFN) ha la missione di costruire una rete globale che fornisca un supporto reale e trasparente al 100% all'umanità. Assistiamo le persone ovunque, in qualsiasi momento, con bisogni essenziali sfruttando la potenza della tecnologia blockchain. Il nostro obiettivo è creare un sistema di aiuti decentralizzato che sia efficiente, responsabile e accessibile a tutti. Crediamo che collegando directamente le persone alle cause, possiamo eliminare le inefficienze e garantire che l'aiuto raggiunga coloro che ne hanno più bisogno.`,
     about_vision_title: `La Nostra Visione`,
     about_vision_desc: `Immaginiamo un mondo in cui i confini non limitino la compassione e il supporto. Un mondo in cui la tecnologia ci unisce per risolvere problemi globali critici come la povertà, la mancanza di accesso all'assistenza sanitaria e le disparità educative. OWFN mira ad essere più di un semplice progetto; è un movimento. Una forza viva e pulsante per il bene, costruita e sostenuta da una comunità globale di individui che credono in un futuro migliore e più equo per tutti. Questa visione può essere raggiunta solo attraverso l'azione collettiva e il sostegno incrollabile della nostra comunità.`,
     about_impact_areas_title: `Aree di Impatto`,
@@ -85,7 +91,7 @@ export const it = {
     about_new_section_connection_title: `Aiuto Senza Condizioni. Pura Connessione Umana.`,
     about_new_section_connection_desc: `L'Official World Family Network è stato creato con una sola verità al suo centro: stare al fianco delle persone quando si sentono sole in questo mondo. Ogni token non è solo un asset digitale: è un simbolo di speranza, un gesto di supporto, una scintilla di dignità.`,
     about_new_section_access_title: `Semplice, Veloce e Accessibile`,
-    about_new_section_access_desc: `OWFN è progettato per essere inviato direttamente a chiunque ne abbia bisogno, senza burocrazia, senza documenti, senza attese. Che si tratti di cibo, medicine o riparo, il valore di OWFN può essere utilizzato istantaneamente, offrendo un impatto reale in tempo reale.`,
+    about_new_section_access_desc: `OWFN è progettato per essere inviato directamente a chiunque ne abbia bisogno, senza burocrazia, senza documenti, senza attese. Che si tratti di cibo, medicine o riparo, il valore di OWFN può essere utilizzato istantaneamente, offrendo un impatto reale in tempo reale.`,
     about_new_section_transparency_title: `Trasparenza Totale. Un Impegno per la Vita.`,
     about_new_section_transparency_desc: `Una parte significativa dell'offerta totale sarà assegnata a un portafoglio pubblico, noto come Portafoglio del Tesoro per l'Impatto e le Iniziative Sociali, utilizzato esclusivamente per:`,
     about_new_section_transparency_item1: `Aiuti umanitari verificati.`,
@@ -159,7 +165,7 @@ export const it = {
 
     // Donations Page
     make_donation: `Fai una Donazione`,
-    donation_desc: `Sostieni le nostre iniziative di impatto sociale donando criptovalute. Tutti i fondi vanno direttamente al Tesoro dell'Impatto.`,
+    donation_desc: `Sostieni le nostre iniziative di impatto sociale donando criptovalute. Tutti i fondi vanno directamente al Tesoro dell'Impatto.`,
     donation_message_title: `Un Ponte di Speranza, Costruito da Te`,
     donation_message_p1: `Al di là del codice e della blockchain si trova la nostra vera missione: l'umanità. Ogni transazione su questa pagina è più di un semplice trasferimento di valore; è una mano tesa attraverso i continenti, un segnale che nessuno deve temere di essere dimenticato.`,
     donation_message_p2_part1: `Il tuo contributo, indipendentemente dalla criptovaluta scelta, si trasforma. Diventa le fondamenta di una nuova scuola, un rifugio sicuro dove il potenziale di un bambino può fiorire. Diventa assistenza medica salvavita per una famiglia che aveva perso ogni speranza. Diventa un pasto caldo per qualcuno emarginato dalla società, una casa dignitosa per un anziano, o i materiali necessari per ricostruire una comunità devastata da un disastro. Attraverso la trasparenza offerta dalla blockchain di Solana, l' `,
@@ -275,7 +281,7 @@ export const it = {
     faq_q1: `Cos'è OWFN?`,
     faq_a1: `OWFN (Official World Family Network) è un token basato su Solana progettato per unire le famiglie a livello globale attraverso la tecnologia blockchain, concentrandosi sull'impatto sociale, l'istruzione, la sanità e l'aiuto umanitario con totale trasparenza.`,
     faq_q2: `Come posso acquistare i token OWFN?`,
-    faq_a2: `Puoi partecipare alla prevendita dei token OWFN direttamente tramite il link fornito nella sezione "Prevendita" del nostro sito web. Assicurati di avere SOL (Solana) nel tuo portafoglio per effettuare l'acquisto.`,
+    faq_a2: `Puoi partecipare alla prevendita dei token OWFN directamente tramite il link fornito nella sezione "Prevendita" del nostro sito web. Assicurati di avere SOL (Solana) nel tuo portafoglio per effettuare l'acquisto.`,
     faq_q3: `Qual è l'offerta totale di token OWFN?`,
     faq_a3: `L'offerta totale di token OWFN è di 18.000.000.000 (18 miliardi) OWFN.`,
     faq_q4: `Come garantisce OWFN la trasparenza nelle sue iniziative di impatto sociale?`,
@@ -285,8 +291,9 @@ export const it = {
     faq_q6: `Dove posso trovare il Whitepaper di OWFN?`,
     faq_a6: `Puoi trovare il Whitepaper dettagliato di OWFN cliccando sul pulsante "Whitepaper" nell'intestazione o nella sezione principale del nostro sito web.`,
     faq_q7: `In che modo OWFN fa la differenza nel mondo reale?`,
-    faq_a7: `OWFN finanzia direttamente iniziative in aree critiche come la sanità (es. copertura dei costi chirurgici, modernizzazione degli ospedali), l'istruzione (es. costruzione e ristrutturazione di scuole, asili) e i bisogni di base (es. fornitura di cibo, riparo, vestiti per i senzatetto, creazione di case di riposo). Rispondiamo anche ai disastri e investiamo in progetti di sviluppo comunitario sostenibile. Ogni token contribuisce a queste azioni concrete, garantendo un supporto reale al 100% all'umanità.`,
-    faq_a8: `Il tuo contributo aiuta in due modi fondamentali. In primo luogo, quando acquisti token durante la prevendita, una parte significativa dei fondi va direttamente al Tesoro dell'Impatto per lanciare i nostri progetti sociali. In secondo luogo, per creare una fonte di finanziamento sostenibile a lungo termine, una piccola commissione di trasferimento dello 0,5% sarà attivata su tutte le transazioni *dopo* la conclusione del periodo di prevendita. Questa commissione è concepita come una micro-donazione automatica al Tesoro dell'Impatto. Ciò significa che ogni volta che il token viene utilizzato in futuro, genera un supporto continuo per le nostre cause umanitarie, trasformando l'intero ecosistema in una forza perpetua per il bene. Tutti questi flussi finanziari sono completamente trasparenti sulla blockchain.`,
+    faq_a7: `OWFN finanzia directamente iniziative in aree critiche come la sanità (es. copertura dei costi chirurgici, modernizzazione degli ospedali), l'istruzione (es. costruzione e ristrutturazione di scuole, asili) e i bisogni di base (es. fornitura di cibo, riparo, vestiti per i senzatetto, creazione di case di riposo). Rispondiamo anche ai disastri e investiamo in progetti di sviluppo comunitario sostenibile. Ogni token contribuisce a queste azioni concrete, garantendo un supporto reale al 100% all'umanità.`,
+    faq_q8: `In che modo il mio contributo, acquistando token, aiuta concretamente?`,
+    faq_a8: `Il tuo contributo aiuta in due modi fondamentali. In primo luogo, quando acquisti token durante la prevendita, una parte significativa dei fondi va directamente al Tesoro dell'Impatto per lanciare i nostri progetti sociali. In secondo luogo, per creare una fonte di finanziamento sostenibile a lungo termine, una piccola commissione di trasferimento dello 0,5% sarà attivata su tutte le transazioni *dopo* la conclusione del periodo di prevendita. Questa commissione è concepita come una micro-donazione automatica al Tesoro dell'Impatto. Ciò significa che ogni volta che il token viene utilizzato in futuro, genera un supporto continuo per le nostre cause umanitarie, trasformando l'intero ecosistema in una forza perpetua per il bene. Tutti questi flussi finanziari sono completamente trasparenti sulla blockchain.`,
     faq_q9: `Oltre ad acquistare token, in che altro modo posso essere coinvolto e aiutare OWFN?`,
     faq_a9: `Il tuo coinvolgimento è cruciale! Spargere la voce su OWFN è incredibilmente potente. Parla con i tuoi amici, familiari e colleghi della nostra missione. Condividi la nostra visione sui social media, durante i tuoi viaggi o al lavoro. Ogni conversazione, ogni condivisione, aiuta ad aumentare la consapevolezza e porta più persone nella nostra famiglia globale, amplificando il nostro impatto collettivo. Unisciti ai nostri canali comunitari per rimanere aggiornato e partecipare alle discussioni.`,
     faq_q10: `Ci sono istruzioni speciali per donare USDC o USDT?`,
@@ -297,7 +304,7 @@ export const it = {
     faq_a12: `Secondo la nostra Roadmap, dopo la conclusione positiva della prevendita, procederemo con la quotazione ufficiale del token $OWFN sugli scambi decentralizzati (DEX) all'interno dell'ecosistema di Solana. La data esatta e le piattaforme verranno annunciate sui nostri canali ufficiali.`,
     faq_q13: `Perché c'è un limite massimo di acquisto (Max Buy) nella prevendita?`,
     faq_a13: `Il limite massimo di acquisto è una misura importante per garantire la distribuzione più equa possibile dei token e per impedire che un piccolo numero di grandi investitori ("balene") controlli una parte significativa dell'offerta. Questo promuove una comunità più sana e decentralizzata a lungo termine.`,
-    faq_q14: `Cosa significa che il token è "portatore di interessi" con un APY del 2%? Come funziona?`,
+    faq_q14: `Cosa è la commissione di trasferimento dello 0,5% e quando viene attivata?`,
     faq_a14: `Questa commissione è un meccanismo chiave per il finanziamento a lungo termine della nostra missione. Una commissione dello 0,5% verrà applicata a tutte le transazioni con il token OWFN *dopo* la conclusione del periodo di prevendita. I fondi raccolti da questa commissione vengono automaticamente indirizzati al Tesoro dell'Impatto per finanziare continuamente i nostri progetti sociali. Pertanto, ogni transazione contribuisce al bene comune.`,
     faq_q15: `Perché avete scelto la blockchain di Solana per questo progetto?`,
     faq_a15: `Abbiamo scelto Solana per la sua eccezionale velocità, i costi di transazione molto bassi e l'alta scalabilità. Queste caratteristiche sono essenziali per un progetto globale come il nostro, consentendo micro-transazioni efficienti e garantendo un'esperienza rapida e accessibile per tutti gli utenti, che si tratti di donare, acquistare o scambiare token.`,
@@ -305,7 +312,8 @@ export const it = {
     faq_a16: `La trasparenza è fondamentale per noi. Tutti i fondi destinati a cause sociali sono gestiti attraverso il Tesoro dell'Impatto, il cui indirizzo del portafoglio è pubblico. Puoi monitorare tutte le transazioni in entrata e in uscita su un esploratore di blocchi di Solana, come Solscan. Inoltre, sul Portale dell'Impatto forniremo aggiornamenti regolari e rapporti dettagliati sui progetti finanziati.`,
     faq_q17: `Posso proporre un caso sociale o una causa da finanziare da parte di OWFN?`,
     faq_a17: `Nella fase iniziale, i progetti vengono selezionati dal nostro team sulla base di rigorosi criteri di impatto e fattibilità. Man mano che il progetto avanza, implementeremo un sistema di governance (DAO) che consentirà ai membri della comunità di proporre e votare sulle future iniziative, dandoti un ruolo diretto nell'indirizzare i fondi.`,
-    faq_q18: `I dettagli sulla visione e i valori del nostro team sono presentati sul sito web. Man mano che ci avviciniamo al lancio pubblico, forniremo maggiore trasparenza riguardo ai membri chiave e ai consulenti che contribuiscono al successo del progetto, nel rispetto della loro sicurezza e privacy.`,
+    faq_q18: `Chi c'è dietro il progetto OWFN? Il team è anonimo?`,
+    faq_a18: `I dettagli sulla visione e i valori del nostro team sono presentati sul sito web. Man mano che ci avviciniamo al lancio pubblico, forniremo maggiore trasparenza riguardo ai membri chiave e ai consulenti che contribuiscono al successo del progetto, nel rispetto della loro sicurezza e privacy.`,
     faq_q20: `Quali misure di sicurezza avete adottato per proteggere i fondi del progetto e degli investitori?`,
     faq_a20: `La sicurezza è la nostra massima priorità. Utilizziamo portafogli multi-firma per la gestione dei fondi critici, il che significa che nessuna singola transazione può essere approvata da una sola persona. Il contratto intelligente del token sarà sottoposto ad audit da parte di rinomate società di sicurezza per identificare e correggere eventuali vulnerabilità prima del lancio.`,
 
@@ -345,7 +353,17 @@ export const it = {
     chatbot_proactive_profile: `Benvenuto al tuo profilo! Fammi sapere se hai domande sui tuoi token o sulle statistiche di impatto.`,
     chatbot_proactive_wallet_intro: `Bentornato! Vedo che hai alcuni asset nel tuo portafoglio connesso:`,
     chatbot_proactive_wallet_outro: `Posso aiutarti ad acquistare più OWFN o a fare una donazione. Cosa ti interessa oggi?`,
-    
+    chatbot_send_transcript: 'Invia Trascrizione via Email',
+    chatbot_email_modal_title: 'Invia Trascrizione Chat',
+    chatbot_email_modal_desc: 'Inserisci il tuo indirizzo email qui sotto per ricevere una copia di questa conversazione.',
+    chatbot_email_modal_placeholder: 'tua.email@esempio.com',
+    chatbot_email_modal_send: 'Invia',
+    chatbot_email_modal_cancel: 'Annulla',
+    chatbot_email_modal_sending: 'Invio in corso...',
+    chatbot_email_success_toast: 'Trascrizione inviata con successo a {email}.',
+    chatbot_email_error_toast: 'Impossibile inviare la trascrizione. Riprova.',
+    chatbot_email_invalid_toast: 'Inserisci un indirizzo email valido.',
+
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,
     whitepaper_subtitle: `Una Panoramica Dettagliata del Progetto Official World Family Network`,
@@ -420,7 +438,7 @@ export const it = {
     contact_faq_button: `Visualizza le FAQ`,
     contact_required_fields: `I campi contrassegnati con un asterisco (*) sono obbligatori.`,
     contact_disclaimer_title: `Nota sulla Nostra Politica di Comunicazione`,
-    contact_disclaimer_message: `Per garantire che il nostro team possa supportare efficacemente la comunità e far progredire il progetto, diamo la priorità alle richieste direttamente correlate all'Official World Family Network. I messaggi fuori tema, lo spam o le proposte non richieste potrebbero non ricevere una risposta. Grazie per la tua comprensione e per averci aiutato a rimanere concentrati sulla nostra missione.`,
+    contact_disclaimer_message: `Per garantire che il nostro team possa supportare efficacemente la comunità e far progredire il progetto, diamo la priorità alle richieste directamente correlate all'Official World Family Network. I messaggi fuori tema, lo spam o le proposte non richieste potrebbero non ricevere una risposta. Grazie per la tua comprensione e per averci aiutato a rimanere concentrati sulla nostra missione.`,
     contact_social_x_title: `X.com / Twitter`,
     contact_social_x_desc: `Seguici per aggiornamenti in tempo reale, notizie e annunci.`,
     contact_social_telegram_channel_title: `Canale Telegram`,
@@ -449,4 +467,9 @@ export const it = {
     unique_contributors: `Contributori Unici`,
     airdrop_info_box_title: `Riguardo a questo Airdrop`,
     airdrop_info_box_desc: `Questo airdrop è progettato per premiare i primi sostenitori e i membri attivi della comunità. L'idoneità si basa su fattori come la partecipazione alla prevendita e l'impegno negli eventi della comunità.`,
+
+    // New keys for email transcript signature
+    email_transcript_for: `Trascrizione per:`,
+    email_transcript_sent_from: `Questa trascrizione è stata inviata automaticamente da`,
+    email_transcript_visit_us: `Visita owfn.org`,
 };

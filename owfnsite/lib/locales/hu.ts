@@ -354,6 +354,16 @@ export const hu = {
     chatbot_proactive_profile: `Üdvözöljük a profiljában! Mondja el, ha kérdései vannak a tokenjeivel vagy a hatásstatisztikáival kapcsolatban.`,
     chatbot_proactive_wallet_intro: `Üdvözöljük újra! Látom, vannak eszközei a csatlakoztatott pénztárcájában:`,
     chatbot_proactive_wallet_outro: `Segíthetek további OWFN vásárlásában vagy adományozásában. Mi érdekli ma?`,
+    chatbot_send_transcript: 'Jegyzőkönyv Küldése E-mailben',
+    chatbot_email_modal_title: 'Csevegési Jegyzőkönyv Küldése',
+    chatbot_email_modal_desc: 'Adja meg e-mail címét alább, hogy megkapja ennek a beszélgetésnek a másolatát.',
+    chatbot_email_modal_placeholder: 'az.email.cimed@pelda.com',
+    chatbot_email_modal_send: 'Küldés',
+    chatbot_email_modal_cancel: 'Mégse',
+    chatbot_email_modal_sending: 'Küldés...',
+    chatbot_email_success_toast: 'A jegyzőkönyv sikeresen elküldve a(z) {email} címre.',
+    chatbot_email_error_toast: 'Nem sikerült elküldeni a jegyzőkönyvet. Kérjük, próbálja újra.',
+    chatbot_email_invalid_toast: 'Kérjük, adjon meg érvényes e-mail címet.',
 
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -581,4 +591,9 @@ export const hu = {
     airdrop_resume: `Airdrop Folytatása`,
     airdrop_clear_progress_confirm: `Biztosan törölni szeretné az airdrop folyamatát és naplóit? Ez a művelet nem vonható vissza, és csak vészhelyzeti visszaállításra szolgál.`,
     airdrop_clear_progress: `Folyamat és Naplók Törlése`,
+
+    // New keys for email transcript signature
+    email_transcript_for: `Jegyzőkönyv címzettje:`,
+    email_transcript_sent_from: `Ezt a jegyzőkönyvet automatikusan küldte a`,
+    email_transcript_visit_us: `Látogasson el az owfn.org oldalra`,
 };

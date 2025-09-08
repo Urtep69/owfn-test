@@ -1,3 +1,4 @@
+
 export const sr = {
     // Navigation
     home: `Почетна`,
@@ -356,6 +357,16 @@ export const sr = {
     chatbot_proactive_profile: `Добродошли на ваш профил! Јавите ми ако имате питања о вашим токенима или статистици утицаја.`,
     chatbot_proactive_wallet_intro: `Добродошли назад! Видим да имате неке активе у повезаном новчанику:`,
     chatbot_proactive_wallet_outro: `Могу вам помоћи да купите још ОWFN-а или да донирате. Шта вас данас занима?`,
+    chatbot_send_transcript: 'Pošalji transkript putem e-pošte',
+    chatbot_email_modal_title: 'Pošalji transkript razgovora',
+    chatbot_email_modal_desc: 'Unesite svoju e-mail adresu ispod da biste primili kopiju ovog razgovora.',
+    chatbot_email_modal_placeholder: 'vas.email@primer.com',
+    chatbot_email_modal_send: 'Pošalji',
+    chatbot_email_modal_cancel: 'Otkaži',
+    chatbot_email_modal_sending: 'Slanje...',
+    chatbot_email_success_toast: 'Transkript je uspešno poslat na {email}.',
+    chatbot_email_error_toast: 'Slanje transkripta nije uspelo. Pokušajte ponovo.',
+    chatbot_email_invalid_toast: 'Unesite važeću e-mail adresu.',
     
     // Whitepaper
     whitepaper_title: `ОWFN Бела књига`,
@@ -441,4 +452,28 @@ export const sr = {
     contact_social_discord_title: `Дисцорд сервер`,
     contact_social_discord_desc: `Постаните део наше активне заједнице за дискусије и подршку.`,
     send_direct_message: `Пошаљи директну поруку`,
+
+    // AI Features
+    ai_summary_button: `Добиј резиме вештачке интелигенције`,
+    ai_summary_loading: `Генерисање...`,
+    ai_summary_title: `Резиме вештачке интелигенције`,
+    generated_by_ai: `Генерисано вештачком интелигенцијом`,
+    impact_narrative_title: `Ваша прича о утицају`,
+    impact_narrative_loading: `Креирање ваше персонализоване приче...`,
+    nft_reward_title: `Посебна захвалност`,
+    nft_reward_button: `Генериши уметност захвалности`,
+    nft_reward_loading: `Генерисање вашег јединственог уметничког дела... Ово може потрајати.`,
+    nft_reward_significant_donation_prompt: `Донирајте ${'$'}{threshold}+ да бисте генерисали јединствену уметност захвалности!`,
+    api_error_generic: `Захтев тренутно није могуће извршити.`,
+
+    // Admin
+    presale_admin_title: `Администратор претпродаје`,
+    unique_contributors: `Јединствени доприносиоци`,
+    airdrop_info_box_title: `О овом аирдропу`,
+    airdrop_info_box_desc: `Овај аирдроп је осмишљен да награди ране присталице и активне чланове заједнице. Подобност се заснива на факторима као што су учешће у претпродаји и ангажовање у догађајима заједнице.`,
+
+    // New keys for email transcript signature
+    email_transcript_for: `Транскрипт за:`,
+    email_transcript_sent_from: `Овај транскрипт је аутоматски послат са`,
+    email_transcript_visit_us: `Посетите owfn.org`,
 };

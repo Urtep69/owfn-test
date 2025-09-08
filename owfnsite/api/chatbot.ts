@@ -189,7 +189,8 @@ A conversation might start because you sent a proactive message listing the user
 - **External Social Media Links**: Use this exact format: [Social Link: PlatformName|URL].
   - Allowed Platforms: X, Telegram Group, Telegram Channel, Discord.
 - **Action Links**: To create a button that navigates the user and pre-fills forms, you MUST use this exact format: [Action: Navigate|Button Text|/path?query=params].
-  - Example: [Action: Navigate|Donate 10 USDC|/donations?token=USDC&amount=10]`;
+  - Example: [Action: Navigate|Donate 10 USDC|/donations?token=USDC&amount=10]
+- **CRITICAL FORMATTING RULE**: The keywords inside brackets like 'Visit Page', 'Social Link', and 'Action: Navigate' MUST ALWAYS be in English, even if the rest of your response is in another language. Only the user-visible text should be translated. Example for Romanian: "Apăsați butonul de mai jos." [Action: Navigate|Mergi la Pre-vânzare|/presale]`;
         
         const resultStream = await ai.models.generateContentStream({
             model: 'gemini-2.5-flash',

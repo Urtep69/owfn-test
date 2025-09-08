@@ -590,4 +590,9 @@ export const de = {
     airdrop_resume: `Airdrop fortsetzen`,
     airdrop_clear_progress_confirm: `Sind Sie sicher, dass Sie den Airdrop-Fortschritt und die Protokolle löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden und ist nur für Notfall-Resets vorgesehen.`,
     airdrop_clear_progress: `Fortschritt & Protokolle löschen`,
+
+    // New keys for email transcript signature
+    email_transcript_for: `Transkript für:`,
+    email_transcript_sent_from: `Dieses Transkript wurde automatisch gesendet von der`,
+    email_transcript_visit_us: `Besuchen Sie owfn.org`,
 };

@@ -1,3 +1,4 @@
+
 export const tr = {
     // Navigation
     home: `Anasayfa`,
@@ -356,6 +357,16 @@ export const tr = {
     chatbot_proactive_profile: `Profilinize hoş geldiniz! Tokenleriniz veya etki istatistikleriniz hakkında sorularınız varsa bana bildirin.`,
     chatbot_proactive_wallet_intro: `Tekrar hoş geldiniz! Bağlı cüzdanınızda bazı varlıklarınız olduğunu görüyorum:`,
     chatbot_proactive_wallet_outro: `Daha fazla OWFN satın almanıza veya bağış yapmanıza yardımcı olabilirim. Bugün ne ile ilgileniyorsunuz?`,
+    chatbot_send_transcript: 'Sohbet Dökümünü E-posta ile Gönder',
+    chatbot_email_modal_title: 'Sohbet Dökümünü Gönder',
+    chatbot_email_modal_desc: 'Bu konuşmanın bir kopyasını almak için aşağıya e-posta adresinizi girin.',
+    chatbot_email_modal_placeholder: 'e-postaniz@ornek.com',
+    chatbot_email_modal_send: 'Gönder',
+    chatbot_email_modal_cancel: 'İptal',
+    chatbot_email_modal_sending: 'Gönderiliyor...',
+    chatbot_email_success_toast: 'Döküm {email} adresine başarıyla gönderildi.',
+    chatbot_email_error_toast: 'Döküm gönderilemedi. Lütfen tekrar deneyin.',
+    chatbot_email_invalid_toast: 'Lütfen geçerli bir e-posta adresi girin.',
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -441,4 +452,28 @@ export const tr = {
     contact_social_discord_title: `Discord Sunucusu`,
     contact_social_discord_desc: `Tartışmalar ve destek için aktif topluluğumuzun bir parçası olun.`,
     send_direct_message: `Doğrudan Mesaj Gönder`,
+
+    // AI Features
+    ai_summary_button: `Yapay Zeka Özeti Al`,
+    ai_summary_loading: `Oluşturuluyor...`,
+    ai_summary_title: `Yapay Zeka Özeti`,
+    generated_by_ai: `Yapay Zeka Tarafından Oluşturuldu`,
+    impact_narrative_title: `Etki Hikayeniz`,
+    impact_narrative_loading: `Kişiselleştirilmiş hikayeniz oluşturuluyor...`,
+    nft_reward_title: `Özel Bir Teşekkür`,
+    nft_reward_button: `Teşekkür Sanatı Oluştur`,
+    nft_reward_loading: `Benzersiz sanat eseriniz oluşturuluyor... Bu biraz zaman alabilir.`,
+    nft_reward_significant_donation_prompt: `Benzersiz bir teşekkür sanatı oluşturmak için ${'$'}{threshold}+ bağış yapın!`,
+    api_error_generic: `İstek şu anda tamamlanamadı.`,
+
+    // Admin
+    presale_admin_title: `Ön Satış Yöneticisi`,
+    unique_contributors: `Benzersiz Katkıda Bulunanlar`,
+    airdrop_info_box_title: `Bu Airdrop Hakkında`,
+    airdrop_info_box_desc: `Bu airdrop, erken destekçileri ve aktif topluluk üyelerini ödüllendirmek için tasarlanmıştır. Uygunluk, ön satışa katılım ve topluluk etkinliklerine katılım gibi faktörlere dayanmaktadır.`,
+
+    // New keys for email transcript signature
+    email_transcript_for: `Transkript Sahibi:`,
+    email_transcript_sent_from: `Bu transkript otomatik olarak şuradan gönderilmiştir:`,
+    email_transcript_visit_us: `owfn.org'u ziyaret et`,
 };
