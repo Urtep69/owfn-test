@@ -5,7 +5,6 @@ import { useLocalization } from '../hooks/useLocalization.ts';
 import { useSolana } from '../hooks/useSolana.ts';
 import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
-import { translateText } from '../services/geminiService.ts';
 
 interface AppContextType {
   theme: Theme;
@@ -20,8 +19,9 @@ interface AppContextType {
   vestingSchedules: VestingSchedule[];
   addVestingSchedule: (schedule: VestingSchedule) => void;
   proposals: GovernanceProposal[];
-  addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
-  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
+  addProposal: (proposal: { title: string; description: string; }) => Promise<void>;
+  voteOnProposal: (proposalId: number, vote: 'for' | 'against') => Promise<void>;
+  fetchProposals: () => Promise<void>;
   isMaintenanceActive: boolean;
   setWalletModalOpen: (open: boolean) => void;
 }
@@ -39,6 +39,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
 
+  const fetchProposals = useCallback(async () => {
+    try {
+        const res = await fetch('/api/governance');
+        if (res.ok) {
+            const data = await res.json();
+            setProposals(data.proposals || []);
+        } else {
+            console.error("Failed to fetch proposals");
+        }
+    } catch (error) {
+        console.error("Error fetching proposals:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProposals();
+  }, [fetchProposals]);
+
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
   };
@@ -47,58 +65,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setVestingSchedules(prev => [schedule, ...prev]);
   };
 
-  const addProposal = useCallback(async (proposalData: { title: string; description: string; endDate: Date; }) => {
-    const newTitleTranslations: Record<string, string> = { en: proposalData.title };
-    const newDescriptionTranslations: Record<string, string> = { en: proposalData.description };
-
-    const languagesToTranslate = SUPPORTED_LANGUAGES.filter(lang => lang.code !== 'en');
-    
-    try {
-        const translationPromises = languagesToTranslate.flatMap(lang => [
-            translateText(proposalData.title, lang.name),
-            translateText(proposalData.description, lang.name),
-        ]);
-
-        const translations = await Promise.all(translationPromises);
-
-        languagesToTranslate.forEach((lang, index) => {
-            newTitleTranslations[lang.code] = translations[index * 2] || proposalData.title;
-            newDescriptionTranslations[lang.code] = translations[index * 2 + 1] || proposalData.description;
-        });
-    } catch (error) {
-        console.error("Translation failed for proposal:", error);
-        languagesToTranslate.forEach(lang => {
-            newTitleTranslations[lang.code] = proposalData.title;
-            newDescriptionTranslations[lang.code] = proposalData.description;
-        });
+  const addProposal = useCallback(async (proposalData: { title: string; description: string; }) => {
+    const result = await solana.createProposal(proposalData.title, proposalData.description);
+    if (result.success && result.newProposal) {
+        setProposals(prev => [result.newProposal!, ...prev]);
+        alert(t(result.messageKey));
+    } else {
+        alert(t(result.messageKey));
     }
-    
-    const newProposal: GovernanceProposal = {
-        id: `prop${Date.now()}`,
-        title: newTitleTranslations,
-        description: newDescriptionTranslations,
-        endDate: proposalData.endDate,
-        proposer: solana.address || 'Anonymous',
-        status: 'active',
-        votesFor: 0,
-        votesAgainst: 0,
-    };
-    setProposals(prev => [newProposal, ...prev]);
-  }, [solana.address]);
+  }, [solana, t]);
   
-  const voteOnProposal = useCallback((proposalId: string, vote: 'for' | 'against') => {
-    setProposals(prev => prev.map(p => {
-        if (p.id === proposalId) {
-            const votePower = 1000000;
-            return {
-                ...p,
-                votesFor: vote === 'for' ? p.votesFor + votePower : p.votesFor,
-                votesAgainst: vote === 'against' ? p.votesAgainst + votePower : p.votesAgainst,
-            }
-        }
-        return p;
-    }));
-  }, []);
+  const voteOnProposal = useCallback(async (proposalId: number, vote: 'for' | 'against') => {
+     const result = await solana.voteOnProposal(proposalId, vote);
+     if (result.success && result.updatedProposal) {
+         setProposals(prev => prev.map(p => p.id === result.updatedProposal!.id ? result.updatedProposal! : p));
+         alert(t(result.messageKey));
+     } else {
+         alert(t(result.messageKey));
+     }
+  }, [solana, t]);
 
   const value: AppContextType = {
     theme,
@@ -115,6 +100,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     proposals,
     addProposal,
     voteOnProposal,
+    fetchProposals,
     isMaintenanceActive,
     setWalletModalOpen,
   };
