@@ -116,15 +116,14 @@ export interface VestingSchedule {
 }
 
 export interface GovernanceProposal {
-  id: number;
-  proposer_address: string;
+  id: string;
   title: Record<string, string>;
   description: Record<string, string>;
-  start_date: string; // ISO string date
-  end_date: string; // ISO string date
+  proposer: string;
   status: 'active' | 'passed' | 'failed';
-  votes_for: number;
-  votes_against: number;
+  votesFor: number;
+  votesAgainst: number;
+  endDate: Date;
 }
 
 export interface ImpactNFT {
@@ -159,7 +158,6 @@ export interface SiwsReturn {
   isAuthenticated: boolean;
   isLoading: boolean;
   isSessionLoading: boolean;
-  // FIX: Corrected typo from `Si-wsSession` to `SiwsSession`.
   session: SiwsSession | null;
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
