@@ -1,22 +1,40 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ShieldCheck, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ShieldCheck, FileWarning, AlertTriangle, Info, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 const messages = [
   {
-    text: 'Domain Verification: Please confirm you are visiting the official domain [slerf.tools] Beware of fake websites stealing assets.',
+    id: 'domain',
+    icon: <ShieldCheck className="w-5 h-5" />,
+    color: 'text-green-500 dark:text-green-400',
+    text: 'Domain Verification: Please confirm you are visiting the official domain [owfn.org]. Beware of fake websites stealing assets.',
     highlight: 'Domain Verification:',
-    linkText: '[slerf.tools]',
-    linkHref: '#' // Placeholder link
+    linkText: '[owfn.org]',
+    linkHref: 'https://owfn.org'
   },
   {
-    text: 'This is a second announcement message as a placeholder.',
-    highlight: 'Important Update:',
+    id: 'openSource',
+    icon: <Info className="w-5 h-5" />,
+    color: 'text-blue-500 dark:text-blue-400',
+    text: 'Open Source Declaration: All tools are personally provided on the chain. Do not use similar tools through third-party links.',
+    highlight: 'Open Source Declaration:',
     linkText: null,
     linkHref: null
   },
   {
-    text: 'This is a third placeholder message for the ticker.',
-    highlight: 'Reminder:',
+    id: 'riskWarning',
+    icon: <AlertTriangle className="w-5 h-5" />,
+    color: 'text-yellow-500 dark:text-yellow-400',
+    text: 'Risk Warning: Recently, multiple fake platforms have appeared with low-price bait to attract users into paying for private key theft; please be extremely vigilant.',
+    highlight: 'Risk Warning:',
+    linkText: null,
+    linkHref: null
+  },
+  {
+    id: 'riskDescription',
+    icon: <FileWarning className="w-5 h-5" />,
+    color: 'text-red-500 dark:text-red-400',
+    text: 'Risk Description: OWFN has not conducted a Telegram audit; please do not trust private messages or accounts. Do not click on unofficial or browser links.',
+    highlight: 'Risk Description:',
     linkText: null,
     linkHref: null
   }
@@ -26,7 +44,7 @@ const renderMessage = (msg: typeof messages[0]) => {
     const textWithoutHighlight = msg.text.replace(msg.highlight, '').trim();
     
     if (!msg.linkText) {
-        return <><span className="text-green-400 font-semibold mr-1">{msg.highlight}</span> {textWithoutHighlight}</>
+        return <><span className={`${msg.color} font-semibold mr-1`}>{msg.highlight}</span> {textWithoutHighlight}</>
     }
     
     const parts = textWithoutHighlight.split(msg.linkText);
@@ -38,7 +56,7 @@ const renderMessage = (msg: typeof messages[0]) => {
 
     return (
         <>
-            <span className="text-green-400 font-semibold mr-1">{msg.highlight}</span>
+            <span className={`${msg.color} font-semibold mr-1`}>{msg.highlight}</span>
             {parts[0]}
             {linkRendered}
             {parts[1]}
@@ -91,7 +109,9 @@ export const TopBanner = () => {
     <div className="bg-primary-200 dark:bg-darkPrimary-900 text-primary-800 dark:text-darkPrimary-200 hidden md:block">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-sm h-10">
         <div className="flex items-center gap-3 overflow-hidden">
-            <ShieldCheck className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0" />
+            <span className={currentMessage.color}>
+                {currentMessage.icon}
+            </span>
             <div className="flex-1 min-w-0">
                  <p className="truncate">
                     {renderMessage(currentMessage)}
