@@ -7,7 +7,7 @@ export const ComingSoon = () => {
 
     return (
         <div 
-            className="absolute inset-0 bg-primary-100 dark:bg-darkPrimary-950 flex items-center justify-center z-10 p-4"
+            className="absolute inset-0 bg-primary-100/30 dark:bg-darkPrimary-950/30 backdrop-blur-md flex items-center justify-center z-10 p-4"
             aria-live="polite"
         >
             <div className="bg-white/50 dark:bg-darkPrimary-800/50 p-8 rounded-2xl shadow-3d-lg text-center max-w-md w-full animate-fade-in-up" style={{ animationDuration: '300ms' }}>
