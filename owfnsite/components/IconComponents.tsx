@@ -77,3 +77,35 @@ export const WalletManagerIcon = ({ className = 'w-6 h-6' }: { className?: strin
       <path d="M13.5 13H12V14.5H13.5V16H15V14.5H16.5V13H15V11.5H13.5V13Z" fill="white" fillOpacity="0.8" />
     </svg>
   );
+  
+export const HelpCenterIcon = ({ className = 'w-10 h-10' }: { className?: string }) => (
+  <svg
+    aria-hidden="true"
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9.08984 9.00002C9.32495 8.19204 9.87614 7.51447 10.6015 7.11123C11.3269 6.70799 12.1691 6.61108 12.9619 6.84213C13.7547 7.07318 14.4446 7.61524 14.8893 8.34907C15.334 9.08289 15.4984 9.94052 15.3538 10.76C15.2093 11.5794 14.7663 12.3114 14.1118 12.82C13.5918 13.22 12.9618 13.5 12.3198 13.5H11.6798"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 16.5H12.01"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);

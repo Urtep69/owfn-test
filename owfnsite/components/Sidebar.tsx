@@ -6,7 +6,7 @@ import {
     Heart, TrendingUp, Lock, Award, User, Vote, Shield
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { OwfnIcon } from './IconComponents.tsx';
+import { OwfnIcon, HelpCenterIcon } from './IconComponents.tsx';
 import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 
 interface SidebarProps {
@@ -113,7 +113,16 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 )}
             </nav>
             
-            <div className="px-2 py-4 border-t border-primary-200/80 dark:border-darkPrimary-700/80 flex-shrink-0">
+            <div className="px-4 py-4 border-t border-primary-200/80 dark:border-darkPrimary-700/80 flex-shrink-0 space-y-2">
+                 <Link to="/docs" onClick={handleLinkClick} className="block bg-primary-200/50 dark:bg-darkPrimary-800/50 p-3 rounded-lg hover:bg-primary-200 dark:hover:bg-darkPrimary-800 transition-colors">
+                    <div className="flex items-center">
+                       <HelpCenterIcon className={`w-8 h-8 text-primary-600 dark:text-darkPrimary-300 transition-all ${isOpen ? 'mr-3' : 'mx-auto'}`} />
+                       <div className={`transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
+                          <p className="font-bold text-primary-800 dark:text-darkPrimary-100">{t('help_center')}</p>
+                          <p className="text-xs text-primary-600 dark:text-darkPrimary-400">{t('help_center_subtitle')}</p>
+                       </div>
+                    </div>
+                 </Link>
                  <NavItem to="/profile" icon={<User size={20} />} label={t('profile')} isOpen={isOpen} onClick={handleLinkClick} />
             </div>
         </aside>
