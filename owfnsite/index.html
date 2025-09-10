@@ -22,11 +22,10 @@
     <meta name="twitter:url" content="https://www.owfn.org/" />
     <meta name="twitter:site" content="@OWFN_Official" />
     
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -34,69 +33,30 @@
           extend: {
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
-              serif: ['Lora', 'serif'],
             },
             colors: {
-              // Light theme palettes remain unchanged
-              'primary': { 
-                '50': '#fafaf9',
-                '100': '#f5f5f4',
-                '200': '#e7e5e4',
-                '300': '#d6d3d1',
-                '400': '#a8a29e',
-                '500': '#78716c',
-                '600': '#57534e',
-                '700': '#44403c',
-                '800': '#292524',
-                '900': '#1c1917',
-                '950': '#0c0a09',
+              // New primary accent color (vibrant blue)
+              primary: {
+                '50': '#eff6ff', '100': '#dbeafe', '200': '#bfdbfe', '300': '#93c5fd', '400': '#60a5fa',
+                '500': '#3b82f6', '600': '#2563eb', '700': '#1d4ed8', '800': '#1e40af', '900': '#1e3a8a',
+                '950': '#172554'
               },
-              'accent': {
-                '50': '#fffbeb',
-                '100': '#fef3c7',
-                '200': '#fde68a',
-                '300': '#fcd34d',
-                '400': '#fbbf24',
-                '500': '#f59e0b',
-                '600': '#d97706',
-                '700': '#b45309',
-                '800': '#92400e',
-                '900': '#78350f',
-                '950': '#451a03',
+              // New neutral color palette (slate)
+              slate: {
+                '50': '#f8fafc', '100': '#f1f5f9', '200': '#e2e8f0', '300': '#cbd5e1', '400': '#94a3b8',
+                '500': '#64748b', '600': '#475569', '700': '#334155', '800': '#1e293b', '900': '#0f172a',
+                '950': '#020617'
               },
-              // Updated Dark theme palettes to match the screenshot
-              'darkPrimary': {
-                '50': '#f7f8f9',
-                '100': '#FFFFFF',    // Headings Text
-                '200': '#E1E3E8',    // Main Text
-                '300': '#9ca3af',    // Subtle Text / Icons
-                '400': '#6b7280',
-                '500': '#4b5563',
-                '700': '#3B3E47',    // Borders
-                '800': '#2A2D35',    // Cards, inputs
-                '900': '#1F2128',    // Content BG, Sidebar
-                '950': '#16181D',    // Page background
-              },
-              'darkAccent': { // New Gold/Orange accent from screenshot
-                '400': '#F9A825', 
-                '500': '#F39C12', // Main button color
-                '600': '#E67E22', 
-              }
             },
             boxShadow: {
-              // Softer, more layered shadows for a premium "floating" effect
-              '3d': '0 2.8px 2.2px rgba(0, 0, 0, 0.02), 0 6.7px 5.3px rgba(0, 0, 0, 0.028), 0 12.5px 10px rgba(0, 0, 0, 0.035), 0 22.3px 17.9px rgba(0, 0, 0, 0.042), 0 41.8px 33.4px rgba(0, 0, 0, 0.05), 0 100px 80px rgba(0, 0, 0, 0.07)',
-              '3d-lg': '0 5px 15px rgba(0, 0, 0, 0.05), 0 15px 35px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0,0,0,0.03)',
-              'inner-3d': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
-              'inner-press': 'inset 0 3px 6px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)',
+              'glow-primary': '0 0 15px 0 rgba(59, 130, 246, 0.4)',
+              'glow-primary-lg': '0 0 25px 0 rgba(59, 130, 246, 0.5)',
             },
             animation: {
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
               'slide-in': 'slideIn 0.5s ease-out forwards',
-              'glow': 'glow 2.5s ease-in-out infinite alternate',
-              'aurora': 'aurora 20s ease-in-out infinite alternate',
-              'press-in': 'pressIn 0.2s ease-out forwards',
-              'scroll-fade-in': 'scrollFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'glow': 'glow 1.5s ease-in-out infinite alternate',
+              'subtle-pulse': 'subtlePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               fadeInUp: {
@@ -108,73 +68,28 @@
                 '100%': { transform: 'translateX(0)' },
               },
               glow: {
-                'from': { 'box-shadow': '0 0 5px -5px #fbbf24' },
-                'to': { 'box-shadow': '0 0 10px 5px #f59e0b' }
+                'from': { 'box-shadow': '0 0 5px -5px #3b82f6' },
+                'to': { 'box-shadow': '0 0 5px 5px #3b82f6' }
               },
-              aurora: {
-                '0%': { 'background-position': '0% 50%' },
-                '50%': { 'background-position': '100% 50%' },
-                '100%': { 'background-position': '0% 50%' },
-              },
-              pressIn: {
-                '0%': { transform: 'scale(1)', boxShadow: '0 2.8px 2.2px rgba(0, 0, 0, 0.02)' },
-                '100%': { transform: 'scale(0.97)', boxShadow: 'inset 0 3px 6px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)' },
-              },
-              scrollFadeIn: {
-                from: { opacity: 0, transform: 'translateY(30px) scale(0.98)' },
-                to: { opacity: 1, transform: 'translateY(0) scale(1)' },
+              subtlePulse: {
+                '50%': { opacity: '.75' },
               },
             },
           },
         },
       };
     </script>
-    <style>
-        html {
-            font-size: 16px;
-            scroll-behavior: smooth;
+     <style>
+        body {
+            font-family: 'Inter', sans-serif;
         }
-        .perspective-1000 {
-            perspective: 1000px;
+        .dark body {
+            background-color: #0f172a; /* slate-900 */
+            background-image: radial-gradient(circle at top, #1e293b, #0f172a 40%);
         }
-        .transform-style-3d {
-            transform-style: preserve-3d;
-        }
-        .btn-tactile:active {
-            animation: pressIn 0.15s ease-out forwards;
-        }
-        .animate-scroll {
-            animation-range-start: entry 0%;
-            animation-range-end: entry 40%;
-            animation-timeline: view(block);
-            animation-name: scrollFadeIn;
-            animation-fill-mode: both;
-        }
-        .aurora-bg {
-            position: relative;
-            overflow: hidden;
-        }
-        .aurora-bg::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 150%;
-            height: 150%;
-            z-index: 0;
-            background: radial-gradient(circle at center, rgba(251, 191, 36, 0.1), transparent 40%),
-                        radial-gradient(circle at 20% 80%, rgba(217, 119, 6, 0.1), transparent 40%),
-                        radial-gradient(circle at 80% 30%, rgba(180, 83, 9, 0.1), transparent 40%);
-            background-size: 200% 200%;
-            animation: aurora 20s ease-in-out infinite alternate;
-            will-change: background-position;
-        }
-        .dark .aurora-bg::before {
-            background: radial-gradient(circle at center, rgba(243, 156, 18, 0.05), transparent 40%),
-                        radial-gradient(circle at 20% 80%, rgba(249, 168, 37, 0.05), transparent 40%),
-                        radial-gradient(circle at 80% 30%, rgba(230, 126, 34, 0.05), transparent 40%);
-            background-size: 200% 200%;
+        body {
+           background-color: #f1f5f9; /* slate-100 */
+           background-image: radial-gradient(circle at top, #e2e8f0, #f1f5f9 50%);
         }
     </style>
     <link rel="stylesheet" href="https://esm.sh/@solana/wallet-adapter-react-ui@^0.9.39/styles.css" />
@@ -202,7 +117,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-primary-100 dark:bg-darkPrimary-950 font-sans text-primary-800 dark:text-darkPrimary-200">
+  <body class="bg-slate-100 dark:bg-slate-900">
     <div id="root"></div>
     <script type="module" src="/bundle.js"></script>
   <script type="module" src="/index.tsx"></script>
