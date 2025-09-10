@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
@@ -19,8 +18,8 @@ const NavItem = ({ to, icon, label, isOpen, onClick }: { to: string, icon: React
     const [isActive] = useRoute(to);
     const navLinkClasses = `flex items-center py-3 px-4 my-1 rounded-lg transition-colors duration-200 ${
         isActive 
-            ? 'bg-accent-400/10 text-accent-600 dark:bg-darkAccent-500/10 dark:text-darkAccent-400 font-semibold' 
-            : 'text-primary-600 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700'
+            ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-semibold' 
+            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
         }`;
 
     return (
@@ -33,7 +32,7 @@ const NavItem = ({ to, icon, label, isOpen, onClick }: { to: string, icon: React
 
 const NavGroup = ({ title, isOpen, children }: { title: string, isOpen: boolean, children: React.ReactNode }) => (
     <div>
-        <h3 className={`px-4 pt-4 pb-2 text-xs font-semibold uppercase text-primary-500 dark:text-darkPrimary-500 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
+        <h3 className={`px-4 pt-4 pb-2 text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 hidden'}`}>
             {title}
         </h3>
         {children}
@@ -85,11 +84,11 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     ];
 
     return (
-        <aside className={`fixed top-0 left-0 h-full bg-primary-50 dark:bg-darkPrimary-800 shadow-lg z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-             <div className="flex items-center justify-between h-16 px-4 border-b border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
+        <aside className={`fixed top-0 left-0 h-full bg-slate-100/50 dark:bg-slate-900/50 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800/80 shadow-lg z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+             <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200/80 dark:border-slate-800/80 flex-shrink-0">
                 <Link to="/" onClick={handleLinkClick} className={`flex items-center space-x-3 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
                     <OwfnIcon className="h-9 w-9" />
-                    <span className={`font-bold text-xl text-primary-900 dark:text-darkPrimary-100 ${isOpen ? 'inline' : 'hidden'}`}>OWFN</span>
+                    <span className={`font-bold text-xl text-slate-900 dark:text-slate-100 ${isOpen ? 'inline' : 'hidden'}`}>OWFN</span>
                 </Link>
              </div>
 
@@ -114,7 +113,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 )}
             </nav>
             
-            <div className="px-2 py-4 border-t border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
+            <div className="px-2 py-4 border-t border-slate-200/80 dark:border-slate-800/80 flex-shrink-0">
                  <NavItem to="/profile" icon={<User size={20} />} label={t('profile')} isOpen={isOpen} onClick={handleLinkClick} />
             </div>
         </aside>
