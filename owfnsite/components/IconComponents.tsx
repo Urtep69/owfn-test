@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Image } from 'lucide-react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from '../lib/assets.ts';
@@ -82,30 +81,24 @@ export const HelpCenterIcon = ({ className = 'w-10 h-10' }: { className?: string
   <svg
     aria-hidden="true"
     className={className}
-    viewBox="0 0 24 24"
+    viewBox="0 0 48 48"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M24 4C12.954 4 4 12.954 4 24C4 35.046 12.954 44 24 44C35.046 44 44 35.046 44 24C44 12.954 35.046 4 24 4Z"
+      className="fill-primary-400 dark:fill-darkPrimary-800"
     />
     <path
-      d="M9.08984 9.00002C9.32495 8.19204 9.87614 7.51447 10.6015 7.11123C11.3269 6.70799 12.1691 6.61108 12.9619 6.84213C13.7547 7.07318 14.4446 7.61524 14.8893 8.34907C15.334 9.08289 15.4984 9.94052 15.3538 10.76C15.2093 11.5794 14.7663 12.3114 14.1118 12.82C13.5918 13.22 12.9618 13.5 12.3198 13.5H11.6798"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M24 10C16.268 10 10 16.268 10 24H38C38 16.268 31.732 10 24 10Z"
+      className="fill-accent-400 dark:fill-darkAccent-500"
     />
+    <circle cx="18" cy="24" r="2" className="fill-white dark:fill-darkPrimary-950"/>
+    <circle cx="30" cy="24" r="2" className="fill-white dark:fill-darkPrimary-950"/>
+    <rect x="20" y="30" width="8" height="2" rx="1" className="fill-primary-300 dark:fill-darkPrimary-400"/>
     <path
-      d="M12 16.5H12.01"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M24 4C23.172 4 22.5 4.672 22.5 5.5V7.5C22.5 8.328 23.172 9 24 9C24.828 9 25.5 8.328 25.5 7.5V5.5C25.5 4.672 24.828 4 24 4Z"
+      className="fill-accent-400 dark:fill-darkAccent-500"
     />
   </svg>
 );

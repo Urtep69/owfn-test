@@ -21,13 +21,12 @@ export default function Docs() {
     useEffect(() => {
         observer.current = new IntersectionObserver(
             (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setActiveSection(entry.target.id);
-                    }
-                });
+                const intersectingEntry = entries.find(entry => entry.isIntersecting);
+                if (intersectingEntry) {
+                    setActiveSection(intersectingEntry.target.id);
+                }
             },
-            { rootMargin: '-20% 0px -80% 0px', threshold: 0 }
+            { rootMargin: '-20% 0px -70% 0px', threshold: 0.1 }
         );
 
         const sections = SECTIONS.map(s => document.getElementById(s.id)).filter(Boolean);
@@ -44,7 +43,7 @@ export default function Docs() {
 
     return (
         <div className="animate-fade-in-up">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <div className="lg:col-span-9">
                     <article className="prose prose-lg dark:prose-invert max-w-none text-primary-700 dark:text-darkPrimary-300 leading-relaxed space-y-8">
                         <header>
@@ -141,7 +140,7 @@ export default function Docs() {
                                             href={`#${section.id}`}
                                             className={`block -ml-px pl-4 py-2 border-l-2 transition-colors ${
                                                 activeSection === section.id
-                                                    ? 'border-darkAccent-500 text-darkAccent-500 font-bold'
+                                                    ? 'border-accent-500 text-accent-500 font-bold'
                                                     : 'border-transparent text-primary-600 dark:text-darkPrimary-400 hover:border-primary-300 dark:hover:border-darkPrimary-600'
                                             }`}
                                         >
@@ -151,7 +150,7 @@ export default function Docs() {
                                 ))}
                             </ul>
                         </nav>
-                        <button onClick={scrollToTop} className="mt-8 flex items-center gap-2 text-primary-600 dark:text-darkPrimary-400 hover:text-darkAccent-500 transition-colors">
+                        <button onClick={scrollToTop} className="mt-8 flex items-center gap-2 text-sm text-primary-600 dark:text-darkPrimary-400 hover:text-accent-500 transition-colors">
                             <ArrowUp size={16} /> {t('back_to_top')}
                         </button>
                     </div>
