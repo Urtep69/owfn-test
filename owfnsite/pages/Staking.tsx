@@ -149,7 +149,6 @@ const StakingInterface = () => {
     );
 };
 
-// FIX: The file was incomplete, causing a build error. This completes the file by adding the main Staking component and its default export.
 export default function Staking() {
     const { t, solana } = useAppContext();
     
