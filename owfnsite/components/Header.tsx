@@ -5,6 +5,7 @@ import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 import { ThemeSwitcher } from './ThemeSwitcher.tsx';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { WalletManagerIcon } from './IconComponents.tsx';
+import { TopBanner } from './TopBanner.tsx';
 
 interface HeaderProps {
     toggleSidebar: () => void;
@@ -53,7 +54,7 @@ const ConnectButton = () => {
         return (
             <button
                 onClick={() => setVisible(true)}
-                className="group relative inline-flex items-center justify-center px-5 py-2.5 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-3d hover:shadow-3d-lg transition-all duration-300 transform hover:-translate-y-0.5 btn-tactile"
+                className="group relative inline-flex items-center justify-center px-5 py-2.5 overflow-hidden font-bold text-darkPrimary-950 rounded-lg shadow-3d hover:shadow-3d-lg transition-all duration-300 transform hover:-translate-y-0.5 btn-tactile"
             >
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-accent-400 to-accent-500 dark:from-darkAccent-400 dark:to-darkAccent-600"></span>
                 <span className="absolute bottom-0 right-0 w-full h-full transition-all duration-500 ease-in-out transform translate-x-full translate-y-full bg-accent-500/80 dark:bg-darkAccent-500/80 group-hover:translate-x-0 group-hover:translate-y-0"></span>
@@ -123,23 +124,26 @@ const ConnectButton = () => {
 
 export const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
   return (
-    <header className="bg-primary-100/70 dark:bg-darkPrimary-950/70 backdrop-blur-lg sticky top-0 z-40 border-b border-primary-200/80 dark:border-darkPrimary-800/80">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-             <button
-              onClick={toggleSidebar}
-              className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none hidden md:block"
-              aria-label="Toggle sidebar"
-            >
-              {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <ThemeSwitcher />
-            <LanguageSwitcher />
-            <ConnectButton />
+    <header className="sticky top-0 z-40">
+      <TopBanner />
+      <div className="bg-primary-100/70 dark:bg-darkPrimary-950/70 backdrop-blur-lg border-b border-primary-200/80 dark:border-darkPrimary-800/80">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+               <button
+                onClick={toggleSidebar}
+                className="p-2 rounded-md text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 focus:outline-none hidden md:block"
+                aria-label="Toggle sidebar"
+              >
+                {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <ThemeSwitcher />
+              <LanguageSwitcher />
+              <ConnectButton />
+            </div>
           </div>
         </div>
       </div>

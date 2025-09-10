@@ -65,31 +65,22 @@
                 '950': '#451a03',
               },
               // Updated Dark theme palettes to match the screenshot
-              'darkPrimary': { // Dark Theme -> Custom Charcoal/Brown from screenshot
-                '50': '#FCFAF7',
-                '100': '#F5F2ED',
-                '200': '#EBE5DB', // Main text color
-                '300': '#C8BFB5',
-                '400': '#A59D94',
-                '500': '#837C73',
-                '600': '#645F58',
-                '700': '#494540', // Borders
-                '800': '#302D29', // Card BG
-                '900': '#211F1C', // Footer BG
-                '950': '#141311', // Page BG
+              'darkPrimary': {
+                '50': '#f7f8f9',
+                '100': '#FFFFFF',    // Headings Text
+                '200': '#E1E3E8',    // Main Text
+                '300': '#9ca3af',    // Subtle Text / Icons
+                '400': '#6b7280',
+                '500': '#4b5563',
+                '700': '#3B3E47',    // Borders
+                '800': '#2A2D35',    // Cards, inputs
+                '900': '#1F2128',    // Content BG, Sidebar
+                '950': '#16181D',    // Page background
               },
-              'darkAccent': { // Dark Theme -> Custom Muted Beige/Gold from screenshot
-                '50': '#FEFCFA',
-                '100': '#FBF6EE',
-                '200': '#F5E9D6',
-                '300': '#EEDBBD',
-                '400': '#E4D5A8', // Accent Text
-                '500': '#DDC9A7', // Buttons
-                '600': '#C7B191', // Button hover/gradient
-                '700': '#A59176',
-                '800': '#86725A',
-                '900': '#695844',
-                '950': '#3A3126', // Text on buttons
+              'darkAccent': { // New Gold/Orange accent from screenshot
+                '400': '#F9A825', 
+                '500': '#F39C12', // Main button color
+                '600': '#E67E22', 
               }
             },
             boxShadow: {
@@ -180,9 +171,9 @@
             will-change: background-position;
         }
         .dark .aurora-bg::before {
-            background: radial-gradient(circle at center, rgba(228, 213, 168, 0.05), transparent 40%),
-                        radial-gradient(circle at 20% 80%, rgba(221, 201, 167, 0.05), transparent 40%),
-                        radial-gradient(circle at 80% 30%, rgba(199, 177, 145, 0.05), transparent 40%);
+            background: radial-gradient(circle at center, rgba(243, 156, 18, 0.05), transparent 40%),
+                        radial-gradient(circle at 20% 80%, rgba(249, 168, 37, 0.05), transparent 40%),
+                        radial-gradient(circle at 80% 30%, rgba(230, 126, 34, 0.05), transparent 40%);
             background-size: 200% 200%;
         }
     </style>
@@ -211,7 +202,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-primary-100 dark:bg-darkPrimary-950 font-sans">
+  <body class="bg-primary-100 dark:bg-darkPrimary-950 font-sans text-primary-800 dark:text-darkPrimary-200">
     <div id="root"></div>
     <script type="module" src="/bundle.js"></script>
   <script type="module" src="/index.tsx"></script>

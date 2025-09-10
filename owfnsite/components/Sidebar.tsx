@@ -18,8 +18,8 @@ const NavItem = ({ to, icon, label, isOpen, onClick }: { to: string, icon: React
     const [isActive] = useRoute(to);
     const navLinkClasses = `flex items-center py-3 px-4 my-1 rounded-lg transition-colors duration-200 ${
         isActive 
-            ? 'bg-accent-400/10 text-accent-600 dark:bg-darkAccent-500/10 dark:text-darkAccent-400 font-semibold' 
-            : 'text-primary-600 dark:text-darkPrimary-400 hover:bg-primary-200 dark:hover:bg-darkPrimary-700'
+            ? 'bg-darkAccent-500 text-darkPrimary-950 font-bold' 
+            : 'text-primary-600 dark:text-darkPrimary-300 hover:bg-primary-200 dark:hover:bg-darkPrimary-800'
         }`;
 
     return (
@@ -84,7 +84,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     ];
 
     return (
-        <aside className={`fixed top-0 left-0 h-full bg-primary-100/80 dark:bg-darkPrimary-800/80 backdrop-blur-lg border-r border-primary-200/80 dark:border-darkPrimary-700/80 z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <aside className={`fixed top-0 left-0 h-full bg-primary-100/80 dark:bg-darkPrimary-900/80 backdrop-blur-lg border-r border-primary-200/80 dark:border-darkPrimary-700/80 z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
              <div className="flex items-center justify-between h-16 px-4 border-b border-primary-200/80 dark:border-darkPrimary-700/80 flex-shrink-0">
                 <Link to="/" onClick={handleLinkClick} className={`flex items-center space-x-3 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
                     <OwfnIcon className="h-9 w-9" />
