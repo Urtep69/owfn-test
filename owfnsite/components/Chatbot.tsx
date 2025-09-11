@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
-import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2 } from 'lucide-react';
+import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2, Mail, Check, AlertCircle } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
 import type { ChatMessage } from '../types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -98,6 +98,11 @@ export const Chatbot = () => {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
+    const [isEmailFormVisible, setIsEmailFormVisible] = useState(false);
+    const [recipientEmail, setRecipientEmail] = useState('');
+    const [emailStatus, setEmailStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [emailError, setEmailError] = useState('');
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
@@ -134,6 +139,41 @@ export const Chatbot = () => {
             second: '2-digit'
         });
     };
+
+    const handleSendEmail = async () => {
+        if (!recipientEmail.trim() || !/^\S+@\S+\.\S+$/.test(recipientEmail)) {
+            setEmailError('Please enter a valid email address.');
+            setEmailStatus('error');
+            return;
+        }
+        setEmailStatus('loading');
+        setEmailError('');
+
+        try {
+            const res = await fetch('/api/email-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recipientEmail, messages }),
+            });
+
+            if (!res.ok) {
+                throw new Error(await res.text());
+            }
+
+            setEmailStatus('success');
+            setTimeout(() => {
+                setIsEmailFormVisible(false);
+                setEmailStatus('idle');
+                setRecipientEmail('');
+            }, 3000);
+
+        } catch (error) {
+            console.error("Failed to send chat email:", error);
+            setEmailError('Failed to send email. Please try again.');
+            setEmailStatus('error');
+        }
+    };
+
 
     const handleSend = async () => {
         if (input.trim() === '' || isLoading) return;
@@ -245,6 +285,9 @@ export const Chatbot = () => {
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
                 <div className="flex items-center space-x-1">
+                    <button onClick={() => setIsEmailFormVisible(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Email conversation">
+                        <Mail size={20} />
+                    </button>
                     <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Minimize Chat">
                         <Minus size={20} />
                     </button>
@@ -292,6 +335,40 @@ export const Chatbot = () => {
                     <div ref={messagesEndRef} />
                 </div>
             </div>
+            {isEmailFormVisible && (
+                <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700 bg-primary-50 dark:bg-darkPrimary-700/50 animate-fade-in-up" style={{animationDuration: '300ms'}}>
+                    <h4 className="font-semibold text-sm mb-2 text-center text-primary-800 dark:text-darkPrimary-200">Email this conversation</h4>
+                    {emailStatus === 'success' ? (
+                        <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 font-semibold p-2 bg-green-500/10 rounded-md">
+                            <Check size={18} /> Conversation sent successfully!
+                        </div>
+                    ) : (
+                         <div className="space-y-3">
+                            <input
+                                type="email"
+                                value={recipientEmail}
+                                onChange={(e) => setRecipientEmail(e.target.value)}
+                                placeholder="Enter your email address..."
+                                className="w-full p-2 text-sm bg-primary-100 dark:bg-darkPrimary-700 rounded-md focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
+                                disabled={emailStatus === 'loading'}
+                            />
+                            <div className="flex gap-2">
+                                <button onClick={() => setIsEmailFormVisible(false)} className="flex-1 text-sm py-2 px-3 rounded-md bg-primary-200 dark:bg-darkPrimary-600 hover:bg-primary-300 dark:hover:bg-darkPrimary-500 transition-colors">Cancel</button>
+                                <button
+                                    onClick={handleSendEmail}
+                                    disabled={emailStatus === 'loading' || !recipientEmail}
+                                    className="flex-1 text-sm py-2 px-3 rounded-md bg-accent-500 dark:bg-darkAccent-600 text-white hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 flex items-center justify-center"
+                                >
+                                    {emailStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send'}
+                                </button>
+                            </div>
+                            {emailStatus === 'error' && (
+                                <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1.5"><AlertCircle size={14}/> {emailError}</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
             <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
                 <div className="relative">
                     <input
