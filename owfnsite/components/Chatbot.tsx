@@ -304,24 +304,24 @@ export const Chatbot = () => {
             </header>
             <div className="flex-1 p-4 overflow-y-auto">
                 <div className="space-y-4">
-                    {messages.map((msg, index) => (
-                        <div key={index}>
-                             {msg.timestamp && (
-                                <p className={`text-xs text-primary-400 dark:text-darkPrimary-500 mb-1 text-center`}>
-                                    {formatTimestamp(msg.timestamp)}
-                                </p>
-                            )}
-                            <div className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />}
-                                <div className="flex flex-col">
-                                    <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
-                                       <div className="text-sm whitespace-pre-wrap">
-                                           {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
-                                       </div>
-                                    </div>
+                     {messages.map((msg, index) => (
+                        <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0" />}
+                            
+                            <div className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                {msg.timestamp && (
+                                    <p className="text-xs text-primary-400 dark:text-darkPrimary-500 mb-1">
+                                        {formatTimestamp(msg.timestamp)}
+                                    </p>
+                                )}
+                                <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
+                                   <div className="text-sm whitespace-pre-wrap">
+                                       {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
+                                   </div>
                                 </div>
-                                {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0 mt-1" />}
                             </div>
+
+                            {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0" />}
                         </div>
                     ))}
                     {isLoading && (

@@ -65,44 +65,45 @@ const generateChatTranscriptHtml = (messages: ChatMessage[], langCode: string) =
 
         const date = new Date(msg.timestamp);
         const formattedTimestamp = date.toLocaleString(langCode, timestampOptions);
-        
-        // Timestamp Row
-        html += `
-            <tr>
-                <td colspan="3" style="text-align: center; padding-top: 10px; padding-bottom: 5px;">
-                    <p style="margin: 0; font-family: Arial, sans-serif; font-size: 12px; color: #a1a1aa;">${formattedTimestamp}</p>
-                </td>
-            </tr>
-        `;
-
         const textContent = msg.parts[0].text.replace(/\n/g, '<br />');
 
-        // Message Row
         if (msg.role === 'model') {
             html += `
                 <tr>
-                    <td style="padding: 5px; vertical-align: bottom; width: 40px;">
-                        <img src="https://www.owfn.org/assets/owfn.png" alt="OWFN" width="32" style="border-radius: 50%; width: 32px; height: 32px;" />
+                    <td style="padding-bottom: 20px; text-align: left; vertical-align: top;">
+                        <table border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+                            <tr>
+                                <td style="vertical-align: top; padding-right: 10px;">
+                                    <img src="https://www.owfn.org/assets/owfn.png" alt="OWFN" width="32" style="border-radius: 50%; width: 32px; height: 32px;" />
+                                </td>
+                                <td style="vertical-align: top;">
+                                    <p style="margin: 0 0 4px 0; font-family: Arial, sans-serif; font-size: 12px; color: #a1a1aa;">${formattedTimestamp}</p>
+                                    <div style="background-color: #404040; color: #f5f5f4; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; padding: 10px 15px; border-radius: 12px; max-width: 450px;">
+                                        ${textContent}
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
-                    <td style="padding: 5px; text-align: left;">
-                        <div style="background-color: #404040; color: #f5f5f4; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 15px; border-radius: 12px; display: inline-block; max-width: 90%;">
-                            ${textContent}
-                        </div>
-                    </td>
-                    <td style="width: 40px;"></td>
                 </tr>
             `;
         } else { // user
             html += `
                 <tr>
-                    <td style="width: 40px;"></td>
-                    <td style="padding: 5px; text-align: right;">
-                        <div style="background-color: #b89b74; color: #1c1917; font-family: Arial, sans-serif; font-size: 14px; padding: 10px 15px; border-radius: 12px; display: inline-block; max-width: 90%;">
-                           ${textContent}
-                        </div>
-                    </td>
-                    <td style="padding: 5px; vertical-align: bottom; width: 40px; text-align: center;">
-                        <img src="https://img.icons8.com/material-sharp/48/b89b74/user-male-circle.png" alt="User" width="32" style="width: 32px; height: 32px;"/>
+                    <td style="padding-bottom: 20px; text-align: right; vertical-align: top;">
+                        <table border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-left: auto;">
+                            <tr>
+                                <td style="vertical-align: top; text-align: right; padding-right: 10px;">
+                                    <p style="margin: 0 0 4px 0; font-family: Arial, sans-serif; font-size: 12px; color: #a1a1aa;">${formattedTimestamp}</p>
+                                    <div style="background-color: #b89b74; color: #1c1917; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.5; padding: 10px 15px; border-radius: 12px; max-width: 450px;">
+                                       ${textContent}
+                                    </div>
+                                </td>
+                                <td style="vertical-align: top;">
+                                    <img src="https://img.icons8.com/material-outlined/48/a1a1aa/user-male-circle.png" alt="User" width="32" style="width: 32px; height: 32px;"/>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
             `;
@@ -144,26 +145,34 @@ export default async function handler(req: any, res: any) {
                 <meta charset="UTF-8">
                 <title>${introContent.subject}</title>
             </head>
-            <body style="margin: 0; padding: 20px; background-color: #18181b; font-family: Arial, sans-serif;">
-                <table style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #18181b;" border="0" cellspacing="0" cellpadding="0">
+            <body style="margin: 0; padding: 0; width: 100%; background-color: #1c1917; font-family: Arial, sans-serif;">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #1c1917;">
                     <tr>
-                        <td style="padding: 20px 20px 0 20px;">
-                            <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin-bottom: 25px;">
-                                ${introContent.body}
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 20px; background-color: #27272a; border-radius: 8px;">
-                            <table style="width: 100%;" border="0" cellspacing="0" cellpadding="0">
-                                ${transcriptHtml}
+                        <td align="center" style="padding: 20px 10px;">
+                            <table style="width: 100%; max-width: 600px; margin: 0 auto;" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <p style="font-size: 14px; color: #a1a1aa; line-height: 1.6; margin: 0 0 25px 0;">
+                                            ${introContent.body}
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 20px; background-color: #27272a; border-radius: 12px;">
+                                        <table style="width: 100%;" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                                ${transcriptHtml}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                     <td style="padding: 0 20px;">
+                                        ${signatureHtml}
+                                     </td>
+                                </tr>
                             </table>
                         </td>
-                    </tr>
-                    <tr>
-                         <td style="padding: 0 20px;">
-                            ${signatureHtml}
-                         </td>
                     </tr>
                 </table>
             </body>
