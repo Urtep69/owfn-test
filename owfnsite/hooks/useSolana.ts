@@ -168,7 +168,7 @@ export const useSolana = (): UseSolanaReturn => {
             [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon),
             'So11111111111111111111111111111111111111112': React.createElement(SolIcon),
             'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon),
-            'Es9vMFrzaCERmJfrF4H2HYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon),
+            'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon),
         };
 
         allTokens.forEach(token => {
@@ -312,12 +312,12 @@ export const useSolana = (): UseSolanaReturn => {
     userTokens,
     loading,
     connection,
-    userStats: { // Mocked user stats for the new profile page
-        totalDonated: 125.50,
-        projectsSupported: 3,
-        votesCast: 5,
+    userStats: { 
+        totalDonated: 0,
+        projectsSupported: 0,
+        votesCast: 0,
         donations: [],
-        votedProposalIds: ['prop1629876543210'] // Mock that user voted on one proposal
+        votedProposalIds: []
     },
     stakedBalance: 0,
     earnedRewards: 0,

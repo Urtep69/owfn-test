@@ -5,10 +5,11 @@ export default async function handler(req: any, res: any) {
         return res.status(405).json({ success: false, error: 'Method Not Allowed' });
     }
     
+    const geminiApiKey = process.env.GEMINI_API_KEY;
     const resendApiKey = process.env.RESEND_API_KEY;
 
-    if (!process.env.API_KEY || !resendApiKey) {
-        console.error("CRITICAL: API_KEY or RESEND_API_KEY environment variable is not set.");
+    if (!geminiApiKey || !resendApiKey) {
+        console.error("CRITICAL: GEMINI_API_KEY or RESEND_API_KEY environment variable is not set.");
         return res.status(500).json({ success: false, error: "Server configuration error." });
     }
 
@@ -71,7 +72,7 @@ export default async function handler(req: any, res: any) {
         const reasonForPrompt = reasonTextMap[reason as string] || 'Other';
         
         // Step 1: Use Gemini to analyze, translate to ROMANIAN, and format the email content
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const ai = new GoogleGenAI({ apiKey: geminiApiKey });
         
         const prompt = `A user has submitted a contact form on the OWFN (Official World Family Network) website. Your task is to process this information and generate a structured email for an administrator.
 
@@ -94,21 +95,6 @@ User's Original Message:
 ${message}
 ---`;
 
-        const subjectDescription = [
-            'A concise email subject line. Start with \'[OWFN Contact]\'',
-            'followed by the reason for contact and the sender\'s name.'
-        ].join(' ');
-
-        const htmlBodyDescription = [
-            'The full, formatted body of the email in HTML.',
-            'It MUST contain the following sections in this exact order:',
-            '1. A styled \'Submission Details\' block with all provided metadata including the detected language.',
-            '2. A section titled \'AI Summary (Romanian)\' with your concise summary.',
-            '3. A section titled \'AI Translation (Romanian)\' with your full translation.',
-            '4. A horizontal rule (<hr>).',
-            '5. The \'Original Message\' section with the user\'s verbatim message.'
-        ].join(' ');
-
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: prompt,
@@ -119,11 +105,11 @@ ${message}
                     properties: {
                         subject: {
                             type: Type.STRING,
-                            description: subjectDescription
+                            description: "A concise email subject line. Start with '[OWFN Contact]' followed by the reason for contact and the sender's name."
                         },
                         htmlBody: {
                             type: Type.STRING,
-                            description: htmlBodyDescription
+                            description: "The full, formatted body of the email in HTML. It MUST contain the following sections in this exact order: 1. A styled 'Submission Details' block with all provided metadata including the detected language. 2. A section titled 'AI Summary (Romanian)' with your concise summary. 3. A section titled 'AI Translation (Romanian)' with your full translation. 4. A horizontal rule (<hr>). 5. The 'Original Message' section with the user's verbatim message."
                         }
                     },
                     propertyOrdering: ["subject", "htmlBody"],

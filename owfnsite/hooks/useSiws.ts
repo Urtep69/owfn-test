@@ -1,95 +1,81 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import type { SiwsSession, SiwsReturn } from '../types.ts';
-import { useLocalization } from './useLocalization.ts';
 
 const SESSION_KEY = 'owfn-siws-session';
 
 export const useSiws = (): SiwsReturn => {
-    const { publicKey, signMessage } = useWallet();
-    const { t } = useLocalization();
+    const { publicKey, signMessage, connected } = useWallet();
     const [session, setSession] = useState<SiwsSession | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isSessionLoading, setIsSessionLoading] = useState(true);
-
-    useEffect(() => {
-        try {
-            const storedSession = window.localStorage.getItem(SESSION_KEY);
-            if (storedSession) {
-                const parsed: SiwsSession = JSON.parse(storedSession);
-                // On mount, if a wallet is connected, check if the stored session matches.
-                if (publicKey && parsed.publicKey === publicKey.toBase58()) {
-                    setSession(parsed);
-                } else if (publicKey && parsed.publicKey !== publicKey.toBase58()) {
-                    // Wallet changed, invalidate session
-                    window.localStorage.removeItem(SESSION_KEY);
-                    setSession(null);
-                }
-            }
-        } catch (e) {
-            console.warn("Could not load SIWS session from localStorage", e);
-        } finally {
-            setIsSessionLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        const storedSession = window.localStorage.getItem(SESSION_KEY);
-        if (publicKey) {
-            if (storedSession) {
-                const parsed: SiwsSession = JSON.parse(storedSession);
-                if (parsed.publicKey === publicKey.toBase58()) {
-                    setSession(parsed);
-                } else {
-                    window.localStorage.removeItem(SESSION_KEY);
-                    setSession(null);
-                }
-            }
-        } else {
-            setSession(null);
-        }
-    }, [publicKey]);
-
-    const signIn = useCallback(async (): Promise<boolean> => {
-        if (!publicKey || !signMessage) {
-            console.error("Wallet not connected or does not support signMessage");
-            return false;
-        }
-
-        setIsLoading(true);
-        try {
-            const issuedAt = new Date().toISOString();
-            const statement = t('siws_message_statement', { defaultValue: "Sign this message to authenticate with Official World Family Network (OWFN)." });
-            const domain = window.location.host;
-            const noCost = t('siws_message_no_cost', { defaultValue: "This request will not trigger a blockchain transaction or cost any gas fees." });
-
-            const messageToSign = `${statement}\n\n${t('siws_message_uri', { defaultValue: 'Domain' })}: ${domain}\n${t('siws_message_issued_at', { defaultValue: 'Issued At' })}: ${issuedAt}\n\n${noCost}`;
-            const encodedMessage = new TextEncoder().encode(messageToSign);
-            
-            const signature = await signMessage(encodedMessage);
-
-            if (signature) {
-                const newSession: SiwsSession = {
-                    publicKey: publicKey.toBase58(),
-                    signedAt: Date.now(),
-                };
-                window.localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
-                setSession(newSession);
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error("SIWS sign-in error:", error);
-            return false;
-        } finally {
-            setIsLoading(false);
-        }
-    }, [publicKey, signMessage, t]);
 
     const signOut = useCallback(async (): Promise<void> => {
         window.localStorage.removeItem(SESSION_KEY);
         setSession(null);
     }, []);
+
+    useEffect(() => {
+        try {
+            const storedSession = window.localStorage.getItem(SESSION_KEY);
+            if (storedSession) {
+                const parsedSession: SiwsSession = JSON.parse(storedSession);
+                
+                // If a wallet is connected, verify the session belongs to it.
+                if (publicKey && parsedSession.publicKey !== publicKey.toBase58()) {
+                    signOut(); // Wallet changed, clear session
+                } else {
+                    setSession(parsedSession);
+                }
+            }
+        } catch (error) {
+            console.warn("Could not load SIWS session from localStorage", error);
+        } finally {
+            setIsSessionLoading(false);
+        }
+    }, [publicKey, signOut]);
+
+    // Automatically sign out if wallet disconnects
+    useEffect(() => {
+        if (!connected && session) {
+            signOut();
+        }
+    }, [connected, session, signOut]);
+
+
+    const signIn = useCallback(async (): Promise<boolean> => {
+        if (!publicKey || !signMessage) {
+            console.error("Wallet not connected or signMessage not available");
+            return false;
+        }
+        setIsLoading(true);
+        try {
+            const now = new Date();
+            const message = `owfn.org wants you to sign in with your Solana account:
+${publicKey.toBase58()}
+
+Issued At: ${now.toISOString()}
+
+For more information, please visit https://www.owfn.org`;
+            
+            const encodedMessage = new TextEncoder().encode(message);
+            await signMessage(encodedMessage);
+
+            const newSession: SiwsSession = {
+                publicKey: publicKey.toBase58(),
+                signedAt: now.getTime(),
+            };
+            window.localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
+            setSession(newSession);
+            setIsLoading(false);
+            return true;
+        } catch (error) {
+            console.error("Sign-in process failed:", error);
+            setIsLoading(false);
+            await signOut();
+            return false;
+        }
+    }, [publicKey, signMessage, signOut]);
 
     const isAuthenticated = !!session && session.publicKey === publicKey?.toBase58();
 
@@ -99,6 +85,6 @@ export const useSiws = (): SiwsReturn => {
         isSessionLoading,
         session,
         signIn,
-        signOut,
+        signOut
     };
 };
