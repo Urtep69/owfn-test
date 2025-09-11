@@ -5,7 +5,7 @@ export default async function handler(req: any, res: any) {
         return res.status(405).send('Method Not Allowed');
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.API_KEY;
     if (!apiKey) {
         console.error("API key is not configured in environment variables.");
         return res.status(500).json({ error: "API key not configured." });

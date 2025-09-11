@@ -5,11 +5,11 @@ export default async function handler(req: any, res: any) {
         return res.status(405).json({ success: false, error: 'Method Not Allowed' });
     }
     
-    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const geminiApiKey = process.env.API_KEY;
     const resendApiKey = process.env.RESEND_API_KEY;
 
     if (!geminiApiKey || !resendApiKey) {
-        console.error("CRITICAL: GEMINI_API_KEY or RESEND_API_KEY environment variable is not set.");
+        console.error("CRITICAL: API_KEY or RESEND_API_KEY environment variable is not set.");
         return res.status(500).json({ success: false, error: "Server configuration error." });
     }
 

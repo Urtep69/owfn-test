@@ -99,6 +99,7 @@ export const Chatbot = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('');
     const [quickReplies, setQuickReplies] = useState<{label: string, value: string}[]>([]);
+    const [showWelcomeBubble, setShowWelcomeBubble] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const loadingIntervalRef = useRef<number | null>(null);
@@ -114,27 +115,49 @@ export const Chatbot = () => {
             setTimeout(() => inputRef.current?.focus(), 100);
         }
     }, [isOpen, isMaximized]);
-    
+
+    const setWelcomed = () => {
+        localStorage.setItem('owfn-chatbot-welcomed', 'true');
+        setShowWelcomeBubble(false);
+    };
+
+    // Effect to show the welcome bubble on first visit
     useEffect(() => {
         const hasBeenWelcomed = localStorage.getItem('owfn-chatbot-welcomed');
         if (!hasBeenWelcomed && !isOpen) {
-            const welcomeMessage: ChatMessage = {
-                role: 'model',
-                parts: [{ text: t('chatbot_welcome_message', { defaultValue: "Hello! Welcome to the OWFN family. Are you interested in learning about our mission, how you can buy tokens, or would you like to see our latest impact projects?" }) }],
-                timestamp: new Date()
-            };
-            const initialQuickReplies = [
-                { label: t('chatbot_qr_mission', {defaultValue: "Mission"}), value: t('chatbot_qr_mission_q', {defaultValue: "Tell me about the mission"}) },
-                { label: t('chatbot_qr_presale', {defaultValue: "Presale"}), value: t('chatbot_qr_presale_q', {defaultValue: "How can I buy tokens?"}) },
-                { label: t('chatbot_qr_impact', {defaultValue: "Impact"}), value: t('chatbot_qr_impact_q', {defaultValue: "Show me impact projects"}) },
-            ];
-            
-            setMessages([welcomeMessage]);
-            setQuickReplies(initialQuickReplies);
-            setIsOpen(true);
-            localStorage.setItem('owfn-chatbot-welcomed', 'true');
+            const timer = setTimeout(() => setShowWelcomeBubble(true), 2000); // 2-second delay
+            return () => clearTimeout(timer);
         }
-    }, [isOpen, t]);
+    }, [isOpen]);
+
+    // Effect to populate the welcome message when the chat is opened for the first time
+    useEffect(() => {
+        if (isOpen && messages.length === 0) {
+            const hasBeenWelcomed = localStorage.getItem('owfn-chatbot-welcomed');
+            if (hasBeenWelcomed) { // It's not the first time ever, but the chat state is empty
+                 const reWelcomeMessage: ChatMessage = {
+                    role: 'model',
+                    parts: [{ text: t('chatbot_placeholder') }],
+                    timestamp: new Date()
+                };
+                setMessages([reWelcomeMessage]);
+
+            } else { // It is the very first time this user is opening the chat
+                const welcomeMessage: ChatMessage = {
+                    role: 'model',
+                    parts: [{ text: t('chatbot_welcome_message') }],
+                    timestamp: new Date()
+                };
+                const initialQuickReplies = [
+                    { label: t('chatbot_qr_mission'), value: t('chatbot_qr_mission_q') },
+                    { label: t('chatbot_qr_presale'), value: t('chatbot_qr_presale_q') },
+                    { label: t('chatbot_qr_impact'), value: t('chatbot_qr_impact_q') },
+                ];
+                setMessages([welcomeMessage]);
+                setQuickReplies(initialQuickReplies);
+            }
+        }
+    }, [isOpen, messages.length, t]);
 
 
     useEffect(() => {
@@ -249,13 +272,33 @@ export const Chatbot = () => {
     
     if (!isOpen) {
         return (
-            <button
-                onClick={() => setIsOpen(true)}
-                className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
-                aria-label="Open Chatbot"
-            >
-                <MessageCircle size={28} />
-            </button>
+            <>
+                 {showWelcomeBubble && (
+                    <div className="fixed bottom-24 right-5 w-64 animate-fade-in-up z-40">
+                        <div className="bg-accent-500 dark:bg-darkAccent-600 text-white p-3 rounded-lg shadow-lg relative">
+                            <button 
+                                onClick={setWelcomed} 
+                                className="absolute top-1 right-1 p-1 hover:bg-white/20 rounded-full" 
+                                aria-label="Dismiss welcome message"
+                            >
+                                <X size={16} />
+                            </button>
+                            <p className="text-sm pr-4">{t('chatbot_welcome_bubble', { defaultValue: 'Hello! 👋 Do you have questions about our mission? Ask me anything!'})}</p>
+                            <div className="absolute -bottom-2 right-4 w-4 h-4 bg-accent-500 dark:bg-darkAccent-600 transform rotate-45"></div>
+                        </div>
+                    </div>
+                )}
+                <button
+                    onClick={() => {
+                        setIsOpen(true);
+                        setWelcomed();
+                    }}
+                    className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
+                    aria-label="Open Chatbot"
+                >
+                    <MessageCircle size={28} />
+                </button>
+            </>
         );
     }
 

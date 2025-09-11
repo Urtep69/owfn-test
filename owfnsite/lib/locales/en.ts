@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -350,6 +349,7 @@ export const en = {
     chatbot_loading_2: `Analyzing your question...`,
     chatbot_loading_3: `Formulating a response...`,
     chatbot_welcome_message: `Hello! Welcome to the OWFN family. Are you interested in learning about our mission, how you can buy tokens, or would you like to see our latest impact projects?`,
+    chatbot_welcome_bubble: `Hello! 👋 Do you have questions about our mission? Ask me anything!`,
     chatbot_qr_mission: `Mission`,
     chatbot_qr_mission_q: `Tell me about the mission`,
     chatbot_qr_presale: `Presale`,

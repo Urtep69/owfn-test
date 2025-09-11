@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -350,6 +349,7 @@ export const ro = {
     chatbot_loading_2: `Analizez întrebarea...`,
     chatbot_loading_3: `Formulez un răspuns...`,
     chatbot_welcome_message: `Salut! Bine ai venit în familia OWFN. Ești interesat să afli despre misiunea noastră, cum poți cumpăra tokenuri sau vrei să vezi ultimele noastre proiecte de impact?`,
+    chatbot_welcome_bubble: `Salut! 👋 Ai întrebări despre misiunea noastră? Întreabă-mă orice!`,
     chatbot_qr_mission: `Misiune`,
     chatbot_qr_mission_q: `Povestește-mi despre misiune`,
     chatbot_qr_presale: `Prevânzare`,
