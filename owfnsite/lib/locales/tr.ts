@@ -1,3 +1,4 @@
+
 export const tr = {
     // Navigation
     home: `Anasayfa`,
@@ -569,15 +570,4 @@ export const tr = {
     contact_social_discord_title: `Discord Sunucusu`,
     contact_social_discord_desc: `Tartışmalar ve destek için aktif topluluğumuzun bir parçası olun.`,
     send_direct_message: `Doğrudan Mesaj Gönder`,
-    auto_reply_subject: `Mesaj Alındı: {departmentName}`,
-    auto_reply_body: `
-<div style="font-family: sans-serif; line-height: 1.6;">
-    <p>Merhaba {userName},</p>
-    <p>Resmi Dünya Aile Ağı (OWFN) projesinin <strong>{departmentName}</strong> departmanıyla iletişime geçtiğiniz için teşekkür ederiz.</p>
-    <p>Mesajınızı başarıyla aldık ve sistemimizde günlüğe kaydedildiğini onaylıyoruz.</p>
-    <p>Bu, otomatik olarak oluşturulmuş bir e-postadır. Yanıtlar izlenmediği için <strong>lütfen bu mesaja yanıt vermeyin</strong>.</p>
-    <p>Ekibimiz sorgunuzu inceleyecek ve en kısa sürede resmi bir e-posta adresinden yanıt verecektir. Aldığımız yüksek hacimli e-postalar nedeniyle yanıt süreleri değişebilir. Sabrınız için teşekkür ederiz.</p>
-    <p>Saygılarımızla,<br>OWFN Ekibi</p>
-</div>
-`,
 };

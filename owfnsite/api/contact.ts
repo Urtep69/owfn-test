@@ -1,67 +1,43 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { translations } from '../lib/locales/index.ts';
-import { SUPPORTED_LANGUAGES } from '../constants.ts';
 
-const sendAutoReply = async (apiKey: string, userName: string, userEmail: string, reason: string, message: string) => {
-    try {
-        const ai = new GoogleGenAI({ apiKey });
+const generateAutoReplySignatureHtml = () => {
+    const logoUrl = 'https://www.owfn.org/assets/owfn.png';
+    const twitterLink = 'https://x.com/OWFN_Official';
+    const telegramLink = 'https://t.me/OWFNOfficial';
+    const discordLink = 'https://discord.gg/DzHm5HCqDW';
 
-        // 1. Detect language
-        const langDetectionPrompt = `Detect the ISO 639-1 language code of the following text. Respond with ONLY the two-letter code (e.g., 'en', 'ro'). Do not add any other text or explanation. Text:\n---\n${message}`;
-        
-        const langDetectionResponse = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: langDetectionPrompt,
-            config: {
-                temperature: 0,
-                thinkingConfig: { thinkingBudget: 0 },
-            }
-        });
-
-        const detectedLangCode = langDetectionResponse.text.trim().toLowerCase();
-        const supportedLangCodes = SUPPORTED_LANGUAGES.map(l => l.code);
-        const lang = supportedLangCodes.includes(detectedLangCode) ? detectedLangCode : 'en';
-
-        // 2. Prepare translated content
-        const departmentKey = `contact_reason_${reason}`;
-        const departmentName = translations[lang]?.[departmentKey] || translations['en']?.[departmentKey] || reason;
-
-        const subjectTemplate = translations[lang]?.auto_reply_subject || translations['en']?.auto_reply_subject;
-        const bodyTemplate = translations[lang]?.auto_reply_body || translations['en']?.auto_reply_body;
-
-        const autoReplySubject = subjectTemplate.replace('{departmentName}', departmentName);
-        
-        // Replace both placeholders in the body
-        let autoReplyBody = bodyTemplate.replace('{userName}', userName);
-        autoReplyBody = autoReplyBody.replace('{departmentName}', departmentName);
-
-        // 3. Send email to user
-        const response = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
-            },
-            body: JSON.stringify({
-                from: 'OWFN Auto-Reply <no-reply@owfn.org>',
-                to: userEmail,
-                subject: autoReplySubject,
-                html: autoReplyBody,
-            })
-        });
-
-        if (!response.ok) {
-            const errorBody = await response.json();
-            console.error('Auto-reply Resend API error:', errorBody);
-        } else {
-             console.log(`Auto-reply successfully sent to ${userEmail} in language: ${lang}`);
-        }
-
-    } catch (error) {
-        console.error('Failed to send auto-reply email:', error);
-        // Do not throw, as the main function should still return success to the user.
-    }
+    return `
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-top: 1px solid #dddddd; margin-top: 25px; padding-top: 20px;">
+            <tr>
+                <td style="padding-bottom: 20px;">
+                    <table border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td align="left" valign="top" style="padding-right: 15px;">
+                                <img src="${logoUrl}" alt="OWFN Logo" width="60" style="width: 60px; border-radius: 50%;">
+                            </td>
+                            <td align="left" valign="middle" style="font-family: Arial, sans-serif;">
+                                <p style="margin: 0; font-size: 14px; color: #333333; font-weight: bold;">Official World Family Network (OWFN)</p>
+                                <p style="margin: 5px 0 0; font-size: 12px; color: #777777;">
+                                    <a href="${twitterLink}" style="color: #777777; text-decoration: none; margin-right: 10px;">X/Twitter</a> |
+                                    <a href="${telegramLink}" style="color: #777777; text-decoration: none; margin: 0 10px;">Telegram</a> |
+                                    <a href="${discordLink}" style="color: #777777; text-decoration: none; margin-left: 10px;">Discord</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding-top: 15px; border-top: 1px solid #eeeeee;">
+                    <p style="font-family: Arial, sans-serif; font-size: 11px; color: #888888; text-align: center; margin: 0;">
+                        This is an automated email to confirm receipt of your message. Please be patient, as we receive a high volume of emails. We will respond to you as soon as possible.
+                    </p>
+                </td>
+            </tr>
+        </table>
+    `;
 };
+
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
@@ -93,12 +69,10 @@ export default async function handler(req: any, res: any) {
         // Enhanced location details from Vercel headers
         const countryCode = req.headers['x-vercel-ip-country'] || 'N/A';
         const city = req.headers['x-vercel-ip-city'] ? decodeURIComponent(req.headers['x-vercel-ip-city']) : 'N/A';
-        const region = req.headers['x-vercel-ip-country-region'] || 'N/A';
         
         let countryName = 'N/A';
         if (countryCode !== 'N/A') {
             try {
-                // Get the full country name in English from the country code
                 countryName = new Intl.DisplayNames(['en'], { type: 'region' }).of(countryCode) || countryCode;
             } catch (e) {
                 console.warn(`Could not get country name for code: ${countryCode}`);
@@ -106,13 +80,7 @@ export default async function handler(req: any, res: any) {
             }
         }
         
-        const locationParts = [
-            countryCode !== 'N/A' ? countryCode : null,
-            city !== 'N/A' ? city : null,
-            countryName !== 'N/A' && countryName !== countryCode ? countryName : null,
-        ].filter(Boolean); // Filter out null values
-        
-        const senderLocation = locationParts.length > 0 ? locationParts.join(', ') : 'N/A';
+        const senderLocation = [city, countryName].filter(part => part !== 'N/A').join(', ');
         
         const emailRecipientMap: Record<string, string> = {
             general: 'info@owfn.org',
@@ -137,7 +105,7 @@ export default async function handler(req: any, res: any) {
         // Step 1: Use Gemini to analyze, translate to ROMANIAN, and format the email content for the admin
         const ai = new GoogleGenAI({ apiKey: geminiApiKey });
         
-        const adminPrompt = `A user has submitted a contact form on the OWFN (Official World Family Network) website. Your task is to process this information and generate a structured email for an administrator.
+        const promptForAdmin = `A user has submitted a contact form on the OWFN (Official World Family Network) website. Your task is to process this information and generate a structured email for an administrator.
 
 First, analyze the user's message provided below to detect its original language.
 Then, create a concise summary of the message IN ROMANIAN.
@@ -158,68 +126,42 @@ User's Original Message:
 ${message}
 ---`;
 
-        const subjectDescription = [
-            'A concise email subject line. Start with \'[OWFN Contact]\'',
-            'followed by the reason for contact and the sender\'s name.'
-        ].join(' ');
-
-        const htmlBodyDescription = [
-            'The full, formatted body of the email in HTML.',
-            'It MUST contain the following sections in this exact order:',
-            '1. A styled \'Submission Details\' block with all provided metadata including the detected language.',
-            '2. A section titled \'AI Summary (Romanian)\' with your concise summary.',
-            '3. A section titled \'AI Translation (Romanian)\' with your full translation.',
-            '4. A horizontal rule (<hr>).',
-            '5. The \'Original Message\' section with the user\'s verbatim message.'
-        ].join(' ');
-
-        const adminEmailResponse = await ai.models.generateContent({
+        const adminEmailSchema = {
+            type: Type.OBJECT,
+            properties: {
+                subject: { type: Type.STRING, description: 'A concise email subject line. Start with \'[OWFN Contact]\', followed by the reason for contact and the sender\'s name.' },
+                htmlBody: { type: Type.STRING, description: 'The full, formatted body of the email in HTML. It MUST contain: 1. A styled \'Submission Details\' block with all metadata. 2. A section titled \'AI Summary (Romanian)\'. 3. A section titled \'AI Translation (Romanian)\'. 4. A horizontal rule. 5. The \'Original Message\' section.' },
+                detectedLanguage: { type: Type.STRING, description: 'The detected language of the user\'s message as a standard name, e.g., "English", "Romanian", "Spanish". Default to "English" if unsure.' }
+            },
+            propertyOrdering: ["subject", "htmlBody", "detectedLanguage"],
+        };
+        
+        const responseForAdmin = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: adminPrompt,
+            contents: promptForAdmin,
             config: {
                 responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        subject: {
-                            type: Type.STRING,
-                            description: subjectDescription
-                        },
-                        htmlBody: {
-                            type: Type.STRING,
-                            description: htmlBodyDescription
-                        }
-                    },
-                    propertyOrdering: ["subject", "htmlBody"],
-                },
+                responseSchema: adminEmailSchema,
             },
         });
         
         let adminEmailContent;
+        let detectedLanguage = 'English';
+
         try {
-            const jsonStr = adminEmailResponse.text.trim();
-            adminEmailContent = JSON.parse(jsonStr);
-        } catch(e) {
-            console.error("Gemini did not return valid JSON for admin email.", e);
-            console.error("Gemini response text:", adminEmailResponse.text);
-            // Fallback to a simple email if AI processing fails
+            const jsonStr = responseForAdmin.text.trim();
+            const parsedContent = JSON.parse(jsonStr);
+            adminEmailContent = parsedContent;
+            detectedLanguage = parsedContent.detectedLanguage || 'English';
+        } catch (e) {
+            console.error("Gemini did not return valid JSON for admin email.", e, responseForAdmin.text);
             adminEmailContent = {
                 subject: `[OWFN Contact] ${reasonForPrompt} from ${name}`,
-                htmlBody: `
-                    <h1>New Contact Form Submission (AI Processing Failed)</h1>
-                    <p><strong>Name:</strong> ${name}</p>
-                    <p><strong>Email:</strong> ${email}</p>
-                    <p><strong>Reason:</strong> ${reasonForPrompt}</p>
-                    <p><strong>Submission Time (UTC):</strong> ${submissionDate}</p>
-                    <p><strong>Sender Location:</strong> ${senderLocation}</p>
-                    <hr>
-                    <h2>Original Message</h2>
-                    <p style="white-space: pre-wrap;">${message}</p>
-                `
+                htmlBody: `<p>AI Processing Failed. Original message below.</p><hr><p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Reason:</strong> ${reasonForPrompt}</p><p><strong>Location:</strong> ${senderLocation}</p><hr><p style="white-space: pre-wrap;">${message}</p>`
             };
         }
 
-        // Step 2: Send the formatted email to the admin using Resend
+        // Step 2: Send the formatted email to the admin
         const sendAdminEmailResponse = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -227,7 +169,7 @@ ${message}
                 'Authorization': `Bearer ${resendApiKey}`
             },
             body: JSON.stringify({
-                from: 'Contact Form OWFN <contact-form@owfn.org>',
+                from: 'Contact Form OWFN <contact@email.owfn.org>',
                 to: recipientEmail,
                 subject: adminEmailContent.subject,
                 html: adminEmailContent.htmlBody,
@@ -237,13 +179,72 @@ ${message}
 
         if (!sendAdminEmailResponse.ok) {
             const errorBody = await sendAdminEmailResponse.json();
-            console.error('Admin email Resend API error:', errorBody);
+            console.error('Resend API error for admin email:', errorBody);
             throw new Error('Failed to send admin email via Resend.');
         }
 
-        // Step 3: Send the auto-reply to the user (fire and forget)
-        // We do this after the main action is successful. We don't want an auto-reply failure to cause the user to see an error.
-        sendAutoReply(geminiApiKey, name, email, reason, message);
+        // Step 3 (Fire and Forget): Generate and send the auto-reply to the user
+        try {
+            const departmentName = reasonTextMap[reason as string] || 'our team';
+
+            const promptForUser = `A user named "${name}" contacted the "${departmentName}" department of OWFN. Their original message was in ${detectedLanguage}.
+Your task is to generate a polite, automated confirmation email for them IN ${detectedLanguage}.
+The email must include the following points:
+1. A polite greeting to the user by their name, "${name}".
+2. Confirmation that their message to the "${departmentName}" department has been received.
+3. An explanation that this is an automated response and a team member will reply as soon as possible.
+4. A statement that response times may vary due to a high volume of inquiries.
+5. The mandatory closing phrase: "Please do not reply to this email, as it is system-generated." or its direct translation in ${detectedLanguage}.
+
+Generate a suitable, translated subject line and the plain text body for this email.`;
+
+            const userEmailSchema = {
+                type: Type.OBJECT,
+                properties: {
+                    subject: { type: Type.STRING, description: `A translated subject line in ${detectedLanguage}. Should be similar to "We've received your message | OWFN".` },
+                    body: { type: Type.STRING, description: `The complete, translated plain text body of the email in ${detectedLanguage}, including the greeting and all required points.` }
+                },
+                propertyOrdering: ["subject", "body"],
+            };
+
+            const responseForUser = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: promptForUser,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: userEmailSchema,
+                }
+            });
+
+            let userEmailContent;
+            try {
+                userEmailContent = JSON.parse(responseForUser.text.trim());
+            } catch (e) {
+                console.error("Gemini failed to generate valid JSON for user auto-reply:", e, responseForUser.text);
+                throw new Error("Failed to parse Gemini response for user email.");
+            }
+
+            if (userEmailContent.subject && userEmailContent.body) {
+                const textBodyWithLineBreaks = `<p>${userEmailContent.body.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+                const signature = generateAutoReplySignatureHtml();
+                const finalHtmlBody = `<div style="font-family: Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.6;">${textBodyWithLineBreaks}${signature}</div>`;
+
+                await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendApiKey}` },
+                    body: JSON.stringify({
+                        from: 'OWFN Auto-Reply <no-reply@email.owfn.org>',
+                        to: email,
+                        subject: userEmailContent.subject,
+                        html: finalHtmlBody,
+                    })
+                });
+            }
+        } catch (autoReplyError) {
+            console.error('Failed to send auto-reply to user:', autoReplyError);
+            // We do not re-throw this error. The primary function of sending the admin email was successful.
+            // This is a non-critical enhancement for the user.
+        }
 
         return res.status(200).json({ success: true, message: 'Message sent successfully.' });
 

@@ -1,3 +1,4 @@
+
 export const sr = {
     // Navigation
     home: `Почетна`,
@@ -566,18 +567,7 @@ export const sr = {
     contact_social_telegram_channel_desc: `Претплатите се за важне најаве и званичне вести.`,
     contact_social_telegram_group_title: `Телеграм група`,
     contact_social_telegram_group_desc: `Придружите се нашој групи заједнице да бисте разговарали и комуницирали са другим члановима.`,
-    contact_social_discord_title: `Дискорд сервер`,
+    contact_social_discord_title: `Дисцорд сервер`,
     contact_social_discord_desc: `Постаните део наше активне заједнице за дискусије и подршку.`,
     send_direct_message: `Пошаљи директну поруку`,
-    auto_reply_subject: `Порука примљена: {departmentName}`,
-    auto_reply_body: `
-<div style="font-family: sans-serif; line-height: 1.6;">
-    <p>Поштовани/а {userName},</p>
-    <p>Хвала вам што сте контактирали одељење <strong>{departmentName}</strong> пројекта Official World Family Network (OWFN).</p>
-    <p>Успешно смо примили вашу поруку и потврђујемо да је евидентирана у нашем систему.</p>
-    <p>Ово је аутоматски генерисана е-порука. <strong>Молимо вас да не одговарате на ову поруку</strong>, јер се одговори не прате.</p>
-    <p>Наш тим ће прегледати ваш упит и одговорити са званичне е-маил адресе у најкраћем могућем року. Због великог броја е-порука које примамо, време одговора може варирати. Ценимо ваше стрпљење.</p>
-    <p>С поштовањем,<br>OWFN тим</p>
-</div>
-`,
 };
