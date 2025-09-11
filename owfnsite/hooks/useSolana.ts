@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
@@ -352,8 +351,9 @@ export const useSolana = (): UseSolanaReturn => {
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
         if (address) {
-            balanceCache.delete(address);
+            balanceCache.delete(address); // Invalidate cache on successful transaction
             getWalletBalances(address).then(setUserTokens);
+            getUserImpactStats(); // Refresh impact stats after a transaction
         }
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
@@ -362,7 +362,7 @@ export const useSolana = (): UseSolanaReturn => {
         setLoading(false);
         return { success: false, messageKey: 'transaction_failed_alert' };
     }
-  }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
+  }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances, getUserImpactStats]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");

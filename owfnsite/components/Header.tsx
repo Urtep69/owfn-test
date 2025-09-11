@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat, Shield } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
@@ -16,7 +15,7 @@ const ConnectButton = () => {
     const { t, solana, siws } = useAppContext();
     const { setVisible } = useWalletModal();
     const { connected, address, connecting, disconnectWallet } = solana;
-    const { isAuthenticated, isLoading: isSiwsLoading, isSessionLoading, signIn } = siws;
+    const { isAuthenticated, isLoading: isSiwsLoading, isSessionLoading, signIn, signOut } = siws;
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -38,6 +37,11 @@ const ConnectButton = () => {
         navigator.clipboard.writeText(address);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+    
+    const handleDisconnect = async () => {
+        await signOut();
+        await disconnectWallet();
     };
 
     if (connecting || isSessionLoading) {
@@ -110,14 +114,14 @@ const ConnectButton = () => {
                             onClick={copyToClipboard}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
-                            <span>{t('copy_address', {defaultValue: 'Copy Address'})}</span>
+                            <span>{t('copy_address')}</span>
                             {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
                         </button>
                         <button
                             onClick={() => setVisible(true)}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
-                            <span>{t('change_wallet', {defaultValue: 'Change Wallet'})}</span>
+                            <span>{t('change_wallet')}</span>
                             <Repeat size={16} />
                         </button>
                         <a
@@ -126,13 +130,13 @@ const ConnectButton = () => {
                             rel="noopener noreferrer"
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
-                            <span>{t('view_on_solscan', {defaultValue: 'View on Solscan'})}</span>
+                            <span>{t('view_on_solscan')}</span>
                             <ExternalLink size={16} />
                         </a>
                     </div>
                     <div className="p-2 border-t border-primary-200 dark:border-darkPrimary-700">
                          <button
-                            onClick={disconnectWallet}
+                            onClick={handleDisconnect}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-red-600 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10 font-semibold transition-colors"
                         >
                             <span>{t('disconnect_wallet')}</span>
