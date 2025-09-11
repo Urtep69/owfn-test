@@ -40,12 +40,12 @@ export const PROJECT_LINKS = {
 };
 
 export const TOKEN_ALLOCATIONS: TokenAllocation[] = [
-  { name: 'Impact Treasury & Social Initiatives', value: 6300000000, percentage: 35, color: '#3b82f6' },
-  { name: 'Community & Ecosystem Growth', value: 5400000000, percentage: 30, color: '#60a5fa' },
-  { name: 'Presale & Liquidity', value: 2880000000, percentage: 16, color: '#93c5fd' },
-  { name: 'Team & Founders', value: 2700000000, percentage: 15, color: '#bfdbfe' },
-  { name: 'Marketing & Business Development', value: 540000000, percentage: 3, color: '#1d4ed8' },
-  { name: 'Advisors & Partnerships', value: 180000000, percentage: 1, color: '#1e3a8a' },
+  { name: 'Impact Treasury & Social Initiatives', value: 6300000000, percentage: 35, color: '#b89b74' },
+  { name: 'Community & Ecosystem Growth', value: 5400000000, percentage: 30, color: '#9e825c' },
+  { name: 'Presale & Liquidity', value: 2880000000, percentage: 16, color: '#eac06a' },
+  { name: 'Team & Founders', value: 2700000000, percentage: 15, color: '#f0d090' },
+  { name: 'Marketing & Business Development', value: 540000000, percentage: 3, color: '#d2b48c' },
+  { name: 'Advisors & Partnerships', value: 180000000, percentage: 1, color: '#846944' },
 ];
 
 export const ROADMAP_DATA: RoadmapPhase[] = [
