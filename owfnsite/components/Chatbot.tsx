@@ -181,7 +181,13 @@ export const Chatbot = () => {
     const handleSend = async () => {
         if (input.trim() === '' || isLoading) return;
 
-        const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }], timestamp: new Date() };
+        const now = new Date();
+        const userMessage: ChatMessage = {
+            role: 'user',
+            parts: [{ text: input }],
+            timestamp: now,
+            formattedTimestamp: formatTimestamp(now)
+        };
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
         const currentInput = input;
         const currentTime = new Date().toISOString();
@@ -207,6 +213,7 @@ export const Chatbot = () => {
 
         try {
             let firstChunkReceived = false;
+            let firstChunkTime: Date | null = null;
 
             await getChatbotResponse(
                 historyForApi,
@@ -220,7 +227,13 @@ export const Chatbot = () => {
                         setIsLoading(false); // Stop loading animation
                     }
                     if (!firstChunkReceived) {
-                        setMessages(prev => [...prev, { role: 'model', parts: [{ text: chunk }], timestamp: new Date() }]);
+                        firstChunkTime = new Date();
+                        setMessages(prev => [...prev, {
+                            role: 'model',
+                            parts: [{ text: chunk }],
+                            timestamp: firstChunkTime,
+                            formattedTimestamp: formatTimestamp(firstChunkTime)
+                        }]);
                         firstChunkReceived = true;
                     } else {
                          setMessages(prev => {
@@ -238,7 +251,13 @@ export const Chatbot = () => {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
                     }
-                    setMessages(prev => [...prev, { role: 'model', parts: [{ text: errorMsg }], timestamp: new Date() }]);
+                    const errorTime = new Date();
+                    setMessages(prev => [...prev, {
+                        role: 'model',
+                        parts: [{ text: errorMsg }],
+                        timestamp: errorTime,
+                        formattedTimestamp: formatTimestamp(errorTime)
+                    }]);
                 }
             );
         } catch (error) {
@@ -247,7 +266,13 @@ export const Chatbot = () => {
                 window.clearInterval(loadingIntervalRef.current);
                 loadingIntervalRef.current = null;
             }
-             setMessages(prev => [...prev, { role: 'model', parts: [{ text: t('chatbot_error') }], timestamp: new Date() }]);
+            const errorTime = new Date();
+            setMessages(prev => [...prev, {
+                role: 'model',
+                parts: [{ text: t('chatbot_error') }],
+                timestamp: errorTime,
+                formattedTimestamp: formatTimestamp(errorTime)
+            }]);
         } finally {
             if (loadingIntervalRef.current) {
                 window.clearInterval(loadingIntervalRef.current);
@@ -305,23 +330,20 @@ export const Chatbot = () => {
             <div className="flex-1 p-4 overflow-y-auto">
                 <div className="space-y-4">
                      {messages.map((msg, index) => (
-                        <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            {msg.role === 'model' && <OwfnIcon className="w-6 h-6 flex-shrink-0" />}
-                            
-                            <div className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                {msg.timestamp && (
-                                    <p className="text-xs text-primary-400 dark:text-darkPrimary-500 mb-1">
-                                        {formatTimestamp(msg.timestamp)}
+                        <div key={index} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                            <div className={`flex items-center gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                {msg.role === 'model' ? <OwfnIcon className="w-6 h-6" /> : <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400" />}
+                                {msg.formattedTimestamp && (
+                                    <p className="text-xs text-primary-400 dark:text-darkPrimary-500">
+                                        {msg.formattedTimestamp}
                                     </p>
                                 )}
-                                <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none'}`}>
-                                   <div className="text-sm whitespace-pre-wrap">
-                                       {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
-                                   </div>
+                            </div>
+                            <div className={`mt-1 max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none mr-8' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none ml-8'}`}>
+                                <div className="text-sm whitespace-pre-wrap">
+                                    {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
                                 </div>
                             </div>
-
-                            {msg.role === 'user' && <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400 flex-shrink-0" />}
                         </div>
                     ))}
                     {isLoading && (

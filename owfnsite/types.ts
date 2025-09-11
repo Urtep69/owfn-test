@@ -1,5 +1,4 @@
 
-
 export interface Token {
   name: string;
   symbol: string;
@@ -53,6 +52,7 @@ export interface ChatMessage {
     role: 'user' | 'model';
     parts: { text: string }[];
     timestamp?: Date;
+    formattedTimestamp?: string;
 }
 
 export interface TokenExtensionState {
