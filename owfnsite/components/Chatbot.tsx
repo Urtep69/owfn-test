@@ -117,24 +117,24 @@ export const Chatbot = () => {
     }, [isOpen, isMaximized]);
 
     const setWelcomed = () => {
-        localStorage.setItem('owfn-chatbot-welcomed', 'true');
+        sessionStorage.setItem('owfn-chatbot-welcomed-session', 'true');
         setShowWelcomeBubble(false);
     };
 
-    // Effect to show the welcome bubble on first visit
+    // Effect to show the welcome bubble once per session
     useEffect(() => {
-        const hasBeenWelcomed = localStorage.getItem('owfn-chatbot-welcomed');
+        const hasBeenWelcomed = sessionStorage.getItem('owfn-chatbot-welcomed-session');
         if (!hasBeenWelcomed && !isOpen) {
             const timer = setTimeout(() => setShowWelcomeBubble(true), 2000); // 2-second delay
             return () => clearTimeout(timer);
         }
     }, [isOpen]);
 
-    // Effect to populate the welcome message when the chat is opened for the first time
+    // Effect to populate the welcome message when the chat is opened for the first time in a session
     useEffect(() => {
         if (isOpen && messages.length === 0) {
-            const hasBeenWelcomed = localStorage.getItem('owfn-chatbot-welcomed');
-            if (hasBeenWelcomed) { // It's not the first time ever, but the chat state is empty
+            const hasBeenWelcomedThisSession = sessionStorage.getItem('owfn-chatbot-welcomed-session');
+             if (hasBeenWelcomedThisSession) { // It's not the first time ever, but the chat state is empty
                  const reWelcomeMessage: ChatMessage = {
                     role: 'model',
                     parts: [{ text: t('chatbot_placeholder') }],
@@ -142,7 +142,7 @@ export const Chatbot = () => {
                 };
                 setMessages([reWelcomeMessage]);
 
-            } else { // It is the very first time this user is opening the chat
+            } else { // It is the very first time this user is opening the chat in this session
                 const welcomeMessage: ChatMessage = {
                     role: 'model',
                     parts: [{ text: t('chatbot_welcome_message') }],

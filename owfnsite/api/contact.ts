@@ -5,10 +5,9 @@ export default async function handler(req: any, res: any) {
         return res.status(405).json({ success: false, error: 'Method Not Allowed' });
     }
     
-    const geminiApiKey = process.env.API_KEY;
     const resendApiKey = process.env.RESEND_API_KEY;
 
-    if (!geminiApiKey || !resendApiKey) {
+    if (!process.env.API_KEY || !resendApiKey) {
         console.error("CRITICAL: API_KEY or RESEND_API_KEY environment variable is not set.");
         return res.status(500).json({ success: false, error: "Server configuration error." });
     }
@@ -72,7 +71,7 @@ export default async function handler(req: any, res: any) {
         const reasonForPrompt = reasonTextMap[reason as string] || 'Other';
         
         // Step 1: Use Gemini to analyze, translate to ROMANIAN, and format the email content
-        const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         
         const prompt = `A user has submitted a contact form on the OWFN (Official World Family Network) website. Your task is to process this information and generate a structured email for an administrator.
 

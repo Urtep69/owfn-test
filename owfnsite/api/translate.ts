@@ -5,8 +5,7 @@ export default async function handler(req: any, res: any) {
         return res.status(405).send('Method Not Allowed');
     }
 
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) {
+    if (!process.env.API_KEY) {
         console.error("API key is not configured in environment variables.");
         return res.status(500).json({ error: "API key not configured." });
     }
@@ -24,7 +23,7 @@ export default async function handler(req: any, res: any) {
             return res.status(200).json({ text: text || '' });
         }
         
-        const ai = new GoogleGenAI({ apiKey });
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
         const systemInstructionParts = [
             'You are a highly skilled translator. Translate any text you receive into ' + targetLanguage + '.',

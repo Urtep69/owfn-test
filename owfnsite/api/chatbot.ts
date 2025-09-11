@@ -90,8 +90,7 @@ export default async function handler(req: any, res: any) {
             return res.status(405).json({ error: 'Method Not Allowed' });
         }
 
-        const apiKey = process.env.API_KEY;
-        if (!apiKey) {
+        if (!process.env.API_KEY) {
             console.error("CRITICAL: API_KEY environment variable is not set.");
             return res.status(500).json({ error: "Server configuration error. The site administrator needs to configure the API key." });
         }
@@ -105,7 +104,7 @@ export default async function handler(req: any, res: any) {
         const validHistory = buildValidHistory(history);
         const contents = [...validHistory, { role: 'user', parts: [{ text: question }] }];
         
-        const ai = new GoogleGenAI({ apiKey });
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         
         let languageName = 'English';
         try {
