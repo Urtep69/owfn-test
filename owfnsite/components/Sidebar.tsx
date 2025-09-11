@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
@@ -66,6 +65,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             title: t('sidebar_finance'),
             links: [
                 { to: '/presale', label: t('presale'), icon: <ShoppingCart size={20} /> },
+                { to: '/presale-info', label: t('presale_info'), icon: <Briefcase size={20} /> },
                 { to: '/tokenomics', label: t('tokenomics'), icon: <PieChart size={20} /> },
                 { to: '/donations', label: t('donations'), icon: <Gift size={20} /> },
                 { to: '/dashboard', label: t('dashboard'), icon: <BarChart2 size={20} /> },

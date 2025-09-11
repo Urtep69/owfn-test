@@ -12,6 +12,7 @@ import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
 
 import Home from './pages/Home.tsx';
 import Presale from './pages/Presale.tsx';
+import PresaleStages from './pages/PresaleStages.tsx';
 import About from './pages/About.tsx';
 import Tokenomics from './pages/Tokenomics.tsx';
 import Roadmap from './pages/Roadmap.tsx';
@@ -48,6 +49,7 @@ const AppContent = () => {
       <Layout>
         <Switch>
           <Route path="/presale"><Presale /></Route>
+          <Route path="/presale-info"><PresaleStages /></Route>
           <Route path="/about"><About /></Route>
           <Route path="/whitepaper"><Whitepaper /></Route>
           <Route path="/tokenomics"><Tokenomics /></Route>

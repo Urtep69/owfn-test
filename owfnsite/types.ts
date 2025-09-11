@@ -1,3 +1,4 @@
+import React from 'react';
 
 export interface Token {
   name: string;
@@ -161,4 +162,20 @@ export interface SiwsReturn {
   session: SiwsSession | null;
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
+}
+
+export interface PresaleStage {
+  phase: number;
+  titleKey: string;
+  status: 'completed' | 'active' | 'upcoming';
+  startDate: string;
+  endDate: string;
+  rate: number;
+  bonusThreshold: number;
+  bonusPercentage: number;
+  minBuy: number;
+  maxBuy: number;
+  softCap: number;
+  hardCap: number;
+  distributionWallet: string;
 }

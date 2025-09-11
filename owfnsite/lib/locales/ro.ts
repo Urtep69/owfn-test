@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -125,6 +124,7 @@ export const ro = {
     token_extensions: `Extensii Active`,
     
     // Presale Page
+    presale_info: `Info Prevânzare`,
     presale_join_title: `Alătură-te Prevânzării`,
     presale_ends_in: `Prevânzarea se încheie în`,
     progress: `Progres`,
@@ -174,6 +174,21 @@ export const ro = {
     presale_you_can_buy: `Puteți contribui cu până la încă {amount} SOL.`,
     presale_bonus_offer: `BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!`,
     presale_checking_contribution: `Se verifică contribuția...`,
+
+    // Presale Stages Page
+    presale_stages_title: `Etapele Prevânzării`,
+    presale_stages_subtitle: `O prezentare transparentă a etapelor noastre de finanțare.`,
+    phase_1: `Faza 1`,
+    phase_2: `Faza 2`,
+    status_completed: `Finalizat`,
+    status_active: `Activ`,
+    status_upcoming: `Urmează`,
+    period: `Perioadă`,
+    token_price: `Preț Token`,
+    bonuses: `Bonusuri`,
+    total_raised: `Total Strâns`,
+    live_progress: `Progres Live`,
+    participate_now: `Participă Acum`,
 
     // Donations Page
     make_donation: `Fă o Donație`,
@@ -479,9 +494,10 @@ export const ro = {
     votes_for: `Pentru`,
     votes_against: `Împotrivă`,
     ends_in: `Se termină în`,
-    status_active: `Activă`,
-    status_passed: `Aprobată`,
-    status_failed: `Respinsă`,
+    // FIX: Renamed governance status keys to avoid duplicates
+    governance_status_active: `Activă`,
+    governance_status_passed: `Aprobată`,
+    governance_status_failed: `Respinsă`,
     you_voted: `Ai Votat`,
     no_active_proposals: `Momentan nu există propuneri active.`,
     no_past_proposals: `Nu există propuneri anterioare de afișat.`,

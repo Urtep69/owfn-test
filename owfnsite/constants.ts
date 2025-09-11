@@ -1,5 +1,4 @@
-
-import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction } from './types.ts';
+import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction, PresaleStage } from './types.ts';
 import React from 'react';
 import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './lib/assets.ts';
 
@@ -66,6 +65,40 @@ export const PRESALE_DETAILS = {
   startDate: new Date('2025-08-13T00:00:00Z'),
   endDate: new Date('2025-09-12T00:00:00Z')
 };
+
+export const PRESALE_STAGES: PresaleStage[] = [
+    {
+        phase: 1,
+        titleKey: 'phase_1',
+        status: 'completed',
+        startDate: '2025-08-13T00:00:00Z',
+        endDate: '2025-09-12T00:00:00Z',
+        rate: 10000000,
+        bonusThreshold: 2,
+        bonusPercentage: 10,
+        minBuy: 0.1,
+        maxBuy: 5,
+        softCap: 105,
+        hardCap: 200,
+        distributionWallet: DISTRIBUTION_WALLETS.presale,
+    },
+    {
+        phase: 2,
+        titleKey: 'phase_2',
+        status: 'upcoming',
+        startDate: '2025-09-26T00:00:00Z',
+        endDate: '2025-10-17T00:00:00Z',
+        rate: 9000000,
+        bonusThreshold: 2.5,
+        bonusPercentage: 8,
+        minBuy: 0.1,
+        maxBuy: 10,
+        softCap: 200,
+        hardCap: 400,
+        distributionWallet: '...', // Placeholder for Phase 2 wallet
+    }
+];
+
 
 export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'en', name: 'English', flag: '🇬🇧' },

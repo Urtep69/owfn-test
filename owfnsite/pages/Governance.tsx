@@ -55,9 +55,10 @@ const ProposalCard = ({ proposal }: { proposal: GovernanceProposal }) => {
 
     const getStatusChip = () => {
         switch(proposal.status) {
-            case 'active': return <div className="bg-blue-500/20 text-blue-400 dark:text-blue-300 text-xs font-bold px-2 py-1 rounded-full">{t('status_active')}</div>;
-            case 'passed': return <div className="bg-green-500/20 text-green-500 dark:text-green-300 text-xs font-bold px-2 py-1 rounded-full">{t('status_passed')}</div>;
-            case 'failed': return <div className="bg-red-500/20 text-red-500 dark:text-red-300 text-xs font-bold px-2 py-1 rounded-full">{t('status_failed')}</div>;
+            // FIX: Use specific governance status keys
+            case 'active': return <div className="bg-blue-500/20 text-blue-400 dark:text-blue-300 text-xs font-bold px-2 py-1 rounded-full">{t('governance_status_active')}</div>;
+            case 'passed': return <div className="bg-green-500/20 text-green-500 dark:text-green-300 text-xs font-bold px-2 py-1 rounded-full">{t('governance_status_passed')}</div>;
+            case 'failed': return <div className="bg-red-500/20 text-red-500 dark:text-red-300 text-xs font-bold px-2 py-1 rounded-full">{t('governance_status_failed')}</div>;
         }
     }
 

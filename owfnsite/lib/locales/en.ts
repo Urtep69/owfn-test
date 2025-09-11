@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -125,6 +124,7 @@ export const en = {
     token_extensions: `Active Extensions`,
     
     // Presale Page
+    presale_info: `Presale Info`,
     presale_join_title: `Join the Presale`,
     presale_ends_in: `Presale ends in`,
     progress: `Progress`,
@@ -175,6 +175,21 @@ export const en = {
     presale_bonus_offer: `{percentage}% BONUS on purchases of {threshold} SOL or more!`,
     presale_checking_contribution: `Checking your contribution...`,
 
+    // Presale Stages Page
+    presale_stages_title: `Presale Stages`,
+    presale_stages_subtitle: `A transparent overview of our funding phases.`,
+    phase_1: `Phase 1`,
+    phase_2: `Phase 2`,
+    status_completed: `Completed`,
+    status_active: `Active`,
+    status_upcoming: `Upcoming`,
+    period: `Period`,
+    token_price: `Token Price`,
+    bonuses: `Bonuses`,
+    total_raised: `Total Raised`,
+    live_progress: `Live Progress`,
+    participate_now: `Participate Now`,
+    
     // Donations Page
     make_donation: `Make a Donation`,
     donation_desc: `Support our social impact initiatives by donating crypto. All funds go directly to the Impact Treasury.`,
@@ -462,8 +477,6 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
-    airdrop_info_box_title: `About this Airdrop`,
-    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -479,9 +492,10 @@ export const en = {
     votes_for: `For`,
     votes_against: `Against`,
     ends_in: `Ends in`,
-    status_active: `Active`,
-    status_passed: `Passed`,
-    status_failed: `Failed`,
+    // FIX: Renamed governance status keys to avoid duplicates
+    governance_status_active: `Active`,
+    governance_status_passed: `Passed`,
+    governance_status_failed: `Failed`,
     you_voted: `You Voted`,
     no_active_proposals: `There are currently no active proposals.`,
     no_past_proposals: `There are no past proposals to display.`,

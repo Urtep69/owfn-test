@@ -1,4 +1,3 @@
-
 export const es = {
     // Navigation
     home: `Inicio`,
@@ -125,6 +124,7 @@ export const es = {
     token_extensions: `Extensiones Activas`,
     
     // Presale Page
+    presale_info: `Presale Info`,
     presale_join_title: `Únete a la Preventa`,
     presale_ends_in: `La preventa termina en`,
     progress: `Progreso`,
@@ -174,6 +174,21 @@ export const es = {
     presale_you_can_buy: `Puedes contribuir con hasta {amount} SOL más.`,
     presale_bonus_offer: `¡BONUS del {percentage}% en compras de {threshold} SOL o más!`,
     presale_checking_contribution: `Verificando su contribución...`,
+
+    // Presale Stages Page
+    presale_stages_title: `Presale Stages`,
+    presale_stages_subtitle: `A transparent overview of our funding phases.`,
+    phase_1: `Phase 1`,
+    phase_2: `Phase 2`,
+    status_completed: `Completed`,
+    status_active: `Active`,
+    status_upcoming: `Upcoming`,
+    period: `Period`,
+    token_price: `Token Price`,
+    bonuses: `Bonuses`,
+    total_raised: `Total Raised`,
+    live_progress: `Live Progress`,
+    participate_now: `Participate Now`,
     
     // Donations Page
     make_donation: `Hacer una Donación`,
@@ -318,8 +333,6 @@ export const es = {
     faq_q13: `¿Por qué hay un límite máximo de compra (Max Buy) en la preventa?`,
     faq_a13: `El límite máximo de compra es una medida importante para garantizar la distribución más justa posible de los tokens y para evitar que un pequeño número de grandes inversores ("ballenas") controle una parte significativa del suministro. Esto promueve una comunidad más sana y descentralizada a largo plazo.`,
     faq_q14: `¿Qué significa que el token es "Portador de Intereses" con un 2% de APY? ¿Cómo funciona?`,
-    faq_a14: `Significa que el token OWFN está programado para generar intereses automáticamente. Simplemente manteniendo los tokens en su billetera compatible con Solana, la cantidad de sus tokens aumentará con el tiempo, con un Rendimiento Porcentual Anual (APY) del 2%. No necesita hacer staking ni realizar ninguna acción adicional; las recompensas se acumulan automáticamente.`,
-    faq_q15: `¿Qué es la tarifa de transferencia del 0.5% y cuándo se activará?`,
     faq_a15: `Esta tarifa es un mecanismo clave para la financiación a largo plazo de nuestra misión. Se aplicará una tarifa del 0.5% a todas las transacciones con el token OWFN *después* de que concluya el período de preventa. Los fondos recaudados de esta tarifa se dirigen automáticamente a la Tesorería de Impacto para financiar continuamente nuestros proyectos sociales. Por lo tanto, cada transacción contribuye al bien común.`,
     faq_q16: `¿Por qué eligieron la blockchain de Solana para este proyecto?`,
     faq_a16: `Elegimos Solana por su velocidad excepcional, costos de transacción muy bajos y alta escalabilidad. Estas características son esenciales para un proyecto global como el nuestro, permitiendo micro-transacciones eficientes y asegurando una experiencia rápida y accesible para todos los usuarios, ya sea que estén donando, comprando o comerciando tokens.`,
@@ -462,8 +475,6 @@ export const es = {
     airdrop_eligible_message: `¡Tu billetera es elegible! Recibirás {amount} tokens OWFN en la próxima distribución.`,
     airdrop_not_eligible: `No Elegible`,
     airdrop_not_eligible_message: `Lo sentimos, esta dirección de billetera no es elegible para el airdrop actual. ¡Mantente activo en nuestra comunidad para futuras oportunidades!`,
-    airdrop_info_box_title: `Acerca de este Airdrop`,
-    airdrop_info_box_desc: `Este airdrop está diseñado para recompensar a los primeros partidarios y a los miembros activos de la comunidad. La elegibilidad se basa en factores como la participación en la preventa y el compromiso en los eventos de la comunidad.`,
     
     // Governance
     governance_title: `Gobernanza`,
@@ -479,9 +490,10 @@ export const es = {
     votes_for: `A Favor`,
     votes_against: `En Contra`,
     ends_in: `Termina en`,
-    status_active: `Activa`,
-    status_passed: `Aprobada`,
-    status_failed: `Rechazada`,
+    // FIX: Renamed governance status keys to avoid duplicates
+    governance_status_active: `Activa`,
+    governance_status_passed: `Aprobada`,
+    governance_status_failed: `Rechazada`,
     you_voted: `Ya Votaste`,
     no_active_proposals: `Actualmente no hay propuestas activas.`,
     no_past_proposals: `No hay propuestas pasadas para mostrar.`,
@@ -567,14 +579,6 @@ export const es = {
     contact_faq_button: `Ver Preguntas Frecuentes`,
     contact_required_fields: `Los campos marcados con un asterisco (*) son obligatorios.`,
     contact_disclaimer_title: `Nota sobre nuestra Política de Comunicación`,
-    contact_disclaimer_message: `Para garantizar que nuestro equipo pueda apoyar eficazmente a la comunidad y hacer avanzar el proyecto, damos prioridad a las consultas directamente relacionadas con la Red Familiar Mundial Oficial. Los mensajes que no estén relacionados con el tema, sean spam o solicitudes no deseadas pueden no recibir una respuesta. Gracias por tu comprensión y por ayudarnos a mantenernos enfocados en nuestra misión.`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Síguenos para obtener actualizaciones en tiempo real, noticias y anuncios.`,
-    contact_social_telegram_channel_title: `Canal de Telegram`,
-    contact_social_telegram_channel_desc: `Suscríbete para recibir anuncios importantes y noticias oficiales.`,
-    contact_social_telegram_group_title: `Grupo de Telegram`,
-    contact_social_telegram_group_desc: `Únete a nuestro grupo comunitario para discutir e interactuar con otros miembros.`,
-    contact_social_discord_title: `Servidor de Discord`,
-    contact_social_discord_desc: `Forma parte de nuestra comunidad activa para discusiones y soporte.`,
+    contact_disclaimer_message: `Para garantizar que nuestro equipo pueda apoyar eficazmente a la comunidad y avanzar el proyecto, damos prioridad a las consultas directamente relacionadas con la Official World Family Network. Mensajes fuera del tópico, spam o solicitudes no solicitadas pueden no recibir una respuesta. Gracias por su comprensión y por ayudarnos a mantener el foco en nuestra misión.`,
     send_direct_message: `Enviar Mensaje Directo`,
 };
