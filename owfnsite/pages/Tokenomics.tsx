@@ -1,6 +1,6 @@
 import React from 'react';
 import { AllocationChart } from '../components/AllocationChart.tsx';
-import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, OWFN_LOGO_URL } from '../constants.ts';
+import { TOKEN_DETAILS, TOKEN_ALLOCATIONS } from '../constants.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from '../components/IconComponents.tsx';
 
@@ -23,48 +23,38 @@ export default function Tokenomics() {
                 </p>
             </div>
 
-            <div className="grid lg:grid-cols-5 gap-12 items-start">
-                <div className="lg:col-span-3 space-y-8">
-                    <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
-                        <h2 className="text-2xl font-bold mb-6">{t('tokenomics_details_title')}</h2>
-                        <div className="space-y-2">
-                            <DetailItem 
-                                label={t('total_supply')} 
-                                value={
-                                    <div className="flex items-center justify-end space-x-2">
-                                        <span>{TOKEN_DETAILS.totalSupply.toLocaleString()} B</span>
-                                        <OwfnIcon className="w-5 h-5" />
-                                        <span>OWFN</span>
-                                    </div>
-                                } 
-                            />
-                            <DetailItem label={t('token_decimals')} value={TOKEN_DETAILS.decimals} />
-                            <DetailItem label={t('token_standard')} value={TOKEN_DETAILS.standard} />
-                            <DetailItem label={t('token_extensions')} value={TOKEN_DETAILS.extensions} />
-                            <DetailItem label={t('presale_price')} value={TOKEN_DETAILS.presalePrice} />
-                            <DetailItem label={t('launch_price')} value={TOKEN_DETAILS.dexLaunchPrice} />
-                        </div>
-                    </div>
-
-                    <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
-                        <h2 className="text-2xl font-bold mb-6">{t('tokenomics_allocation_title')}</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {TOKEN_ALLOCATIONS.map(alloc => (
-                                <div key={alloc.name} className="flex items-center space-x-3">
-                                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: alloc.color }}></div>
-                                    <span className="text-sm">{alloc.name} ({alloc.percentage}%)</span>
+            <div className="max-w-4xl mx-auto space-y-8">
+                <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
+                    <h2 className="text-2xl font-bold mb-6">{t('tokenomics_details_title')}</h2>
+                    <div className="space-y-2">
+                        <DetailItem 
+                            label={t('total_supply')} 
+                            value={
+                                <div className="flex items-center justify-end space-x-2">
+                                    <span>{TOKEN_DETAILS.totalSupply.toLocaleString()} B</span>
+                                    <OwfnIcon className="w-5 h-5" />
+                                    <span>OWFN</span>
                                 </div>
-                            ))}
-                        </div>
+                            } 
+                        />
+                        <DetailItem label={t('token_decimals')} value={TOKEN_DETAILS.decimals} />
+                        <DetailItem label={t('token_standard')} value={TOKEN_DETAILS.standard} />
+                        <DetailItem label={t('token_extensions')} value={TOKEN_DETAILS.extensions} />
+                        <DetailItem label={t('presale_price')} value={TOKEN_DETAILS.presalePrice} />
+                        <DetailItem label={t('launch_price')} value={TOKEN_DETAILS.dexLaunchPrice} />
                     </div>
                 </div>
-                
-                <div className="lg:col-span-2 flex justify-center items-center">
-                    <img 
-                        src={OWFN_LOGO_URL}
-                        alt="OWFN Coin"
-                        className="w-64 h-64 drop-shadow-2xl hero-coin"
-                    />
+
+                <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
+                    <h2 className="text-2xl font-bold mb-6">{t('tokenomics_allocation_title')}</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {TOKEN_ALLOCATIONS.map(alloc => (
+                            <div key={alloc.name} className="flex items-center space-x-3">
+                                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: alloc.color }}></div>
+                                <span className="text-sm">{alloc.name} ({alloc.percentage}%)</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 

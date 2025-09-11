@@ -21,11 +21,11 @@ export default function Home() {
         <div className="space-y-16 animate-fade-in-up">
             <section className="text-center bg-gradient-to-br from-white to-primary-200 dark:from-darkPrimary-800 dark:to-darkPrimary-950 rounded-3xl p-8 md:p-16 shadow-3d-lg -mt-8 -mx-8">
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="mb-6 bg-white/20 dark:bg-darkPrimary-950/20 rounded-full w-48 h-48 p-3 shadow-lg backdrop-blur-sm border-2 border-primary-300/30 dark:border-darkPrimary-100/30 hero-coin-container">
+                    <div className="mb-6 bg-white/20 dark:bg-darkPrimary-950/20 rounded-full w-48 h-48 p-3 shadow-lg backdrop-blur-sm border-2 border-primary-300/30 dark:border-darkPrimary-100/30">
                         <img 
                             src={OWFN_LOGO_URL} 
-                            alt="OWFN Coin" 
-                            className="w-full h-full object-cover hero-coin"
+                            alt="OWFN Logo" 
+                            className="w-full h-full object-cover rounded-full"
                         />
                     </div>
                     <h1 className="text-4xl md:text-6xl font-extrabold text-primary-900 dark:text-white leading-tight tracking-tighter drop-shadow-lg">

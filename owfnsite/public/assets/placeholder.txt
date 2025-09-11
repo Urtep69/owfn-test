@@ -1,8 +1,7 @@
 IMPORTANT: Please place your actual image files in this directory.
 
 The application is configured to load the following files from here:
-- owfn.png (old logo, can be replaced or removed)
-- owfn-coin.png (the new coin image)
+- owfn.png
 - solana.png
 - usdc.png
 - usdt.png
