@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -38,7 +37,7 @@ export default function ImpactCategory() {
     if (!details) {
         return (
             <div className="text-center py-10 animate-fade-in-up">
-                <h2 className="text-2xl font-bold">{t('category_not_found_title')}</h2>
+                <h2 className="text-2xl font-bold">Category Not Found</h2>
                 <Link to="/impact" className="text-accent-500 dark:text-darkAccent-500 hover:underline mt-4 inline-block">{t('back_to_all_cases')}</Link>
             </div>
         );

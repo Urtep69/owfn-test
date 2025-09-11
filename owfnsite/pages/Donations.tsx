@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useLocation } from 'wouter';
+
+import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
@@ -13,26 +13,10 @@ const tokens = [
 ];
 
 export default function Donations() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
-    const [location, setLocation] = useLocation();
+    const { t, solana, setWalletModalOpen, siws } = useAppContext();
+    const { isAuthenticated, signIn, isLoading: isSiwsLoading } = siws;
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
-
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const tokenFromQuery = params.get('token');
-        const amountFromQuery = params.get('amount');
-        if (tokenFromQuery && tokens.some(t => t.symbol === tokenFromQuery)) {
-            setSelectedToken(tokenFromQuery);
-        }
-        if (amountFromQuery) {
-            setAmount(amountFromQuery);
-        }
-         // Clean the URL after reading params
-        if (tokenFromQuery || amountFromQuery) {
-             window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }, [location]);
 
     const currentUserToken = useMemo(() => solana.userTokens.find(t => t.symbol === selectedToken), [solana.userTokens, selectedToken]);
 
@@ -60,6 +44,12 @@ export default function Donations() {
             setWalletModalOpen(true);
             return;
         }
+
+        if (!isAuthenticated) {
+            await signIn();
+            // After signing in, the user will need to click again. This is a simple and safe flow.
+            return;
+        }
     
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
@@ -78,10 +68,11 @@ export default function Donations() {
     };
     
     const buttonText = useMemo(() => {
-        if (solana.loading) return t('processing');
+        if (solana.loading || isSiwsLoading) return t('processing');
         if (!solana.connected) return t('connect_wallet');
+        if (!isAuthenticated) return t('sign_in_to_donate', {defaultValue: 'Sign-In to Donate'});
         return t('donate');
-    }, [solana.connected, solana.loading, t]);
+    }, [solana.connected, solana.loading, t, isAuthenticated, isSiwsLoading]);
 
     const percentages = [5, 10, 15, 25, 50, 75, 100];
 
@@ -196,7 +187,7 @@ export default function Donations() {
                             </p>
                         </div>
                     )}
-                     <button onClick={handleDonate} disabled={solana.loading || (solana.connected && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                     <button onClick={handleDonate} disabled={solana.loading || isSiwsLoading || (solana.connected && isAuthenticated && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                          {buttonText}
                     </button>
                 </div>

@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
@@ -242,8 +243,8 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 
 
 export default function Presale() {
-  const { t, solana, setWalletModalOpen } = useAppContext();
-  const [location, setLocation] = useLocation();
+  const { t, solana, setWalletModalOpen, siws } = useAppContext();
+  const { isAuthenticated, signIn, isLoading: isSiwsLoading } = siws;
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -254,16 +255,6 @@ export default function Presale() {
   const [presaleStatus, setPresaleStatus] = useState<'pending' | 'active' | 'ended'>('pending');
   const [endReason, setEndReason] = useState<'date' | 'hardcap' | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const amountFromQuery = params.get('amount');
-    if (amountFromQuery) {
-        setSolAmount(amountFromQuery);
-        // Clean the URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [location]);
 
   const fetchPresaleProgress = useCallback(async () => {
         if (new Date() < PRESALE_DETAILS.startDate) {
@@ -483,6 +474,11 @@ export default function Presale() {
         return;
     }
 
+    if (!isAuthenticated) {
+        await signIn();
+        return;
+    }
+
     if (presaleStatus !== 'active' || isAmountInvalid || solana.loading) {
         return;
     }
@@ -512,10 +508,11 @@ export default function Presale() {
   };
 
   const buttonText = useMemo(() => {
-    if (solana.loading) return t('processing');
+    if (solana.loading || isSiwsLoading) return t('processing');
     if (!solana.connected) return t('connect_wallet');
+    if (!isAuthenticated) return t('sign_in_to_buy', {defaultValue: 'Sign-In to Buy'});
     return t('buy');
-  }, [solana.connected, solana.loading, t]);
+  }, [solana.connected, solana.loading, t, isAuthenticated, isSiwsLoading]);
 
 
   const formatSaleDate = (date: Date) => {
@@ -667,7 +664,7 @@ export default function Presale() {
                                 {isCheckingContribution ? (
                                     <div className="flex items-center justify-center gap-2">
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>{t('presale_checking_contribution')}</span>
+                                        <span>Checking your contribution...</span>
                                     </div>
                                 ) : (
                                     <>
@@ -723,7 +720,7 @@ export default function Presale() {
                         <button 
                             onClick={handleBuy}
                             className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                            disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
+                            disabled={solana.loading || isSiwsLoading || isCheckingContribution || (solana.connected && isAuthenticated && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
                         >
                             {buttonText}
                         </button>
