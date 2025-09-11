@@ -25,10 +25,16 @@ export const pt = {
     sidebar_finance: `Finanças`,
     sidebar_engage: `Interagir`,
 
+    // Header
+    header_new: `NOVO`,
+    header_wallet_manager: `Gerente de Carteira`,
+
     // General
     connect_wallet: `Conectar Carteira`,
     disconnect_wallet: `Desconectar Carteira`,
+    copy_address: `Copiar Endereço`,
     change_wallet: `Mudar Carteira`,
+    view_on_solscan: `Ver no Solscan`,
     connected_as: `Conectado como`,
     buy_now: `Compre Agora!`,
     donate: `Doar`,
@@ -40,15 +46,6 @@ export const pt = {
     connect_wallet_first: `Por favor, conecte sua carteira primeiro.`,
     yes: `Sim`,
     no: `Não`,
-    authenticating: `Autenticando...`,
-    sign_in_to_buy: `Entrar para Comprar`,
-    sign_in_to_donate: `Entrar para Doar`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `Assine esta mensagem para se autenticar com a Official World Family Network (OWFN).`,
-    siws_message_uri: `Domínio`,
-    siws_message_issued_at: `Emitido em`,
-    siwS_message_no_cost: `Este pedido não acionará uma transação na blockchain nem custará taxas de gás.`,
     
     // Time Units
     time_days: `Dias`,
@@ -176,6 +173,7 @@ export const pt = {
     presale_you_contributed: `Você já contribuiu: {amount} SOL.`,
     presale_you_can_buy: `Você pode contribuir com mais {amount} SOL.`,
     presale_bonus_offer: `{percentage}% DE BÔNUS em compras de {threshold} SOL ou mais!`,
+    presale_checking_contribution: `Verificando sua contribuição...`,
     
     // Donations Page
     make_donation: `Fazer uma Doação`,
@@ -214,7 +212,6 @@ export const pt = {
     token_types: `Tipos de Token`,
     profile_loading_tokens: `Carregando tokens...`,
     profile_connect_prompt: `Conecte sua carteira para ver seu perfil e saldos de tokens.`,
-    profile_sign_in_prompt: `Conecte e faça login com sua carteira para ver seu perfil.`,
     profile_no_tokens: `Nenhum token encontrado nesta carteira.`,
     impact_dashboard_title: `Meu Painel de Impacto`,
     my_impact_stats: `Minhas Estatísticas de Impacto`,
@@ -327,7 +324,7 @@ export const pt = {
     faq_q18: `Como posso ter certeza de que minhas doações chegam às causas que vocês apoiam?`,
     faq_a19: `A transparência é fundamental para nós. Todos os fundos destinados a causas sociais são gerenciados através do Tesouro de Impacto, cujo endereço de carteira é público. Você pode monitorar todas as transações de entrada e saída em um explorador de blocos da Solana, como o Solscan. Além disso, no Portal de Impacto, forneceremos atualizações regulares e relatórios detalhados sobre os projetos financiados.`,
     faq_q20: `Posso propor um caso social ou uma causa a ser financiada pela OWFN?`,
-
+    
     // Chatbot
     chatbot_title: `Assistente OWFN`,
     chatbot_placeholder: `Faça uma pergunta...`,
@@ -354,16 +351,17 @@ export const pt = {
     translation_error_alert: `Ocorreu um erro durante a tradução. O caso não foi criado. Por favor, tente novamente.`,
     invalid_amount_generic: `Por favor, insira um valor válido.`,
     vote_success_alert: `Seu voto foi registrado com sucesso!`,
-
+    
     // Footer
     footer_copyright: `© {year} Official World Family Network. Todos os direitos reservados.`,
-
+    
     // Token Detail Page
     token_detail_title: `Análise de Token`,
     back_to_dashboard: `Voltar ao Painel`,
     back_to_profile: `Voltar ao Perfil`,
     token_not_found: `Dados do token não encontrados.`,
     token_description_title: `DESCRIÇÃO DO TOKEN`,
+    price_per_token: `Preço`,
     sell: `Vender`,
     sells: `Vendas`,
     market_cap: `Capitalização de Mercado`,
@@ -372,6 +370,7 @@ export const pt = {
     pair_address: `Endereço do Par`,
     mint_authority: `Autoridade de Cunhagem`,
     freeze_authority: `Autoridade de Congelamento`,
+    update_authority: `Autoridade de Atualização`,
     fully_diluted_valuation: `Avaliação Totalmente Diluída (FDV)`,
     market_stats: `Estatísticas de Mercado`,
     trading_stats: `Estatísticas de Negociação`,
@@ -483,13 +482,12 @@ export const pt = {
     maintenance_heading: `Estamos melhorando as coisas!`,
     maintenance_message: `Nossa plataforma está atualmente em manutenção programada para melhorar sua experiência. Agradecemos sua paciência e compreensão. Estaremos de volta em breve.`,
     maintenance_stay_tuned: `Fique atento às atualizações em nossos canais sociais:`,
-    admin_controls: `Controles de Administrador`,
+    admin_login: `Login de Administrador`,
     maintenance_status: `Status`,
     maintenance_status_active: `ATIVO`,
     maintenance_status_inactive: `INATIVO`,
     activate_maintenance_mode: `Ativar Manutenção`,
     deactivate_maintenance_mode: `Desativar Manutenção`,
-    admin_login: `Login de Administrador`,
     maintenance_login_denied: `Conexão negada. A plataforma está em modo de manutenção. Apenas administradores podem fazer login.`,
     
     // Coming Soon
@@ -516,29 +514,29 @@ export const pt = {
     your_owfn_balance: `Seu Saldo de OWFN`,
     insufficient_owfn_balance: `Saldo de OWFN insuficiente para realizar o airdrop.`,
     your_sol_balance: `Seu Saldo de SOL (para taxas)`,
-    insufficient_sol_balance: `Saldo de SOL insuficiente para taxas de transação.`,
+    insufficient_sol_balance: `Saldo de SOL insuficiente para as taxas de transação.`,
     estimated_tx_fees: `Taxas de transação estimadas`,
     start_airdrop: `Iniciar Airdrop`,
-    airdrop_confirmation_prompt: `Tem certeza de que deseja iniciar o airdrop? Isso enviará tokens OWFN para {count} carteiras únicas e não pode ser desfeito.`,
+    airdrop_confirmation_prompt: `Você tem certeza que deseja iniciar o airdrop? Isso enviará tokens OWFN para {count} carteiras únicas e não pode ser desfeito.`,
     airdrop_in_progress: `Airdrop em Andamento... Não feche esta janela.`,
     processing_batch: `Processando lote {current} de {total}...`,
     airdrop_complete: `Airdrop Concluído`,
     airdrop_summary: `{success} bem-sucedidos, {failed} falharam.`,
     airdrop_log: `Log do Airdrop`,
-
+    
     // Contact Page
     contact_title: `Entre em Contato`,
-    contact_subtitle: `Adoraríamos ouvir de você. Escolha a melhor maneira de se conectar conosco abaixo.`,
+    contact_subtitle: `Adoraríamos ouvir de você. Escolha a melhor forma de nos contatar abaixo.`,
     contact_how_can_we_help: `Como podemos ajudar?`,
     contact_general_inquiries: `Consultas Gerais`,
     contact_general_desc: `Para qualquer dúvida geral sobre o projeto.`,
     contact_partnerships: `Parcerias`,
     contact_partnerships_desc: `Para propostas de colaboração e parcerias estratégicas.`,
     contact_press_media: `Imprensa e Mídia`,
-    contact_press_desc: `Para jornalistas, blogueiros e consultas de mídia.`,
+    contact_press_desc: `Para jornalistas, blogueiros e solicitações da mídia.`,
     contact_technical_support: `Suporte Técnico`,
     contact_support_desc: `Para problemas técnicos com o site, pré-venda ou carteira.`,
-    contact_socials_title: `Junte-se à Conversa`,
+    contact_socials_title: `Participe da Conversa`,
     contact_form_title: `Envie-nos uma Mensagem Direta`,
     contact_form_name: `Seu Nome`,
     contact_form_email: `Seu Endereço de E-mail`,
@@ -558,9 +556,9 @@ export const pt = {
     contact_faq_title: `Tem uma pergunta rápida?`,
     contact_faq_desc: `Muitas respostas já podem ser encontradas em nossa seção de perguntas frequentes. Economize tempo e confira agora!`,
     contact_faq_button: `Ver Perguntas Frequentes`,
-    contact_required_fields: `Os campos marcados com um asterisco (*) são obrigatórios.`,
+    contact_required_fields: `Campos marcados com um asterisco (*) são obrigatórios.`,
     contact_disclaimer_title: `Nota sobre nossa Política de Comunicação`,
-    contact_disclaimer_message: `Para garantir que nossa equipe possa apoiar eficazmente a comunidade e avançar o projeto, damos prioridade a consultas diretamente relacionadas à Official World Family Network. Mensagens fora do tópico, spam ou solicitações não solicitadas podem não receber uma resposta. Obrigado por sua compreensão e por nos ajudar a manter o foco em nossa missão.`,
+    contact_disclaimer_message: `Para garantir que nossa equipe possa apoiar efetivamente a comunidade e avançar o projeto, damos prioridade a consultas diretamente relacionadas à Official World Family Network. Mensagens fora do tópico, spam ou solicitações não solicitadas podem não receber uma resposta. Agradecemos sua compreensão e por nos ajudar a manter o foco em nossa missão.`,
     contact_social_x_title: `X.com / Twitter`,
     contact_social_x_desc: `Siga-nos para atualizações em tempo real, notícias e anúncios.`,
     contact_social_telegram_channel_title: `Canal do Telegram`,
@@ -570,4 +568,15 @@ export const pt = {
     contact_social_discord_title: `Servidor do Discord`,
     contact_social_discord_desc: `Faça parte de nossa comunidade ativa para discussões e suporte.`,
     send_direct_message: `Enviar Mensagem Direta`,
+    auto_reply_subject: `Mensagem Recebida: {departmentName}`,
+    auto_reply_body: `
+<div style="font-family: sans-serif; line-height: 1.6;">
+    <p>Olá {userName},</p>
+    <p>Obrigado por contatar o departamento <strong>{departmentName}</strong> do projeto Official World Family Network (OWFN).</p>
+    <p>Recebemos sua mensagem com sucesso e confirmamos que ela foi registrada em nosso sistema.</p>
+    <p>Este é um e-mail gerado automaticamente. <strong>Por favor, não responda a esta mensagem</strong>, pois as respostas não são monitoradas.</p>
+    <p>Nossa equipe analisará sua consulta e responderá de um endereço de e-mail oficial o mais rápido possível. Devido ao alto volume de e-mails que recebemos, os tempos de resposta podem variar. Agradecemos sua paciência.</p>
+    <p>Atenciosamente,<br>A Equipe OWFN</p>
+</div>
+`,
 };

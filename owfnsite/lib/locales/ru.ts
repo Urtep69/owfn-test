@@ -25,10 +25,16 @@ export const ru = {
     sidebar_finance: `Финансы`,
     sidebar_engage: `Участвовать`,
 
+    // Header
+    header_new: `НОВЫЙ`,
+    header_wallet_manager: `Менеджер Кошелька`,
+
     // General
     connect_wallet: `Подключить кошелек`,
     disconnect_wallet: `Отключить кошелек`,
+    copy_address: `Скопировать Адрес`,
     change_wallet: `Сменить кошелек`,
+    view_on_solscan: `Посмотреть на Solscan`,
     connected_as: `Подключен как`,
     buy_now: `Купить сейчас!`,
     donate: `Пожертвовать`,
@@ -40,15 +46,6 @@ export const ru = {
     connect_wallet_first: `Пожалуйста, сначала подключите свой кошелек.`,
     yes: `Да`,
     no: `Нет`,
-    authenticating: `Аутентификация...`,
-    sign_in_to_buy: `Войти, чтобы купить`,
-    sign_in_to_donate: `Войти, чтобы пожертвовать`,
-
-    // SIWS (Sign-In With Solana)
-    siws_message_statement: `Подпишите это сообщение для аутентификации в Official World Family Network (OWFN).`,
-    siws_message_uri: `Домен`,
-    siws_message_issued_at: `Выдано`,
-    siwS_message_no_cost: `Этот запрос не вызовет транзакцию в блокчейне и не потребует никаких комиссий за газ.`,
 
     // Time Units
     time_days: `Дни`,
@@ -176,6 +173,7 @@ export const ru = {
     presale_you_contributed: `Вы уже внесли: {amount} SOL.`,
     presale_you_can_buy: `Вы можете внести еще до {amount} SOL.`,
     presale_bonus_offer: `БОНУС {percentage}% при покупках на сумму {threshold} SOL и более!`,
+    presale_checking_contribution: `Проверка вашего взноса...`,
     
     // Donations Page
     make_donation: `Сделать пожертвование`,
@@ -214,7 +212,6 @@ export const ru = {
     token_types: `Типы токенов`,
     profile_loading_tokens: `Загрузка токенов...`,
     profile_connect_prompt: `Подключите свой кошелек, чтобы увидеть свой профиль и баланс токенов.`,
-    profile_sign_in_prompt: `Подключитесь и войдите с помощью вашего кошелька, чтобы увидеть свой профиль.`,
     profile_no_tokens: `В этом кошельке не найдено токенов.`,
     impact_dashboard_title: `Моя панель влияния`,
     my_impact_stats: `Моя статистика влияния`,
@@ -364,6 +361,7 @@ export const ru = {
     back_to_profile: `Назад к профилю`,
     token_not_found: `Данные токена не найдены.`,
     token_description_title: `ОПИСАНИЕ ТОКЕНА`,
+    price_per_token: `Цена`,
     sell: `Продать`,
     sells: `Продажи`,
     market_cap: `Рыночная капитализация`,
@@ -372,6 +370,7 @@ export const ru = {
     pair_address: `Адрес пары`,
     mint_authority: `Право на выпуск`,
     freeze_authority: `Право на заморозку`,
+    update_authority: `Право на обновление`,
     fully_diluted_valuation: `Полностью разводненная оценка (FDV)`,
     market_stats: `Рыночная статистика`,
     trading_stats: `Торговая статистика`,
@@ -483,13 +482,12 @@ export const ru = {
     maintenance_heading: `Мы делаем вещи лучше!`,
     maintenance_message: `Наша платформа в настоящее время находится на плановом обслуживании для улучшения вашего опыта. Мы ценим ваше терпение и понимание. Мы скоро вернемся в онлайн.`,
     maintenance_stay_tuned: `Следите за обновлениями на наших социальных каналах:`,
-    admin_controls: `Админ-контроль`,
+    admin_login: `Вход для администратора`,
     maintenance_status: `Статус`,
     maintenance_status_active: `АКТИВЕН`,
     maintenance_status_inactive: `НЕАКТИВЕН`,
     activate_maintenance_mode: `Активировать обслуживание`,
     deactivate_maintenance_mode: `Деактивировать обслуживание`,
-    admin_login: `Вход для администратора`,
     maintenance_login_denied: `В доступе отказано. Платформа находится в режиме обслуживания. Вход разрешен только администраторам.`,
 
     // Coming Soon
@@ -570,4 +568,15 @@ export const ru = {
     contact_social_discord_title: `Сервер в Discord`,
     contact_social_discord_desc: `Станьте частью нашего активного сообщества для обсуждений и поддержки.`,
     send_direct_message: `Отправить прямое сообщение`,
+    auto_reply_subject: `Сообщение получено: {departmentName}`,
+    auto_reply_body: `
+<div style="font-family: sans-serif; line-height: 1.6;">
+    <p>Здравствуйте, {userName},</p>
+    <p>Спасибо за обращение в отдел <strong>{departmentName}</strong> проекта Official World Family Network (OWFN).</p>
+    <p>Мы успешно получили ваше сообщение и подтверждаем, что оно зарегистрировано в нашей системе.</p>
+    <p>Это автоматически сгенерированное письмо. <strong>Пожалуйста, не отвечайте на это сообщение</strong>, так как ответы не отслеживаются.</p>
+    <p>Наша команда рассмотрит ваш запрос и ответит с официального адреса электронной почты в кратчайшие сроки. В связи с большим количеством получаемых писем время ответа может варьироваться. Мы ценим ваше терпение.</p>
+    <p>С уважением,<br>Команда OWFN</p>
+</div>
+`,
 };

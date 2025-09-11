@@ -575,4 +575,15 @@ export const ja = {
     contact_social_discord_title: `Discordサーバー`,
     contact_social_discord_desc: `議論やサポートのために、活発なコミュニティの一員になりましょう。`,
     send_direct_message: `ダイレクトメッセージを送信`,
+    auto_reply_subject: `メッセージ受信：{departmentName}`,
+    auto_reply_body: `
+<div style="font-family: sans-serif; line-height: 1.6;">
+    <p>{userName}様</p>
+    <p>Official World Family Network (OWFN) プロジェクトの<strong>{departmentName}</strong>部門にお問い合わせいただき、ありがとうございます。</p>
+    <p>メッセージを正常に受信し、システムに記録されたことを確認いたしました。</p>
+    <p>これは自動生成されたメールです。返信は監視されていないため、<strong>このメッセージには返信しないでください</strong>。</p>
+    <p>担当チームがお問い合わせ内容を確認し、できるだけ早く公式メールアドレスから返信いたします。多数のお問い合わせをいただいているため、返信にお時間がかかる場合がございます。ご理解いただけますようお願い申し上げます。</p>
+    <p>敬具<br>OWFNチーム</p>
+</div>
+`,
 };

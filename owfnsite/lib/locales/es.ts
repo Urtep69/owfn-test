@@ -1,4 +1,3 @@
-
 export const es = {
     // Navigation
     home: `Inicio`,

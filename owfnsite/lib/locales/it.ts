@@ -460,8 +460,6 @@ export const it = {
     airdrop_eligible_message: `Il tuo portafoglio è idoneo! Riceverai {amount} token OWFN nella prossima distribuzione.`,
     airdrop_not_eligible: `Non Idoneo`,
     airdrop_not_eligible_message: `Spiacente, questo indirizzo di portafoglio non è idoneo per l'airdrop attuale. Rimani attivo nella nostra comunità per future opportunità!`,
-    airdrop_info_box_title: `Riguardo a questo Airdrop`,
-    airdrop_info_box_desc: `Questo airdrop è progettato per premiare i primi sostenitori e i membri attivi della comunità. L'idoneità si basa su fattori come la partecipazione alla prevendita e l'impegno negli eventi della comunità.`,
     
     // Governance
     governance_title: `Governance`,
@@ -575,4 +573,15 @@ export const it = {
     contact_social_discord_title: `Server Discord`,
     contact_social_discord_desc: `Diventa parte della nostra comunità attiva per discussioni e supporto.`,
     send_direct_message: `Invia un Messaggio Diretto`,
+    auto_reply_subject: `Messaggio Ricevuto: {departmentName}`,
+    auto_reply_body: `
+<div style="font-family: sans-serif; line-height: 1.6;">
+    <p>Ciao {userName},</p>
+    <p>Grazie per aver contattato il dipartimento <strong>{departmentName}</strong> del progetto Official World Family Network (OWFN).</p>
+    <p>Abbiamo ricevuto con successo il tuo messaggio e confermiamo che è stato registrato nel nostro sistema.</p>
+    <p>Questa è un'email generata automaticamente. <strong>Ti preghiamo di non rispondere a questo messaggio</strong>, poiché le risposte non vengono monitorate.</p>
+    <p>Il nostro team esaminerà la tua richiesta e risponderà da un indirizzo email ufficiale il prima possibile. A causa dell'elevato volume di email che riceviamo, i tempi di risposta possono variare. Apprezziamo la tua pazienza.</p>
+    <p>Cordiali saluti,<br>Il Team OWFN</p>
+</div>
+`,
 };

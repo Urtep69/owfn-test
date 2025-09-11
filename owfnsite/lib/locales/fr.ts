@@ -1,3 +1,4 @@
+
 export const fr = {
     // Navigation
     home: `Accueil`,
@@ -170,7 +171,7 @@ export const fr = {
     time: `Heure`,
     just_now: `À l'instant`,
     presale_you_contributed: `Vous avez déjà contribué : {amount} SOL.`,
-    presale_you_can_buy: `Vous pouvez encore contribuer jusqu'à {amount} SOL.`,
+    presale_you_can_buy: `Vous pouvez encore contribuir jusqu'à {amount} SOL.`,
     presale_bonus_offer: `{percentage}% DE BONUS pour les achats de {threshold} SOL ou plus !`,
     presale_checking_contribution: `Vérification de votre contribution...`,
     
@@ -558,14 +559,24 @@ export const fr = {
     contact_required_fields: `Les champs marqués d'un astérisque (*) sont obligatoires.`,
     contact_disclaimer_title: `Note sur notre Politique de Communication`,
     contact_disclaimer_message: `Pour garantir que notre équipe puisse soutenir efficacement la communauté et faire avancer le projet, nous donnons la priorité aux demandes directement liées à l'Official World Family Network. Les messages hors sujet, le spam ou les sollicitations non sollicitées pourraient ne pas recevoir de réponse. Merci de votre compréhension et de nous aider à rester concentrés sur notre mission.`,
-    // Fix: The following line was an invalid shorthand property. Replaced with full key-value pairs.
     contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Suivez-nous pour des mises à jour en temps réel, des nouvelles et des annonces.`,
+    contact_social_x_desc: `Suivez-nous pour les mises à jour en temps réel, les nouvelles et les annonces.`,
     contact_social_telegram_channel_title: `Canal Telegram`,
     contact_social_telegram_channel_desc: `Abonnez-vous pour les annonces importantes et les nouvelles officielles.`,
     contact_social_telegram_group_title: `Groupe Telegram`,
     contact_social_telegram_group_desc: `Rejoignez notre groupe communautaire pour discuter et interagir avec d'autres membres.`,
     contact_social_discord_title: `Serveur Discord`,
-    contact_social_discord_desc: `Devenez membre de notre communauté active pour des discussions et du soutien.`,
+    contact_social_discord_desc: `Devenez membre de notre communauté active pour les discussions et le soutien.`,
     send_direct_message: `Envoyer un Message Direct`,
+    auto_reply_subject: `Message reçu : {departmentName}`,
+    auto_reply_body: `
+<div style="font-family: sans-serif; line-height: 1.6;">
+    <p>Bonjour {userName},</p>
+    <p>Nous vous remercions d'avoir contacté le service <strong>{departmentName}</strong> du projet Official World Family Network (OWFN).</p>
+    <p>Nous avons bien reçu votre message et confirmons qu'il a été enregistré dans notre système.</p>
+    <p>Ceci est un e-mail généré automatiquement. <strong>Veuillez ne pas répondre à ce message</strong>, car les réponses ne sont pas surveillées.</p>
+    <p>Notre équipe examinera votre demande et vous répondra depuis une adresse e-mail officielle dans les plus brefs délais. En raison du grand nombre de demandes que nous recevons, le temps de réponse peut varier. Nous apprécions votre patience.</p>
+    <p>Cordialement,<br>L'équipe OWFN</p>
+</div>
+`,
 };

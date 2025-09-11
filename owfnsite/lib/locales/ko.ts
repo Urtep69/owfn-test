@@ -1,4 +1,3 @@
-
 export const ko = {
     // Navigation
     home: `홈`,
@@ -173,7 +172,6 @@ export const ko = {
     presale_you_contributed: `이미 기부하셨습니다: {amount} SOL.`,
     presale_you_can_buy: `최대 {amount} SOL까지 더 기부할 수 있습니다.`,
     presale_bonus_offer: `{threshold} SOL 이상 구매 시 {percentage}% 보너스!`,
-    presale_checking_contribution: `기부 내역 확인 중...`,
 
     // Donations Page
     make_donation: `기부하기`,
@@ -575,4 +573,15 @@ export const ko = {
     contact_social_discord_title: `디스코드 서버`,
     contact_social_discord_desc: `토론과 지원을 위해 활발한 커뮤니티의 일원이 되세요.`,
     send_direct_message: `직접 메시지 보내기`,
+    auto_reply_subject: `메시지 수신 완료: {departmentName}`,
+    auto_reply_body: `
+<div style="font-family: sans-serif; line-height: 1.6;">
+    <p>{userName}님, 안녕하세요.</p>
+    <p>Official World Family Network (OWFN) 프로젝트의 <strong>{departmentName}</strong> 부서에 문의해 주셔서 감사합니다.</p>
+    <p>귀하의 메시지를 성공적으로 수신했으며 저희 시스템에 기록되었음을 확인합니다.</p>
+    <p>이 이메일은 자동으로 생성된 이메일입니다. 회신은 모니터링되지 않으므로 <strong>이 메시지에 회신하지 마십시오</strong>.</p>
+    <p>저희 팀이 귀하의 문의를 검토하고 가능한 한 빨리 공식 이메일 주소로 답변해 드리겠습니다. 받는 이메일의 양이 많아 응답 시간이 다소 걸릴 수 있습니다. 양해해 주셔서 감사합니다.</p>
+    <p>감사합니다,<br>OWFN 팀</p>
+</div>
+`,
 };

@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { translations } from '../lib/locales/index.ts';
 import { SUPPORTED_LANGUAGES } from '../constants.ts';
@@ -44,7 +43,7 @@ const sendAutoReply = async (apiKey: string, userName: string, userEmail: string
                 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
             },
             body: JSON.stringify({
-                from: 'OWFN Auto-Reply <no-reply@email.owfn.org>',
+                from: 'OWFN Auto-Reply <no-reply@owfn.org>',
                 to: userEmail,
                 subject: autoReplySubject,
                 html: autoReplyBody,
@@ -228,7 +227,7 @@ ${message}
                 'Authorization': `Bearer ${resendApiKey}`
             },
             body: JSON.stringify({
-                from: 'Contact Form OWFN <contact@email.owfn.org>',
+                from: 'Contact Form OWFN <contact-form@owfn.org>',
                 to: recipientEmail,
                 subject: adminEmailContent.subject,
                 html: adminEmailContent.htmlBody,
