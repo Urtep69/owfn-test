@@ -112,11 +112,6 @@ export const Chatbot = () => {
         if (isOpen) {
             // A small delay helps ensure the element is visible and animations are settled.
             setTimeout(() => inputRef.current?.focus(), 100);
-            
-            // Onboarding trigger
-            if (messages.length === 0 && !isLoading) {
-                 handleSend("Greetings");
-            }
         }
     }, [isOpen, isMaximized]);
 
@@ -140,21 +135,17 @@ export const Chatbot = () => {
         });
     };
 
-    const handleSend = async (initialPrompt?: string) => {
-        const currentInput = initialPrompt || input;
-        if (currentInput.trim() === '' || isLoading) return;
-        
-        const isInitialGreeting = initialPrompt === "Greetings";
-        if (!isInitialGreeting) {
-            const userMessage: ChatMessage = { role: 'user', parts: [{ text: currentInput }], timestamp: new Date() };
-            setMessages(prev => [...prev, userMessage]);
-        }
-        
+    const handleSend = async () => {
+        if (input.trim() === '' || isLoading) return;
+
+        const userMessage: ChatMessage = { role: 'user', parts: [{ text: input }], timestamp: new Date() };
+        const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
+        const currentInput = input;
+        const currentTime = new Date().toISOString();
+
+        setMessages(prev => [...prev, userMessage]);
         setInput('');
         setIsLoading(true);
-
-        const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
-        const currentTime = new Date().toISOString();
 
         const loadingMessages = [
             t('chatbot_loading_1'),
@@ -314,7 +305,7 @@ export const Chatbot = () => {
                         disabled={isLoading}
                     />
                     <button
-                        onClick={() => handleSend()}
+                        onClick={handleSend}
                         disabled={isLoading || input.trim() === ''}
                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
                         aria-label="Send message"

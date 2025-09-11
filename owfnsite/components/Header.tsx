@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat, Shield } from 'lucide-react';
+import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { LanguageSwitcher } from './LanguageSwitcher.tsx';
 import { ThemeSwitcher } from './ThemeSwitcher.tsx';
@@ -12,10 +12,9 @@ interface HeaderProps {
 }
 
 const ConnectButton = () => {
-    const { t, solana, siws } = useAppContext();
+    const { t, solana } = useAppContext();
     const { setVisible } = useWalletModal();
     const { connected, address, connecting, disconnectWallet } = solana;
-    const { isAuthenticated, isLoading: isSiwsLoading, isSessionLoading, signIn, signOut } = siws;
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -38,24 +37,19 @@ const ConnectButton = () => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
-    
-    const handleDisconnect = async () => {
-        await signOut();
-        await disconnectWallet();
-    };
 
-    if (connecting || isSessionLoading) {
+    if (connecting) {
         return (
             <div className="flex items-center space-x-3 px-4 py-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
                 <Loader2 size={18} className="animate-spin text-primary-600 dark:text-darkPrimary-400" />
                 <span className="font-semibold text-sm text-primary-700 dark:text-darkPrimary-200">
-                    {connecting ? t('connecting') : 'Loading...'}
+                    {t('connecting')}
                 </span>
             </div>
         );
     }
 
-    if (!connected) {
+    if (!connected || !address) {
         return (
             <button
                 onClick={() => setVisible(true)}
@@ -67,22 +61,6 @@ const ConnectButton = () => {
                 <span className="relative">{t('connect_wallet')}</span>
             </button>
         );
-    }
-
-    if (connected && !isAuthenticated) {
-        return (
-             <button
-                onClick={signIn}
-                disabled={isSiwsLoading}
-                className="group relative inline-flex items-center justify-center gap-2 px-5 py-2 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-                <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-400 to-blue-500 dark:from-blue-500 dark:to-blue-600"></span>
-                <span className="relative flex items-center gap-2">
-                    {isSiwsLoading ? <Loader2 className="w-5 h-5 animate-spin"/> : <Shield className="w-5 h-5" />}
-                    {isSiwsLoading ? 'Signing In...' : 'Sign-In to Verify'}
-                </span>
-            </button>
-        )
     }
     
     return (
@@ -107,21 +85,21 @@ const ConnectButton = () => {
             {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white/80 dark:bg-darkPrimary-800/80 backdrop-blur-xl border border-primary-200/50 dark:border-darkPrimary-700/50 rounded-lg shadow-3d-lg animate-fade-in-up" style={{animationDuration: '200ms'}}>
                     <div className="p-3">
-                         <span className="font-semibold text-sm font-mono text-primary-800 dark:text-darkPrimary-100">{truncateAddress(address!)}</span>
+                         <span className="font-semibold text-sm font-mono text-primary-800 dark:text-darkPrimary-100">{truncateAddress(address)}</span>
                     </div>
                     <div className="p-2 space-y-1 border-t border-primary-200 dark:border-darkPrimary-700">
                          <button
                             onClick={copyToClipboard}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
-                            <span>{t('copy_address')}</span>
+                            <span>{t('copy_address', {defaultValue: 'Copy Address'})}</span>
                             {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
                         </button>
                         <button
                             onClick={() => setVisible(true)}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
-                            <span>{t('change_wallet')}</span>
+                            <span>{t('change_wallet', {defaultValue: 'Change Wallet'})}</span>
                             <Repeat size={16} />
                         </button>
                         <a
@@ -130,13 +108,13 @@ const ConnectButton = () => {
                             rel="noopener noreferrer"
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
-                            <span>{t('view_on_solscan')}</span>
+                            <span>{t('view_on_solscan', {defaultValue: 'View on Solscan'})}</span>
                             <ExternalLink size={16} />
                         </a>
                     </div>
                     <div className="p-2 border-t border-primary-200 dark:border-darkPrimary-700">
                          <button
-                            onClick={handleDisconnect}
+                            onClick={disconnectWallet}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-red-600 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10 font-semibold transition-colors"
                         >
                             <span>{t('disconnect_wallet')}</span>

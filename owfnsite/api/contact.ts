@@ -1,4 +1,68 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
+import { translations } from '../lib/locales/index.ts';
+import { SUPPORTED_LANGUAGES } from '../constants.ts';
+
+const sendAutoReply = async (apiKey: string, userName: string, userEmail: string, reason: string, message: string) => {
+    try {
+        const ai = new GoogleGenAI({ apiKey });
+
+        // 1. Detect language
+        const langDetectionPrompt = `Detect the ISO 639-1 language code of the following text. Respond with ONLY the two-letter code (e.g., 'en', 'ro'). Do not add any other text or explanation. Text:\n---\n${message}`;
+        
+        const langDetectionResponse = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: langDetectionPrompt,
+            config: {
+                temperature: 0,
+                thinkingConfig: { thinkingBudget: 0 },
+            }
+        });
+
+        const detectedLangCode = langDetectionResponse.text.trim().toLowerCase();
+        const supportedLangCodes = SUPPORTED_LANGUAGES.map(l => l.code);
+        const lang = supportedLangCodes.includes(detectedLangCode) ? detectedLangCode : 'en';
+
+        // 2. Prepare translated content
+        const departmentKey = `contact_reason_${reason}`;
+        const departmentName = translations[lang]?.[departmentKey] || translations['en']?.[departmentKey] || reason;
+
+        const subjectTemplate = translations[lang]?.auto_reply_subject || translations['en']?.auto_reply_subject;
+        const bodyTemplate = translations[lang]?.auto_reply_body || translations['en']?.auto_reply_body;
+
+        const autoReplySubject = subjectTemplate.replace('{departmentName}', departmentName);
+        
+        // Replace both placeholders in the body
+        let autoReplyBody = bodyTemplate.replace('{userName}', userName);
+        autoReplyBody = autoReplyBody.replace('{departmentName}', departmentName);
+
+        // 3. Send email to user
+        const response = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+            },
+            body: JSON.stringify({
+                from: 'OWFN Auto-Reply <no-reply@email.owfn.org>',
+                to: userEmail,
+                subject: autoReplySubject,
+                html: autoReplyBody,
+            })
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json();
+            console.error('Auto-reply Resend API error:', errorBody);
+        } else {
+             console.log(`Auto-reply successfully sent to ${userEmail} in language: ${lang}`);
+        }
+
+    } catch (error) {
+        console.error('Failed to send auto-reply email:', error);
+        // Do not throw, as the main function should still return success to the user.
+    }
+};
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
@@ -71,10 +135,10 @@ export default async function handler(req: any, res: any) {
         const recipientEmail = emailRecipientMap[reason as string] || 'info@owfn.org';
         const reasonForPrompt = reasonTextMap[reason as string] || 'Other';
         
-        // Step 1: Use Gemini to analyze, translate to ROMANIAN, and format the email content
+        // Step 1: Use Gemini to analyze, translate to ROMANIAN, and format the email content for the admin
         const ai = new GoogleGenAI({ apiKey: geminiApiKey });
         
-        const prompt = `A user has submitted a contact form on the OWFN (Official World Family Network) website. Your task is to process this information and generate a structured email for an administrator.
+        const adminPrompt = `A user has submitted a contact form on the OWFN (Official World Family Network) website. Your task is to process this information and generate a structured email for an administrator.
 
 First, analyze the user's message provided below to detect its original language.
 Then, create a concise summary of the message IN ROMANIAN.
@@ -110,9 +174,9 @@ ${message}
             '5. The \'Original Message\' section with the user\'s verbatim message.'
         ].join(' ');
 
-        const response = await ai.models.generateContent({
+        const adminEmailResponse = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: prompt,
+            contents: adminPrompt,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {
@@ -132,15 +196,15 @@ ${message}
             },
         });
         
-        let emailContent;
+        let adminEmailContent;
         try {
-            const jsonStr = response.text.trim();
-            emailContent = JSON.parse(jsonStr);
+            const jsonStr = adminEmailResponse.text.trim();
+            adminEmailContent = JSON.parse(jsonStr);
         } catch(e) {
-            console.error("Gemini did not return valid JSON.", e);
-            console.error("Gemini response text:", response.text);
+            console.error("Gemini did not return valid JSON for admin email.", e);
+            console.error("Gemini response text:", adminEmailResponse.text);
             // Fallback to a simple email if AI processing fails
-            emailContent = {
+            adminEmailContent = {
                 subject: `[OWFN Contact] ${reasonForPrompt} from ${name}`,
                 htmlBody: `
                     <h1>New Contact Form Submission (AI Processing Failed)</h1>
@@ -156,8 +220,8 @@ ${message}
             };
         }
 
-        // Step 2: Send the formatted email using Resend
-        const sendEmailResponse = await fetch('https://api.resend.com/emails', {
+        // Step 2: Send the formatted email to the admin using Resend
+        const sendAdminEmailResponse = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -166,17 +230,21 @@ ${message}
             body: JSON.stringify({
                 from: 'Contact Form OWFN <contact@email.owfn.org>',
                 to: recipientEmail,
-                subject: emailContent.subject,
-                html: emailContent.htmlBody,
+                subject: adminEmailContent.subject,
+                html: adminEmailContent.htmlBody,
                 reply_to: email
             })
         });
 
-        if (!sendEmailResponse.ok) {
-            const errorBody = await sendEmailResponse.json();
-            console.error('Resend API error:', errorBody);
-            throw new Error('Failed to send email via Resend.');
+        if (!sendAdminEmailResponse.ok) {
+            const errorBody = await sendAdminEmailResponse.json();
+            console.error('Admin email Resend API error:', errorBody);
+            throw new Error('Failed to send admin email via Resend.');
         }
+
+        // Step 3: Send the auto-reply to the user (fire and forget)
+        // We do this after the main action is successful. We don't want an auto-reply failure to cause the user to see an error.
+        sendAutoReply(geminiApiKey, name, email, reason, message);
 
         return res.status(200).json({ success: true, message: 'Message sent successfully.' });
 

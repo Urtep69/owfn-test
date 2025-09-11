@@ -1,3 +1,4 @@
+
 export const de = {
     // Navigation
     home: `Startseite`,
@@ -45,8 +46,6 @@ export const de = {
     connect_wallet_first: `Bitte verbinden Sie zuerst Ihre Wallet.`,
     yes: `Ja`,
     no: `Nein`,
-    sign_in_to_buy: 'Zum Kaufen anmelden',
-    sign_in_to_donate: 'Zum Spenden anmelden',
 
     // Time Units
     time_days: `Tage`,
@@ -488,19 +487,18 @@ export const de = {
     maintenance_heading: `Wir machen die Dinge besser!`,
     maintenance_message: `Unsere Plattform wird derzeit planmäßig gewartet, um Ihre Erfahrung zu verbessern. Wir danken Ihnen für Ihre Geduld und Ihr Verständnis. Wir werden in Kürze wieder online sein.`,
     maintenance_stay_tuned: `Bleiben Sie auf dem Laufenden über unsere sozialen Kanäle:`,
-    admin_controls: `Admin-Steuerung`,
+    admin_login: `Admin-Anmeldung`,
     maintenance_status: `Status`,
     maintenance_status_active: `AKTIV`,
     maintenance_status_inactive: `INAKTIV`,
     activate_maintenance_mode: `Wartung aktivieren`,
     deactivate_maintenance_mode: `Wartung deaktivieren`,
-    admin_login: `Admin-Anmeldung`,
     maintenance_login_denied: `Verbindung verweigert. Die Plattform befindet sich im Wartungsmodus. Nur Administratoren können sich anmelden.`,
 
     // Coming Soon
     coming_soon_title: `Demnächst`,
     coming_soon_desc: `Diese Funktion befindet sich derzeit in der Entwicklung. Wir arbeiten hart daran, sie Ihnen bald zur Verfügung zu stellen. Vielen Dank für Ihre Geduld und Unterstützung.`,
-
+    
     // Admin Presale
     presale_admin_title: `Vorverkaufs-Admin`,
     presale_admin_subtitle: `Überwachen Sie Transaktionen und verwalten Sie den Token-Airdrop nach dem Vorverkauf.`,
@@ -575,4 +573,15 @@ export const de = {
     contact_social_discord_title: `Discord-Server`,
     contact_social_discord_desc: `Werden Sie Teil unserer aktiven Community für Diskussionen und Unterstützung.`,
     send_direct_message: `Direktnachricht Senden`,
+    auto_reply_subject: `Nachricht empfangen: {departmentName}`,
+    auto_reply_body: `
+<div style="font-family: sans-serif; line-height: 1.6;">
+    <p>Hallo {userName},</p>
+    <p>vielen Dank, dass Sie sich an die Abteilung <strong>{departmentName}</strong> des Official World Family Network (OWFN) gewandt haben.</p>
+    <p>Wir haben Ihre Nachricht erfolgreich erhalten und bestätigen, dass sie in unserem System erfasst wurde.</p>
+    <p>Dies ist eine automatisch generierte E-Mail. <strong>Bitte antworten Sie nicht auf diese Nachricht</strong>, da die Antworten nicht überwacht werden.</p>
+    <p>Unser Team wird Ihre Anfrage prüfen und Ihnen so schnell wie möglich von einer offiziellen E-Mail-Adresse aus antworten. Aufgrund des hohen E-Mail-Aufkommens können die Antwortzeiten variieren. Wir danken Ihnen für Ihre Geduld.</p>
+    <p>Mit freundlichen Grüßen,<br>Das OWFN-Team</p>
+</div>
+`,
 };

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
@@ -14,29 +14,19 @@ const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge3', titleKey: 'badge_diverse_donor', descriptionKey: 'badge_diverse_donor_desc', icon: <Gem /> },
 ];
 
-const StatCard = ({ icon, title, value, isLoading }: { icon: React.ReactNode, title: string, value: string | number, isLoading?: boolean }) => (
+const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => (
     <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg flex items-center space-x-4">
         <div className="text-accent-500 dark:text-darkAccent-400">{icon}</div>
         <div>
             <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
-            {isLoading ? 
-                <div className="h-7 w-24 bg-primary-200 dark:bg-darkPrimary-600 rounded-md animate-pulse mt-1"></div>
-                : <p className="text-xl font-bold">{value}</p>
-            }
+            <p className="text-xl font-bold">{value}</p>
         </div>
     </div>
 );
 
 export default function Profile() {
-    const { t, solana, setWalletModalOpen, siws } = useAppContext();
-    const { connected, address, userTokens, loading, userStats, getUserImpactStats, isStatsLoading } = solana;
-    const { isAuthenticated, signIn, isLoading: isSiwsLoading } = siws;
-    
-    useEffect(() => {
-        if (isAuthenticated) {
-            getUserImpactStats();
-        }
-    }, [isAuthenticated, getUserImpactStats]);
+    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { connected, address, userTokens, loading, userStats } = solana;
     
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
@@ -63,24 +53,6 @@ export default function Profile() {
             </div>
         );
     }
-
-    if (connected && !isAuthenticated) {
-        return (
-            <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
-                <ShieldCheck className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
-                <h1 className="text-2xl font-bold mb-2">Verify Your Wallet</h1>
-                <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">Sign a message to securely log in and view your personalized dashboard.</p>
-                <button
-                    onClick={signIn}
-                    disabled={isSiwsLoading}
-                    className="flex items-center justify-center mx-auto gap-2 bg-accent-400 hover:bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:hover:bg-darkAccent-600 dark:text-darkPrimary-950 font-bold py-3 px-6 rounded-lg transition-colors duration-300 disabled:opacity-50"
-                >
-                    {isSiwsLoading ? <Loader2 className="animate-spin"/> : null}
-                    {isSiwsLoading ? 'Verifying...' : 'Sign-In to Verify'}
-                </button>
-            </div>
-        );
-    }
     
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -89,15 +61,6 @@ export default function Profile() {
                 <div className="flex items-center space-x-2 mt-2">
                     <span className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('connected_as')}:</span>
                     {address && <AddressDisplay address={address} />}
-                </div>
-            </div>
-            
-            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
-                <div className="grid md:grid-cols-3 gap-4">
-                    <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonatedUSD.toFixed(2)}`} isLoading={isStatsLoading} />
-                    <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.donationCount} isLoading={isStatsLoading} />
-                    <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} isLoading={isStatsLoading} />
                 </div>
             </div>
 
@@ -165,6 +128,17 @@ export default function Profile() {
                 )}
             </div>
             
+            <ComingSoonWrapper>
+                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
+                    <div className="grid md:grid-cols-3 gap-4">
+                        <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
+                        <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
+                        <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
+                    </div>
+                </div>
+            </ComingSoonWrapper>
+
             <div className="grid lg:grid-cols-2 gap-8">
                 <ComingSoonWrapper showMessage={false}>
                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">

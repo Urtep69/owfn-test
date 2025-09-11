@@ -3,7 +3,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
 import type { Token } from '../types.ts';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS, DISTRIBUTION_WALLETS } from '../constants.ts';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_DETAILS } from '../constants.ts';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.tsx';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -13,10 +13,9 @@ export interface UseSolanaReturn {
   address: string | null;
   userTokens: Token[];
   loading: boolean;
-  isStatsLoading: boolean;
   userStats: {
-    totalDonatedUSD: number;
-    donationCount: number;
+    totalDonated: number;
+    projectsSupported: number;
     votesCast: number;
     donations: any[]; 
     votedProposalIds: string[];
@@ -26,7 +25,6 @@ export interface UseSolanaReturn {
   connection: Connection;
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
-  getUserImpactStats: () => Promise<void>;
   sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
   stakeTokens: (amount: number) => Promise<any>;
   unstakeTokens: (amount: number) => Promise<any>;
@@ -53,69 +51,8 @@ export const useSolana = (): UseSolanaReturn => {
   const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isStatsLoading, setIsStatsLoading] = useState(false);
-  const [userStats, setUserStats] = useState({
-      totalDonatedUSD: 0,
-      donationCount: 0,
-      votesCast: 0,
-      donations: [],
-      votedProposalIds: []
-  });
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
-
-  const getUserImpactStats = useCallback(async () => {
-      if (!publicKey || isStatsLoading) return;
-      setIsStatsLoading(true);
-      try {
-          // This client-side check is intensive. We limit to recent history for performance.
-          // A full backend solution would be more robust. This currently only tracks native SOL donations.
-          const signatures = await connection.getSignaturesForAddress(publicKey, { limit: 200 });
-
-          let totalDonatedSOL = 0;
-          let donationCount = 0;
-          
-          const donationWallet = DISTRIBUTION_WALLETS.impactTreasury;
-
-          // Batch fetch transactions for efficiency
-          const txs = await connection.getParsedTransactions(signatures.map(s => s.signature), { maxSupportedTransactionVersion: 0 });
-
-          for (const tx of txs) {
-              if (tx && tx.transaction.message.instructions) {
-                  for (const inst of tx.transaction.message.instructions) {
-                      if ('parsed' in inst && inst.program === 'system' && inst.parsed.type === 'transfer') {
-                          const info = inst.parsed.info;
-                          if (info.source === publicKey.toBase58() && info.destination === donationWallet) {
-                              totalDonatedSOL += info.lamports / LAMPORTS_PER_SOL;
-                              donationCount++;
-                          }
-                      }
-                  }
-              }
-          }
-          
-          let totalDonatedUSD = 0;
-          if (totalDonatedSOL > 0) {
-              const solPriceRes = await fetch('/api/token-prices', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ mints: ['So11111111111111111111111111111111111111112'] }),
-              });
-              if (solPriceRes.ok) {
-                  const priceData = await solPriceRes.json();
-                  const solPrice = priceData['So11111111111111111111111111111111111111112']?.price || 0;
-                  totalDonatedUSD = totalDonatedSOL * solPrice;
-              }
-          }
-
-          setUserStats(prev => ({ ...prev, totalDonatedUSD, donationCount }));
-
-      } catch (e) {
-          console.error("Failed to get user impact stats:", e);
-      } finally {
-          setIsStatsLoading(false);
-      }
-  }, [publicKey, connection, isStatsLoading]);
 
   const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
     const cached = balanceCache.get(walletAddress);
@@ -262,7 +199,6 @@ export const useSolana = (): UseSolanaReturn => {
     } else {
       setUserTokens([]);
       balanceCache.clear();
-      setUserStats({ totalDonatedUSD: 0, donationCount: 0, votesCast: 0, donations: [], votedProposalIds: [] });
     }
   }, [connected, address, getWalletBalances]);
 
@@ -351,9 +287,8 @@ export const useSolana = (): UseSolanaReturn => {
         console.log(`Transaction successful with signature: ${signature}`);
         setLoading(false);
         if (address) {
-            balanceCache.delete(address); // Invalidate cache on successful transaction
+            balanceCache.delete(address);
             getWalletBalances(address).then(setUserTokens);
-            getUserImpactStats(); // Refresh impact stats after a transaction
         }
         return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
 
@@ -362,7 +297,7 @@ export const useSolana = (): UseSolanaReturn => {
         setLoading(false);
         return { success: false, messageKey: 'transaction_failed_alert' };
     }
-  }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances, getUserImpactStats]);
+  }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
@@ -376,14 +311,18 @@ export const useSolana = (): UseSolanaReturn => {
     address,
     userTokens,
     loading,
-    isStatsLoading,
     connection,
-    userStats,
+    userStats: { 
+        totalDonated: 0,
+        projectsSupported: 0,
+        votesCast: 0,
+        donations: [],
+        votedProposalIds: []
+    },
     stakedBalance: 0,
     earnedRewards: 0,
     disconnectWallet: disconnect,
     getWalletBalances,
-    getUserImpactStats,
     sendTransaction,
     stakeTokens: notImplemented,
     unstakeTokens: notImplemented,

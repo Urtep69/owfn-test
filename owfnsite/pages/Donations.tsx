@@ -12,8 +12,7 @@ const tokens = [
 ];
 
 export default function Donations() {
-    const { t, solana, setWalletModalOpen, siws } = useAppContext();
-    const { isAuthenticated, signIn, isLoading: isSiwsLoading } = siws;
+    const { t, solana, setWalletModalOpen } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('USDC');
 
@@ -43,12 +42,6 @@ export default function Donations() {
             setWalletModalOpen(true);
             return;
         }
-
-        if (!isAuthenticated) {
-            await signIn();
-            // After signing in, the user will need to click again. This is a simple and safe flow.
-            return;
-        }
     
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
@@ -67,11 +60,10 @@ export default function Donations() {
     };
     
     const buttonText = useMemo(() => {
-        if (solana.loading || isSiwsLoading) return t('processing');
+        if (solana.loading) return t('processing');
         if (!solana.connected) return t('connect_wallet');
-        if (!isAuthenticated) return t('sign_in_to_donate');
         return t('donate');
-    }, [solana.connected, solana.loading, t, isAuthenticated, isSiwsLoading]);
+    }, [solana.connected, solana.loading, t]);
 
     const percentages = [5, 10, 15, 25, 50, 75, 100];
 
@@ -186,7 +178,7 @@ export default function Donations() {
                             </p>
                         </div>
                     )}
-                     <button onClick={handleDonate} disabled={solana.loading || isSiwsLoading || (solana.connected && isAuthenticated && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                     <button onClick={handleDonate} disabled={solana.loading || (solana.connected && !(parseFloat(amount) > 0))} className="w-full bg-gradient-to-r from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600 text-accent-950 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                          {buttonText}
                     </button>
                 </div>
