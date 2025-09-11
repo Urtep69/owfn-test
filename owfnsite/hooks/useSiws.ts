@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import type { SiwsSession, SiwsReturn } from '../types.ts';
@@ -12,7 +11,7 @@ export const useSiws = (): SiwsReturn => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSessionLoading, setIsSessionLoading] = useState(true);
 
-    // Load session from localStorage on mount
+    // Load session from localStorage on initial mount
     useEffect(() => {
         setIsSessionLoading(true);
         try {
@@ -20,12 +19,10 @@ export const useSiws = (): SiwsReturn => {
             if (storedSession) {
                 const parsed: SiwsSession = JSON.parse(storedSession);
                 const isExpired = Date.now() - parsed.signedAt > SESSION_DURATION;
-                
-                // Only restore session if the connected wallet matches the one in the session
-                if (!isExpired && publicKey?.toBase58() === parsed.publicKey) {
-                    setSession(parsed);
+                if (!isExpired) {
+                    setSession(parsed); // Load session from storage if not expired
                 } else {
-                    window.localStorage.removeItem(SESSION_KEY);
+                    window.localStorage.removeItem(SESSION_KEY); // Clear expired session
                     setSession(null);
                 }
             }
@@ -35,17 +32,18 @@ export const useSiws = (): SiwsReturn => {
         } finally {
             setIsSessionLoading(false);
         }
-    }, [publicKey]);
+    }, []); // Empty dependency array runs only on mount.
 
-    // Clear session if wallet disconnects
+    // Effect to validate the loaded session against the connected wallet, or clear on disconnect.
     useEffect(() => {
-        if (!connected) {
+        if (session && (!connected || publicKey?.toBase58() !== session.publicKey)) {
             setSession(null);
             try {
                 window.localStorage.removeItem(SESSION_KEY);
             } catch (e) { /* ignore */ }
         }
-    }, [connected]);
+    }, [connected, publicKey, session]);
+
 
     const createSiwsMessage = (address: string, issuedAt: string): string => {
         return `${window.location.host} wants you to sign in with your Solana account:\n${address}\n\nThis will not trigger a transaction and will not cost any gas fees.\n\nIssued At: ${issuedAt}`;

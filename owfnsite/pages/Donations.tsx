@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DISTRIBUTION_WALLETS } from '../constants.ts';
@@ -70,7 +69,7 @@ export default function Donations() {
     const buttonText = useMemo(() => {
         if (solana.loading || isSiwsLoading) return t('processing');
         if (!solana.connected) return t('connect_wallet');
-        if (!isAuthenticated) return t('sign_in_to_donate', {defaultValue: 'Sign-In to Donate'});
+        if (!isAuthenticated) return t('sign_in_to_donate');
         return t('donate');
     }, [solana.connected, solana.loading, t, isAuthenticated, isSiwsLoading]);
 

@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -46,6 +45,8 @@ export const en = {
     connect_wallet_first: `Please connect your wallet first.`,
     yes: `Yes`,
     no: `No`,
+    sign_in_to_buy: 'Sign-In to Buy',
+    sign_in_to_donate: 'Sign-In to Donate',
 
     // Time Units
     time_days: `Days`,
@@ -462,8 +463,6 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
-    airdrop_info_box_title: `About this Airdrop`,
-    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -491,18 +490,19 @@ export const en = {
     maintenance_heading: `We're making things better!`,
     maintenance_message: `Our platform is currently undergoing scheduled maintenance to improve your experience. We appreciate your patience and understanding. We will be back online shortly.`,
     maintenance_stay_tuned: `Stay tuned for updates on our social channels:`,
-    admin_login: `Admin Login`,
+    admin_controls: `Admin Controls`,
     maintenance_status: `Status`,
     maintenance_status_active: `ACTIVE`,
     maintenance_status_inactive: `INACTIVE`,
     activate_maintenance_mode: `Activate Maintenance`,
     deactivate_maintenance_mode: `Deactivate Maintenance`,
+    admin_login: `Admin Login`,
     maintenance_login_denied: `Connection denied. The platform is in maintenance mode. Only administrators can log in.`,
 
     // Coming Soon
     coming_soon_title: `Coming Soon`,
     coming_soon_desc: `This feature is currently under development. We are working hard to bring it to you soon. Thank you for your patience and support.`,
-    
+
     // Admin Presale
     presale_admin_title: `Presale Admin`,
     presale_admin_subtitle: `Monitor transactions and manage the post-presale token airdrop.`,
@@ -573,7 +573,7 @@ export const en = {
     contact_social_telegram_channel_title: `Telegram Channel`,
     contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
     contact_social_telegram_group_title: `Telegram Group`,
-    contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
+    contact_social_telegram_group_desc: `Join our community group to discuss and interact with other members.`,
     contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our active community for discussions and support.`,
     send_direct_message: `Send a Direct Message`,

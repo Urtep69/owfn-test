@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -46,6 +45,8 @@ export const ro = {
     connect_wallet_first: `Vă rugăm să vă conectați mai întâi portofelul.`,
     yes: `Da`,
     no: `Nu`,
+    sign_in_to_buy: 'Autentifică-te pentru a Cumpăra',
+    sign_in_to_donate: 'Autentifică-te pentru a Dona',
 
     // Time Units
     time_days: `Zile`,

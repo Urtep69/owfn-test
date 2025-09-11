@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
@@ -510,7 +509,7 @@ export default function Presale() {
   const buttonText = useMemo(() => {
     if (solana.loading || isSiwsLoading) return t('processing');
     if (!solana.connected) return t('connect_wallet');
-    if (!isAuthenticated) return t('sign_in_to_buy', {defaultValue: 'Sign-In to Buy'});
+    if (!isAuthenticated) return t('sign_in_to_buy');
     return t('buy');
   }, [solana.connected, solana.loading, t, isAuthenticated, isSiwsLoading]);
 
