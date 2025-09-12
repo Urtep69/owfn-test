@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
-import type { ChatMessage, PresaleProgress } from '../types.ts';
-import { PRESALE_STAGES } from '../constants.ts';
+import type { ChatMessage } from '../types.ts';
+import { PRESALE_STAGES, SUPPORTED_LANGUAGES } from '../constants.ts';
 
 /**
  * The definitive, "anti-crash" history builder. This function is
@@ -78,14 +78,11 @@ export default async function handler(req: any, res: any) {
         
         const ai = new GoogleGenAI({ apiKey });
         
-        let languageName = 'English';
-        try {
-            if (typeof Intl.DisplayNames === 'function') {
-                languageName = new Intl.DisplayNames(['en'], { type: 'language' }).of(langCode || 'en') || 'English';
-            }
-        } catch (e) {
-             console.warn(`Could not determine language name for code: ${langCode}. Defaulting to English.`);
-        }
+        const getLanguageName = (code: string): string => {
+            const lang = SUPPORTED_LANGUAGES.find(l => l.code === code);
+            return lang ? lang.name : 'English'; // Safe fallback
+        };
+        const languageName = getLanguageName(langCode || 'en');
         
         // --- Server-side Time-Awareness Logic ---
         const stage = PRESALE_STAGES[0];
