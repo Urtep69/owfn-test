@@ -38,7 +38,6 @@ export default async function handler(req: any, res: any) {
             config: {
                 systemInstruction: systemInstruction,
                 temperature: 0.2,
-                thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for faster, direct translation
             },
         });
         
