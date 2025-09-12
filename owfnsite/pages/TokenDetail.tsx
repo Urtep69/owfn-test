@@ -17,7 +17,7 @@ const DetailItem = ({ label, value, children }: { label: string, value?: React.R
     </div>
 );
 
-const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
+const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactNode, children?: React.ReactNode }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
         <div className="flex items-center gap-3 mb-4">
             {icon}
@@ -36,7 +36,8 @@ export default function TokenDetail() {
     // when the component is nested inside a wrapper, which was breaking context inference.
     const [match, params] = useRoute("/dashboard/token/:mint");
     const [location] = useLocation();
-    const mintAddress = match ? params?.mint : undefined;
+    // FIX: Added a check for `params` to ensure it is not null or undefined before accessing properties, resolving a possible runtime error.
+    const mintAddress = match && params ? params.mint : undefined;
 
     const [tokenDetails, setTokenDetails] = useState<TokenDetails | null>(null);
     const [loading, setLoading] = useState(true);
