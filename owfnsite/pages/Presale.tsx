@@ -244,37 +244,53 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
 );
 
 const MedalIcon = ({ nameKey }: { nameKey: string }) => {
-    let rank, colors;
+    let rank, medalStyle, ribbonStyle, numberStyle;
     switch (nameKey) {
         case 'bonus_tier_gold':
             rank = 1;
-            colors = 'bg-yellow-400 border-yellow-500 text-yellow-800';
+            medalStyle = { background: 'radial-gradient(circle, #fde047, #f59e0b)', border: '3px solid #b45309'};
+            ribbonStyle = { part1: 'bg-blue-600', part2: 'bg-blue-500' };
+            numberStyle = 'text-yellow-900';
             break;
         case 'bonus_tier_silver':
             rank = 2;
-            colors = 'bg-slate-300 border-slate-400 text-slate-700';
+            medalStyle = { background: 'radial-gradient(circle, #e2e8f0, #94a3b8)', border: '3px solid #64748b'};
+            ribbonStyle = { part1: 'bg-indigo-500', part2: 'bg-indigo-400' };
+            numberStyle = 'text-slate-800';
             break;
         case 'bonus_tier_bronze':
             rank = 3;
-            colors = 'bg-amber-500 border-amber-600 text-amber-900';
+            medalStyle = { background: 'radial-gradient(circle, #fcd34d, #c2410c)', border: '3px solid #9a3412'};
+            ribbonStyle = { part1: 'bg-red-700', part2: 'bg-red-600' };
+            numberStyle = 'text-orange-950';
             break;
         case 'bonus_tier_copper':
             rank = 4;
-            colors = 'bg-orange-400 border-orange-500 text-orange-900';
+            medalStyle = { background: 'radial-gradient(circle, #fb923c, #b45309)', border: '3px solid #92400e'};
+            ribbonStyle = { part1: 'bg-slate-600', part2: 'bg-slate-500' };
+            numberStyle = 'text-orange-950';
             break;
-        default:
-            return null;
+        default: return null;
     }
+
     return (
-        <div className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 shadow-inner mx-auto ${colors}`}>
-            <span className="font-bold text-xl drop-shadow-sm">{rank}</span>
+        <div className="relative">
+            {/* Ribbon */}
+            <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-6 h-8 z-0">
+                <div className={`absolute left-0 bottom-0 w-1/2 h-full ${ribbonStyle.part1} transform -skew-x-[20deg] origin-bottom-right rounded-sm`}></div>
+                <div className={`absolute right-0 bottom-0 w-1/2 h-full ${ribbonStyle.part2} transform skew-x-[20deg] origin-bottom-left rounded-sm`}></div>
+            </div>
+            {/* Medal */}
+            <div style={medalStyle} className="relative w-10 h-10 rounded-full flex items-center justify-center shadow-lg">
+                <span className={`font-black text-xl ${numberStyle}`} style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}>{rank}</span>
+            </div>
         </div>
     );
 };
 
 const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bonusTiers'], activeThreshold: number }) => {
     const { t } = useAppContext();
-    const displayTiers = [...tiers].sort((a, b) => a.threshold - b.threshold);
+    const displayTiers = [...tiers].sort((a, b) => b.threshold - a.threshold);
 
     return (
         <div className="bg-primary-50 dark:bg-darkPrimary-800/50 p-4 rounded-lg">
@@ -284,7 +300,7 @@ const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bo
                     const isActive = activeThreshold >= tier.threshold;
                     return (
                         <div key={tier.threshold} className={`p-3 rounded-lg border-2 text-center transition-all duration-300 ${isActive ? 'bg-accent-100 dark:bg-darkAccent-900 border-accent-500 dark:border-darkAccent-400 scale-105 shadow-lg' : 'bg-primary-100 dark:bg-darkPrimary-800 border-transparent'}`}>
-                            <div className="mb-1 h-10 flex items-center justify-center">
+                            <div className="mb-2 h-14 pt-2 flex items-center justify-center">
                                 <MedalIcon nameKey={tier.nameKey} />
                             </div>
                             <p className="font-bold text-xs text-primary-900 dark:text-darkPrimary-100">{t(tier.nameKey)}</p>

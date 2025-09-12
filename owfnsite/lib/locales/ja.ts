@@ -586,4 +586,12 @@ export const ja = {
     contact_disclaimer_title: `コミュニケーションポリシーに関する注意`,
     contact_disclaimer_message: `チームがコミュニティを効果的にサポートし、プロジェクトを推進できるようにするため、公式ワールドファミリーネットワークに直接関連する問い合わせを優先します。トピック外、スパム、または未承諾の勧誘メッセージには返信しない場合があります。ご理解とご協力に感謝し、私たちの使命に集中できるようご協力ください。`,
     send_direct_message: `ダイレクトメッセージを送信`,
+    contact_social_x_title: `Xで私たちを見つけてください`,
+    contact_social_x_desc: `公式アカウントをフォローして、最新のニュースやお知らせを入手してください。`,
+    contact_social_telegram_channel_title: `テレグラムチャンネル`,
+    contact_social_telegram_channel_desc: `重要な更新情報やプロジェクトニュースについては、私たちのチャンネルを購読してください。`,
+    contact_social_telegram_group_title: `テレグラムグループ`,
+    contact_social_telegram_group_desc: `私たちのコミュニティグループに参加して、チャットしたり、質問したり、交流したりしましょう。`,
+    contact_social_discord_title: `Discordサーバー`,
+    contact_social_discord_desc: `詳細な議論のために、私たちのDiscordコミュニティの一員になりましょう。`,
 };

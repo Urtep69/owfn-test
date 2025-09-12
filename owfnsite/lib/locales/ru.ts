@@ -587,4 +587,12 @@ export const ru = {
     contact_disclaimer_title: `Примечание о нашей политике коммуникации`,
     contact_disclaimer_message: `Чтобы наша команда могла эффективно поддерживать сообщество и продвигать проект, мы отдаем приоритет запросам, непосредственно связанным с Official World Family Network. Сообщения, не относящиеся к теме, спам или нежелательные предложения могут не получить ответа. Спасибо за понимание и за помощь в сосредоточении на нашей миссии.`,
     send_direct_message: `Отправить прямое сообщение`,
+    contact_social_x_title: `Найдите нас в X`,
+    contact_social_x_desc: `Следите за нашим официальным аккаунтом, чтобы узнавать последние новости и объявления.`,
+    contact_social_telegram_channel_title: `Telegram-канал`,
+    contact_social_telegram_channel_desc: `Подпишитесь на наш канал, чтобы получать важные обновления и новости проекта.`,
+    contact_social_telegram_group_title: `Telegram-группа`,
+    contact_social_telegram_group_desc: `Присоединяйтесь к нашей группе сообщества, чтобы общаться, задавать вопросы и взаимодействовать с нами.`,
+    contact_social_discord_title: `Discord-сервер`,
+    contact_social_discord_desc: `Станьте частью нашего Discord-сообщества для углубленных обсуждений.`,
 };
