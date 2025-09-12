@@ -414,6 +414,7 @@ export const ro = {
     token_distribution: `Distribuție Token`,
     is_mintable: `Se poate crea?`,
     is_freezable: `Se poate îngheța?`,
+
     deployer: `Creator`,
     lp_burned: `LP Ars`,
     enabled: `Activat`,
@@ -484,6 +485,8 @@ export const ro = {
     airdrop_eligible_message: `Portofelul tău este eligibil! Vei primi {amount} tokeni OWFN la următoarea distribuire.`,
     airdrop_not_eligible: `Neeligibil`,
     airdrop_not_eligible_message: `Ne pare rău, această adresă de portofel nu este eligibilă pentru airdrop-ul curent. Fii activ în comunitatea noastră pentru oportunități viitoare!`,
+    airdrop_info_box_title: `Despre acest Airdrop`,
+    airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
     
     // Governance
     governance_title: `Guvernanță`,

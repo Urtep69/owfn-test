@@ -124,7 +124,7 @@ export const de = {
     token_extensions: `Aktive Erweiterungen`,
     
     // Presale Page
-    presale_info: `Presale Info`,
+    presale_info: `Vorverkaufsinfo`,
     presale_join_title: `Am Vorverkauf teilnehmen`,
     presale_ends_in: `Vorverkauf endet in`,
     progress: `Fortschritt`,
@@ -344,15 +344,10 @@ export const de = {
     faq_q14: `Was bedeutet es, dass der Token "zinstragend" mit 2% APY ist? Wie funktioniert das?`,
     faq_a15: `Diese Gebühr ist ein Schlüsselmechanismus für die langfristige Finanzierung unserer Mission. Eine Gebühr von 0,5% wird auf alle Transaktionen mit dem OWFN-Token *nach* Abschluss des Vorverkaufszeitraums erhoben. Die aus dieser Gebühr gesammelten Mittel werden automatisch an die Impact Treasury weitergeleitet, um unsere sozialen Projekte kontinuierlich zu finanzieren. So trägt jede Transaktion zum Gemeinwohl bei.`,
     faq_q16: `Warum haben Sie die Solana-Blockchain für dieses Projekt gewählt?`,
-    faq_a16: `Wir haben uns für Solana wegen seiner außergewöhnlichen Geschwindigkeit, sehr niedrigen Transaktionskosten und hohen Skalierbarkeit entschieden. Diese Eigenschaften sind für ein globales Projekt wie unseres unerlässlich und ermöglichen effiziente Mikrotransaktionen und eine schnelle und zugängliche Erfahrung für alle Benutzer, egal ob sie spenden, kaufen oder Token handeln.`,
-    faq_q17: `Wie kann ich sicher sein, dass meine Spenden die von Ihnen unterstützten Zwecke erreichen?`,
-    faq_a17: `Transparenz ist für uns von grundlegender Bedeutung. Alle für soziale Zwecke bestimmten Mittel werden über die Impact Treasury verwaltet, deren Wallet-Adresse öffentlich ist. Sie können alle eingehenden und ausgehenden Transaktionen auf einem Solana-Block-Explorer wie Solscan verfolgen. Darüber hinaus werden wir auf dem Impact-Portal regelmäßige Updates und detaillierte Berichte über die finanzierten Projekte bereitstellen.`,
-    faq_q18: `Kann ich einen sozialen Fall oder einen Zweck vorschlagen, der von OWFN finanziert werden soll?`,
-    faq_a18: `In der Anfangsphase werden die Projekte von unserem Team nach strengen Kriterien für Wirkung und Machbarkeit ausgewählt. Im weiteren Verlauf des Projekts werden wir ein Governance-System (DAO) implementieren, das es den Community-Mitgliedern ermöglicht, zukünftige Initiativen vorzuschlagen und darüber abzustimmen, wodurch Sie eine direkte Rolle bei der Lenkung der Mittel erhalten.`,
-    faq_q19: `Wer steckt hinter dem OWFN-Projekt? Ist das Team anonym?`,
-    faq_a19: `Details zur Vision und den Werten unseres Teams werden auf der Website vorgestellt. Wenn wir uns dem öffentlichen Start nähern, werden wir mehr Transparenz über die Schlüsselmitglieder und Berater schaffen, die zum Erfolg des Projekts beitragen, während wir ihre Sicherheit und Privatsphäre respektieren.`,
-    faq_q20: `Welche Sicherheitsmaßnahmen haben Sie getroffen, um die Gelder des Projekts und der Investoren zu schützen?`,
-    faq_a20: `Sicherheit hat für uns oberste Priorität. Wir verwenden Multi-Signatur-Wallets für die Verwaltung kritischer Gelder, was bedeutet, dass keine einzelne Transaktion von einer Person genehmigt werden kann. Der Smart Contract des Tokens wird von renommierten Sicherheitsfirmen auditiert, um potenzielle Schwachstellen vor dem Start zu identifizieren und zu beheben.`,
+    faq_a17: `Wir haben uns für Solana wegen seiner außergewöhnlichen Geschwindigkeit, sehr niedrigen Transaktionskosten und hohen Skalierbarkeit entschieden. Diese Eigenschaften sind für ein globales Projekt wie unseres unerlässlich und ermöglichen effiziente Mikrotransaktionen und eine schnelle und zugängliche Erfahrung für alle Benutzer, egal ob sie spenden, kaufen oder Token handeln.`,
+    faq_q18: `Wie kann ich sicher sein, dass meine Spenden die von Ihnen unterstützten Zwecke erreichen?`,
+    faq_a19: `Transparenz ist für uns von grundlegender Bedeutung. Alle für soziale Zwecke bestimmten Mittel werden über die Impact Treasury verwaltet, deren Wallet-Adresse öffentlich ist. Sie können alle eingehenden und ausgehenden Transaktionen auf einem Solana-Block-Explorer wie Solscan verfolgen. Darüber hinaus werden wir auf dem Impact-Portal regelmäßige Updates und detaillierte Berichte über die finanzierten Projekte bereitstellen.`,
+    faq_q20: `Kann ich einen sozialen Fall oder einen Zweck vorschlagen, der von OWFN finanziert werden soll?`,
     
     // Chatbot
     chatbot_title: `OWFN-Assistent`,
@@ -484,6 +479,8 @@ export const de = {
     airdrop_eligible_message: `Ihre Wallet ist berechtigt! Sie erhalten {amount} OWFN-Token bei der nächsten Verteilung.`,
     airdrop_not_eligible: `Nicht berechtigt`,
     airdrop_not_eligible_message: `Leider ist diese Wallet-Adresse nicht für den aktuellen Airdrop berechtigt. Bleiben Sie in unserer Community aktiv für zukünftige Gelegenheiten!`,
+    airdrop_info_box_title: `Über diesen Airdrop`,
+    airdrop_info_box_desc: `Dieser Airdrop wurde entwickelt, um frühe Unterstützer und aktive Community-Mitglieder zu belohnen. Die Berechtigung basiert auf Faktoren wie der Teilnahme am Vorverkauf und dem Engagement bei Community-Events.`,
     
     // Governance
     governance_title: `Governance`,

@@ -318,7 +318,7 @@ export const fr = {
     faq_q1: `Qu'est-ce que l'OWFN ?`,
     faq_a1: `L'OWFN (Official World Family Network) est un jeton basé sur Solana conçu pour unir les familles du monde entier grâce à la technologie blockchain, en se concentrant sur l'impact social, l'éducation, la santé et l'aide humanitaire avec une transparence totale.`,
     faq_q2: `Comment puis-je acheter des jetons OWFN ?`,
-    faq_a2: `Vous pouvez participer à la prévente de jetons OWFN directement via le lien fourni dans la section "Prévente" de notre site web. Assurez-vous d'avoir des SOL (Solana) dans votre portefeuille pour effectuer l'achat.`,
+    faq_a2: `Vous pouvez participer à la prévente de jetons OWFN directly via le lien fourni dans la section "Prévente" de notre site web. Assurez-vous d'avoir des SOL (Solana) dans votre portefeuille pour effectuer l'achat.`,
     faq_q3: `Quelle est l'offre totale de jetons OWFN ?`,
     faq_a3: `L'offre totale de jetons OWFN est de 18 000 000 000 (18 milliards) OWFN.`,
     faq_q4: `Comment l'OWFN assure-t-elle la transparence de ses initiatives à impact social ?`,
@@ -344,15 +344,10 @@ export const fr = {
     faq_q14: `Que signifie le fait que le jeton soit "porteur d'intérêts" avec un APY de 2% ? Comment cela fonctionne-t-il ?`,
     faq_a15: `Ces frais sont un mécanisme clé pour le financement à long terme de notre mission. Des frais de 0,5% s'appliqueront à toutes les transactions avec le jeton OWFN *après* la fin de la période de prévente. Les fonds collectés grâce à ces frais sont automatiquement dirigés vers la Trésorerie d'Impact pour financer continuellement nos projets sociaux. Ainsi, chaque transaction contribue au bien commun.`,
     faq_q16: `Pourquoi avez-vous choisi la blockchain Solana pour ce projet ?`,
-    faq_a16: `Nous avons choisi Solana pour sa vitesse exceptionnelle, ses coûts de transaction très bas et sa grande évolutivité. Ces caractéristiques sont essentielles pour un projet mondial comme le nôtre, permettant des micro-transactions efficaces et garantissant une expérience rapide et accessible pour tous les utilisateurs, qu'ils fassent des dons, achètent ou échangent des jetons.`,
-    faq_q17: `Comment puis-je être sûr que mes dons atteignent les causes que vous soutenez ?`,
-    faq_a17: `La transparence est fondamentale pour nous. Tous les fonds destinés à des causes sociales sont gérés par la Trésorerie d'Impact, dont l'adresse de portefeuille est publique. Vous pouvez suivre toutes les transactions entrantes et sortantes sur un explorateur de blocs Solana, comme Solscan. De plus, sur le Portail d'Impact, nous fournirons des mises à jour régulières et des rapports détaillés sur les projets financés.`,
-    faq_q18: `Puis-je proposer un cas social ou une cause à financer par l'OWFN ?`,
-    faq_a18: `Dans la phase initiale, les projets sont sélectionnés par notre équipe sur la base de critères stricts d'impact et de faisabilité. Au fur et à mesure de l'avancement du projet, nous mettrons en place un système de gouvernance (DAO) qui permettra aux membres de la communauté de proposer et de voter sur les futures initiatives, vous donnant ainsi un rôle direct dans l'orientation des fonds.`,
-    faq_q19: `Qui est derrière le projet OWFN ? L'équipe est-elle anonyme ?`,
-    faq_a19: `Les détails sur la vision et les valeurs de notre équipe sont présentés sur le site web. À l'approche du lancement public, nous fournirons plus de transparence sur les membres clés et les conseillers qui contribuent au succès du projet, tout en respectant leur sécurité et leur vie privée.`,
-    faq_q20: `Quelles mesures de sécurité avez-vous prises pour protéger les fonds du projet et des investisseurs ?`,
-    faq_a20: `La sécurité est notre priorité absolue. Nous utilisons des portefeuilles multi-signatures pour la gestion des fonds critiques, ce qui signifie qu'aucune transaction ne peut être approuvée par une seule personne. Le contrat intelligent du jeton sera audité par des sociétés de sécurité réputées pour identifier et corriger toute vulnérabilité potentielle avant le lancement.`,
+    faq_a17: `Nous avons choisi Solana pour sa vitesse exceptionnelle, ses coûts de transaction très bas et sa grande évolutivité. Ces caractéristiques sont essentielles pour un projet mondial comme le nôtre, permettant des micro-transactions efficaces et garantissant une expérience rapide et accessible pour tous les utilisateurs, qu'ils fassent des dons, achètent ou échangent des jetons.`,
+    faq_q18: `Comment puis-je être sûr que mes dons atteignent les causes que vous soutenez ?`,
+    faq_a19: `La transparence est fondamentale pour nous. Tous les fonds destinés à des causes sociales sont gérés par la Trésorerie d'Impact, dont l'adresse de portefeuille est publique. Vous pouvez suivre toutes les transactions entrantes et sortantes sur un explorateur de blocs Solana, comme Solscan. De plus, sur le Portail d'Impact, nous fournirons des mises à jour régulières et des rapports détaillés sur les projets financés.`,
+    faq_q20: `Puis-je proposer un cas social ou une cause à financer par l'OWFN ?`,
     
     // Chatbot
     chatbot_title: `Assistant OWFN`,
@@ -484,6 +479,8 @@ export const fr = {
     airdrop_eligible_message: `Votre portefeuille est éligible ! Vous recevrez {amount} jetons OWFN lors de la prochaine distribution.`,
     airdrop_not_eligible: `Non Éligible`,
     airdrop_not_eligible_message: `Désolé, cette adresse de portefeuille n'est pas éligible pour l'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !`,
+    airdrop_info_box_title: `À propos de cet Airdrop`,
+    airdrop_info_box_desc: `Cet airdrop est conçu pour récompenser les premiers supporters et les membres actifs de la communauté. L'éligibilité est basée sur des facteurs tels que la participation à la prévente et l'engagement dans les événements de la communauté.`,
     
     // Governance
     governance_title: `Gouvernance`,
@@ -503,9 +500,9 @@ export const fr = {
     governance_status_passed: `Adoptée`,
     governance_status_failed: `Rejetée`,
     you_voted: `Vous Avez Voté`,
-    no_active_proposals: `Il n'y a currently aucune proposition active.`,
+    no_active_proposals: `Il n'y a actuellement aucune proposition active.`,
     no_past_proposals: `Il n'y a aucune proposition passée à afficher.`,
-    no_active_cases_in_category: `Il n'y a currently aucun cas actif dans cette catégorie.`,
+    no_active_cases_in_category: `Il n'y a actuellement aucun cas actif dans cette catégorie.`,
     
     // Maintenance
     maintenance_heading: `Nous améliorons les choses !`,

@@ -124,7 +124,7 @@ export const es = {
     token_extensions: `Extensiones Activas`,
     
     // Presale Page
-    presale_info: `Info de la Preventa`,
+    presale_info: `Información de Preventa`,
     presale_join_title: `Únete a la Preventa`,
     presale_ends_in: `La preventa termina en`,
     progress: `Progreso`,
@@ -484,6 +484,8 @@ export const es = {
     airdrop_eligible_message: `¡Tu billetera es elegible! Recibirás {amount} tokens OWFN en la próxima distribución.`,
     airdrop_not_eligible: `No Elegible`,
     airdrop_not_eligible_message: `Lo sentimos, esta dirección de billetera no es elegible para el airdrop actual. ¡Mantente activo en nuestra comunidad para futuras oportunidades!`,
+    airdrop_info_box_title: `Sobre este Airdrop`,
+    airdrop_info_box_desc: `Este airdrop está diseñado para recompensar a los primeros partidarios y a los miembros activos de la comunidad. La elegibilidad se basa en factores como la participación en la preventa y la participación en eventos de la comunidad.`,
     
     // Governance
     governance_title: `Gobernanza`,
