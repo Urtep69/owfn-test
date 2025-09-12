@@ -201,7 +201,7 @@ export const Chatbot = () => {
 
     const handleSend = async (questionToSend?: string) => {
         const currentInput = questionToSend || input;
-        if (currentInput.trim() === '' || isLoading) return;
+        if (currentInput.trim() === '' || isLoading || presaleProgress.isLoading) return;
 
         const now = new Date();
         const userMessage: ChatMessage = {
@@ -332,6 +332,8 @@ export const Chatbot = () => {
         : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50";
 
     const showSuggestions = messages.length === 1; // Only show after the initial welcome message
+    const isDataLoading = presaleProgress.isLoading;
+    const isInputDisabled = isLoading || isDataLoading;
 
     return (
         <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
@@ -437,13 +439,13 @@ export const Chatbot = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder={t('chatbot_placeholder')}
-                        className="w-full p-3 pr-20 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
-                        disabled={isLoading}
+                        placeholder={isDataLoading ? "Loading live data, please wait..." : t('chatbot_placeholder')}
+                        className="w-full p-3 pr-20 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none disabled:cursor-wait"
+                        disabled={isInputDisabled}
                     />
                     <button
                         onClick={() => handleSend()}
-                        disabled={isLoading || input.trim() === ''}
+                        disabled={isInputDisabled || input.trim() === ''}
                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
                         aria-label="Send message"
                     >

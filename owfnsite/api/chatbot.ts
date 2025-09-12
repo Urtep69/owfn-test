@@ -73,6 +73,11 @@ export default async function handler(req: any, res: any) {
             return res.status(400).json({ error: 'Invalid question provided.' });
         }
         
+        // Ensure presaleProgress data is valid before proceeding. The client should prevent this, but it's a good safeguard.
+        if (!presaleProgress || typeof presaleProgress.soldSOL !== 'number') {
+            return res.status(400).json({ error: 'Valid presale progress data is required.' });
+        }
+        
         const validHistory = buildValidHistory(history);
         const contents = [...validHistory, { role: 'user', parts: [{ text: question }] }];
         
@@ -117,9 +122,9 @@ export default async function handler(req: any, res: any) {
             `- **External Links**: To link to social media, use the exact format: [Social Link: PlatformName|URL].`,
             ``,
             `### REAL-TIME PRESALE DATA (LATEST AVAILABLE) ###`,
-            `- Total SOL Raised: ${presaleProgress?.soldSOL?.toFixed(4) || '0'} SOL`,
-            `- Total OWFN Tokens Sold (Base): ${presaleProgress?.owfnSold?.toLocaleString() || '0'} OWFN`,
-            `- Number of Unique Contributors: ${presaleProgress?.contributors || '0'}`,
+            `- Total SOL Raised: ${presaleProgress.soldSOL.toFixed(4)} SOL`,
+            `- Total OWFN Tokens Sold (Base): ${presaleProgress.owfnSold.toLocaleString()} OWFN`,
+            `- Number of Unique Contributors: ${presaleProgress.contributors}`,
             `- IMPORTANT: When asked about presale progress, you MUST use this real-time data. You should state these are the latest figures available. Do not invent or promise future values.`,
             ``,
             `### CORE MISSION & VISION ###`,
