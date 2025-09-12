@@ -592,4 +592,12 @@ export const ro = {
     contact_disclaimer_title: `Notă privind Politica Noastră de Comunicare`,
     contact_disclaimer_message: `Pentru a ne asigura că echipa noastră poate sprijini eficient comunitatea și poate avansa proiectul, prioritizăm solicitările direct legate de Official World Family Network. Mesajele care nu au legătură cu subiectul, sunt spam sau nesolicitate s-ar putea să nu primească un răspuns. Vă mulțumim pentru înțelegere și pentru că ne ajutați să rămânem concentrați pe misiunea noastră.`,
     send_direct_message: 'Trimite un Mesaj Direct',
+    contact_social_x_title: `Găsește-ne pe X`,
+    contact_social_x_desc: `Urmărește contul nostru oficial pentru cele mai recente știri și anunțuri.`,
+    contact_social_telegram_channel_title: `Canal Telegram`,
+    contact_social_telegram_channel_desc: `Abonează-te la canalul nostru pentru actualizări importante și știri despre proiect.`,
+    contact_social_telegram_group_title: `Grup Telegram`,
+    contact_social_telegram_group_desc: `Alătură-te grupului nostru comunitar pentru a discuta, a pune întrebări și a interacționa cu noi.`,
+    contact_social_discord_title: `Server Discord`,
+    contact_social_discord_desc: `Fii parte din comunitatea noastră Discord pentru discuții aprofundate.`,
 };

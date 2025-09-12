@@ -591,4 +591,12 @@ export const es = {
     contact_disclaimer_title: `Nota sobre nuestra Política de Comunicación`,
     contact_disclaimer_message: `Para garantizar que nuestro equipo pueda apoyar eficazmente a la comunidad y avanzar el proyecto, damos prioridad a las consultas directamente relacionadas con la Official World Family Network. Mensajes fuera del tópico, spam o solicitudes no solicitadas pueden no recibir una respuesta. Gracias por su comprensión y por ayudarnos a mantener el foco en nuestra misión.`,
     send_direct_message: `Enviar Mensaje Directo`,
+    contact_social_x_title: `Encuéntranos en X`,
+    contact_social_x_desc: `Sigue nuestra cuenta oficial para las últimas noticias y anuncios.`,
+    contact_social_telegram_channel_title: `Canal de Telegram`,
+    contact_social_telegram_channel_desc: `Suscríbete a nuestro canal para actualizaciones importantes y noticias del proyecto.`,
+    contact_social_telegram_group_title: `Grupo de Telegram`,
+    contact_social_telegram_group_desc: `Únete a nuestro grupo comunitario para chatear, hacer preguntas e interactuar con nosotros.`,
+    contact_social_discord_title: `Servidor de Discord`,
+    contact_social_discord_desc: `Forma parte de nuestra comunidad de Discord para discusiones en profundidad.`,
 };

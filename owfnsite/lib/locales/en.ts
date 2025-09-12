@@ -484,6 +484,8 @@ export const en = {
     airdrop_eligible_message: `Your wallet is eligible! You will receive {amount} OWFN tokens in the upcoming distribution.`,
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
+    airdrop_info_box_title: `About this Airdrop`,
+    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors such as presale participation and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -589,4 +591,12 @@ export const en = {
     contact_disclaimer_title: `A Note on Our Communication Policy`,
     contact_disclaimer_message: `To ensure our team can effectively support the community and advance the project, we prioritize inquiries directly related to the Official World Family Network. Messages that are off-topic, spam, or unsolicited solicitations may not receive a response. Thank you for your understanding and for helping us stay focused on our mission.`,
     send_direct_message: `Send a Direct Message`,
+    contact_social_x_title: `Find us on X`,
+    contact_social_x_desc: `Follow our official account for the latest news and announcements.`,
+    contact_social_telegram_channel_title: `Telegram Channel`,
+    contact_social_telegram_channel_desc: `Subscribe to our channel for important updates and project news.`,
+    contact_social_telegram_group_title: `Telegram Group`,
+    contact_social_telegram_group_desc: `Join our community group to chat, ask questions, and engage with us.`,
+    contact_social_discord_title: `Discord Server`,
+    contact_social_discord_desc: `Become part of our Discord community for in-depth discussions.`,
 };

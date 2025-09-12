@@ -1,3 +1,4 @@
+
 export const fr = {
     // Navigation
     home: `Accueil`,
@@ -478,7 +479,7 @@ export const fr = {
     airdrop_congratulations: `Félicitations !`,
     airdrop_eligible_message: `Votre portefeuille est éligible ! Vous recevrez {amount} jetons OWFN lors de la prochaine distribution.`,
     airdrop_not_eligible: `Non Éligible`,
-    airdrop_not_eligible_message: `Désolé, cette adresse de portefeuille n'est pas éligible pour l'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !`,
+    airdrop_not_eligible_message: `Désolé, cette adresse de portefeuille n'est pas éligible for l'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !`,
     airdrop_info_box_title: `À propos de cet Airdrop`,
     airdrop_info_box_desc: `Cet airdrop est conçu pour récompenser les premiers supporters et les membres actifs de la communauté. L'éligibilité est basée sur des facteurs tels que la participation à la prévente et l'engagement dans les événements de la communauté.`,
     
@@ -500,7 +501,7 @@ export const fr = {
     governance_status_passed: `Adoptée`,
     governance_status_failed: `Rejetée`,
     you_voted: `Vous Avez Voté`,
-    no_active_proposals: `Il n'y a actuellement aucune proposition active.`,
+    no_active_proposals: `Il n'y a currently aucune proposition active.`,
     no_past_proposals: `Il n'y a aucune proposition passée à afficher.`,
     no_active_cases_in_category: `Il n'y a actuellement aucun cas actif dans cette catégorie.`,
     
@@ -518,7 +519,7 @@ export const fr = {
 
     // Coming Soon
     coming_soon_title: `Bientôt Disponible`,
-    coming_soon_desc: `Cette fonctionnalité est actuellement en cours de développement. Nous travaillons dur pour vous la proposer bientôt. Merci de votre patience et de votre soutien.`,
+    coming_soon_desc: `Cette fonctionnalité est currently en cours de développement. Nous travaillons dur pour vous la proposer bientôt. Merci de votre patience et de votre soutien.`,
     
     // Admin Presale
     presale_admin_title: `Admin Prévente`,
@@ -583,7 +584,15 @@ export const fr = {
     contact_faq_desc: `De nombreuses réponses se trouvent déjà dans notre section FAQ. Gagnez du temps et consultez-la maintenant !`,
     contact_faq_button: `Voir la FAQ`,
     contact_required_fields: `Les champs marqués d'un astérisque (*) sont obligatoires.`,
-    contact_disclaimer_title: `Note sur notre Politique de Communication`,
-    contact_disclaimer_message: `Afin de garantir que notre équipe puisse soutenir efficacement la communauté et faire avancer le projet, nous accordons la priorité aux demandes directement liées à l'Official World Family Network. Les messages hors sujet, le spam ou les sollicitations non désirées pourraient ne pas recevoir de réponse. Merci de votre compréhension et de nous aider à rester concentrés sur notre mission.`,
+    // FIX: Removed erroneous backslashes before template literals causing a syntax error.
+    contact_disclaimer_message: `Afin de garantir que notre équipe puisse soutenir efficacement la communauté et faire avancer le projet, nous accordons la priorité aux demandes directement liées à l'Official World Family Network. Les messages hors sujet, le spam ou les sollicitations non sollicitées pourraient ne pas recevoir de réponse. Merci de votre compréhension et de nous aider à rester concentrés sur notre mission.`,
     send_direct_message: `Envoyer un Message Direct`,
+    contact_social_x_title: `Retrouvez-nous sur X`,
+    contact_social_x_desc: `Suivez notre compte officiel pour les dernières nouvelles et annonces.`,
+    contact_social_telegram_channel_title: `Chaîne Telegram`,
+    contact_social_telegram_channel_desc: `Abonnez-vous à notre chaîne pour les mises à jour importantes et les nouvelles du projet.`,
+    contact_social_telegram_group_title: `Groupe Telegram`,
+    contact_social_telegram_group_desc: `Rejoignez notre groupe communautaire pour discuter, poser des questions et échanger avec nous.`,
+    contact_social_discord_title: `Serveur Discord`,
+    contact_social_discord_desc: `Devenez membre de notre communauté Discord pour des discussions approfondies.`,
 };
