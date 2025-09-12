@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
 import { Wallet, TrendingUp, Gift, Database, HeartHandshake } from 'lucide-react';
-import { OwfnIcon } from '../components/IconComponents.tsx';
+import { OwfnIcon } from '../components/IconComponents.js';
 
 const StatCard = ({ icon, title, value, subtext }: { icon: React.ReactNode, title: string, value: string, subtext?: string }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d">

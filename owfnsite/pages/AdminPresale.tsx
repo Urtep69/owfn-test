@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount, ACCOUNT_SIZE } from '@solana/spl-token';
@@ -9,11 +9,11 @@ import {
     PRESALE_STAGES,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
-} from '../lib/constants.ts';
+} from '../lib/constants.js';
 import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User, PieChart, RotateCcw } from 'lucide-react';
-import { SolIcon } from '../components/IconComponents.tsx';
-import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { Token, PresaleStage } from '../lib/types.ts';
+import { SolIcon } from '../components/IconComponents.js';
+import { AddressDisplay } from '../components/AddressDisplay.js';
+import type { Token, PresaleStage } from '../lib/types.js';
 
 interface PresaleTx {
     signature: string;

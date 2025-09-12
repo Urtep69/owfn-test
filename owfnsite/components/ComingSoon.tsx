@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
 import { Construction } from 'lucide-react';
 
 export const ComingSoon = () => {

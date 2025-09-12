@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { PRESALE_STAGES, QUICKNODE_RPC_URL } from '../lib/constants.ts';
-import type { PresaleStage } from '../lib/types.ts';
-import { ProgressBar } from '../components/ProgressBar.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
+import { PRESALE_STAGES, QUICKNODE_RPC_URL } from '../lib/constants.js';
+import type { PresaleStage } from '../lib/types.js';
+import { ProgressBar } from '../components/ProgressBar.js';
 import { Loader2, Calendar, CheckCircle, Clock, PlayCircle } from 'lucide-react';
 import { Connection, PublicKey, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 

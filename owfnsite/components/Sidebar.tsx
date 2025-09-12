@@ -5,9 +5,9 @@ import {
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
     Heart, TrendingUp, Lock, Award, User, Vote, Shield
 } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { OwfnIcon } from './IconComponents.tsx';
-import { ADMIN_WALLET_ADDRESS } from '../lib/constants.ts';
+import { useAppContext } from '../contexts/AppContext.js';
+import { OwfnIcon } from './IconComponents.js';
+import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 
 interface SidebarProps {
     isOpen: boolean;

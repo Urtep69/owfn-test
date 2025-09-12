@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
 import { Wallet, CheckCircle, XCircle, Gift, Loader2 } from 'lucide-react';
 
 const MOCK_AIRDROP_AMOUNT = 5000;
@@ -9,7 +9,7 @@ const ConnectWalletPrompt = () => {
     return (
         <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d max-w-md mx-auto">
             <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
-            <h2 className="text-2xl font-bold">{t('airdrop')}</h2>
+            <h2 className="text-2xl font-bold mb-2">{t('airdrop')}</h2>
             <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('airdrop_connect_prompt')}</p>
             <button
                 onClick={() => setWalletModalOpen(true)}

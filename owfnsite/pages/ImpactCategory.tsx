@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'wouter';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { CaseCard } from '../components/CaseCard.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
+import { CaseCard } from '../components/CaseCard.js';
 import { ArrowLeft, HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
 
 const categoryDetails: { [key: string]: { icon: React.ReactNode, titleKey: string, descKey: string } } = {
