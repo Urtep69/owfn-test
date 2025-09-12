@@ -160,7 +160,6 @@ export default async function handler(req: any, res: any) {
             contents,
             config: {
                 systemInstruction,
-                thinkingConfig: { thinkingBudget: 0 },
             }
         });
 
