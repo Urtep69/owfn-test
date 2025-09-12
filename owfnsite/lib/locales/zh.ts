@@ -161,7 +161,6 @@ export const zh = {
     view_full_details: `查看完整详情 →`,
     presale_dyor_nfa_title: `DYOR, NFA`,
     presale_dyor_nfa_desc: `请自行研究。非财务建议。`,
-
     presale_footer_copyright: `© {year} 官方世界家庭网络 | 版权所有。`,
     presale_amount_error: `金额必须在 {min} 和 {max} SOL 之间。`,
     presale_amount_error_no_min: `金额必须大于 0 且不超过 {max} SOL。`,
@@ -439,7 +438,6 @@ export const zh = {
     balance: `余额`,
     stake_owfn: `质押 OWFN`,
     unstake_owfn: `取消质押 OWFN`,
-
     my_rewards: `我的奖励`,
     claim_rewards: `领取奖励`,
     staking_connect_title: `连接以进行质押`,
@@ -501,7 +499,6 @@ export const zh = {
     vote_for: `赞成`,
     vote_against: `反对`,
     votes_for: `赞成`,
-
     votes_against: `反对`,
     ends_in: `结束于`,
     governance_status_active: `进行中`,
