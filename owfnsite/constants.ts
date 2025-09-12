@@ -64,7 +64,7 @@ export const PRESALE_STAGES: PresaleStage[] = [
         rate: 9000000,
         bonusThreshold: 2.5,
         bonusPercentage: 8,
-        minBuy: 0.1,
+        minBuy: 0.0001,
         maxBuy: 10,
         softCap: 35,
         hardCap: 70,
