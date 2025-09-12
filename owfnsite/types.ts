@@ -183,3 +183,10 @@ export interface PresaleStage {
   hardCap: number;
   distributionWallet: string;
 }
+
+export interface PresaleProgress {
+  soldSOL: number;
+  owfnSold: number;
+  contributors: number;
+  isLoading: boolean;
+}

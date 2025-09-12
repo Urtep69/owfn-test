@@ -361,6 +361,10 @@ export const en = {
     chatbot_loading_1: `Connecting to my circuits...`,
     chatbot_loading_2: `Analyzing your question...`,
     chatbot_loading_3: `Formulating a response...`,
+    chatbot_welcome_message: `Hello! I'm the OWFN Assistant. How can I help you learn about our mission today?`,
+    chatbot_suggestion_1: `What is OWFN?`,
+    chatbot_suggestion_2: `How do I buy?`,
+    chatbot_suggestion_3: `Tell me about bonuses.`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -591,12 +595,12 @@ export const en = {
     contact_disclaimer_title: `A Note on Our Communication Policy`,
     contact_disclaimer_message: `To ensure our team can effectively support the community and advance the project, we prioritize inquiries directly related to the Official World Family Network. Messages that are off-topic, spam, or unsolicited solicitations may not receive a response. Thank you for your understanding and for helping us stay focused on our mission.`,
     send_direct_message: `Send a Direct Message`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Follow us for real-time updates, news, and announcements.`,
+    contact_social_x_title: `Find Us on X`,
+    contact_social_x_desc: `Follow our official account for real-time updates, news, and announcements.`,
     contact_social_telegram_channel_title: `Telegram Channel`,
-    contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
+    contact_social_telegram_channel_desc: `Subscribe to our channel for important updates and project news.`,
     contact_social_telegram_group_title: `Telegram Group`,
-    contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
+    contact_social_telegram_group_desc: `Join our community group to chat, ask questions, and interact with us.`,
     contact_social_discord_title: `Discord Server`,
-    contact_social_discord_desc: `Become part of our active community for discussions and support.`,
+    contact_social_discord_desc: `Become part of our Discord community for in-depth discussions.`,
 };

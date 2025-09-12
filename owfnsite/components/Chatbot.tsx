@@ -89,11 +89,31 @@ const renderMessageContent = (text: string) => {
     return <>{result.map((part, i) => <React.Fragment key={i}>{part}</React.Fragment>)}</>;
 };
 
+const SuggestionChip = ({ text, onSelect }: { text: string; onSelect: (text: string) => void }) => (
+    <button
+        onClick={() => onSelect(text)}
+        className="px-3 py-1.5 bg-primary-100 dark:bg-darkPrimary-700/80 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 rounded-full text-sm font-medium transition-colors"
+    >
+        {text}
+    </button>
+);
+
 
 export const Chatbot = () => {
-    const { t, currentLanguage } = useAppContext();
+    const { t, currentLanguage, presaleProgress } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
+    
+    const getWelcomeMessage = (): ChatMessage => {
+        const now = new Date();
+        return {
+            role: 'model',
+            parts: [{ text: t('chatbot_welcome_message', { defaultValue: "Hello! I'm the OWFN Assistant. How can I help you learn about our mission today?" }) }],
+            timestamp: now,
+            formattedTimestamp: formatTimestamp(now)
+        };
+    };
+
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -115,12 +135,13 @@ export const Chatbot = () => {
     
     useEffect(() => {
         if (isOpen) {
-            // A small delay helps ensure the element is visible and animations are settled.
+            if (messages.length === 0) {
+                setMessages([getWelcomeMessage()]);
+            }
             setTimeout(() => inputRef.current?.focus(), 100);
         }
     }, [isOpen, isMaximized]);
 
-    // Cleanup interval on component unmount
     useEffect(() => {
         return () => {
             if (loadingIntervalRef.current) {
@@ -178,18 +199,18 @@ export const Chatbot = () => {
     };
 
 
-    const handleSend = async () => {
-        if (input.trim() === '' || isLoading) return;
+    const handleSend = async (questionToSend?: string) => {
+        const currentInput = questionToSend || input;
+        if (currentInput.trim() === '' || isLoading) return;
 
         const now = new Date();
         const userMessage: ChatMessage = {
             role: 'user',
-            parts: [{ text: input }],
+            parts: [{ text: currentInput }],
             timestamp: now,
             formattedTimestamp: formatTimestamp(now)
         };
         const historyForApi = messages.slice(-MAX_HISTORY_MESSAGES);
-        const currentInput = input;
         const currentTime = new Date().toISOString();
 
         setMessages(prev => [...prev, userMessage]);
@@ -208,7 +229,7 @@ export const Chatbot = () => {
             index = (index + 1) % loadingMessages.length;
         };
         
-        updateLoadingText(); // Set initial text immediately
+        updateLoadingText();
         loadingIntervalRef.current = window.setInterval(updateLoadingText, 2500);
 
         try {
@@ -220,11 +241,12 @@ export const Chatbot = () => {
                 currentInput,
                 currentLanguage.code,
                 currentTime,
-                (chunk) => { // onChunk: Append text to the last message
+                presaleProgress,
+                (chunk) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
-                        setIsLoading(false); // Stop loading animation
+                        setIsLoading(false);
                     }
                     if (!firstChunkReceived) {
                         firstChunkTime = new Date();
@@ -246,7 +268,7 @@ export const Chatbot = () => {
                         });
                     }
                 },
-                (errorMsg) => { // onError: Display error in a new message bubble
+                (errorMsg) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
                         loadingIntervalRef.current = null;
@@ -282,6 +304,10 @@ export const Chatbot = () => {
             setTimeout(() => inputRef.current?.focus(), 0);
         }
     };
+    
+    const handleSuggestionClick = (text: string) => {
+        handleSend(text);
+    };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -304,6 +330,8 @@ export const Chatbot = () => {
     const containerClasses = isMaximized
         ? "fixed inset-0 flex flex-col bg-white dark:bg-darkPrimary-800 z-50 animate-fade-in-up"
         : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50";
+
+    const showSuggestions = messages.length === 1; // Only show after the initial welcome message
 
     return (
         <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
@@ -395,6 +423,13 @@ export const Chatbot = () => {
                 </div>
             )}
             <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
+                 {showSuggestions && (
+                    <div className="flex flex-wrap gap-2 mb-3 animate-fade-in-up">
+                        <SuggestionChip text={t('chatbot_suggestion_1', { defaultValue: 'What is OWFN?' })} onSelect={handleSuggestionClick} />
+                        <SuggestionChip text={t('chatbot_suggestion_2', { defaultValue: 'How do I buy?' })} onSelect={handleSuggestionClick} />
+                        <SuggestionChip text={t('chatbot_suggestion_3', { defaultValue: 'Tell me about bonuses.' })} onSelect={handleSuggestionClick} />
+                    </div>
+                )}
                 <div className="relative">
                     <input
                         ref={inputRef}
@@ -407,7 +442,7 @@ export const Chatbot = () => {
                         disabled={isLoading}
                     />
                     <button
-                        onClick={handleSend}
+                        onClick={() => handleSend()}
                         disabled={isLoading || input.trim() === ''}
                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
                         aria-label="Send message"

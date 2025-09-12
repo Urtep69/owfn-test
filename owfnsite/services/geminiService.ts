@@ -1,4 +1,4 @@
-import type { ChatMessage } from '../types.ts';
+import type { ChatMessage, PresaleProgress } from '../types.ts';
 
 // This is the new "ultramodern" service function that understands the JSON stream protocol.
 export async function getChatbotResponse(
@@ -6,6 +6,7 @@ export async function getChatbotResponse(
   question: string,
   langCode: string,
   currentTime: string,
+  presaleProgress: PresaleProgress,
   onChunk: (chunk: string) => void,
   onError: (errorMsg: string) => void
 ): Promise<void> {
@@ -13,7 +14,7 @@ export async function getChatbotResponse(
     const response = await fetch('/api/chatbot', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history, question, langCode, currentTime }),
+      body: JSON.stringify({ history, question, langCode, currentTime, presaleProgress }),
     });
 
     // The server should always respond with 200 OK now, even for errors.

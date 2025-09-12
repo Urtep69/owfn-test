@@ -361,6 +361,10 @@ export const ro = {
     chatbot_loading_1: `Mă conectez la circuitele mele...`,
     chatbot_loading_2: `Analizez întrebarea...`,
     chatbot_loading_3: `Formulez un răspuns...`,
+    chatbot_welcome_message: `Salut! Sunt Asistentul OWFN. Cum te pot ajuta astăzi să afli mai multe despre misiunea noastră?`,
+    chatbot_suggestion_1: `Ce este OWFN?`,
+    chatbot_suggestion_2: `Cum cumpăr?`,
+    chatbot_suggestion_3: `Spune-mi despre bonusuri.`,
     
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,

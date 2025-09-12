@@ -316,57 +316,16 @@ const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bo
 
 
 export default function Presale() {
-  const { t, solana, setWalletModalOpen } = useAppContext();
+  const { t, solana, setWalletModalOpen, presaleProgress } = useAppContext();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
-  const [soldSOL, setSoldSOL] = useState(0);
   const [userContribution, setUserContribution] = useState(0);
   const [isCheckingContribution, setIsCheckingContribution] = useState(false);
   
   const [presaleStatus, setPresaleStatus] = useState<'pending' | 'active' | 'ended'>('pending');
   const [endReason, setEndReason] = useState<'date' | 'hardcap' | null>(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  const fetchPresaleProgress = useCallback(async () => {
-        if (new Date() < new Date(currentStage.startDate)) {
-            setSoldSOL(0);
-            return;
-        }
-
-        try {
-            const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
-            const presalePublicKey = new PublicKey(currentStage.distributionWallet);
-            // In a real scenario, you'd paginate through all transactions for an exact total.
-            // For a progress bar, fetching recent transactions and summing them up gives a good-enough estimate
-            // without being too resource-intensive on the client. Let's fetch the max allowed (1000).
-            const signatures = await connection.getSignaturesForAddress(presalePublicKey, { limit: 1000 });
-            const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
-            const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
-            
-            let totalContributed = 0;
-            if (relevantSignatures.length > 0) {
-                 const transactions = await connection.getParsedTransactions(
-                    relevantSignatures.map(s => s.signature),
-                    { maxSupportedTransactionVersion: 0 }
-                );
-
-                transactions.forEach(tx => {
-                    if (tx) {
-                        tx.transaction.message.instructions.forEach(inst => {
-                            if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === currentStage.distributionWallet) {
-                                totalContributed += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
-                            }
-                        });
-                    }
-                });
-            }
-            setSoldSOL(totalContributed);
-        } catch (error) {
-            console.error("Failed to fetch presale progress:", error);
-            // Don't reset to 0 if it fails, keep the last known value
-        }
-    }, []);
 
   useEffect(() => {
     const calculateState = () => {
@@ -378,7 +337,7 @@ export default function Presale() {
         let newStatus: 'pending' | 'active' | 'ended';
         let newEndReason: 'date' | 'hardcap' | null = null;
         
-        if (soldSOL >= hardCap) {
+        if (presaleProgress.soldSOL >= hardCap) {
             newStatus = 'ended';
             newEndReason = 'hardcap';
         } else if (now.getTime() < startDate.getTime()) {
@@ -417,14 +376,7 @@ export default function Presale() {
     const timer = setInterval(calculateState, 1000);
 
     return () => clearInterval(timer);
-  }, [soldSOL]);
-
-
-  useEffect(() => {
-    fetchPresaleProgress();
-    const interval = setInterval(fetchPresaleProgress, 60000);
-    return () => clearInterval(interval);
-  }, [fetchPresaleProgress]);
+  }, [presaleProgress.soldSOL]);
 
   useEffect(() => {
     const fetchUserContribution = async () => {
@@ -469,7 +421,7 @@ export default function Presale() {
     };
 
     fetchUserContribution();
-  }, [solana.connected, solana.address]);
+  }, [solana.connected, solana.address, latestPurchase]); // Refetch on new purchase
 
   const maxAllowedBuy = Math.max(0, currentStage.maxBuy - userContribution);
 
@@ -539,7 +491,7 @@ export default function Presale() {
   }, [solAmount]);
 
 
-  const saleProgress = (soldSOL / currentStage.hardCap) * 100;
+  const saleProgress = (presaleProgress.soldSOL / currentStage.hardCap) * 100;
   const numSolAmount = parseFloat(solAmount);
   const isAmountInvalid = isNaN(numSolAmount) || numSolAmount < currentStage.minBuy || numSolAmount > maxAllowedBuy;
 
@@ -570,9 +522,6 @@ export default function Presale() {
         };
         setLatestPurchase(newTx);
         setSolAmount('');
-        setUserContribution(prev => prev + numSolAmount);
-        setSoldSOL(prev => prev + numSolAmount);
-        fetchPresaleProgress(); // Re-fetch progress immediately
     } else {
         alert(t(result.messageKey));
     }
@@ -631,7 +580,7 @@ export default function Presale() {
                             <div className="bg-accent-400 dark:bg-darkAccent-400 h-2.5 rounded-full" style={{width: `${saleProgress}%`}}></div>
                         </div>
                         <div className="flex justify-between mt-1 text-sm text-primary-700 dark:text-darkPrimary-300">
-                            <span>{soldSOL.toFixed(2)} SOL</span>
+                            <span>{presaleProgress.soldSOL.toFixed(2)} SOL</span>
                             <span>{currentStage.hardCap.toFixed(2)} SOL</span>
                         </div>
                     </div>
