@@ -70,8 +70,8 @@ export const PRESALE_STAGES: PresaleStage[] = [
         ],
         minBuy: 0.0001,
         maxBuy: 10,
-        softCap: 35,
-        hardCap: 70,
+        softCap: 105,
+        hardCap: 200,
         distributionWallet: DISTRIBUTION_WALLETS.presale,
     }
 ];
