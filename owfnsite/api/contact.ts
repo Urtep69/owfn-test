@@ -89,18 +89,7 @@ export default async function handler(req: any, res: any) {
         // Enhanced location details from Vercel headers
         const countryCode = req.headers['x-vercel-ip-country'] || 'N/A';
         const city = req.headers['x-vercel-ip-city'] ? decodeURIComponent(req.headers['x-vercel-ip-city']) : 'N/A';
-        
-        let countryName = 'N/A';
-        if (countryCode !== 'N/A') {
-            try {
-                countryName = new Intl.DisplayNames(['en'], { type: 'region' }).of(countryCode) || countryCode;
-            } catch (e) {
-                console.warn(`Could not get country name for code: ${countryCode}`);
-                countryName = countryCode;
-            }
-        }
-        
-        const senderLocation = [city, countryName].filter(part => part !== 'N/A').join(', ');
+        const senderLocation = [city, countryCode].filter(part => part !== 'N/A').join(', ');
         
         const emailRecipientMap: Record<string, string> = {
             general: 'info@owfn.org',
