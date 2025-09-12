@@ -73,11 +73,6 @@ export default async function handler(req: any, res: any) {
             return res.status(400).json({ error: 'Invalid question provided.' });
         }
         
-        // Ensure presaleProgress data is valid before proceeding. The client should prevent this, but it's a good safeguard.
-        if (!presaleProgress || typeof presaleProgress.soldSOL !== 'number') {
-            return res.status(400).json({ error: 'Valid presale progress data is required.' });
-        }
-        
         const validHistory = buildValidHistory(history);
         const contents = [...validHistory, { role: 'user', parts: [{ text: question }] }];
         
@@ -117,15 +112,10 @@ export default async function handler(req: any, res: any) {
             ``,
             `### CRITICAL INSTRUCTIONS ###`,
             `- **Time Awareness**: The current, pre-calculated status of the presale is: **${presaleStatusText}**. You MUST use this status and the provided dates when answering questions about the presale. Do not calculate the status yourself; use this provided text.`,
+            `- **Presale Progress Questions**: If a user asks how much has been raised, how many tokens are sold, or how many buyers there are, you MUST NOT provide any numbers. Instead, you MUST tell them they can find the live, real-time information on the presale page and provide a link using this exact format: [Visit Page: Presale].`,
             `- **Calculations**: When asked to calculate token amounts from a SOL contribution, you MUST be precise. Break down the calculation step-by-step for the user: state the SOL amount, the base OWFN rate, the applicable bonus tier and percentage, calculate the bonus amount, and finally show the total.`,
-            `- **Internal Links**: To link to a page on the website, use the exact format: [Visit Page: PageName]. Valid PageNames: Home, Presale, About, Whitepaper, Tokenomics, Roadmap, Staking, Vesting, Donations, Dashboard, Profile, Impact Portal, Partnerships, FAQ, Contact.`,
+            `- **Internal Links**: To link to a page on the website, use the exact format: [Visit Page: PageName]. This is mandatory for navigating users to pages like 'About', 'Tokenomics', and especially the 'Presale' page for progress questions. Valid PageNames: Home, Presale, About, Whitepaper, Tokenomics, Roadmap, Staking, Vesting, Donations, Dashboard, Profile, Impact Portal, Partnerships, FAQ, Contact.`,
             `- **External Links**: To link to social media, use the exact format: [Social Link: PlatformName|URL].`,
-            ``,
-            `### REAL-TIME PRESALE DATA (LATEST AVAILABLE) ###`,
-            `- Total SOL Raised: ${presaleProgress.soldSOL.toFixed(4)} SOL`,
-            `- Total OWFN Tokens Sold (Base): ${presaleProgress.owfnSold.toLocaleString()} OWFN`,
-            `- Number of Unique Contributors: ${presaleProgress.contributors}`,
-            `- IMPORTANT: When asked about presale progress, you MUST use this real-time data. You should state these are the latest figures available. Do not invent or promise future values.`,
             ``,
             `### CORE MISSION & VISION ###`,
             `- **Name**: Official World Family Network (OWFN), Ticker: $OWFN`,
