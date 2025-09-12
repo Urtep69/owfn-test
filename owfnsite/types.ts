@@ -171,8 +171,12 @@ export interface PresaleStage {
   startDate: string;
   endDate: string;
   rate: number;
-  bonusThreshold: number;
-  bonusPercentage: number;
+  bonusTiers: {
+    threshold: number;
+    percentage: number;
+    nameKey: string;
+    icon: string;
+  }[];
   minBuy: number;
   maxBuy: number;
   softCap: number;

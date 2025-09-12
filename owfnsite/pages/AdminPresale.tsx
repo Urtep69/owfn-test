@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
@@ -152,36 +151,30 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        // A map to store the final aggregated data for each contributor.
         const contributorMap = new Map<string, { totalLamports: bigint; totalOwfn: bigint }>();
 
-        // FIX: Use currentStage instead of PRESALE_DETAILS
         const presaleRateBigInt = BigInt(currentStage.rate);
-        const bonusThresholdLamports = BigInt(Math.round(currentStage.bonusThreshold * LAMPORTS_PER_SOL));
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
+        const sortedTiers = [...currentStage.bonusTiers].sort((a, b) => b.threshold - a.threshold);
 
-        // Process each transaction individually to calculate the correct OWFN amount with bonus.
         transactions.forEach(tx => {
             const lamports = BigInt(tx.lamports);
-            
-            // Calculate base OWFN for this single transaction
+            const solAmount = tx.solAmount;
+
+            const applicableTier = sortedTiers.find(tier => solAmount >= tier.threshold);
             let owfnForThisTx = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
 
-            // Check if this single transaction qualifies for a bonus
-            if (lamports >= bonusThresholdLamports) {
-                // FIX: Use currentStage instead of PRESALE_DETAILS
-                const bonusAmount = (owfnForThisTx * BigInt(currentStage.bonusPercentage)) / 100n;
+            if (applicableTier) {
+                const bonusAmount = (owfnForThisTx * BigInt(applicableTier.percentage)) / 100n;
                 owfnForThisTx += bonusAmount;
             }
 
-            // Aggregate the results for the contributor.
             const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n, totalOwfn: 0n };
             existing.totalLamports += lamports;
             existing.totalOwfn += owfnForThisTx;
             contributorMap.set(tx.from, existing);
         });
 
-        // Convert the map to the final array structure.
         return Array.from(contributorMap.entries()).map(([address, data]) => {
             const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
             return { address, totalSol, totalOwfn: data.totalOwfn };

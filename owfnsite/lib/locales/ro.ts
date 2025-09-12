@@ -174,6 +174,13 @@ export const ro = {
     presale_you_can_buy: `Puteți contribui cu până la încă {amount} SOL.`,
     presale_bonus_offer: `BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!`,
     presale_checking_contribution: `Se verifică contribuția...`,
+    bonus_tiers_title: `Niveluri de Bonus`,
+    bonus_tier_copper: `Nivel Cupru`,
+    bonus_tier_bronze: `Nivel Bronz`,
+    bonus_tier_silver: `Nivel Argint`,
+    bonus_tier_gold: `Nivel Aur`,
+    bonus_amount: `Sumă Bonus`,
+    total_to_receive: `Total de Primit`,
 
     // Presale Stages Page
     presale_stages_title: `Etapele Prevânzării`,
@@ -190,6 +197,7 @@ export const ro = {
     total_raised: `Total Strâns`,
     live_progress: `Progres Live`,
     participate_now: `Participă Acum`,
+    bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) la {maxPercentage}% ({maxThreshold} SOL+)`,
 
     // Donations Page
     make_donation: `Fă o Donație`,

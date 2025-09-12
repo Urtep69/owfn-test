@@ -174,6 +174,13 @@ export const en = {
     presale_you_can_buy: `You can contribute up to {amount} more SOL.`,
     presale_bonus_offer: `{percentage}% BONUS on purchases of {threshold} SOL or more!`,
     presale_checking_contribution: `Checking your contribution...`,
+    bonus_tiers_title: `Bonus Tiers`,
+    bonus_tier_copper: `Copper Level`,
+    bonus_tier_bronze: `Bronze Level`,
+    bonus_tier_silver: `Silver Level`,
+    bonus_tier_gold: `Gold Level`,
+    bonus_amount: `Bonus Amount`,
+    total_to_receive: `Total To Receive`,
 
     // Presale Stages Page
     presale_stages_title: `Presale Stages`,
@@ -190,6 +197,7 @@ export const en = {
     total_raised: `Total Raised`,
     live_progress: `Live Progress`,
     participate_now: `Participate Now`,
+    bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) to {maxPercentage}% ({maxThreshold} SOL+)`,
     
     // Donations Page
     make_donation: `Make a Donation`,
@@ -334,8 +342,6 @@ export const en = {
     faq_q13: 'Why is there a maximum purchase limit (Max Buy) in the presale?',
     faq_a13: 'The maximum purchase limit is an important measure to ensure the fairest possible distribution of tokens and to prevent a small number of large investors ("whales") from controlling a significant portion of the supply. This promotes a healthier and more decentralized community in the long run.',
     faq_q14: 'What does it mean that the token is "Interest-Bearing" with 2% APY? How does it work?',
-    faq_a14: 'It means the OWFN token is programmed to automatically generate interest. Just by holding the tokens in your Solana-compatible wallet, the amount of your tokens will increase over time, with a 2% Annual Percentage Yield (APY). You do not need to stake them or take any additional action; the rewards accumulate automatically.',
-    faq_q15: 'What is the 0.5% transfer fee and when will it be activated?',
     faq_a15: 'This fee is a key mechanism for the long-term funding of our mission. A 0.5% fee will apply to all transactions with the OWFN token *after* the presale period concludes. The funds collected from this fee are automatically directed to the Impact Treasury to continuously fund our social projects. Thus, every transaction contributes to the common good.',
     faq_q16: 'Why did you choose the Solana blockchain for this project?',
     faq_a16: 'We chose Solana for its exceptional speed, very low transaction costs, and high scalability. These features are essential for a global project like ours, allowing for efficient micro-transactions and ensuring a fast and accessible experience for all users, whether they are donating, buying, or trading tokens.',

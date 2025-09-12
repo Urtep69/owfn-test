@@ -87,6 +87,16 @@ const StageCard = ({ stage, index, totalRaised }: { stage: PresaleStage, index: 
     const cardClasses = `presale-card relative w-full lg:w-5/12 p-6 rounded-xl shadow-3d-lg bg-white/30 dark:bg-darkPrimary-800/50 backdrop-blur-md border border-primary-200/30 dark:border-darkPrimary-700/50 ${isEven ? 'lg:mr-auto' : 'lg:ml-auto'}`;
     const activeBorderClasses = stage.status === 'active' ? 'border-accent-500/50 dark:border-darkAccent-400/50 animate-active-glow' : '';
 
+    const bonusTiers = stage.bonusTiers;
+    const minBonus = bonusTiers[0];
+    const maxBonus = bonusTiers[bonusTiers.length - 1];
+    const bonusText = t('bonus_range_text', {
+        minPercentage: minBonus.percentage,
+        minThreshold: minBonus.threshold,
+        maxPercentage: maxBonus.percentage,
+        maxThreshold: maxBonus.threshold
+    });
+
     return (
         <div className={cardClasses}>
             <div className={`absolute -inset-px rounded-xl pointer-events-none transition-shadow duration-300 ${activeBorderClasses}`}></div>
@@ -95,7 +105,7 @@ const StageCard = ({ stage, index, totalRaised }: { stage: PresaleStage, index: 
             <div className="space-y-3">
                 <DetailRow label={t('period')} value={`${formatDate(stage.startDate)} - ${formatDate(stage.endDate)}`} />
                 <DetailRow label={t('token_price')} value={`1 SOL = ${stage.rate.toLocaleString()} OWFN`} />
-                <DetailRow label={t('bonuses')} value={`${stage.bonusPercentage}% on ${stage.bonusThreshold}+ SOL`} />
+                <DetailRow label={t('bonuses')} value={bonusText} />
             </div>
 
             {stage.status === 'completed' && (

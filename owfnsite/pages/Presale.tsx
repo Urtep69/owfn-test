@@ -243,6 +243,30 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
   </div>
 );
 
+const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bonusTiers'], activeThreshold: number }) => {
+    const { t } = useAppContext();
+    const displayTiers = [...tiers].sort((a, b) => a.threshold - b.threshold);
+
+    return (
+        <div className="bg-primary-50 dark:bg-darkPrimary-800/50 p-4 rounded-lg">
+            <h3 className="text-md font-bold text-center text-primary-800 dark:text-darkPrimary-200 mb-3">{t('bonus_tiers_title')}</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {displayTiers.map((tier) => {
+                    const isActive = activeThreshold >= tier.threshold;
+                    return (
+                        <div key={tier.threshold} className={`p-3 rounded-lg border-2 text-center transition-all duration-300 ${isActive ? 'bg-accent-100 dark:bg-darkAccent-900 border-accent-500 dark:border-darkAccent-400 scale-105 shadow-lg' : 'bg-primary-100 dark:bg-darkPrimary-800 border-transparent'}`}>
+                            <div className="text-2xl mb-1">{tier.icon}</div>
+                            <p className="font-bold text-xs text-primary-900 dark:text-darkPrimary-100">{t(tier.nameKey)}</p>
+                            <p className="text-xs text-primary-600 dark:text-darkPrimary-400">{tier.threshold} SOL+</p>
+                            <p className="text-sm font-bold text-green-600 dark:text-green-400 mt-1">+{tier.percentage}%</p>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+};
+
 
 export default function Presale() {
   const { t, solana, setWalletModalOpen } = useAppContext();
@@ -424,7 +448,7 @@ export default function Presale() {
   const calculation = useMemo(() => {
     const numAmount = parseFloat(solAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
-        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
+        return { base: 0, bonus: 0, total: 0, appliedBonusPercentage: 0 };
     }
 
     try {
@@ -437,31 +461,33 @@ export default function Presale() {
         const fractionalPart = (parts[1] || '').slice(0, 9).padEnd(9, '0');
         const lamports = integerPart * LAMPORTS_PER_SOL_BIGINT + BigInt(fractionalPart);
 
-        const presaleRateBigInt = BigInt(currentStage.rate);
-        const bonusThresholdLamports = BigInt(Math.round(currentStage.bonusThreshold * LAMPORTS_PER_SOL));
-        
-        const baseOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
-        let bonusOwfnSmallestUnit = 0n;
-        let isBonus = false;
+        const applicableTier = [...currentStage.bonusTiers]
+            .sort((a, b) => b.threshold - a.threshold)
+            .find(tier => numAmount >= tier.threshold);
 
-        if (lamports >= bonusThresholdLamports) {
-            bonusOwfnSmallestUnit = (baseOwfnSmallestUnit * BigInt(currentStage.bonusPercentage)) / 100n;
-            isBonus = true;
+        const presaleRateBigInt = BigInt(currentStage.rate);
+        const baseOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
+        
+        let bonusOwfnSmallestUnit = 0n;
+        let appliedBonusPercentage = 0;
+
+        if (applicableTier) {
+            appliedBonusPercentage = applicableTier.percentage;
+            bonusOwfnSmallestUnit = (baseOwfnSmallestUnit * BigInt(applicableTier.percentage)) / 100n;
         }
 
         const totalOwfnSmallestUnit = baseOwfnSmallestUnit + bonusOwfnSmallestUnit;
-
         const toDisplayAmount = (amountInSmallestUnit: bigint) => Number(amountInSmallestUnit) / Number(owfnDecimalsMultiplier);
         
         return {
             base: toDisplayAmount(baseOwfnSmallestUnit),
             bonus: toDisplayAmount(bonusOwfnSmallestUnit),
             total: toDisplayAmount(totalOwfnSmallestUnit),
-            bonusApplied: isBonus,
+            appliedBonusPercentage: appliedBonusPercentage,
         };
     } catch (e) {
         console.error("Error calculating OWFN amount:", e);
-        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
+        return { base: 0, bonus: 0, total: 0, appliedBonusPercentage: 0 };
     }
   }, [solAmount]);
 
@@ -653,6 +679,8 @@ export default function Presale() {
                 <div className="lg:col-span-2 space-y-6 flex flex-col">
                     {/* Buy Section */}
                     <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6 space-y-4">
+                        <BonusTiersDisplay tiers={currentStage.bonusTiers} activeThreshold={parseFloat(solAmount) || 0} />
+
                         <p className="text-sm text-primary-700 dark:text-darkPrimary-300 text-center">
                             {t('presale_buy_info', { min: currentStage.minBuy, max: currentStage.maxBuy.toFixed(2) })}
                         </p>
@@ -661,7 +689,7 @@ export default function Presale() {
                                 {isCheckingContribution ? (
                                     <div className="flex items-center justify-center gap-2">
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>Checking your contribution...</span>
+                                        <span>{t('presale_checking_contribution')}</span>
                                     </div>
                                 ) : (
                                     <>
@@ -690,23 +718,23 @@ export default function Presale() {
 
                         {error && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
                         
-                        <div className="bg-primary-100 dark:bg-darkPrimary-800/50 p-4 rounded-lg space-y-3">
+                        <div className="bg-primary-100 dark:bg-darkPrimary-800/50 p-4 rounded-lg space-y-2">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-primary-600 dark:text-darkPrimary-400">{t('owfn_base_amount')}</span>
                                 <span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
                             </div>
                             
-                            {calculation.bonusApplied && (
+                            {calculation.appliedBonusPercentage > 0 && (
                                 <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
-                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> Bonus ({currentStage.bonusPercentage}%)</span>
+                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> {t('bonus_amount')} ({calculation.appliedBonusPercentage}%)</span>
                                     <span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
                                 </div>
                             )}
 
-                            <div className="border-t border-primary-200/80 dark:border-darkPrimary-700/80 my-2"></div>
+                            <div className="border-t border-primary-200/80 dark:border-darkPrimary-700/80 my-1"></div>
                             
                             <div className="flex justify-between items-center text-lg">
-                                <span className="font-bold text-primary-800 dark:text-darkPrimary-200">{t('you_receive')}</span>
+                                <span className="font-bold text-primary-800 dark:text-darkPrimary-200">{t('total_to_receive')}</span>
                                 <div className="flex items-center gap-2">
                                     <OwfnIcon className="w-6 h-6"/>
                                     <span className="font-mono font-bold text-2xl text-accent-600 dark:text-darkAccent-400">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
@@ -721,12 +749,6 @@ export default function Presale() {
                         >
                             {buttonText}
                         </button>
-
-                         <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center">
-                            <p className="font-bold text-accent-700 dark:text-darkAccent-200 flex items-center justify-center gap-2">
-                                <Gift size={18} /> {t('presale_bonus_offer', { threshold: currentStage.bonusThreshold, percentage: currentStage.bonusPercentage })}
-                            </p>
-                        </div>
                     </div>
                     {/* Live Feed */}
                     <div className="flex-grow">
