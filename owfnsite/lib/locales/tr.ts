@@ -591,4 +591,12 @@ export const tr = {
     contact_disclaimer_title: `İletişim Politikamız Hakkında Bir Not`,
     contact_disclaimer_message: `Ekibimizin topluluğu etkili bir şekilde destekleyebilmesi ve projeyi ilerletebilmesi için, Resmi Dünya Aile Ağı ile doğrudan ilgili sorulara öncelik veriyoruz. Konu dışı, spam veya istenmeyen talepler içeren mesajlara yanıt verilmeyebilir. Anlayışınız ve misyonumuza odaklanmamıza yardımcı olduğunuz için teşekkür ederiz.`,
     send_direct_message: `Doğrudan Mesaj Gönder`,
+    contact_social_x_title: `Bizi X'te Bulun`,
+    contact_social_x_desc: `Gerçek zamanlı güncellemeler, haberler ve duyurular için resmi hesabımızı takip edin.`,
+    contact_social_telegram_channel_title: `Telegram Kanalı`,
+    contact_social_telegram_channel_desc: `Önemli güncellemeler ve proje haberleri için kanalımıza abone olun.`,
+    contact_social_telegram_group_title: `Telegram Grubu`,
+    contact_social_telegram_group_desc: `Sohbet etmek, soru sormak ve bizimle etkileşimde bulunmak için topluluk grubumuza katılın.`,
+    contact_social_discord_title: `Discord Sunucusu`,
+    contact_social_discord_desc: `Derinlemesine tartışmalar için Discord topluluğumuza katılın.`,
 };

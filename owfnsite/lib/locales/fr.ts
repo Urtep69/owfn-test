@@ -503,7 +503,7 @@ export const fr = {
     you_voted: `Vous Avez Voté`,
     no_active_proposals: `Il n'y a currently aucune proposition active.`,
     no_past_proposals: `Il n'y a aucune proposition passée à afficher.`,
-    no_active_cases_in_category: `Il n'y a actuellement aucun cas actif dans cette catégorie.`,
+    no_active_cases_in_category: `Il n'y a currently aucun cas actif dans cette catégorie.`,
     
     // Maintenance
     maintenance_heading: `Nous améliorons les choses !`,
@@ -584,7 +584,6 @@ export const fr = {
     contact_faq_desc: `De nombreuses réponses se trouvent déjà dans notre section FAQ. Gagnez du temps et consultez-la maintenant !`,
     contact_faq_button: `Voir la FAQ`,
     contact_required_fields: `Les champs marqués d'un astérisque (*) sont obligatoires.`,
-    // FIX: Removed erroneous backslashes before template literals causing a syntax error.
     contact_disclaimer_message: `Afin de garantir que notre équipe puisse soutenir efficacement la communauté et faire avancer le projet, nous accordons la priorité aux demandes directement liées à l'Official World Family Network. Les messages hors sujet, le spam ou les sollicitations non sollicitées pourraient ne pas recevoir de réponse. Merci de votre compréhension et de nous aider à rester concentrés sur notre mission.`,
     send_direct_message: `Envoyer un Message Direct`,
     contact_social_x_title: `Retrouvez-nous sur X`,

@@ -591,4 +591,12 @@ export const ko = {
     contact_disclaimer_title: `커뮤니케이션 정책에 대한 참고 사항`,
     contact_disclaimer_message: `저희 팀이 커뮤니티를 효과적으로 지원하고 프로젝트를 발전시킬 수 있도록, 공식 세계 가족 네트워크와 직접 관련된 문의에 우선순위를 둡니다. 주제와 관련이 없거나, 스팸 또는 원치 않는 요청 메시지는 답변을 받지 못할 수 있습니다. 이해해 주셔서 감사하며, 저희가 사명에 집중할 수 있도록 도와주셔서 감사합니다.`,
     send_direct_message: `직접 메시지 보내기`,
+    contact_social_x_title: `X에서 저희를 찾아보세요`,
+    contact_social_x_desc: `실시간 업데이트, 뉴스 및 공지사항을 위해 공식 계정을 팔로우하세요.`,
+    contact_social_telegram_channel_title: `텔레그램 채널`,
+    contact_social_telegram_channel_desc: `중요한 업데이트 및 프로젝트 소식을 위해 저희 채널을 구독하세요.`,
+    contact_social_telegram_group_title: `텔레그램 그룹`,
+    contact_social_telegram_group_desc: `저희 커뮤니티 그룹에 가입하여 채팅하고, 질문하고, 교류하세요.`,
+    contact_social_discord_title: `디스코드 서버`,
+    contact_social_discord_desc: `심도 있는 토론을 위해 저희 디스코드 커뮤니티의 일원이 되세요.`,
 };

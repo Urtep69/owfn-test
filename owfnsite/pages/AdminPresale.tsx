@@ -4,7 +4,6 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount, ACCOUNT_SIZE } from '@solana/spl-token';
 
-// FIX: Replaced non-existent PRESALE_DETAILS with PRESALE_STAGES
 import { 
     DISTRIBUTION_WALLETS, 
     PRESALE_STAGES,
@@ -14,7 +13,6 @@ import {
 import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User, PieChart, RotateCcw } from 'lucide-react';
 import { SolIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-// FIX: Added PresaleStage type import
 import type { Token, PresaleStage } from '../types.ts';
 
 interface PresaleTx {
@@ -32,7 +30,6 @@ interface AggregatedContributor {
     totalOwfn: bigint; // Use BigInt for precision
 }
 
-// FIX: Get current presale stage details from PRESALE_STAGES array
 const currentStage: PresaleStage = PRESALE_STAGES.find(s => s.status === 'active') || PRESALE_STAGES[0];
 
 const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
@@ -80,7 +77,6 @@ export default function AdminPresale() {
         setLoading(true);
         try {
             const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
-            // FIX: Use currentStage instead of PRESALE_DETAILS
             const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
             
             let allSignatures: ConfirmedSignatureInfo[] = [];
@@ -120,7 +116,6 @@ export default function AdminPresale() {
                                     signature: batchSignatures[index],
                                     from: inst.parsed.info.source,
                                     solAmount: inst.parsed.info.lamports / LAMPORTS_PER_SOL,
-                                    // FIX: Use currentStage instead of PRESALE_DETAILS
                                     owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
                                     timestamp: tx.blockTime,
                                     lamports: inst.parsed.info.lamports,

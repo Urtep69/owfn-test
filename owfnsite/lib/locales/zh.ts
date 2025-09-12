@@ -591,4 +591,12 @@ export const zh = {
     contact_disclaimer_title: `关于我们沟通政策的说明`,
     contact_disclaimer_message: `为确保我们的团队能够有效支持社区并推进项目，我们优先处理与官方世界家庭网络直接相关的查询。与主题无关、垃圾邮件或未经请求的招揽信息可能不会收到回复。感谢您的理解和帮助，让我们能够专注于我们的使命。`,
     send_direct_message: `发送直接消息`,
+    contact_social_x_title: `在 X 上找到我们`,
+    contact_social_x_desc: `关注我们的官方账号，获取实时更新、新闻和公告。`,
+    contact_social_telegram_channel_title: `Telegram 频道`,
+    contact_social_telegram_channel_desc: `订阅我们的频道，获取重要更新和项目新闻。`,
+    contact_social_telegram_group_title: `Telegram 群组`,
+    contact_social_telegram_group_desc: `加入我们的社区群组，进行聊天、提问和互动。`,
+    contact_social_discord_title: `Discord 服务器`,
+    contact_social_discord_desc: `成为我们 Discord 社区的一员，进行深入讨论。`,
 };
