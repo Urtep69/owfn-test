@@ -5,16 +5,18 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount, ACCOUNT_SIZE } from '@solana/spl-token';
 
+// FIX: Replaced non-existent PRESALE_DETAILS with PRESALE_STAGES
 import { 
     DISTRIBUTION_WALLETS, 
-    PRESALE_DETAILS,
+    PRESALE_STAGES,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
 } from '../constants.ts';
 import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User, PieChart, RotateCcw } from 'lucide-react';
 import { SolIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { Token } from '../types.ts';
+// FIX: Added PresaleStage type import
+import type { Token, PresaleStage } from '../types.ts';
 
 interface PresaleTx {
     signature: string;
@@ -30,6 +32,9 @@ interface AggregatedContributor {
     totalSol: number;
     totalOwfn: bigint; // Use BigInt for precision
 }
+
+// FIX: Get current presale stage details from PRESALE_STAGES array
+const currentStage: PresaleStage = PRESALE_STAGES.find(s => s.status === 'active') || PRESALE_STAGES[0];
 
 const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md flex items-center space-x-4">
@@ -76,7 +81,8 @@ export default function AdminPresale() {
         setLoading(true);
         try {
             const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
-            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            // FIX: Use currentStage instead of PRESALE_DETAILS
+            const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
             
             let allSignatures: ConfirmedSignatureInfo[] = [];
             let lastSignature: string | undefined = undefined;
@@ -115,7 +121,8 @@ export default function AdminPresale() {
                                     signature: batchSignatures[index],
                                     from: inst.parsed.info.source,
                                     solAmount: inst.parsed.info.lamports / LAMPORTS_PER_SOL,
-                                    owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                                    // FIX: Use currentStage instead of PRESALE_DETAILS
+                                    owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
                                     timestamp: tx.blockTime,
                                     lamports: inst.parsed.info.lamports,
                                 });
@@ -148,8 +155,9 @@ export default function AdminPresale() {
         // A map to store the final aggregated data for each contributor.
         const contributorMap = new Map<string, { totalLamports: bigint; totalOwfn: bigint }>();
 
-        const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * LAMPORTS_PER_SOL));
+        // FIX: Use currentStage instead of PRESALE_DETAILS
+        const presaleRateBigInt = BigInt(currentStage.rate);
+        const bonusThresholdLamports = BigInt(Math.round(currentStage.bonusThreshold * LAMPORTS_PER_SOL));
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
 
         // Process each transaction individually to calculate the correct OWFN amount with bonus.
@@ -161,7 +169,8 @@ export default function AdminPresale() {
 
             // Check if this single transaction qualifies for a bonus
             if (lamports >= bonusThresholdLamports) {
-                const bonusAmount = (owfnForThisTx * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
+                // FIX: Use currentStage instead of PRESALE_DETAILS
+                const bonusAmount = (owfnForThisTx * BigInt(currentStage.bonusPercentage)) / 100n;
                 owfnForThisTx += bonusAmount;
             }
 

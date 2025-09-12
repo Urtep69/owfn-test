@@ -178,6 +178,7 @@ export const de = {
     // Presale Stages Page
     presale_stages_title: `Presale Stages`,
     presale_stages_subtitle: `A transparent overview of our funding phases.`,
+    public_presale: `Öffentlicher Vorverkauf`,
     phase_1: `Phase 1`,
     phase_2: `Phase 2`,
     status_completed: `Completed`,

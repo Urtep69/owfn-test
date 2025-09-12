@@ -178,6 +178,7 @@ export const en = {
     // Presale Stages Page
     presale_stages_title: `Presale Stages`,
     presale_stages_subtitle: `A transparent overview of our funding phases.`,
+    public_presale: `Public Presale`,
     phase_1: `Phase 1`,
     phase_2: `Phase 2`,
     status_completed: `Completed`,
@@ -582,13 +583,5 @@ export const en = {
     contact_required_fields: `Fields marked with an asterisk (*) are required.`,
     contact_disclaimer_title: `A Note on Our Communication Policy`,
     contact_disclaimer_message: `To ensure our team can effectively support the community and advance the project, we prioritize inquiries directly related to the Official World Family Network. Messages that are off-topic, spam, or unsolicited solicitations may not receive a response. Thank you for your understanding and for helping us stay focused on our mission.`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Follow us for real-time updates, news, and announcements.`,
-    contact_social_telegram_channel_title: `Telegram Channel`,
-    contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
-    contact_social_telegram_group_title: `Telegram Group`,
-    contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
-    contact_social_discord_title: `Discord Server`,
-    contact_social_discord_desc: `Become part of our active community for discussions and support.`,
     send_direct_message: `Send a Direct Message`,
 };

@@ -17,7 +17,7 @@ export const TOKEN_DETAILS = {
   decimals: 9,
   standard: 'SPL Token 2022',
   extensions: 'Transfer Fee (0.5% activated after presale concludes), Interest-Bearing (2% APR)',
-  presalePrice: '1 SOL = 10,000,000 OWFN',
+  presalePrice: '1 SOL = 9,000,000 OWFN', // Updated to match the new rate
   dexLaunchPrice: '1 SOL ≈ 6,670,000 OWFN',
 };
 
@@ -54,48 +54,21 @@ export const ROADMAP_DATA: RoadmapPhase[] = [
   { quarter: 'Q2 2026 & Beyond', key_prefix: 'roadmap_q2_2026' },
 ];
 
-export const PRESALE_DETAILS = {
-  softCap: 105,
-  hardCap: 200,
-  minBuy: 0.1,
-  maxBuy: 5,
-  rate: 10000000,
-  bonusThreshold: 2, // Minimum SOL to get the bonus
-  bonusPercentage: 10, // 10% bonus
-  startDate: new Date('2025-08-13T00:00:00Z'),
-  endDate: new Date('2025-09-12T00:00:00Z')
-};
-
 export const PRESALE_STAGES: PresaleStage[] = [
     {
         phase: 1,
-        titleKey: 'phase_1',
-        status: 'completed',
-        startDate: '2025-08-13T00:00:00Z',
-        endDate: '2025-09-12T00:00:00Z',
-        rate: 10000000,
-        bonusThreshold: 2,
-        bonusPercentage: 10,
-        minBuy: 0.1,
-        maxBuy: 5,
-        softCap: 105,
-        hardCap: 200,
-        distributionWallet: DISTRIBUTION_WALLETS.presale,
-    },
-    {
-        phase: 2,
-        titleKey: 'phase_2',
-        status: 'upcoming',
-        startDate: '2025-09-26T00:00:00Z',
-        endDate: '2025-10-17T00:00:00Z',
+        titleKey: 'public_presale',
+        status: 'active',
+        startDate: '2025-09-13T00:00:00Z',
+        endDate: '2025-10-04T00:00:00Z',
         rate: 9000000,
         bonusThreshold: 2.5,
         bonusPercentage: 8,
         minBuy: 0.1,
         maxBuy: 10,
-        softCap: 200,
-        hardCap: 400,
-        distributionWallet: '...', // Placeholder for Phase 2 wallet
+        softCap: 35,
+        hardCap: 70,
+        distributionWallet: DISTRIBUTION_WALLETS.presale,
     }
 ];
 

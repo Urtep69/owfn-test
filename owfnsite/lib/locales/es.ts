@@ -178,6 +178,7 @@ export const es = {
     // Presale Stages Page
     presale_stages_title: `Presale Stages`,
     presale_stages_subtitle: `A transparent overview of our funding phases.`,
+    public_presale: `Preventa Pública`,
     phase_1: `Phase 1`,
     phase_2: `Phase 2`,
     status_completed: `Completed`,
@@ -337,7 +338,7 @@ export const es = {
     faq_q16: `¿Por qué eligieron la blockchain de Solana para este proyecto?`,
     faq_a16: `Elegimos Solana por su velocidad excepcional, costos de transacción muy bajos y alta escalabilidad. Estas características son esenciales para un proyecto global como el nuestro, permitiendo micro-transacciones eficientes y asegurando una experiencia rápida y accesible para todos los usuarios, ya sea que estén donando, comprando o comerciando tokens.`,
     faq_q17: `¿Cómo puedo estar seguro de que mis donaciones llegan a las causas que apoyan?`,
-    faq_a17: `La transparencia es fundamental для нас. Todos los fondos destinados a causas sociales se gestionan a través de la Tesorería de Impacto, cuya dirección de billetera es pública. Puede monitorear todas las transacciones entrantes y salientes en un explorador de bloques de Solana, como Solscan. Además, en el Portal de Impacto, proporcionaremos actualizaciones periódicas e informes detallados sobre los proyectos financiados.`,
+    faq_a17: `La transparencia es fundamental para nosotros. Todos los fondos destinados a causas sociales se gestionan a través de la Tesorería de Impacto, cuya dirección de billetera es pública. Puede monitorear todas las transacciones entrantes y salientes en un explorador de bloques de Solana, como Solscan. Además, en el Portal de Impacto, proporcionaremos actualizaciones periódicas e informes detallados sobre los proyectos financiados.`,
     faq_q18: `¿Puedo proponer un caso social o una causa para que sea financiada por OWFN?`,
     faq_a18: `En la fase inicial, los proyectos son seleccionados por nuestro equipo en base a criterios estrictos de impacto y viabilidad. A medida que el proyecto avance, implementaremos un sistema de gobernanza (DAO) que permitirá a los miembros de la comunidad proponer y votar sobre futuras iniciativas, dándole un papel directo en la dirección de los fondos.`,
     faq_q19: `¿Quién está detrás del proyecto OWFN? ¿El equipo es anónimo?`,
