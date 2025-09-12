@@ -1,4 +1,3 @@
-
 export const it = {
     // Navigation
     home: `Home`,
@@ -125,6 +124,7 @@ export const it = {
     token_extensions: `Estensioni Attive`,
     
     // Presale Page
+    presale_info: `Info Prevendita`,
     presale_join_title: `Partecipa alla Prevendita`,
     presale_ends_in: `La prevendita termina tra`,
     progress: `Progresso`,
@@ -174,7 +174,31 @@ export const it = {
     presale_you_can_buy: `Puoi contribuire con altri {amount} SOL.`,
     presale_bonus_offer: `{percentage}% DI BONUS su acquisti di {threshold} SOL o più!`,
     presale_checking_contribution: `Controllo del tuo contributo...`,
+    bonus_tiers_title: `Livelli Bonus`,
+    bonus_tier_copper: `Livello Rame`,
+    bonus_tier_bronze: `Livello Bronzo`,
+    bonus_tier_silver: `Livello Argento`,
+    bonus_tier_gold: `Livello Oro`,
+    bonus_amount: `Importo Bonus`,
+    total_to_receive: `Totale da Ricevere`,
 
+    // Presale Stages Page
+    presale_stages_title: `Fasi della Prevendita`,
+    presale_stages_subtitle: `Una panoramica trasparente delle nostre fasi di finanziamento.`,
+    public_presale: `Prevendita Pubblica`,
+    phase_1: `Fase 1`,
+    phase_2: `Fase 2`,
+    status_completed: `Completata`,
+    status_active: `Attiva`,
+    status_upcoming: `In arrivo`,
+    period: `Periodo`,
+    token_price: `Prezzo Token`,
+    bonuses: `Bonus`,
+    total_raised: `Totale Raccolto`,
+    live_progress: `Progresso in Diretta`,
+    participate_now: `Partecipa Ora`,
+    bonus_range_text: `dal {minPercentage}% ({minThreshold} SOL+) al {maxPercentage}% ({maxThreshold} SOL+)`,
+    
     // Donations Page
     make_donation: `Fai una Donazione`,
     donation_desc: `Sostieni le nostre iniziative di impatto sociale donando criptovalute. Tutti i fondi vanno direttamente al Tesoro dell'Impatto.`,
@@ -477,9 +501,9 @@ export const it = {
     votes_for: `A Favore`,
     votes_against: `Contro`,
     ends_in: `Termina tra`,
-    status_active: `Attiva`,
-    status_passed: `Approvata`,
-    status_failed: `Respinta`,
+    governance_status_active: `Attiva`,
+    governance_status_passed: `Approvata`,
+    governance_status_failed: `Respinta`,
     you_voted: `Hai Votato`,
     no_active_proposals: `Al momento non ci sono proposte attive.`,
     no_past_proposals: `Non ci sono proposte passate da visualizzare.`,
@@ -566,13 +590,5 @@ export const it = {
     contact_required_fields: `I campi contrassegnati con un asterisco (*) sono obbligatori.`,
     contact_disclaimer_title: `Nota sulla Nostra Politica di Comunicazione`,
     contact_disclaimer_message: `Per garantire che il nostro team possa supportare efficacemente la comunità e far avanzare il progetto, diamo la priorità alle richieste direttamente correlate all'Official World Family Network. I messaggi fuori tema, lo spam o le sollecitazioni non richieste potrebbero non ricevere una risposta. Grazie per la tua comprensione e per averci aiutato a rimanere concentrati sulla nostra missione.`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Seguici per aggiornamenti in tempo reale, notizie e annunci.`,
-    contact_social_telegram_channel_title: `Canale Telegram`,
-    contact_social_telegram_channel_desc: `Iscriviti per annunci importanti e notizie ufficiali.`,
-    contact_social_telegram_group_title: `Gruppo Telegram`,
-    contact_social_telegram_group_desc: `Unisciti al nostro gruppo della comunità per discutere e interagire con altri membri.`,
-    contact_social_discord_title: `Server Discord`,
-    contact_social_discord_desc: `Diventa parte della nostra comunità attiva per discussioni e supporto.`,
     send_direct_message: `Invia un Messaggio Diretto`,
 };

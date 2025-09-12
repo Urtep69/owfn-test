@@ -1,4 +1,3 @@
-
 export const nl = {
     // Navigation
     home: `Home`,
@@ -125,6 +124,7 @@ export const nl = {
     token_extensions: `Actieve Extensies`,
     
     // Presale Page
+    presale_info: `Voorverkoop Info`,
     presale_join_title: `Doe mee met de Voorverkoop`,
     presale_ends_in: `Voorverkoop eindigt in`,
     progress: `Voortgang`,
@@ -174,6 +174,30 @@ export const nl = {
     presale_you_can_buy: `U kunt nog tot {amount} SOL bijdragen.`,
     presale_bonus_offer: `{percentage}% BONUS bij aankopen van {threshold} SOL of meer!`,
     presale_checking_contribution: `Uw bijdrage wordt gecontroleerd...`,
+    bonus_tiers_title: `Bonusniveaus`,
+    bonus_tier_copper: `Koper Niveau`,
+    bonus_tier_bronze: `Brons Niveau`,
+    bonus_tier_silver: `Zilver Niveau`,
+    bonus_tier_gold: `Goud Niveau`,
+    bonus_amount: `Bonusbedrag`,
+    total_to_receive: `Totaal te ontvangen`,
+
+    // Presale Stages Page
+    presale_stages_title: `Voorverkoopfasen`,
+    presale_stages_subtitle: `Een transparant overzicht van onze financieringsfasen.`,
+    public_presale: `Openbare Voorverkoop`,
+    phase_1: `Fase 1`,
+    phase_2: `Fase 2`,
+    status_completed: `Voltooid`,
+    status_active: `Actief`,
+    status_upcoming: `Aankomend`,
+    period: `Periode`,
+    token_price: `Tokenprijs`,
+    bonuses: `Bonussen`,
+    total_raised: `Totaal Opgehaald`,
+    live_progress: `Live Voortgang`,
+    participate_now: `Neem nu deel`,
+    bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) tot {maxPercentage}% ({maxThreshold} SOL+)`,
     
     // Donations Page
     make_donation: `Doe een Donatie`,
@@ -477,9 +501,9 @@ export const nl = {
     votes_for: `Voor`,
     votes_against: `Tegen`,
     ends_in: `Eindigt in`,
-    status_active: `Actief`,
-    status_passed: `Aangenomen`,
-    status_failed: `Verworpen`,
+    governance_status_active: `Actief`,
+    governance_status_passed: `Aangenomen`,
+    governance_status_failed: `Verworpen`,
     you_voted: `U heeft gestemd`,
     no_active_proposals: `Er zijn momenteel geen actieve voorstellen.`,
     no_past_proposals: `Er zijn geen verlopen voorstellen om weer te geven.`,
@@ -566,13 +590,5 @@ export const nl = {
     contact_required_fields: `Velden gemarkeerd met een sterretje (*) zijn verplicht.`,
     contact_disclaimer_title: `Een Opmerking over ons Communicatiebeleid`,
     contact_disclaimer_message: `Om ervoor te zorgen dat ons team de gemeenschap effectief kan ondersteunen en het project kan bevorderen, geven we voorrang aan vragen die rechtstreeks verband houden met het Official World Family Network. Berichten die off-topic, spam of ongevraagde verzoeken zijn, worden mogelijk niet beantwoord. Bedankt voor uw begrip en voor uw hulp om ons op onze missie te concentreren.`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Volg ons voor realtime updates, nieuws en aankondigingen.`,
-    contact_social_telegram_channel_title: `Telegram Kanaal`,
-    contact_social_telegram_channel_desc: `Abonneer u voor belangrijke aankondigingen en officieel nieuws.`,
-    contact_social_telegram_group_title: `Telegram Groep`,
-    contact_social_telegram_group_desc: `Word lid van onze communitygroep om te discussiëren en met andere leden in contact te komen.`,
-    contact_social_discord_title: `Discord Server`,
-    contact_social_discord_desc: `Word lid van onze actieve community voor discussies en ondersteuning.`,
     send_direct_message: `Stuur een Direct Bericht`,
 };

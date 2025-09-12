@@ -499,7 +499,6 @@ export const en = {
     votes_for: `For`,
     votes_against: `Against`,
     ends_in: `Ends in`,
-    // FIX: Renamed governance status keys to avoid duplicates
     governance_status_active: `Active`,
     governance_status_passed: `Passed`,
     governance_status_failed: `Failed`,
