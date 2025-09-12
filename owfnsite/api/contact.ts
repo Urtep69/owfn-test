@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import { SUPPORTED_LANGUAGES } from '../constants.ts';
 
 const generateAutoReplySignatureHtml = (languageCode: string = 'en') => {
     const logoUrl = 'https://www.owfn.org/assets/owfn.png';
@@ -163,10 +164,10 @@ ${message}
             const parsedContent = JSON.parse(jsonStr);
             adminEmailContent = parsedContent;
             detectedLanguage = parsedContent.detectedLanguage || 'English';
-             // Attempt to get a language code from the name
-            const languageNames = new Intl.DisplayNames(['en'], {type: 'language'});
-            const allCodes = ['en', 'ro', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'ja', 'zh', 'ko', 'nl', 'tr', 'sr', 'hu'];
-            detectedLanguageCode = allCodes.find(code => languageNames.of(code)?.toLowerCase() === detectedLanguage.toLowerCase()) || 'en';
+            
+            // ROBUST FIX: Replace unstable Intl.DisplayNames with a safe, internal lookup.
+            const lang = SUPPORTED_LANGUAGES.find(l => l.name.toLowerCase() === detectedLanguage.toLowerCase());
+            detectedLanguageCode = lang ? lang.code : 'en';
 
         } catch (e) {
             console.error("Gemini did not return valid JSON for admin email.", e, responseForAdmin.text);
