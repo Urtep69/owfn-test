@@ -109,7 +109,7 @@ export default async function handler(req: any, res: any) {
             '- **Vision:** A world where compassion isn\'t limited by borders, and technology helps solve critical global issues.',
             '',
             '**2. Presale & Trading**',
-            '- **Current Presale Dates:** The presale starts on September 13, 2025 and ends on October 4, 2025.',
+            '- **Current Presale Dates:** The presale starts on September 20, 2025 and ends on October 20, 2025.',
             '- **Presale Rate:** 1 SOL = 9,000,000 OWFN',
             '- **DEX Launch Price (Estimated):** 1 SOL ≈ 6,670,000 OWFN',
             '- **Contribution Limits:** Min buy is 0.0001 SOL. Max buy is 10 SOL per wallet total.',

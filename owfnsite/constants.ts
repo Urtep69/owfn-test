@@ -59,8 +59,8 @@ export const PRESALE_STAGES: PresaleStage[] = [
         phase: 1,
         titleKey: 'public_presale',
         status: 'active',
-        startDate: '2025-09-13T00:00:00Z',
-        endDate: '2025-10-04T00:00:00Z',
+        startDate: '2025-09-20T00:00:00Z',
+        endDate: '2025-10-21T00:00:00Z',
         rate: 9000000,
         bonusTiers: [
             { threshold: 1, percentage: 5, nameKey: 'bonus_tier_copper', icon: '🟫' },
