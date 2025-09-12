@@ -1,4 +1,4 @@
-import type { ChatMessage } from '../lib/types';
+import type { ChatMessage } from '../lib/types.js';
 
 const introductoryMessages: Record<string, { subject: string, body: string }> = {
     'en': {

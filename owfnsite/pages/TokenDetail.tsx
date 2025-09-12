@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// FIX: The import for wouter was corrupted and pointed to 'w'. Corrected to 'wouter'.
-// 'useParams', 'Link', and 'useLocation' are all valid exports from wouter.
 import { useRoute, Link, useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { TokenDetails } from '../lib/types.ts';
@@ -29,14 +27,13 @@ const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactN
     </div>
 );
 
-// FIX: Added default export to address the import error in App.tsx. The file was also missing.
 export default function TokenDetail() {
     const { t } = useAppContext();
-    // FIX: Switched from useParams to useRoute to correctly extract route parameters
-    // when the component is nested inside a wrapper, which was breaking context inference.
-    const [match, params] = useRoute("/dashboard/token/:mint");
+    // FIX: The `useRoute` hook was not correctly inferring the type for `params`, resulting in a `never` type.
+    // By providing an explicit generic type `<{ mint: string }>`, we ensure `params` is correctly typed as `{ mint: string } | null`,
+    // which resolves the TypeScript error when accessing `params.mint`.
+    const [match, params] = useRoute<{ mint: string }>("/dashboard/token/:mint");
     const [location] = useLocation();
-    // FIX: Added a check for `params` to ensure it is not null or undefined before accessing properties, resolving a possible runtime error.
     const mintAddress = match && params ? params.mint : undefined;
 
     const [tokenDetails, setTokenDetails] = useState<TokenDetails | null>(null);

@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
-import type { ChatMessage } from '../lib/types';
-import { PRESALE_STAGES, SUPPORTED_LANGUAGES } from '../lib/constants';
+import type { ChatMessage } from '../lib/types.js';
+import { PRESALE_STAGES, SUPPORTED_LANGUAGES } from '../lib/constants.js';
 
 /**
  * The definitive, "anti-crash" history builder. This function is

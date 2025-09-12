@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { SUPPORTED_LANGUAGES } from '../lib/constants';
+import { SUPPORTED_LANGUAGES } from '../lib/constants.js';
 
 const generateAutoReplySignatureHtml = (languageCode: string = 'en') => {
     const logoUrl = 'https://www.owfn.org/assets/owfn.png';
