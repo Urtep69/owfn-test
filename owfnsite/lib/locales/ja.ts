@@ -1,4 +1,3 @@
-
 export const ja = {
     // Navigation
     home: `ホーム`,
@@ -125,6 +124,7 @@ export const ja = {
     token_extensions: `アクティブな拡張機能`,
     
     // Presale Page
+    presale_info: `プレセール情報`,
     presale_join_title: `プレセールに参加`,
     presale_ends_in: `プレセール終了まで`,
     progress: `進捗`,
@@ -174,6 +174,30 @@ export const ja = {
     presale_you_can_buy: `あなたはさらに {amount} SOL まで貢献できます。`,
     presale_bonus_offer: `{threshold} SOL 以上の購入で {percentage}% ボーナス！`,
     presale_checking_contribution: `あなたの貢献を確認しています...`,
+    bonus_tiers_title: `ボーナスレベル`,
+    bonus_tier_copper: `カッパーレベル`,
+    bonus_tier_bronze: `ブロンズレベル`,
+    bonus_tier_silver: `シルバーレベル`,
+    bonus_tier_gold: `ゴールドレベル`,
+    bonus_amount: `ボーナス額`,
+    total_to_receive: `合計受取額`,
+
+    // Presale Stages Page
+    presale_stages_title: `プレセール段階`,
+    presale_stages_subtitle: `資金調達フェーズの透明な概要。`,
+    public_presale: `公開プレセール`,
+    phase_1: `フェーズ1`,
+    phase_2: `フェーズ2`,
+    status_completed: `完了`,
+    status_active: `アクティブ`,
+    status_upcoming: `近日公開`,
+    period: `期間`,
+    token_price: `トークン価格`,
+    bonuses: `ボーナス`,
+    total_raised: `総調達額`,
+    live_progress: `ライブ進捗`,
+    participate_now: `今すぐ参加`,
+    bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) から {maxPercentage}% ({maxThreshold} SOL+)`,
     
     // Donations Page
     make_donation: `寄付する`,
@@ -264,7 +288,7 @@ export const ja = {
     case_update_1: `資材が現場に到着しました。来週から建設が始まります！`,
     case_update_2: `建築計画が最終決定され、地方自治体の承認を得ました。`,
     case_update_3: `プロジェクトの資金調達が正式に開始されました。OWFNコミュニティからの第一波の支援に感謝します。`,
-
+    
     // Partnerships Page
     partnerships_title: `パートナーシップと将来の協力`,
     partnerships_focus_title: `現在の焦点`,
@@ -460,8 +484,6 @@ export const ja = {
     airdrop_eligible_message: `あなたのウォレットは対象です！次回の配布で{amount} OWFNトークンを受け取ります。`,
     airdrop_not_eligible: `対象外`,
     airdrop_not_eligible_message: `申し訳ありませんが、このウォレットアドレスは現在のエアドロップの対象外です。今後の機会のためにコミュニティで活動を続けてください！`,
-    airdrop_info_box_title: `このエアドロップについて`,
-    airdrop_info_box_desc: `このエアドロップは、早期支援者とアクティブなコミュニティメンバーを報酬するために設計されています。資格は、プレセールへの参加やコミュニティイベントへの参加などの要因に基づいています。`,
     
     // Governance
     governance_title: `ガバナンス`,
@@ -477,9 +499,9 @@ export const ja = {
     votes_for: `賛成`,
     votes_against: `反対`,
     ends_in: `終了まで`,
-    status_active: `進行中`,
-    status_passed: `可決`,
-    status_failed: `否決`,
+    governance_status_active: `進行中`,
+    governance_status_passed: `可決`,
+    governance_status_failed: `否決`,
     you_voted: `投票済み`,
     no_active_proposals: `現在、進行中の提案はありません。`,
     no_past_proposals: `表示する過去の提案はありません。`,
@@ -566,13 +588,5 @@ export const ja = {
     contact_required_fields: `アスタリスク（*）が付いている項目は必須です。`,
     contact_disclaimer_title: `コミュニケーションポリシーに関する注意`,
     contact_disclaimer_message: `チームがコミュニティを効果的にサポートし、プロジェクトを推進できるようにするため、公式ワールドファミリーネットワークに直接関連する問い合わせを優先します。トピック外、スパム、または未承諾の勧誘メッセージには返信しない場合があります。ご理解とご協力に感謝し、私たちの使命に集中できるようご協力ください。`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `リアルタイムの更新、ニュース、お知らせについては、フォローしてください。`,
-    contact_social_telegram_channel_title: `Telegramチャンネル`,
-    contact_social_telegram_channel_desc: `重要なお知らせや公式ニュースについては、購読してください。`,
-    contact_social_telegram_group_title: `Telegramグループ`,
-    contact_social_telegram_group_desc: `他のメンバーと議論し、交流するためにコミュニティグループに参加してください。`,
-    contact_social_discord_title: `Discordサーバー`,
-    contact_social_discord_desc: `議論やサポートのために、活発なコミュニティの一員になりましょう。`,
     send_direct_message: `ダイレクトメッセージを送信`,
 };

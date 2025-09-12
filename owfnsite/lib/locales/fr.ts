@@ -499,12 +499,11 @@ export const fr = {
     votes_for: `Pour`,
     votes_against: `Contre`,
     ends_in: `Se termine dans`,
-    // FIX: Renamed governance status keys to avoid duplicate keys and ensure correct translation lookup for governance proposals.
     governance_status_active: `Active`,
     governance_status_passed: `Adoptée`,
     governance_status_failed: `Rejetée`,
     you_voted: `Vous Avez Voté`,
-    no_active_proposals: `Il n'y a actuellement aucune proposition active.`,
+    no_active_proposals: `Il n'y a currently aucune proposition active.`,
     no_past_proposals: `Il n'y a aucune proposition passée à afficher.`,
     no_active_cases_in_category: `Il n'y a currently aucun cas actif dans cette catégorie.`,
     
@@ -589,13 +588,5 @@ export const fr = {
     contact_required_fields: `Les champs marqués d'un astérisque (*) sont obligatoires.`,
     contact_disclaimer_title: `Note sur notre Politique de Communication`,
     contact_disclaimer_message: `Afin de garantir que notre équipe puisse soutenir efficacement la communauté et faire avancer le projet, nous accordons la priorité aux demandes directement liées à l'Official World Family Network. Les messages hors sujet, le spam ou les sollicitations non désirées pourraient ne pas recevoir de réponse. Merci de votre compréhension et de nous aider à rester concentrés sur notre mission.`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Suivez-nous pour des mises à jour en temps réel, des nouvelles et des annonces.`,
-    contact_social_telegram_channel_title: `Canal Telegram`,
-    contact_social_telegram_channel_desc: `Abonnez-vous pour les annonces importantes et les nouvelles officielles.`,
-    contact_social_telegram_group_title: `Groupe Telegram`,
-    contact_social_telegram_group_desc: `Rejoignez notre groupe communautaire pour discuter et interagir avec d'autres membres.`,
-    contact_social_discord_title: `Serveur Discord`,
-    contact_social_discord_desc: `Faites partie de notre communauté active pour des discussions et du soutien.`,
     send_direct_message: `Envoyer un Message Direct`,
 };

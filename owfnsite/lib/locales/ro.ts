@@ -484,8 +484,6 @@ export const ro = {
     airdrop_eligible_message: `Portofelul tău este eligibil! Vei primi {amount} tokeni OWFN la următoarea distribuire.`,
     airdrop_not_eligible: `Neeligibil`,
     airdrop_not_eligible_message: `Ne pare rău, această adresă de portofel nu este eligibilă pentru airdrop-ul curent. Fii activ în comunitatea noastră pentru oportunități viitoare!`,
-    airdrop_info_box_title: `Despre acest Airdrop`,
-    airdrop_info_box_desc: `Acest airdrop este conceput pentru a recompensa susținătorii timpurii și membrii activi ai comunității. Eligibilitatea se bazează pe factori precum participarea la prevânzare și implicarea în evenimentele comunității.`,
     
     // Governance
     governance_title: `Guvernanță`,
@@ -501,7 +499,6 @@ export const ro = {
     votes_for: `Pentru`,
     votes_against: `Împotrivă`,
     ends_in: `Se termină în`,
-    // FIX: Renamed governance status keys to avoid duplicates
     governance_status_active: `Activă`,
     governance_status_passed: `Aprobată`,
     governance_status_failed: `Respinsă`,
@@ -591,13 +588,5 @@ export const ro = {
     contact_required_fields: `Câmpurile marcate cu asterisc (*) sunt obligatorii.`,
     contact_disclaimer_title: `Notă privind Politica Noastră de Comunicare`,
     contact_disclaimer_message: `Pentru a ne asigura că echipa noastră poate sprijini eficient comunitatea și poate avansa proiectul, prioritizăm solicitările direct legate de Official World Family Network. Mesajele care nu au legătură cu subiectul, sunt spam sau nesolicitate s-ar putea să nu primească un răspuns. Vă mulțumim pentru înțelegere și pentru că ne ajutați să rămânem concentrați pe misiunea noastră.`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Urmăriți-ne pentru actualizări în timp real, știri și anunțuri.`,
-    contact_social_telegram_channel_title: `Canal Telegram`,
-    contact_social_telegram_channel_desc: `Abonați-vă pentru anunțuri importante și știri oficiale.`,
-    contact_social_telegram_group_title: `Grup Telegram`,
-    contact_social_telegram_group_desc: `Alăturați-vă grupului nostru comunitar pentru a discuta și interacționa cu alți membri.`,
-    contact_social_discord_title: `Server Discord`,
-    contact_social_discord_desc: `Deveniți parte a comunității noastre active pentru discuții și suport.`,
     send_direct_message: 'Trimite un Mesaj Direct',
 };
