@@ -21,7 +21,7 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
 
 // Get the current (and only) presale stage for this page to use.
-const currentStage: PresaleStage = PRESALE_STAGES.find(s => s.status === 'active') || PRESALE_STAGES[0];
+const currentStage: PresaleStage = PRESALE_STAGES[0];
 
 const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransaction | null }) => {
     const { t } = useAppContext();

@@ -8,7 +8,7 @@ import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, PRE
 import { translateText } from '../services/geminiService.ts';
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-const currentStage: PresaleStage = PRESALE_STAGES.find(s => s.status === 'active') || PRESALE_STAGES[0];
+const currentStage: PresaleStage = PRESALE_STAGES[0];
 
 interface AppContextType {
   theme: Theme;
