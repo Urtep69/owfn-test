@@ -100,7 +100,7 @@ const SuggestionChip = ({ text, onSelect }: { text: string; onSelect: (text: str
 
 
 export const Chatbot = () => {
-    const { t, currentLanguage, presaleProgress } = useAppContext();
+    const { t, currentLanguage } = useAppContext();
     const [isOpen, setIsOpen] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     
@@ -201,7 +201,7 @@ export const Chatbot = () => {
 
     const handleSend = async (questionToSend?: string) => {
         const currentInput = questionToSend || input;
-        if (currentInput.trim() === '' || isLoading || presaleProgress.isLoading) return;
+        if (currentInput.trim() === '' || isLoading) return;
 
         const now = new Date();
         const userMessage: ChatMessage = {
@@ -241,7 +241,6 @@ export const Chatbot = () => {
                 currentInput,
                 currentLanguage.code,
                 currentTime,
-                presaleProgress,
                 (chunk) => {
                     if (loadingIntervalRef.current) {
                         window.clearInterval(loadingIntervalRef.current);
@@ -332,8 +331,7 @@ export const Chatbot = () => {
         : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50";
 
     const showSuggestions = messages.length === 1; // Only show after the initial welcome message
-    const isDataLoading = presaleProgress.isLoading;
-    const isInputDisabled = isLoading || isDataLoading;
+    const isInputDisabled = isLoading;
 
     return (
         <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
@@ -439,7 +437,7 @@ export const Chatbot = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder={isDataLoading ? "Loading live data, please wait..." : t('chatbot_placeholder')}
+                        placeholder={t('chatbot_placeholder')}
                         className="w-full p-3 pr-20 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none disabled:cursor-wait"
                         disabled={isInputDisabled}
                     />

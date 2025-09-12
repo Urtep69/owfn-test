@@ -67,7 +67,7 @@ export default async function handler(req: any, res: any) {
             return res.status(500).json({ error: "Server configuration error. The site administrator needs to configure the API key." });
         }
 
-        const { history, question, langCode, currentTime, presaleProgress } = req.body;
+        const { history, question, langCode, currentTime } = req.body;
 
         if (!question || typeof question !== 'string' || question.trim() === '') {
             return res.status(400).json({ error: 'Invalid question provided.' });
