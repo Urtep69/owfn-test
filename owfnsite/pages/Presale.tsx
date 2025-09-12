@@ -243,6 +243,35 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
   </div>
 );
 
+const MedalIcon = ({ nameKey }: { nameKey: string }) => {
+    let rank, colors;
+    switch (nameKey) {
+        case 'bonus_tier_gold':
+            rank = 1;
+            colors = 'bg-yellow-400 border-yellow-500 text-yellow-800';
+            break;
+        case 'bonus_tier_silver':
+            rank = 2;
+            colors = 'bg-slate-300 border-slate-400 text-slate-700';
+            break;
+        case 'bonus_tier_bronze':
+            rank = 3;
+            colors = 'bg-amber-500 border-amber-600 text-amber-900';
+            break;
+        case 'bonus_tier_copper':
+            rank = 4;
+            colors = 'bg-orange-400 border-orange-500 text-orange-900';
+            break;
+        default:
+            return null;
+    }
+    return (
+        <div className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 shadow-inner mx-auto ${colors}`}>
+            <span className="font-bold text-xl drop-shadow-sm">{rank}</span>
+        </div>
+    );
+};
+
 const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bonusTiers'], activeThreshold: number }) => {
     const { t } = useAppContext();
     const displayTiers = [...tiers].sort((a, b) => a.threshold - b.threshold);
@@ -255,7 +284,9 @@ const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bo
                     const isActive = activeThreshold >= tier.threshold;
                     return (
                         <div key={tier.threshold} className={`p-3 rounded-lg border-2 text-center transition-all duration-300 ${isActive ? 'bg-accent-100 dark:bg-darkAccent-900 border-accent-500 dark:border-darkAccent-400 scale-105 shadow-lg' : 'bg-primary-100 dark:bg-darkPrimary-800 border-transparent'}`}>
-                            <div className="text-2xl mb-1">{tier.icon}</div>
+                            <div className="mb-1 h-10 flex items-center justify-center">
+                                <MedalIcon nameKey={tier.nameKey} />
+                            </div>
                             <p className="font-bold text-xs text-primary-900 dark:text-darkPrimary-100">{t(tier.nameKey)}</p>
                             <p className="text-xs text-primary-600 dark:text-darkPrimary-400">{tier.threshold} SOL+</p>
                             <p className="text-sm font-bold text-green-600 dark:text-green-400 mt-1">+{tier.percentage}%</p>
