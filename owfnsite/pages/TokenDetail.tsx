@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // FIX: The import for wouter was corrupted and pointed to 'w'. Corrected to 'wouter'.
 // 'useParams', 'Link', and 'useLocation' are all valid exports from wouter.
-import { useParams, Link, useLocation } from 'wouter';
+import { useRoute, Link, useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import type { TokenDetails } from '../lib/types.ts';
 import { ArrowLeft, Loader2, AlertTriangle, Info, BarChart2, ShieldCheck, PieChart, CheckCircle, XCircle } from 'lucide-react';
@@ -32,9 +32,11 @@ const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactN
 // FIX: Added default export to address the import error in App.tsx. The file was also missing.
 export default function TokenDetail() {
     const { t } = useAppContext();
-    const params = useParams();
+    // FIX: Switched from useParams to useRoute to correctly extract route parameters
+    // when the component is nested inside a wrapper, which was breaking context inference.
+    const [match, params] = useRoute("/dashboard/token/:mint");
     const [location] = useLocation();
-    const mintAddress = params.mint;
+    const mintAddress = match ? params?.mint : undefined;
 
     const [tokenDetails, setTokenDetails] = useState<TokenDetails | null>(null);
     const [loading, setLoading] = useState(true);
