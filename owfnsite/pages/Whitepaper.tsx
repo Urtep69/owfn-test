@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext.js';
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, ROADMAP_DATA, PROJECT_LINKS } from '../lib/constants.js';
@@ -119,4 +118,11 @@ export default function Whitepaper() {
                 <p className="mb-4">{t('whitepaper_community_desc')}</p>
                 <div className="flex flex-wrap gap-x-6 gap-y-2">
                     <a href={PROJECT_LINKS.website} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 hover:underline font-semibold">Website</a>
-                    <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer
+                    <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 hover:underline font-semibold">X (Twitter)</a>
+                    <a href={PROJECT_LINKS.telegramGroup} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 hover:underline font-semibold">Telegram</a>
+                    <a href={PROJECT_LINKS.discord} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 hover:underline font-semibold">Discord</a>
+                </div>
+            </Section>
+        </div>
+    );
+}
