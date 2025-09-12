@@ -2,14 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/assets/owfn.png" />
+    <link rel="icon" type="image/png" href="/assets/owfn-coin.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Official World Family Network (OWFN)</title>
 
     <!-- Social Media Preview / Open Graph Tags -->
     <meta property="og:title" content="Official World Family Network (OWFN)" />
     <meta property="og:description" content="A global network united by the vision to build a better world through technology and humanity." />
-    <meta property="og:image" content="https://www.owfn.org/assets/owfn.png" />
+    <meta property="og:image" content="https://www.owfn.org/assets/owfn-coin.png" />
     <meta property="og:url" content="https://www.owfn.org/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Official World Family Network (OWFN)" />
@@ -18,7 +18,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Official World Family Network (OWFN)" />
     <meta name="twitter:description" content="A global network united by the vision to build a better world through technology and humanity." />
-    <meta name="twitter:image" content="https://www.owfn.org/assets/owfn.png" />
+    <meta name="twitter:image" content="https://www.owfn.org/assets/owfn-coin.png" />
     <meta name="twitter:url" content="https://www.owfn.org/" />
     <meta name="twitter:site" content="@OWFN_Official" />
     
@@ -137,6 +137,49 @@
         }
         .light .presale-card:hover {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .coin-perspective {
+            perspective: 1500px;
+        }
+        .coin-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+        .coin {
+            transform-style: preserve-3d;
+            transition: transform 0.1s linear;
+            will-change: transform;
+        }
+        .coin-shadow {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            width: 80%;
+            height: 20px;
+            background: black;
+            border-radius: 50%;
+            filter: blur(20px);
+            opacity: 0.3;
+            transform: translateX(-50%) rotateX(90deg) translateZ(-120px);
+            transition: transform 0.1s linear, opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .coin-glare {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.5), transparent 50%);
+            opacity: var(--o, 0);
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            mix-blend-mode: overlay;
         }
     </style>
     <link rel="stylesheet" href="https://esm.sh/@solana/wallet-adapter-react-ui@^0.9.39/styles.css" />

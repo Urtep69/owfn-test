@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'wouter';
 import { Target, Users, Zap } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
@@ -16,17 +16,77 @@ const FeatureCard = ({ icon, title, children }: { icon: React.ReactNode, title: 
 
 export default function Home() {
     const { t } = useAppContext();
+    const coinRef = useRef<HTMLDivElement>(null);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!coinRef.current) return;
+        const rect = coinRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const width = rect.width;
+        const height = rect.height;
+
+        const mouseX = x - width / 2;
+        const mouseY = y - height / 2;
+        const rotateY = (mouseX / (width / 2)) * 15; // Max 15 deg rotation
+        const rotateX = (-mouseY / (height / 2)) * 15; // Max 15 deg rotation
+
+        const glareX = (x / width) * 100;
+        const glareY = (y / height) * 100;
+
+        coinRef.current.style.setProperty('--mx', `${glareX}%`);
+        coinRef.current.style.setProperty('--my', `${glareY}%`);
+        coinRef.current.style.setProperty('--o', '1');
+
+        const coinElement = coinRef.current.querySelector('.coin') as HTMLElement;
+        const shadowElement = coinRef.current.querySelector('.coin-shadow') as HTMLElement;
+
+        if (coinElement) {
+            coinElement.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.07, 1.07, 1.07)`;
+        }
+        if (shadowElement) {
+            shadowElement.style.transform = `translateX(-50%) rotateX(90deg) translateZ(-120px) translateY(${mouseY * 0.5}px) translateX(${mouseX * 0.5}px)`;
+            shadowElement.style.opacity = '0.5';
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (!coinRef.current) return;
+        
+        coinRef.current.style.setProperty('--o', '0');
+
+        const coinElement = coinRef.current.querySelector('.coin') as HTMLElement;
+        const shadowElement = coinRef.current.querySelector('.coin-shadow') as HTMLElement;
+
+        if (coinElement) {
+            coinElement.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        }
+        if (shadowElement) {
+            shadowElement.style.transform = `translateX(-50%) rotateX(90deg) translateZ(-120px) translateY(0px) translateX(0px)`;
+            shadowElement.style.opacity = '0.3';
+        }
+    };
+
 
     return (
         <div className="space-y-16 animate-fade-in-up">
             <section className="text-center bg-gradient-to-br from-white to-primary-200 dark:from-darkPrimary-800 dark:to-darkPrimary-950 rounded-3xl p-8 md:p-16 shadow-3d-lg -mt-8 -mx-8">
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className="mb-6 bg-white/20 dark:bg-darkPrimary-950/20 rounded-full w-48 h-48 p-3 shadow-lg backdrop-blur-sm border-2 border-primary-300/30 dark:border-darkPrimary-100/30">
-                        <img 
-                            src={OWFN_LOGO_URL} 
-                            alt="OWFN Logo" 
-                            className="w-full h-full object-cover rounded-full"
-                        />
+                    <div
+                        ref={coinRef}
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={handleMouseLeave}
+                        className="coin-container coin-perspective mb-6 w-48 h-48 cursor-pointer"
+                    >
+                        <div className="relative w-full h-full">
+                            <img
+                                src={OWFN_LOGO_URL}
+                                alt="OWFN Coin"
+                                className="coin w-full h-full object-cover rounded-full shadow-3d-lg"
+                            />
+                            <div className="coin-glare"></div>
+                            <div className="coin-shadow"></div>
+                        </div>
                     </div>
                     <h1 className="text-4xl md:text-6xl font-extrabold text-primary-900 dark:text-white leading-tight tracking-tighter drop-shadow-lg">
                         {t('home_title')}
