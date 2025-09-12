@@ -1,4 +1,4 @@
-import type { ChatMessage, PresaleProgress } from '../types.ts';
+import type { ChatMessage, PresaleProgress } from '../lib/types.ts';
 
 // This is the new "ultramodern" service function that understands the JSON stream protocol.
 export async function getChatbotResponse(

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { PRESALE_STAGES, QUICKNODE_RPC_URL } from '../constants.ts';
-import type { PresaleStage } from '../types.ts';
+import { PRESALE_STAGES, QUICKNODE_RPC_URL } from '../lib/constants.ts';
+import type { PresaleStage } from '../lib/types.ts';
 import { ProgressBar } from '../components/ProgressBar.tsx';
 import { Loader2, Calendar, CheckCircle, Clock, PlayCircle } from 'lucide-react';
 import { Connection, PublicKey, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';

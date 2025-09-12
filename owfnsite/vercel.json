@@ -1,15 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/**/*.ts": {
-      "includeFiles": [
-        "types.ts",
-        "constants.ts",
-        "lib/assets.ts"
-      ]
-    }
-  },
   "rewrites": [
     {
       "source": "/((?!api/|.*\\.).*)",

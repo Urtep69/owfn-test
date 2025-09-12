@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import type { SocialCase } from '../types.ts';
+import type { SocialCase } from '../lib/types.ts';
 import { ProgressBar } from './ProgressBar.tsx';
 
 export const CaseCard = ({ socialCase }: { socialCase: SocialCase }) => {

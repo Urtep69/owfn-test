@@ -1,8 +1,6 @@
-
-
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { TOKEN_ALLOCATIONS } from '../constants.ts';
+import { TOKEN_ALLOCATIONS } from '../lib/constants.ts';
 
 const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {

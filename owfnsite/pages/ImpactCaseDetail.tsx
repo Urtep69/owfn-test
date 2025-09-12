@@ -4,7 +4,7 @@ import { useAppContext } from '../contexts/AppContext.tsx';
 import { ProgressBar } from '../components/ProgressBar.tsx';
 import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
-import { DISTRIBUTION_WALLETS } from '../constants.ts';
+import { DISTRIBUTION_WALLETS } from '../lib/constants.ts';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },

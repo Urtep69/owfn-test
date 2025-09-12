@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from './IconComponents.tsx';
-import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import { ADMIN_WALLET_ADDRESS } from '../lib/constants.ts';
 
 interface SidebarProps {
     isOpen: boolean;

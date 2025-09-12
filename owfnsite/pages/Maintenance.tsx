@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wrench, Twitter, Send } from 'lucide-react';
-import { PROJECT_LINKS } from '../constants.ts';
+import { PROJECT_LINKS } from '../lib/constants.ts';
 import { LanguageSwitcher } from '../components/LanguageSwitcher.tsx';
 import { DiscordIcon } from '../components/IconComponents.tsx';
 import { ThemeSwitcher } from '../components/ThemeSwitcher.tsx';

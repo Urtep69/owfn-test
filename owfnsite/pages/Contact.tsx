@@ -1,10 +1,9 @@
-
 import React, { useState, useRef } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Link } from 'wouter';
 import { Info, Handshake, Newspaper, Wrench, Loader2, CheckCircle, HelpCircle, Mail, Twitter, Send } from 'lucide-react';
 import { DiscordIcon } from '../components/IconComponents.tsx';
-import { PROJECT_LINKS } from '../constants.ts';
+import { PROJECT_LINKS } from '../lib/constants.ts';
 
 interface ContactCardProps {
     icon: React.ReactNode;

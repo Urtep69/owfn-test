@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ROADMAP_DATA } from '../constants.ts';
+import { ROADMAP_DATA } from '../lib/constants.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 
 export default function Roadmap() {

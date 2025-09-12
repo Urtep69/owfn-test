@@ -1,8 +1,6 @@
-
-
 import React from 'react';
 import { AllocationChart } from '../components/AllocationChart.tsx';
-import { TOKEN_DETAILS, TOKEN_ALLOCATIONS } from '../constants.ts';
+import { TOKEN_DETAILS, TOKEN_ALLOCATIONS } from '../lib/constants.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon } from '../components/IconComponents.tsx';
 

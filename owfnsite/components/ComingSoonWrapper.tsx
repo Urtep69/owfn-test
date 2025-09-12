@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import { ADMIN_WALLET_ADDRESS } from '../lib/constants.ts';
 import { ComingSoon } from './ComingSoon.tsx';
 
 interface ComingSoonWrapperProps {

@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Twitter, Send } from 'lucide-react';
-import { PROJECT_LINKS } from '../constants.ts';
+import { PROJECT_LINKS } from '../lib/constants.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { DiscordIcon } from './IconComponents.tsx';
 

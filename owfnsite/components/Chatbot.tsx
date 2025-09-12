@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2, Mail, Check, AlertCircle } from 'lucide-react';
 import { getChatbotResponse } from '../services/geminiService.ts';
-import type { ChatMessage } from '../types.ts';
+import type { ChatMessage } from '../lib/types.ts';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { OwfnIcon, DiscordIcon } from './IconComponents.tsx';
 

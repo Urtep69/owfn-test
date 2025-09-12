@@ -5,10 +5,12 @@ export default async function handler(req: any, res: any) {
         return res.status(405).send('Method Not Allowed');
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    // FIX: Per coding guidelines, the API key must be sourced from process.env.API_KEY.
+    const apiKey = process.env.API_KEY;
     if (!apiKey) {
-        console.error("API key is not configured in environment variables.");
-        return res.status(500).json({ error: "API key not configured." });
+        // FIX: Improved error message for consistency.
+        console.error("CRITICAL: API_KEY environment variable is not set.");
+        return res.status(500).json({ error: "Server configuration error. The site administrator needs to configure the API key." });
     }
     
     let text: string = '';

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Vote, PlusCircle, CheckCircle, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { GovernanceProposal } from '../types.ts';
+import type { GovernanceProposal } from '../lib/types.ts';
 
 const Countdown = ({ endDate }: { endDate: Date }) => {
     const { t } = useAppContext();

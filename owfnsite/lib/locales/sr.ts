@@ -1,4 +1,3 @@
-// FIX: Created a valid Serbian translation file to resolve module errors.
 export const sr = {
     // Navigation
     home: `Početna`,

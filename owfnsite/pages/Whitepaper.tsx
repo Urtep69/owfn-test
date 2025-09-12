@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, ROADMAP_DATA, PROJECT_LINKS } from '../constants.ts';
+import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, ROADMAP_DATA, PROJECT_LINKS } from '../lib/constants.ts';
 import { AllocationChart } from '../components/AllocationChart.tsx';
 import { OwfnIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';

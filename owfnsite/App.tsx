@@ -7,7 +7,7 @@ import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
 import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
 import { Layout } from './components/Layout.tsx';
-import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './constants.ts';
+import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './lib/constants.ts';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
 
 import Home from './pages/Home.tsx';

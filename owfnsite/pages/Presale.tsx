@@ -14,9 +14,9 @@ import {
     DISTRIBUTION_WALLETS,
     QUICKNODE_RPC_URL,
     QUICKNODE_WSS_URL,
-} from '../constants.ts';
+} from '../lib/constants.ts';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { PresaleTransaction, PresaleStage } from '../types.ts';
+import type { PresaleTransaction, PresaleStage } from '../lib/types.ts';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
 

@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
-import type { ChatMessage } from '../types.ts';
-import { PRESALE_STAGES, SUPPORTED_LANGUAGES } from '../constants.ts';
+import type { ChatMessage } from '../lib/types.ts';
+import { PRESALE_STAGES, SUPPORTED_LANGUAGES } from '../lib/constants.ts';
 
 /**
  * The definitive, "anti-crash" history builder. This function is
@@ -61,9 +61,11 @@ export default async function handler(req: any, res: any) {
             return res.status(405).json({ error: 'Method Not Allowed' });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
+        // FIX: Per coding guidelines, the API key must be sourced from process.env.API_KEY.
+        const apiKey = process.env.API_KEY;
         if (!apiKey) {
-            console.error("CRITICAL: GEMINI_API_KEY environment variable is not set.");
+            // FIX: Updated error message to reference the correct environment variable.
+            console.error("CRITICAL: API_KEY environment variable is not set.");
             return res.status(500).json({ error: "Server configuration error. The site administrator needs to configure the API key." });
         }
 

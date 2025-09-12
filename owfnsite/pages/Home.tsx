@@ -1,10 +1,8 @@
-
-
 import React from 'react';
 import { Link } from 'wouter';
 import { Target, Users, Zap } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.tsx';
-import { OWFN_LOGO_URL } from '../constants.ts';
+import { OWFN_LOGO_URL } from '../lib/constants.ts';
 
 const FeatureCard = ({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform">

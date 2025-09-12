@@ -9,11 +9,11 @@ import {
     PRESALE_STAGES,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
-} from '../constants.ts';
+} from '../lib/constants.ts';
 import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User, PieChart, RotateCcw } from 'lucide-react';
 import { SolIcon } from '../components/IconComponents.tsx';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { Token, PresaleStage } from '../types.ts';
+import type { Token, PresaleStage } from '../lib/types.ts';
 
 interface PresaleTx {
     signature: string;

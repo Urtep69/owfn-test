@@ -3,8 +3,8 @@ import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { ImpactBadge, ImpactNFT } from '../types.ts';
-import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import type { ImpactBadge, ImpactNFT } from '../lib/types.ts';
+import { ADMIN_WALLET_ADDRESS } from '../lib/constants.ts';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
 import { formatNumber } from '../lib/utils.ts';
 
