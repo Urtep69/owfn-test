@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Link } from 'wouter';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import type { SocialCase } from '../lib/types.ts';
-import { ADMIN_WALLET_ADDRESS } from '../lib/constants.ts';
-import { translateText } from '../services/geminiService.ts';
-import { SUPPORTED_LANGUAGES } from '../lib/constants.ts';
+import { useAppContext } from '../contexts/AppContext.js';
+import type { SocialCase } from '../lib/types.js';
+import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
+import { translateText } from '../services/geminiService.js';
+import { SUPPORTED_LANGUAGES } from '../lib/constants.js';
 import { HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
 
 const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }) => {

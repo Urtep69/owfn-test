@@ -3,7 +3,7 @@
 import React from 'react';
 import { Link } from 'wouter';
 import { HeartHandshake, BookOpen, HomeIcon, Globe, Handshake as HandshakeIcon, Heart, Zap, ShieldCheck, Link as LinkIcon, CheckCircle } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
 
 export default function About() {
     const { t } = useAppContext();

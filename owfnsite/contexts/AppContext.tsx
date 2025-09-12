@@ -1,11 +1,12 @@
+
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { useTheme } from '../hooks/useTheme.ts';
-import { useLocalization } from '../hooks/useLocalization.ts';
-import { useSolana } from '../hooks/useSolana.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, PresaleStage, PresaleProgress } from '../lib/types.ts';
-import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, PRESALE_STAGES, QUICKNODE_RPC_URL } from '../lib/constants.ts';
-import { translateText } from '../services/geminiService.ts';
+import { useTheme } from '../hooks/useTheme.js';
+import { useLocalization } from '../hooks/useLocalization.js';
+import { useSolana } from '../hooks/useSolana.js';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, PresaleStage, PresaleProgress } from '../lib/types.js';
+import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, PRESALE_STAGES, QUICKNODE_RPC_URL } from '../lib/constants.js';
+import { translateText } from '../services/geminiService.js';
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const currentStage: PresaleStage = PRESALE_STAGES[0];

@@ -1,12 +1,13 @@
+
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
-import { useAppContext } from '../contexts/AppContext.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
 import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
-import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { ImpactBadge, ImpactNFT } from '../lib/types.ts';
-import { ADMIN_WALLET_ADDRESS } from '../lib/constants.ts';
-import { ComingSoonWrapper } from '../components/ComingSoonWrapper.tsx';
-import { formatNumber } from '../lib/utils.ts';
+import { AddressDisplay } from '../components/AddressDisplay.js';
+import type { ImpactBadge, ImpactNFT } from '../lib/types.js';
+import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
+import { ComingSoonWrapper } from '../components/ComingSoonWrapper.js';
+import { formatNumber } from '../lib/utils.js';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },

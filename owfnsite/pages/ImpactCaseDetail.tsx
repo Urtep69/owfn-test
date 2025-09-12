@@ -1,10 +1,11 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { ProgressBar } from '../components/ProgressBar.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
+import { ProgressBar } from '../components/ProgressBar.js';
 import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
-import { DISTRIBUTION_WALLETS } from '../lib/constants.ts';
+import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.js';
+import { DISTRIBUTION_WALLETS } from '../lib/constants.js';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },

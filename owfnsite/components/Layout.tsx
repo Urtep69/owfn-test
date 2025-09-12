@@ -1,10 +1,10 @@
 
 
 import React, { useState } from 'react';
-import { Header } from './Header.tsx';
-import { Footer } from './Footer.tsx';
-import { Chatbot } from './Chatbot.tsx';
-import { Sidebar } from './Sidebar.tsx';
+import { Header } from './Header.js';
+import { Footer } from './Footer.js';
+import { Chatbot } from './Chatbot.js';
+import { Sidebar } from './Sidebar.js';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);

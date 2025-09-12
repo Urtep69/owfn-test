@@ -1,3 +1,4 @@
+
 import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
@@ -5,34 +6,34 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
-import { AppProvider, useAppContext } from './contexts/AppContext.tsx';
-import { Layout } from './components/Layout.tsx';
-import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './lib/constants.ts';
-import { ComingSoonWrapper } from './components/ComingSoonWrapper.tsx';
+import { AppProvider, useAppContext } from './contexts/AppContext.js';
+import { Layout } from './components/Layout.js';
+import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './lib/constants.js';
+import { ComingSoonWrapper } from './components/ComingSoonWrapper.js';
 
-import Home from './pages/Home.tsx';
-import Presale from './pages/Presale.tsx';
-import PresaleStages from './pages/PresaleStages.tsx';
-import About from './pages/About.tsx';
-import Tokenomics from './pages/Tokenomics.tsx';
-import Roadmap from './pages/Roadmap.tsx';
-import Staking from './pages/Staking.tsx';
-import Vesting from './pages/Vesting.tsx';
-import Donations from './pages/Donations.tsx';
-import Dashboard from './pages/Dashboard.tsx';
-import Profile from './pages/Profile.tsx';
-import ImpactPortal from './pages/ImpactPortal.tsx';
-import ImpactCaseDetail from './pages/ImpactCaseDetail.tsx';
-import ImpactCategory from './pages/ImpactCategory.tsx';
-import Partnerships from './pages/Partnerships.tsx';
-import FAQ from './pages/FAQ.tsx';
-import TokenDetail from './pages/TokenDetail.tsx';
-import Whitepaper from './pages/Whitepaper.tsx';
-import Airdrop from './pages/Airdrop.tsx';
-import Governance from './pages/Governance.tsx';
-import Maintenance from './pages/Maintenance.tsx';
-import AdminPresale from './pages/AdminPresale.tsx';
-import Contact from './pages/Contact.tsx';
+import Home from './pages/Home.js';
+import Presale from './pages/Presale.js';
+import PresaleStages from './pages/PresaleStages.js';
+import About from './pages/About.js';
+import Tokenomics from './pages/Tokenomics.js';
+import Roadmap from './pages/Roadmap.js';
+import Staking from './pages/Staking.js';
+import Vesting from './pages/Vesting.js';
+import Donations from './pages/Donations.js';
+import Dashboard from './pages/Dashboard.js';
+import Profile from './pages/Profile.js';
+import ImpactPortal from './pages/ImpactPortal.js';
+import ImpactCaseDetail from './pages/ImpactCaseDetail.js';
+import ImpactCategory from './pages/ImpactCategory.js';
+import Partnerships from './pages/Partnerships.js';
+import FAQ from './pages/FAQ.js';
+import TokenDetail from './pages/TokenDetail.js';
+import Whitepaper from './pages/Whitepaper.js';
+import Airdrop from './pages/Airdrop.js';
+import Governance from './pages/Governance.js';
+import Maintenance from './pages/Maintenance.js';
+import AdminPresale from './pages/AdminPresale.js';
+import Contact from './pages/Contact.js';
 import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {

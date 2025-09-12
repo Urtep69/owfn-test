@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { LanguageSwitcher } from './LanguageSwitcher.tsx';
-import { ThemeSwitcher } from './ThemeSwitcher.tsx';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { WalletManagerIcon } from './IconComponents.tsx';
+import { LanguageSwitcher } from './LanguageSwitcher.js';
+import { ThemeSwitcher } from './ThemeSwitcher.js';
+import { useAppContext } from '../contexts/AppContext.js';
+import { WalletManagerIcon } from './IconComponents.js';
 
 interface HeaderProps {
     toggleSidebar: () => void;

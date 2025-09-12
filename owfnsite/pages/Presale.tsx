@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
+import { OwfnIcon, SolIcon } from '../components/IconComponents.js';
 import { 
     TOKEN_DETAILS, 
     PRESALE_STAGES, 
@@ -14,9 +15,9 @@ import {
     DISTRIBUTION_WALLETS,
     QUICKNODE_RPC_URL,
     QUICKNODE_WSS_URL,
-} from '../lib/constants.ts';
-import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { PresaleTransaction, PresaleStage } from '../lib/types.ts';
+} from '../lib/constants.js';
+import { AddressDisplay } from '../components/AddressDisplay.js';
+import type { PresaleTransaction, PresaleStage } from '../lib/types.js';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
 

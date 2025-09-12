@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { useRoute, Link, useLocation } from 'wouter';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import type { TokenDetails } from '../lib/types.ts';
+import { useAppContext } from '../contexts/AppContext.js';
+import type { TokenDetails } from '../lib/types.js';
 import { ArrowLeft, Loader2, AlertTriangle, Info, BarChart2, ShieldCheck, PieChart, CheckCircle, XCircle } from 'lucide-react';
-import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import { formatNumber } from '../lib/utils.ts';
+import { AddressDisplay } from '../components/AddressDisplay.js';
+import { formatNumber } from '../lib/utils.js';
 
 const DetailItem = ({ label, value, children }: { label: string, value?: React.ReactNode, children?: React.ReactNode }) => (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50">

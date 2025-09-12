@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Image } from 'lucide-react';
-import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from '../lib/assets.ts';
+import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from '../lib/assets.js';
 
 export const OwfnIcon = ({ className = 'w-6 h-6' }: { className?: string }) => (
   <img 

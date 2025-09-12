@@ -1,7 +1,8 @@
+
 import { useState, useCallback, useMemo } from 'react';
-import { translations } from '../lib/locales/index.ts';
-import { SUPPORTED_LANGUAGES } from '../lib/constants.ts';
-import type { Language } from '../lib/types.ts';
+import { translations } from '../lib/locales/index.js';
+import { SUPPORTED_LANGUAGES } from '../lib/constants.js';
+import type { Language } from '../lib/types.js';
 
 export const useLocalization = () => {
   const [language, setLanguage] = useState<string>(() => {

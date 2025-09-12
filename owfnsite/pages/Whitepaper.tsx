@@ -1,9 +1,10 @@
+
 import React from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, ROADMAP_DATA, PROJECT_LINKS } from '../lib/constants.ts';
-import { AllocationChart } from '../components/AllocationChart.tsx';
-import { OwfnIcon } from '../components/IconComponents.tsx';
-import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
+import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, ROADMAP_DATA, PROJECT_LINKS } from '../lib/constants.js';
+import { AllocationChart } from '../components/AllocationChart.js';
+import { OwfnIcon } from '../components/IconComponents.js';
+import { AddressDisplay } from '../components/AddressDisplay.js';
 import { CheckCircle, Users, BarChart2, Map as MapIcon, Star, Link as LinkIcon, FileText } from 'lucide-react';
 
 const Section = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
@@ -118,11 +119,4 @@ export default function Whitepaper() {
                 <p className="mb-4">{t('whitepaper_community_desc')}</p>
                 <div className="flex flex-wrap gap-x-6 gap-y-2">
                     <a href={PROJECT_LINKS.website} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 hover:underline font-semibold">Website</a>
-                    <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 hover:underline font-semibold">X.com (Twitter)</a>
-                    <a href={PROJECT_LINKS.telegramGroup} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 hover:underline font-semibold">Telegram Group</a>
-                    <a href={PROJECT_LINKS.discord} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 hover:underline font-semibold">Discord</a>
-                </div>
-            </Section>
-        </div>
-    );
-}
+                    <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer

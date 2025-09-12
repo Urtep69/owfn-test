@@ -1,7 +1,8 @@
+
 import React, { useState, useMemo } from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { DISTRIBUTION_WALLETS } from '../lib/constants.ts';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
+import { DISTRIBUTION_WALLETS } from '../lib/constants.js';
+import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.js';
 import { AlertTriangle, Info } from 'lucide-react';
 
 const tokens = [

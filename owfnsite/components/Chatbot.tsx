@@ -1,10 +1,11 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
 import { MessageCircle, X, Send, User, Loader2, Twitter, Minus, Maximize2, Minimize2, Mail, Check, AlertCircle } from 'lucide-react';
-import { getChatbotResponse } from '../services/geminiService.ts';
-import type { ChatMessage } from '../lib/types.ts';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { OwfnIcon, DiscordIcon } from './IconComponents.tsx';
+import { getChatbotResponse } from '../services/geminiService.js';
+import type { ChatMessage } from '../lib/types.js';
+import { useAppContext } from '../contexts/AppContext.js';
+import { OwfnIcon, DiscordIcon } from './IconComponents.js';
 
 const MAX_HISTORY_MESSAGES = 8; // Keep last 4 user/model pairs for context to prevent memory errors on the server.
 
