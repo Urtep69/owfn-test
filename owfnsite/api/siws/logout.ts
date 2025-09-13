@@ -8,7 +8,7 @@ export default async function handler(req: any, res: any) {
     res.setHeader('Set-Cookie', serialize('siws-session', '', {
         httpOnly: true,
         secure: process.env.NODE_ENV !== 'development',
-        sameSite: 'strict',
+        sameSite: 'lax',
         path: '/',
         maxAge: -1
     }));

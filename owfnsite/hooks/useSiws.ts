@@ -71,7 +71,7 @@ export const useSiws = (): SiwsReturn => {
         try {
             const challengeRes = await fetch('/api/siws/challenge');
             if (!challengeRes.ok) throw new Error('Failed to get challenge');
-            const { nonce, issuedAt } = await challengeRes.json();
+            const { nonce, issuedAt, challengeToken } = await challengeRes.json();
             
             const message = buildSiwsMessage(
                 window.location.host,
@@ -95,6 +95,7 @@ export const useSiws = (): SiwsReturn => {
                     issuedAt,
                     domain: window.location.host,
                     uri: window.location.origin,
+                    challengeToken,
                 })
             });
 

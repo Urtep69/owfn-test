@@ -1,4 +1,4 @@
-import { serialize } from 'cookie';
+import * as jose from 'jose';
 
 function generateNonce() {
     return crypto.randomUUID();
@@ -9,20 +9,28 @@ export default async function handler(req: any, res: any) {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+        console.error("CRITICAL: JWT_SECRET environment variable is not set.");
+        return res.status(500).json({ error: 'Server configuration error.' });
+    }
+
     try {
         const nonce = generateNonce();
+        const issuedAt = new Date().toISOString();
+        const secretKey = new TextEncoder().encode(jwtSecret);
+
+        const challengeToken = await new jose.SignJWT({ nonce })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setIssuedAt()
+            .setExpirationTime('5m') // Jeton de provocare cu durată scurtă de viață
+            .sign(secretKey);
         
-        res.setHeader('Set-Cookie', serialize('siws-nonce', nonce, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV !== 'development',
-            sameSite: 'strict',
-            path: '/', // Changed from '/api/siws' to '/' for universal access
-            maxAge: 5 * 60 // 5 minutes
-        }));
-        
+        // Nu mai setăm cookie-uri aici
         res.status(200).json({
-            nonce: nonce,
-            issuedAt: new Date().toISOString()
+            nonce,
+            issuedAt,
+            challengeToken
         });
 
     } catch (error) {

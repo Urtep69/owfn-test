@@ -31,7 +31,13 @@ export default async function handler(req: any, res: any) {
 
     } catch (error) {
         console.warn("JWT verification failed in /me handler:", error);
-         res.setHeader('Set-Cookie', serialize('siws-session', '', { maxAge: -1, path: '/' }));
+         res.setHeader('Set-Cookie', serialize('siws-session', '', { 
+            maxAge: -1, 
+            path: '/',
+            httpOnly: true,
+            secure: process.env.NODE_ENV !== 'development',
+            sameSite: 'lax',
+        }));
         return res.status(401).json({ error: 'Session expired or invalid.' });
     }
 }
