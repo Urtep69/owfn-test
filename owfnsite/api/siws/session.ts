@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual, randomBytes } from 'crypto';
-import { serialize } from 'cookie';
+import { serialize, parse } from 'cookie';
 import type { UserSession } from '../../lib/types.js';
 
 let SESSION_SECRET: string;
@@ -59,7 +59,9 @@ export function createSessionCookie(session: UserSession | { nonce: string }, ma
 }
 
 export function getSession(req: any): UserSession | { nonce: string } | null {
-    const cookie = req.cookies['auth-session'];
+    // Manually parse the cookie header for robustness in any serverless environment
+    const cookies = parse(req.headers.cookie || '');
+    const cookie = cookies['auth-session'];
     if (!cookie) return null;
 
     const parts = cookie.split('.');
