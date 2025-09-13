@@ -295,7 +295,7 @@ export default function Donations() {
             
             <DonationStats allTransactions={allDonations} />
             
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div className="grid lg:grid-cols-2 gap-12">
                 <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d lg:sticky top-24">
                     <h2 className="text-2xl font-bold mb-6 text-center">{t('donations_form_title')}</h2>
                     <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-3 rounded-lg text-sm text-primary-700 dark:text-darkPrimary-300 mb-6 flex items-start gap-2">
@@ -331,7 +331,7 @@ export default function Donations() {
                                         disabled={!solana.connected || !currentUserToken || currentUserToken.balance <= 0}
                                         className="flex-grow text-xs bg-primary-200/50 hover:bg-primary-200 dark:bg-darkPrimary-700/50 dark:hover:bg-darkPrimary-700 py-1 px-3 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {p === 100 ? 'MAX' : `${p}%`}
+                                        {p === 100 ? t('max_button') : `${p}%`}
                                     </button>
                                 ))}
                             </div>
@@ -368,7 +368,7 @@ export default function Donations() {
                         </button>
                     </div>
                 </div>
-                <div className="min-h-[600px]">
+                <div>
                     <LiveDonationFeed allTransactions={allDonations} isLoading={isLoading} />
                 </div>
             </div>

@@ -48,11 +48,11 @@ export const LiveDonationFeed = ({ allTransactions, isLoading }: LiveDonationFee
 
         if (seconds < 60) return t('just_now');
         const minutes = Math.floor(seconds / 60);
-        if (minutes < 60) return `${minutes}m ago`;
+        if (minutes < 60) return t('time_minutes_ago', { minutes });
         const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `${hours}h ago`;
+        if (hours < 24) return t('time_hours_ago', { hours });
         const days = Math.floor(hours / 24);
-        return `${days}d ago`;
+        return t('time_days_ago', { days });
     };
 
     return (

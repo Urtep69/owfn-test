@@ -231,6 +231,10 @@ export const ro = {
     donations_usdc_stats_title: `Statistici Donații USDC`,
     donations_usdt_stats_title: `Statistici Donații USDT`,
     donations_owfn_stats_title: `Statistici Donații OWFN`,
+    max_button: `MAX`,
+    time_minutes_ago: `acum {minutes}m`,
+    time_hours_ago: `acum {hours}o`,
+    time_days_ago: `acum {days}z`,
     
     // Dashboard
     wallet_monitor: `Dashboard Monitorizare Portofele`,

@@ -231,6 +231,10 @@ export const en = {
     donations_usdc_stats_title: `USDC Donation Stats`,
     donations_usdt_stats_title: `USDT Donation Stats`,
     donations_owfn_stats_title: `OWFN Donation Stats`,
+    max_button: `MAX`,
+    time_minutes_ago: `{minutes}m ago`,
+    time_hours_ago: `{hours}h ago`,
+    time_days_ago: `{days}d ago`,
 
     // Dashboard
     wallet_monitor: `Wallet Monitoring Dashboard`,
