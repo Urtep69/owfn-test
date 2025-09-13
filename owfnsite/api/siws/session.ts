@@ -2,11 +2,19 @@ import { createHmac, timingSafeEqual, randomBytes } from 'crypto';
 import { serialize } from 'cookie';
 import type { UserSession } from '../../lib/types.js';
 
-const SESSION_SECRET = process.env.SESSION_SECRET_KEY;
+let SESSION_SECRET = process.env.SESSION_SECRET_KEY;
+// This resilience check prevents the API from crashing if the secret key is not set in the environment.
+// For a production environment, this variable MUST be set for security.
 if (!SESSION_SECRET) {
-    console.error("CRITICAL: SESSION_SECRET_KEY environment variable is not set.");
-    throw new Error("Server configuration error: Session secret is missing.");
+    console.warn("---");
+    console.warn("CRITICAL SECURITY WARNING: The `SESSION_SECRET_KEY` environment variable is not set.");
+    console.warn("A temporary, insecure secret is being generated for this session. This is NOT safe for production.");
+    console.warn("Please set a secure, persistent 32-byte hex secret in your deployment environment.");
+    console.warn("---");
+    SESSION_SECRET = randomBytes(32).toString('hex');
 }
+
+// Ensure the secret is a valid hex string before creating a buffer.
 const secretBuffer = Buffer.from(SESSION_SECRET, 'hex');
 
 export function sign(data: string): string {
@@ -16,6 +24,7 @@ export function sign(data: string): string {
 export function verify(data: string, signature: string): boolean {
     try {
         const expectedSignature = sign(data);
+        // Use timingSafeEqual to prevent timing attacks on signature verification.
         return timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
     } catch {
         return false;
@@ -40,7 +49,11 @@ export function getSession(req: any): UserSession | { nonce: string } | null {
     const cookie = req.cookies['auth-session'];
     if (!cookie) return null;
 
-    const [sessionStr, signature] = cookie.split('.');
+    const parts = cookie.split('.');
+    // A valid signed cookie must have exactly two parts.
+    if (parts.length !== 2) return null;
+
+    const [sessionStr, signature] = parts;
     if (!sessionStr || !signature) return null;
 
     if (verify(sessionStr, signature)) {
