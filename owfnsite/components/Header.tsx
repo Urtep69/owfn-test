@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat } from 'lucide-react';
+import { LogOut, Loader2, Copy, Check, ExternalLink, ChevronRight, X, Menu, Repeat, LogIn } from 'lucide-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { LanguageSwitcher } from './LanguageSwitcher.js';
 import { ThemeSwitcher } from './ThemeSwitcher.js';
@@ -13,9 +12,10 @@ interface HeaderProps {
 }
 
 const ConnectButton = () => {
-    const { t, solana } = useAppContext();
-    const { setVisible } = useWalletModal();
+    const { t, solana, siws, setWalletModalOpen } = useAppContext();
     const { connected, address, connecting, disconnectWallet } = solana;
+    const { isAuthenticated, signIn, signOut, isLoading: isSiwsLoading, isSessionLoading } = siws;
+    
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -39,7 +39,7 @@ const ConnectButton = () => {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    if (connecting) {
+    if (connecting || isSessionLoading) {
         return (
             <div className="flex items-center space-x-3 px-4 py-2 bg-primary-200 dark:bg-darkPrimary-800 rounded-lg">
                 <Loader2 size={18} className="animate-spin text-primary-600 dark:text-darkPrimary-400" />
@@ -53,13 +53,29 @@ const ConnectButton = () => {
     if (!connected || !address) {
         return (
             <button
-                onClick={() => setVisible(true)}
+                onClick={() => setWalletModalOpen(true)}
                 className="group relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-bold text-accent-950 dark:text-darkPrimary-950 rounded-lg shadow-md transition-transform transform hover:scale-105"
             >
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-accent-400 to-accent-500 dark:from-darkAccent-500 dark:to-darkAccent-600"></span>
                 <span className="absolute bottom-0 right-0 w-full h-full transition-all duration-500 ease-in-out transform translate-x-full translate-y-full bg-accent-500 dark:bg-darkAccent-600 group-hover:translate-x-0 group-hover:translate-y-0"></span>
                 <span className="absolute inset-0 w-full h-full duration-500 ease-in-out delay-200 opacity-0 group-hover:opacity-100 group-hover:animate-glow"></span>
                 <span className="relative">{t('connect_wallet')}</span>
+            </button>
+        );
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <button
+                onClick={signIn}
+                disabled={isSiwsLoading}
+                className="group relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-bold text-blue-950 dark:text-darkPrimary-950 rounded-lg shadow-md transition-transform transform hover:scale-105 disabled:opacity-70 disabled:cursor-wait"
+            >
+                 <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-400 to-blue-500 dark:from-blue-500 dark:to-blue-600"></span>
+                 <span className="relative flex items-center gap-2">
+                    {isSiwsLoading ? <Loader2 size={18} className="animate-spin" /> : <LogIn size={18} />}
+                    {isSiwsLoading ? t('processing') : 'Sign In'}
+                </span>
             </button>
         );
     }
@@ -70,15 +86,11 @@ const ConnectButton = () => {
                 onClick={() => setDropdownOpen(prev => !prev)}
                 className="flex items-center bg-[#22252A] dark:bg-darkPrimary-800 border border-green-400/30 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:border-green-400/70 shadow-lg"
             >
-                <div 
-                    className="bg-green-500 text-white font-bold py-[7px] pl-4 pr-5 text-xs rounded-l-full"
-                    style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)' }}
-                >
-                    NEW
+                <div className="flex items-center justify-center pl-3 pr-3">
+                    <Check size={16} className="text-green-400" />
                 </div>
-                <div className="flex items-center space-x-2 pl-2 pr-3">
-                    <WalletManagerIcon className="w-5 h-5" />
-                    <span className="text-green-400 text-xs tracking-wider">Wallet Manager</span>
+                <div className="flex items-center space-x-2 pr-3">
+                    <span className="text-green-400 text-xs tracking-wider font-mono">{truncateAddress(address)}</span>
                     <ChevronRight size={16} className="text-green-400/70" />
                 </div>
             </button>
@@ -97,7 +109,7 @@ const ConnectButton = () => {
                             {copied ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
                         </button>
                         <button
-                            onClick={() => setVisible(true)}
+                            onClick={() => setWalletModalOpen(true)}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 transition-colors"
                         >
                             <span>{t('change_wallet', {defaultValue: 'Change Wallet'})}</span>
@@ -113,13 +125,21 @@ const ConnectButton = () => {
                             <ExternalLink size={16} />
                         </a>
                     </div>
-                    <div className="p-2 border-t border-primary-200 dark:border-darkPrimary-700">
+                    <div className="p-2 border-t border-primary-200 dark:border-darkPrimary-700 space-y-1">
+                         <button
+                            onClick={signOut}
+                            disabled={isSiwsLoading}
+                            className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-primary-800 dark:text-darkPrimary-200 hover:bg-primary-100 dark:hover:bg-darkPrimary-700 font-semibold transition-colors"
+                        >
+                            <span>Sign Out</span>
+                            <LogOut size={16} />
+                        </button>
                          <button
                             onClick={disconnectWallet}
                             className="w-full flex items-center justify-between text-left px-3 py-2 text-sm rounded-md text-red-600 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10 font-semibold transition-colors"
                         >
                             <span>{t('disconnect_wallet')}</span>
-                            <LogOut size={16} />
+                            <X size={16} />
                         </button>
                     </div>
                 </div>

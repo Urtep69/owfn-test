@@ -150,20 +150,6 @@ export interface PresaleTransaction {
   time: Date;
 }
 
-export interface SiwsSession {
-  publicKey: string;
-  signedAt: number;
-}
-
-export interface SiwsReturn {
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  isSessionLoading: boolean;
-  session: SiwsSession | null;
-  signIn: () => Promise<boolean>;
-  signOut: () => Promise<void>;
-}
-
 export interface PresaleStage {
   phase: number;
   titleKey: string;
@@ -189,4 +175,17 @@ export interface PresaleProgress {
   owfnSold: number;
   contributors: number;
   isLoading: boolean;
+}
+
+export interface SiwsSession {
+  publicKey: string;
+}
+
+export interface SiwsReturn {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  isSessionLoading: boolean;
+  session: SiwsSession | null;
+  signIn: () => Promise<boolean>;
+  signOut: () => Promise<void>;
 }
