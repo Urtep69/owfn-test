@@ -1,4 +1,3 @@
-// FIX: The file api/siws/verify.ts was a placeholder and has been implemented to handle the server-side logic for Sign-In with Solana (SIWS). This includes message reconstruction, signature verification, and secure session (JWT) creation.
 import { parse, serialize } from 'cookie';
 import bs58 from 'bs58';
 import nacl from 'tweetnacl';
@@ -29,8 +28,8 @@ export default async function handler(req: any, res: any) {
             return res.status(400).json({ error: 'Nonce not found. Please try signing in again.' });
         }
 
-        const { signature, publicKey, issuedAt } = req.body;
-        if (!signature || !publicKey || !issuedAt) {
+        const { signature, publicKey, issuedAt, domain, uri } = req.body;
+        if (!signature || !publicKey || !issuedAt || !domain || !uri) {
             return res.status(400).json({ error: 'Missing required fields.' });
         }
 
@@ -42,16 +41,12 @@ export default async function handler(req: any, res: any) {
             return res.status(400).json({ error: 'Sign-in request has expired.' });
         }
 
-        // --- Reconstruct and Verify Message ---
-        // CORRECTLY determine the protocol (http vs https)
-        const proto = req.headers['x-forwarded-proto'] || 'http';
-        const origin = `${proto}://${req.headers.host}`;
-
+        // --- Reconstruct and Verify Message using client-provided data ---
         const message = buildSiwsMessage(
-            req.headers.host,
+            domain,
             publicKey,
             'Sign in to the Official World Family Network.',
-            origin,
+            uri,
             nonce,
             issuedAt
         );

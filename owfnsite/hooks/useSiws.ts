@@ -92,7 +92,9 @@ export const useSiws = (): SiwsReturn => {
                 body: JSON.stringify({
                     signature,
                     publicKey: publicKey.toBase58(),
-                    issuedAt
+                    issuedAt,
+                    domain: window.location.host,
+                    uri: window.location.origin,
                 })
             });
 
