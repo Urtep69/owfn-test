@@ -126,7 +126,7 @@ export default async function handler(req: any, res: any) {
             `- **DEX Launch Price (Estimate)**: 1 SOL ≈ 6,670,000 OWFN`,
             `- **Contribution Limits**: Minimum 0.0001 SOL, Maximum 10 SOL per wallet.`,
             `- **Funding Caps**: Soft Cap is 105 SOL. Hard Cap is 200 SOL.`,
-            `- **Bonus Tiers (Applied per purchase)**:`,
+            `- **Bonus Tiers (Important Rule)**: The bonus is applied ONLY to a single transaction that meets the threshold. For example, a single purchase of 1 SOL gets a 5% bonus. Multiple smaller purchases (e.g., 0.5 SOL + 0.5 SOL) are NOT added together to qualify for a bonus.`,
             `  - 1 to 2.499 SOL (Copper Level): +5% bonus`,
             `  - 2.5 to 4.999 SOL (Bronze Level): +8% bonus`,
             `  - 5 to 9.999 SOL (Silver Level): +12% bonus`,

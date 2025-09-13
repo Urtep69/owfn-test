@@ -146,38 +146,40 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        // Step 1: Aggregate total SOL (in lamports) for each contributor.
-        const contributorSolMap = new Map<string, bigint>();
-        for (const tx of transactions) {
-            const currentLamports = contributorSolMap.get(tx.from) || 0n;
-            contributorSolMap.set(tx.from, currentLamports + BigInt(tx.lamports));
-        }
-
-        // Step 2: Calculate final OWFN amount for each contributor based on their *total* SOL.
-        const results: AggregatedContributor[] = [];
+        const contributorMap = new Map<string, { totalSol: number; totalOwfn: bigint }>();
         const presaleRateBigInt = BigInt(currentStage.rate);
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
         const sortedTiers = [...currentStage.bonusTiers].sort((a, b) => b.threshold - a.threshold);
-
-        for (const [address, totalLamports] of contributorSolMap.entries()) {
-            const totalSol = Number(totalLamports) / LAMPORTS_PER_SOL;
-            
-            // Find the single applicable bonus tier for the total contribution.
-            const applicableTier = sortedTiers.find(tier => totalSol >= tier.threshold);
-            
-            // Calculate base OWFN from total lamports.
-            const baseOwfn = (totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
-            
-            let totalOwfn = baseOwfn;
+    
+        for (const tx of transactions) {
+            const lamports = BigInt(tx.lamports);
+            const solAmount = tx.solAmount;
+    
+            // Calculate base OWFN for this single transaction
+            const baseOwfn = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
+    
+            // Find bonus ONLY for this single transaction
+            const applicableTier = sortedTiers.find(tier => solAmount >= tier.threshold);
+            let bonusOwfn = 0n;
             if (applicableTier) {
-                const bonusAmount = (baseOwfn * BigInt(applicableTier.percentage)) / 100n;
-                totalOwfn += bonusAmount;
+                bonusOwfn = (baseOwfn * BigInt(applicableTier.percentage)) / 100n;
             }
-            
+    
+            const totalOwfnForTx = baseOwfn + bonusOwfn;
+    
+            // Aggregate results for the contributor
+            const currentData = contributorMap.get(tx.from) || { totalSol: 0, totalOwfn: 0n };
+            currentData.totalSol += solAmount;
+            currentData.totalOwfn += totalOwfnForTx;
+            contributorMap.set(tx.from, currentData);
+        }
+    
+        const results: AggregatedContributor[] = [];
+        for (const [address, data] of contributorMap.entries()) {
             results.push({
                 address,
-                totalSol,
-                totalOwfn,
+                totalSol: data.totalSol,
+                totalOwfn: data.totalOwfn,
             });
         }
         return results;
