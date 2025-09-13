@@ -1,6 +1,6 @@
 import { verify as verifySignature } from 'crypto';
 import bs58 from 'bs58';
-import { createSessionCookie, getSession, clearSessionCookie } from './session.js';
+import { createSessionCookie, getSession } from './session.js';
 
 // Simple SIWS message parser
 function parseSiwsMessage(message: string): { domain: string, address: string, nonce: string } | null {
@@ -69,8 +69,8 @@ export default async function handler(req: any, res: any) {
         };
         const sessionCookie = createSessionCookie(userSession, 60 * 60 * 24 * 7); // 7-day session
 
-        // Set the new session cookie and clear the old nonce cookie
-        res.setHeader('Set-Cookie', [sessionCookie, clearSessionCookie()]);
+        // Set the new user session cookie. This overwrites the old nonce cookie.
+        res.setHeader('Set-Cookie', sessionCookie);
         res.status(200).json(userSession);
 
     } catch (error) {
