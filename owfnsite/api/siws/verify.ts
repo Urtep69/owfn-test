@@ -43,11 +43,15 @@ export default async function handler(req: any, res: any) {
         }
 
         // --- Reconstruct and Verify Message ---
+        // CORRECTLY determine the protocol (http vs https)
+        const proto = req.headers['x-forwarded-proto'] || 'http';
+        const origin = `${proto}://${req.headers.host}`;
+
         const message = buildSiwsMessage(
             req.headers.host,
             publicKey,
             'Sign in to the Official World Family Network.',
-            new URL(req.url, `https://${req.headers.host}`).origin,
+            origin,
             nonce,
             issuedAt
         );
