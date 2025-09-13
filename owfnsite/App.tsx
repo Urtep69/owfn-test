@@ -9,7 +9,6 @@ import { AppProvider, useAppContext } from './contexts/AppContext.js';
 import { Layout } from './components/Layout.js';
 import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './lib/constants.js';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.js';
-import { Buffer } from 'buffer';
 
 import Home from './pages/Home.js';
 import Presale from './pages/Presale.js';
@@ -35,11 +34,6 @@ import Maintenance from './pages/Maintenance.js';
 import AdminPresale from './pages/AdminPresale.js';
 import Contact from './pages/Contact.js';
 import { Analytics } from "@vercel/analytics/react";
-
-// Polyfill Buffer for client-side dependencies like wallet adapters
-if (typeof window !== 'undefined') {
-  window.Buffer = Buffer;
-}
 
 const AppContent = () => {
   const { isMaintenanceActive, isAdmin } = useAppContext();
@@ -115,7 +109,7 @@ const WalletWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   
   return (
      <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect={false}>
+      <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
             {children}
         </WalletModalProvider>
