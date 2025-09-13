@@ -8,10 +8,11 @@
     "build": "rm -rf dist && mkdir -p dist && cp index.html dist/ && copyfiles -u 1 \"public/**/*\" dist && esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.ts=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"'"
   },
   "author": "OWFN",
-  "license": "UNLICENSSED",
+  "license": "UNLICENSED",
   "dependencies": {
     "@google/genai": "^1.13.0",
     "@noble/ed25519": "^2.1.0",
+    "@noble/hashes": "^1.4.0",
     "@solana/spl-token": "^0.4.13",
     "@solana/wallet-adapter-base": "^0.9.27",
     "@solana/wallet-adapter-phantom": "^0.9.28",

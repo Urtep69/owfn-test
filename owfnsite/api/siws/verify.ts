@@ -1,6 +1,12 @@
-import { verify } from '@noble/ed25519';
+import * as ed from '@noble/ed25519';
+import { sha512 } from '@noble/hashes/sha512';
 import bs58 from 'bs58';
 import { createSessionCookie, getSession } from './session.js';
+
+// Set the SHA512 function for @noble/ed25519 to use @noble/hashes
+// This is required in some environments (like Vercel serverless) where crypto auto-detection may fail.
+ed.utils.sha512 = (...m) => sha512(ed.utils.concatBytes(...m));
+
 
 // Simple SIWS message parser
 function parseSiwsMessage(message: string): { domain: string, address: string, nonce: string } | null {
@@ -47,7 +53,7 @@ export default async function handler(req: any, res: any) {
         const signatureBytes = Buffer.from(signature, 'base64'); // Buffer is a Uint8Array subclass
         const publicKeyBytes = bs58.decode(parsedMessage.address); // This is a Uint8Array
 
-        const isVerified = await verify(signatureBytes, messageBytes, publicKeyBytes);
+        const isVerified = await ed.verify(signatureBytes, messageBytes, publicKeyBytes);
 
         if (!isVerified) {
             return res.status(401).json({ error: 'Signature verification failed.' });
