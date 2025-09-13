@@ -3,18 +3,6 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import type { SiwsReturn, SiwsSession } from '../lib/types.js';
 import bs58 from 'bs58';
 
-const buildSiwsMessage = (domain: string, publicKey: string, statement: string, uri: string, nonce: string, issuedAt: string) => {
-    return `${domain} wants you to sign in with your Solana account:\n` +
-           `${publicKey}\n\n` +
-           `${statement}\n\n` +
-           `URI: ${uri}\n` +
-           `Version: 1\n` +
-           `Chain ID: 1\n` + // 1 for Solana Mainnet
-           `Nonce: ${nonce}\n` +
-           `Issued At: ${issuedAt}`;
-};
-
-
 export const useSiws = (): SiwsReturn => {
     const { publicKey, signMessage, connected } = useWallet();
     const [session, setSession] = useState<SiwsSession | null>(null);
@@ -69,32 +57,23 @@ export const useSiws = (): SiwsReturn => {
 
         setIsLoading(true);
         try {
+            // 1. Get the challenge (nonce) from the server via a secure token
             const challengeRes = await fetch('/api/siws/challenge');
             if (!challengeRes.ok) throw new Error('Failed to get challenge');
-            const { nonce, issuedAt, challengeToken } = await challengeRes.json();
+            const { nonce, challengeToken } = await challengeRes.json();
             
-            const message = buildSiwsMessage(
-                window.location.host,
-                publicKey.toBase58(),
-                'Sign in to the Official World Family Network.',
-                window.location.origin,
-                nonce,
-                issuedAt
-            );
-            
-            const encodedMessage = new TextEncoder().encode(message);
+            // 2. Sign the nonce directly. This is simpler and more robust than signing a complex message.
+            const encodedMessage = new TextEncoder().encode(nonce);
             const signatureBytes = await signMessage(encodedMessage);
             const signature = bs58.encode(signatureBytes);
 
+            // 3. Send signature, public key, and the challenge token back for verification.
             const verifyRes = await fetch('/api/siws/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     signature,
                     publicKey: publicKey.toBase58(),
-                    issuedAt,
-                    domain: window.location.host,
-                    uri: window.location.origin,
                     challengeToken,
                 })
             });

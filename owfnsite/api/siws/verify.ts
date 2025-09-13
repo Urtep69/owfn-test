@@ -3,26 +3,14 @@ import bs58 from 'bs58';
 import nacl from 'tweetnacl';
 import * as jose from 'jose';
 
-// Această funcție trebuie să fie identică cu cea de pe partea client.
-const buildSiwsMessage = (domain: string, publicKey: string, statement: string, uri: string, nonce: string, issuedAt: string) => {
-    return `${domain} wants you to sign in with your Solana account:\n` +
-           `${publicKey}\n\n` +
-           `${statement}\n\n` +
-           `URI: ${uri}\n` +
-           `Version: 1\n` +
-           `Chain ID: 1\n` + // 1 pentru Solana Mainnet
-           `Nonce: ${nonce}\n` +
-           `Issued At: ${issuedAt}`;
-};
-
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
     try {
-        const { signature, publicKey, issuedAt, domain, uri, challengeToken } = req.body;
-        if (!signature || !publicKey || !issuedAt || !domain || !uri || !challengeToken) {
+        const { signature, publicKey, challengeToken } = req.body;
+        if (!signature || !publicKey || !challengeToken) {
             return res.status(400).json({ error: 'Missing required fields.' });
         }
 
@@ -33,52 +21,51 @@ export default async function handler(req: any, res: any) {
         }
         const secretKey = new TextEncoder().encode(jwtSecret);
 
-        // --- Verifică jetonul de provocare și extrage nonce-ul ---
+        // --- Step 1: Verify the challenge token and extract the nonce ---
         let nonce: string;
         try {
             const { payload } = await jose.jwtVerify(challengeToken, secretKey);
-            if (typeof payload.nonce !== 'string') {
+            if (typeof payload.nonce !== 'string' || !payload.iat) {
                 throw new Error('Invalid challenge token payload');
             }
+            
+            // Check expiry directly from payload
+            const issueDate = new Date(payload.iat * 1000);
+            const fiveMinutes = 5 * 60 * 1000;
+            if (Date.now() - issueDate.getTime() > fiveMinutes) {
+                 throw new Error('Challenge has expired');
+            }
+            
             nonce = payload.nonce;
-        } catch (jwtError) {
-            console.warn("Challenge token verification failed:", jwtError);
+        } catch (jwtError: any) {
+            console.warn("Challenge token verification failed:", jwtError.message);
             return res.status(401).json({ error: 'Invalid or expired sign-in challenge.' });
         }
 
-        // --- Verifică timestamp-ul pentru a preveni atacurile de reluare ---
-        const now = new Date();
-        const issueDate = new Date(issuedAt);
-        const fiveMinutes = 5 * 60 * 1000;
-        if (now.getTime() - issueDate.getTime() > fiveMinutes) {
-            return res.status(400).json({ error: 'Sign-in request has expired.' });
-        }
-
-        // --- Reconstruiește și verifică mesajul folosind nonce-ul din jeton ---
-        const message = buildSiwsMessage(domain, publicKey, 'Sign in to the Official World Family Network.', uri, nonce, issuedAt);
-        const messageBytes = new TextEncoder().encode(message);
+        // --- Step 2: Verify the signature against the nonce ---
+        const messageBytes = new TextEncoder().encode(nonce);
         const publicKeyBytes = bs58.decode(publicKey);
         const signatureBytes = bs58.decode(signature);
         const verified = nacl.sign.detached.verify(messageBytes, signatureBytes, publicKeyBytes);
 
         if (!verified) {
-            return res.status(401).json({ error: 'Invalid signature.' });
+            return res.status(401).json({ error: 'Invalid signature. The message signed does not match the challenge.' });
         }
         
-        // --- Creează sesiunea JWT ---
+        // --- Step 3: Create the session JWT ---
         const sessionToken = await new jose.SignJWT({ publicKey })
             .setProtectedHeader({ alg: 'HS256' })
             .setIssuedAt()
             .setExpirationTime('24h')
             .sign(secretKey);
 
-        // --- Setează cookie-ul de sesiune ---
+        // --- Step 4: Set the session cookie ---
         res.setHeader('Set-Cookie', serialize('siws-session', sessionToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
-            sameSite: 'lax', // Folosește 'lax' pentru o mai bună compatibilitate
+            sameSite: 'lax',
             path: '/',
-            maxAge: 60 * 60 * 24 // 24 de ore
+            maxAge: 60 * 60 * 24 // 24 hours
         }));
 
         res.status(200).json({ success: true, publicKey: publicKey });
