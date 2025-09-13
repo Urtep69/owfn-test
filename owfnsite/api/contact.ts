@@ -74,7 +74,7 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
-        const { name, email, reason, message } = req.body;
+        const { name, email, reason, message, langCode } = req.body;
 
         // Basic validation
         if (!name || !email || !reason || !message || !name.trim() || !email.trim() || !message.trim()) {
@@ -156,19 +156,10 @@ ${message}
         });
         
         let adminEmailContent;
-        let detectedLanguage = 'English';
-        let detectedLanguageCode = 'en';
-
         try {
             const jsonStr = responseForAdmin.text.trim();
             const parsedContent = JSON.parse(jsonStr);
             adminEmailContent = parsedContent;
-            detectedLanguage = parsedContent.detectedLanguage || 'English';
-            
-            // ROBUST FIX: Replace unstable Intl.DisplayNames with a safe, internal lookup.
-            const lang = SUPPORTED_LANGUAGES.find(l => l.name.toLowerCase() === detectedLanguage.toLowerCase());
-            detectedLanguageCode = lang ? lang.code : 'en';
-
         } catch (e) {
             console.error("Gemini did not return valid JSON for admin email.", e, responseForAdmin.text);
             adminEmailContent = {
@@ -203,13 +194,16 @@ ${message}
         try {
             const departmentName = reasonTextMap[reason as string] || 'our team';
 
-            const promptForUser = `A user named "${name}" contacted the "${departmentName}" department of OWFN. Their original message was in ${detectedLanguage}.
+            const userLanguageCode = langCode && SUPPORTED_LANGUAGES.some(l => l.code === langCode) ? langCode : 'en';
+            const userLanguageName = SUPPORTED_LANGUAGES.find(l => l.code === userLanguageCode)?.name || 'English';
 
-Your task is to generate a longer, more structured, emotional, and engaging automated confirmation email for them IN ${detectedLanguage}.
+            const promptForUser = `A user named "${name}" contacted the "${departmentName}" department of OWFN.
+
+Your task is to generate a longer, more structured, emotional, and engaging automated confirmation email for them IN ${userLanguageName}.
 
 The email MUST adhere to the following structure and tone:
 
-1.  **Subject Line**: Create a warm and professional subject line in ${detectedLanguage}. For example: "Your message to OWFN has been received!" or "Thank you for contacting the OWFN team!".
+1.  **Subject Line**: Create a warm and professional subject line in ${userLanguageName}. For example: "Your message to OWFN has been received!" or "Thank you for contacting the OWFN team!".
 
 2.  **Email Body**:
     *   **Greeting**: Start with a polite and personal greeting to the user by their name, "${name}".
@@ -220,14 +214,14 @@ The email MUST adhere to the following structure and tone:
     *   **Patience and Closing**: Reiterate that a team member will respond as soon as possible, but response times may vary due to high volume.
     *   **Mandatory Closing Line**: The email MUST end with the exact translated phrase for "Please do not reply to this email, as it is system-generated."
 
-Your entire response should be a JSON object with a "subject" and "body" key, with all text translated into ${detectedLanguage}. The body should be plain text with newlines for paragraphs, and the specified HTML links included.`;
+Your entire response should be a JSON object with a "subject" and "body" key, with all text translated into ${userLanguageName}. The body should be plain text with newlines for paragraphs, and the specified HTML links included.`;
 
 
             const userEmailSchema = {
                 type: Type.OBJECT,
                 properties: {
-                    subject: { type: Type.STRING, description: `A translated subject line in ${detectedLanguage}. Should be similar to "We've received your message | OWFN".` },
-                    body: { type: Type.STRING, description: `The complete, translated plain text body of the email in ${detectedLanguage}, including the greeting, all required points, and the specified HTML anchor tags for links.` }
+                    subject: { type: Type.STRING, description: `A translated subject line in ${userLanguageName}. Should be similar to "We've received your message | OWFN".` },
+                    body: { type: Type.STRING, description: `The complete, translated plain text body of the email in ${userLanguageName}, including the greeting, all required points, and the specified HTML anchor tags for links.` }
                 },
                 propertyOrdering: ["subject", "body"],
             };
@@ -251,7 +245,7 @@ Your entire response should be a JSON object with a "subject" and "body" key, wi
 
             if (userEmailContent.subject && userEmailContent.body) {
                 const textBodyWithLineBreaks = `<p>${userEmailContent.body.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
-                const signature = generateAutoReplySignatureHtml(detectedLanguageCode);
+                const signature = generateAutoReplySignatureHtml(userLanguageCode);
                 const finalHtmlBody = `<div style="font-family: Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.6;">${textBodyWithLineBreaks}${signature}</div>`;
 
                 await fetch('https://api.resend.com/emails', {

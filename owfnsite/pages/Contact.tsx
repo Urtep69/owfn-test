@@ -61,7 +61,7 @@ const SocialLinkCard = ({ icon, title, description, href }: { icon: React.ReactN
 
 
 export default function Contact() {
-    const { t } = useAppContext();
+    const { t, currentLanguage } = useAppContext();
     const formRef = useRef<HTMLElement>(null);
 
     const reasonOptions = [
@@ -91,7 +91,7 @@ export default function Contact() {
             const response = await fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, reason, message }),
+                body: JSON.stringify({ name, email, reason, message, langCode: currentLanguage.code }),
             });
             const data = await response.json();
             if (response.ok && data.success) {
