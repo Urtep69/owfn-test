@@ -37,8 +37,17 @@ export function sign(data: string): string {
 export function verify(data: string, signature: string): boolean {
     try {
         const expectedSignature = sign(data);
-        // Use timingSafeEqual to prevent timing attacks on signature verification.
-        return timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
+        // CRITICAL FIX: The signature strings are in hexadecimal format.
+        // They must be converted to Buffers using 'hex' encoding for a correct and safe comparison.
+        const signatureBuffer = Buffer.from(signature, 'hex');
+        const expectedSignatureBuffer = Buffer.from(expectedSignature, 'hex');
+
+        // Use timingSafeEqual to prevent timing attacks. It requires buffers of the same length.
+        if (signatureBuffer.length !== expectedSignatureBuffer.length) {
+            return false;
+        }
+        
+        return timingSafeEqual(signatureBuffer, expectedSignatureBuffer);
     } catch {
         return false;
     }
