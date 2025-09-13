@@ -2,11 +2,6 @@ import * as ed from '@noble/ed25519';
 import bs58 from 'bs58';
 import { createSessionCookie, getSession } from './session.js';
 
-// FIX: The monkey-patching of `utils.sha512Sync` is a pattern for older versions of @noble libraries.
-// The modern approach is to use the async `verify` function, which does not require this setup and is more robust.
-// This also resolves the TypeScript errors related to `sha512Sync` and `concatBytes` not being found on the `utils` type.
-
-
 // Simple SIWS message parser
 function parseSiwsMessage(message: string): { domain: string, address: string, nonce: string } | null {
     const lines = message.split('\n');
@@ -49,12 +44,13 @@ export default async function handler(req: any, res: any) {
 
         // Verify the Solana signature using @noble/ed25519
         const messageBytes = new TextEncoder().encode(message);
-        const signatureBytes = Buffer.from(signature, 'base64'); // Buffer is a Uint8Array subclass
-        const publicKeyBytes = bs58.decode(parsedMessage.address); // This is a Uint8Array
+        const signatureBytes = Buffer.from(signature, 'base64');
+        const publicKeyBytes = bs58.decode(parsedMessage.address);
 
-        // FIX: Switched to the async version of `verify`, which is the standard for modern @noble libraries.
-        // This avoids the need for synchronous hash function patching that was causing type errors.
-        const isVerified = await ed.verify(signatureBytes, messageBytes, publicKeyBytes);
+        // CORRECT FIX: Use the explicitly named `verifyAsync` function. The library's `verify` function
+        // is synchronous and requires `utils.sha512Sync` to be set, which fails in some serverless environments.
+        // `verifyAsync` is designed to work in these environments without manual setup.
+        const isVerified = await ed.verifyAsync(signatureBytes, messageBytes, publicKeyBytes);
 
         if (!isVerified) {
             return res.status(401).json({ error: 'Signature verification failed.' });
