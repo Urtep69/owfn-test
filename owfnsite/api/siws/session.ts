@@ -73,22 +73,28 @@ export function getSession(req: any): UserSession | { nonce: string } | null {
     const cookie = cookies['auth-session'];
     if (!cookie) return null;
 
-    const parts = cookie.split('.');
-    // A valid signed cookie must have exactly two parts.
-    if (parts.length !== 2) return null;
+    const signatureIndex = cookie.lastIndexOf('.');
+    
+    // Check for a valid separator. It can't be the first or last character.
+    if (signatureIndex <= 0 || signatureIndex >= cookie.length - 1) {
+        return null;
+    }
 
-    const [sessionStr, signature] = parts;
-    if (!sessionStr || !signature) return null;
+    const sessionStr = cookie.substring(0, signatureIndex);
+    const signature = cookie.substring(signatureIndex + 1);
 
     if (verify(sessionStr, signature)) {
         try {
             return JSON.parse(sessionStr);
         } catch {
+            // JSON parsing failed, cookie is malformed.
             return null;
         }
     }
+    
     return null;
 }
+
 
 export function clearSessionCookie() {
     return serialize('auth-session', '', {
