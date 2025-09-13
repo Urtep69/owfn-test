@@ -44,7 +44,7 @@ export default async function handler(req: any, res: any) {
 
         // Verify the Solana signature
         const messageBytes = new TextEncoder().encode(message);
-        const signatureBytes = Buffer.from(atob(signature), 'binary');
+        const signatureBytes = Buffer.from(signature, 'base64');
         const publicKeyBytes = bs58.decode(parsedMessage.address);
 
         // FIX: The type definitions for `crypto.createPublicKey` in `@types/node` may not

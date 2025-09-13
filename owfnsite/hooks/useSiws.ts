@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { createSiwsMessage } from '../lib/siws.js';
 import type { SiwsReturn, UserSession } from '../lib/types.js';
+import { Buffer } from 'buffer';
 
 export const useSiws = (): SiwsReturn => {
     const { publicKey, signMessage, connected } = useWallet();
@@ -55,8 +56,8 @@ export const useSiws = (): SiwsReturn => {
             const encodedMessage = new TextEncoder().encode(message);
             const signature = await signMessage(encodedMessage);
             
-            // Convert signature to Base64 for JSON transport
-            const serializedSignature = btoa(String.fromCharCode(...signature));
+            // Use Buffer for robust Base64 encoding
+            const serializedSignature = Buffer.from(signature).toString('base64');
 
             const verifyResponse = await fetch('/api/siws/verify', {
                 method: 'POST',
