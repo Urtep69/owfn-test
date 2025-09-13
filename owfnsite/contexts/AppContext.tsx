@@ -46,7 +46,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
   
-  const isAdmin = useMemo(() => siws.session?.publicKey === ADMIN_WALLET_ADDRESS, [siws.session]);
+  const isAdmin = useMemo(() => solana.address === ADMIN_WALLET_ADDRESS, [solana.address]);
   const isMaintenanceActive = useMemo(() => MAINTENANCE_MODE_ACTIVE && !isAdmin, [isAdmin]);
   
   const [presaleProgress, setPresaleProgress] = useState<PresaleProgress>({
