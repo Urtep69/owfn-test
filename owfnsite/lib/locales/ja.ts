@@ -46,12 +46,18 @@ export const ja = {
     yes: `はい`,
     no: `いいえ`,
     token: `トークン`,
+    balance: `残高`,
+    wallet: `ウォレット`,
     
     // Time Units
     time_days: `日`,
     time_hours: `時間`,
     time_minutes: `分`,
     time_seconds: `秒`,
+    just_now: `たった今`,
+    time_minutes_ago: `{minutes}分前`,
+    time_hours_ago: `{hours}時間前`,
+    time_days_ago: `{days}日前`,
     
     // Home Page
     home_title: `公式ワールドファミリーネットワーク`,
@@ -101,7 +107,6 @@ export const ja = {
     about_new_section_info_supply: `総供給量: 18,000,000,000 (180億)`,
     about_new_section_info_purpose: `目的: 人道的、社会的、コミュニティ志向`,
     about_new_section_info_disclaimer: `投機的資産ではありません。利益の約束はありません。実質的な助けのみです。`,
-    // FIX: Removed incomplete property causing a syntax error.
     
     // Roadmap Page
     roadmap_title: `グローバルインパクトへのロードマップ`,
@@ -167,11 +172,9 @@ export const ja = {
     presale_amount_error: `金額は{min}から{max} SOLの間でなければなりません。`,
     presale_amount_error_no_min: `金額は0より大きく、{max} SOL以下でなければなりません。`,
     live_presale_feed: `リアルタイムプレセールフィード`,
-    wallet: `ウォレット`,
     sol_spent: `使用したSOL`,
     owfn_received: `受け取ったOWFN`,
     time: `時間`,
-    just_now: `たった今`,
     presale_you_contributed: `すでに寄付しました：{amount} SOL。`,
     presale_you_can_buy: `最大{amount} SOLまで追加で寄付できます。`,
     presale_bonus_offer: `{threshold} SOL以上の購入で{percentage}%のボーナス！`,
@@ -216,10 +219,22 @@ export const ja = {
     select_token: `トークンを選択`,
     amount: `金額`,
     donations_form_title: `寄付フォーム`,
-    donations_stats_title: `ライブ寄付統計（シミュレーション）`,
+    donations_stats_title: `ライブ寄付統計`,
     donated: `寄付済み`,
     donation_success_alert: `{amount} {tokenSymbol}のご寄付、誠にありがとうございました。`,
     donation_no_token_balance: `あなたは{symbol}を所有していません。`,
+    live_donation_feed: `ライブ寄付フィード`,
+    amount_donated: `寄付額`,
+    donations_no_recent_donations_for_token: `最近の{token}の寄付はありません。`,
+    donations_today: `今日`,
+    donations_last_week: `先週`,
+    donations_last_month: `先月`,
+    donations_all_time: `合計`,
+    donations_sol_stats_title: `SOL 寄付統計`,
+    donations_usdc_stats_title: `USDC 寄付統計`,
+    donations_usdt_stats_title: `USDT 寄付統計`,
+    donations_owfn_stats_title: `OWFN 寄付統計`,
+    max_button: `最大`,
 
     // Dashboard
     wallet_monitor: `ウォレット監視ダッシュボード`,
@@ -363,6 +378,10 @@ export const ja = {
     chatbot_loading_1: `回路に接続中...`,
     chatbot_loading_2: `質問を分析中...`,
     chatbot_loading_3: `回答を作成中...`,
+    chatbot_welcome_message: `こんにちは！私はOWFNアシスタントです。今日は私たちの使命について、どのようにお手伝いできますか？`,
+    chatbot_suggestion_1: `OWFNとは何ですか？`,
+    chatbot_suggestion_2: `どうすれば購入できますか？`,
+    chatbot_suggestion_3: `ボーナスについて教えてください。`,
     
     // Whitepaper
     whitepaper_title: `OWFNホワイトペーパー`,
@@ -437,7 +456,6 @@ export const ja = {
     my_staked_balance: `私のステーク残高`,
     stake: `ステーク`,
     unstake: `アンステーク`,
-    balance: `残高`,
     stake_owfn: `OWFNをステーク`,
     unstake_owfn: `OWFNをアンステーク`,
     my_rewards: `私の報酬`,
