@@ -155,11 +155,15 @@ export interface SiwsSession {
   signedAt: number;
 }
 
+export interface UserSession {
+  publicKey: string;
+  issuedAt: string;
+}
+
 export interface SiwsReturn {
   isAuthenticated: boolean;
   isLoading: boolean;
-  isSessionLoading: boolean;
-  session: SiwsSession | null;
+  session: UserSession | null;
   signIn: () => Promise<boolean>;
   signOut: () => Promise<void>;
 }

@@ -63,7 +63,7 @@ export function createSessionCookie(session: UserSession | { nonce: string }, ma
         secure: process.env.NODE_ENV === 'production',
         path: '/',
         maxAge: maxAge, // in seconds
-        sameSite: 'none',
+        sameSite: 'lax',
     });
 }
 
@@ -102,7 +102,7 @@ export function clearSessionCookie() {
         secure: process.env.NODE_ENV === 'production',
         path: '/',
         maxAge: -1, // Expire immediately
-        sameSite: 'none',
+        sameSite: 'lax',
     });
 }
 
