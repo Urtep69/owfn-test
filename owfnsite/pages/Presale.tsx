@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
@@ -317,7 +316,7 @@ const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bo
 
 
 export default function Presale() {
-  const { t, solana, setWalletModalOpen, presaleProgress } = useAppContext();
+  const { t, solana, setWalletModalOpen, presaleProgress, isAdmin } = useAppContext();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -503,8 +502,12 @@ export default function Presale() {
         return;
     }
 
-    if (presaleStatus !== 'active' || isAmountInvalid || solana.loading) {
+    const regularUserIsInvalid = isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active';
+    if (!isAdmin && (solana.loading || regularUserIsInvalid)) {
         return;
+    }
+    if (isAdmin && (solana.loading || isNaN(numSolAmount) || numSolAmount <= 0)) {
+        return; // Admin still needs to enter a valid number
     }
 
     const result = await solana.sendTransaction(currentStage.distributionWallet, numSolAmount, 'SOL');
@@ -533,6 +536,18 @@ export default function Presale() {
     if (!solana.connected) return t('connect_wallet');
     return t('buy');
   }, [solana.connected, solana.loading, t]);
+
+  const isBuyButtonDisabled = useMemo(() => {
+    if (solana.loading || isCheckingContribution) return true;
+    if (isAdmin) {
+        // For admin, only disable if the amount is not a positive number.
+        const numericAmount = parseFloat(solAmount);
+        return isNaN(numericAmount) || numericAmount <= 0;
+    }
+    // For regular users, apply all restrictions.
+    if (!solana.connected) return false; // Will show connect wallet text
+    return isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active';
+  }, [solana.loading, isCheckingContribution, isAdmin, solana.connected, isAmountInvalid, maxAllowedBuy, presaleStatus, solAmount]);
 
 
   const formatSaleDate = (dateStr: string) => {
@@ -707,13 +722,13 @@ export default function Presale() {
                                 type="number"
                                 value={solAmount}
                                 onChange={handleAmountChange}
-                                className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 text-right focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
+                                className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 text-right focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error && !isAdmin ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
                                 placeholder="0.00"
-                                disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
+                                disabled={isCheckingContribution || (!isAdmin && presaleStatus !== 'active')}
                             />
                         </div>
 
-                        {error && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
+                        {error && !isAdmin && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
                         
                         <div className="bg-primary-100 dark:bg-darkPrimary-800/50 p-4 rounded-lg space-y-2">
                             <div className="flex justify-between items-center text-sm">
@@ -742,7 +757,7 @@ export default function Presale() {
                         <button 
                             onClick={handleBuy}
                             className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                            disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
+                            disabled={isBuyButtonDisabled}
                         >
                             {buttonText}
                         </button>

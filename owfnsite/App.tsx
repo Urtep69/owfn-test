@@ -1,4 +1,3 @@
-
 import React, { useMemo, useEffect } from 'react';
 import { Router, Switch, Route } from 'wouter';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
@@ -37,11 +36,9 @@ import Contact from './pages/Contact.js';
 import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
-  const { isMaintenanceActive, solana } = useAppContext();
-  const { address } = solana;
-  const isAdmin = address === ADMIN_WALLET_ADDRESS;
+  const { isMaintenanceActive, isAdmin } = useAppContext();
 
-  if (isMaintenanceActive && !isAdmin) {
+  if (isMaintenanceActive) {
     return <Maintenance />;
   }
 

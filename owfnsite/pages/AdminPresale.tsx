@@ -146,34 +146,41 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        const contributorMap = new Map<string, { totalLamports: bigint; totalOwfn: bigint }>();
+        // Step 1: Aggregate total SOL (in lamports) for each contributor.
+        const contributorSolMap = new Map<string, bigint>();
+        for (const tx of transactions) {
+            const currentLamports = contributorSolMap.get(tx.from) || 0n;
+            contributorSolMap.set(tx.from, currentLamports + BigInt(tx.lamports));
+        }
 
+        // Step 2: Calculate final OWFN amount for each contributor based on their *total* SOL.
+        const results: AggregatedContributor[] = [];
         const presaleRateBigInt = BigInt(currentStage.rate);
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
         const sortedTiers = [...currentStage.bonusTiers].sort((a, b) => b.threshold - a.threshold);
 
-        transactions.forEach(tx => {
-            const lamports = BigInt(tx.lamports);
-            const solAmount = tx.solAmount;
-
-            const applicableTier = sortedTiers.find(tier => solAmount >= tier.threshold);
-            let owfnForThisTx = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
-
+        for (const [address, totalLamports] of contributorSolMap.entries()) {
+            const totalSol = Number(totalLamports) / LAMPORTS_PER_SOL;
+            
+            // Find the single applicable bonus tier for the total contribution.
+            const applicableTier = sortedTiers.find(tier => totalSol >= tier.threshold);
+            
+            // Calculate base OWFN from total lamports.
+            const baseOwfn = (totalLamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
+            
+            let totalOwfn = baseOwfn;
             if (applicableTier) {
-                const bonusAmount = (owfnForThisTx * BigInt(applicableTier.percentage)) / 100n;
-                owfnForThisTx += bonusAmount;
+                const bonusAmount = (baseOwfn * BigInt(applicableTier.percentage)) / 100n;
+                totalOwfn += bonusAmount;
             }
-
-            const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n, totalOwfn: 0n };
-            existing.totalLamports += lamports;
-            existing.totalOwfn += owfnForThisTx;
-            contributorMap.set(tx.from, existing);
-        });
-
-        return Array.from(contributorMap.entries()).map(([address, data]) => {
-            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
-            return { address, totalSol, totalOwfn: data.totalOwfn };
-        });
+            
+            results.push({
+                address,
+                totalSol,
+                totalOwfn,
+            });
+        }
+        return results;
     }, [transactions]);
 
 
