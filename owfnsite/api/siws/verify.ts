@@ -1,4 +1,4 @@
-import { verify as verifySignature } from 'crypto';
+import { createPublicKey, verify as verifySignature } from 'crypto';
 import bs58 from 'bs58';
 import { createSessionCookie, getSession } from './session.js';
 
@@ -47,16 +47,17 @@ export default async function handler(req: any, res: any) {
         const signatureBytes = Buffer.from(signature, 'base64');
         const publicKeyBytes = bs58.decode(parsedMessage.address);
 
-        // Directly use a key object configuration for verification instead of creating a KeyObject first.
-        // This is a more direct and robust method that avoids potential subtle issues with createPublicKey
-        // in some serverless environments.
-        const keyObjectForVerify = {
-            key: publicKeyBytes,
+        // Create a KeyObject from the raw public key bytes, which is the correct
+        // way to prepare the key for the crypto.verify function.
+        // FIX: The `crypto.createPublicKey` function expects a Buffer for the 'key' property,
+        // but `bs58.decode` returns a Uint8Array. This converts it to the required type.
+        const publicKey = createPublicKey({
+            key: Buffer.from(publicKeyBytes),
             format: 'raw',
             type: 'ed25519'
-        };
+        });
 
-        const isVerified = verifySignature(undefined, messageBytes, keyObjectForVerify as any, signatureBytes);
+        const isVerified = verifySignature(undefined, messageBytes, publicKey, signatureBytes);
 
         if (!isVerified) {
             return res.status(401).json({ error: 'Signature verification failed.' });
