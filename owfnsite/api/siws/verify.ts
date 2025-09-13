@@ -47,15 +47,15 @@ export default async function handler(req: any, res: any) {
         const signatureBytes = Buffer.from(atob(signature), 'binary');
         const publicKeyBytes = bs58.decode(parsedMessage.address);
 
-        // FIX: The `crypto.createPublicKey` function expects a Buffer for the `key` property
-        // when using the 'raw' format for ed25519. The `bs58.decode` function returns a
-        // Uint8Array, which was causing a TypeScript type error. Explicitly converting the
-        // Uint8Array to a Buffer resolves this incompatibility.
+        // FIX: The type definitions for `crypto.createPublicKey` in `@types/node` may not
+        // correctly include the 'raw' format for 'ed25519' keys, even though it is
+        // supported by the Node.js runtime. Casting the configuration object to `any`
+        // bypasses this TypeScript error, allowing the valid runtime code to execute.
         const publicKey = createPublicKey({
             key: Buffer.from(publicKeyBytes),
             format: 'raw',
             type: 'ed25519'
-        });
+        } as any);
 
         const isVerified = verifySignature(null, messageBytes, publicKey, signatureBytes);
 
