@@ -1,10 +1,7 @@
 import type { TokenAllocation, RoadmapPhase, Language, SocialCase, VestingSchedule, PresaleTransaction, TokenDetails, LiveTransaction, PresaleStage } from './types.ts';
-import React from 'react';
-import { owfnLogo, solanaLogo, usdcLogo, usdtLogo } from './assets.ts';
-
 
 export const OWFN_MINT_ADDRESS = 'Cb2X4L46PFMzuTRJ5gDSnNa4X51DXGyLseoh381VB96B';
-export const OWFN_LOGO_URL: string = owfnLogo;
+export const OWFN_LOGO_URL: string = '/assets/owfn.png';
 export const ADMIN_WALLET_ADDRESS = '7vAUf13zSQjoZBU2aek3UcNAuQnLxsUcbMRnBYdcdvDy'; // Admin wallet
 export const MAINTENANCE_MODE_ACTIVE = false; // Set to true to enable maintenance mode globally
 
@@ -109,7 +106,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         name: 'Official World Family Network',
         symbol: 'OWFN',
         mintAddress: OWFN_MINT_ADDRESS,
-        logo: owfnLogo,
+        logo: '/assets/owfn.png',
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
@@ -126,7 +123,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         name: 'Solana',
         symbol: 'SOL',
         mintAddress: 'So11111111111111111111111111111111111111112',
-        logo: solanaLogo,
+        logo: '/assets/solana.png',
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
@@ -143,7 +140,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         name: 'USD Coin',
         symbol: 'USDC',
         mintAddress: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a',
-        logo: usdcLogo,
+        logo: '/assets/usdc.png',
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
@@ -160,7 +157,7 @@ export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
         name: 'Tether',
         symbol: 'USDT',
         mintAddress: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-        logo: usdtLogo,
+        logo: '/assets/usdt.png',
         balance: 0,
         usdValue: 0,
         pricePerToken: 0,
