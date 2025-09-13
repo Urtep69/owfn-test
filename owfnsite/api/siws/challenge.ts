@@ -16,7 +16,7 @@ export default async function handler(req: any, res: any) {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
             sameSite: 'strict',
-            path: '/api/siws',
+            path: '/', // Changed from '/api/siws' to '/' for universal access
             maxAge: 5 * 60 // 5 minutes
         }));
         

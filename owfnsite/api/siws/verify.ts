@@ -62,7 +62,7 @@ export default async function handler(req: any, res: any) {
         }
         
         // --- Clear Nonce Cookie ---
-        res.setHeader('Set-Cookie', serialize('siws-nonce', '', { maxAge: -1, path: '/api/siws' }));
+        res.setHeader('Set-Cookie', serialize('siws-nonce', '', { maxAge: -1, path: '/' })); // Changed from '/api/siws' to '/'
 
         // --- Create JWT Session ---
         const jwtSecret = process.env.JWT_SECRET;
@@ -92,7 +92,7 @@ export default async function handler(req: any, res: any) {
     } catch (error) {
         console.error("Error in SIWS verify handler:", error);
         // Clear nonce on any error to allow retry
-        res.setHeader('Set-Cookie', serialize('siws-nonce', '', { maxAge: -1, path: '/api/siws' }));
+        res.setHeader('Set-Cookie', serialize('siws-nonce', '', { maxAge: -1, path: '/' }));
         res.status(500).json({ error: 'Verification failed.' });
     }
 }
