@@ -20,6 +20,13 @@ function parseSiwsMessage(message: string): { domain: string, address: string, n
     }
 }
 
+// Standard DER prefix for an Ed25519 public key in SPKI format.
+// This is required for Node.js's native crypto module to correctly interpret the raw key.
+const spkiPrefix = Buffer.from([
+    0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00,
+]);
+
+
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
@@ -47,14 +54,15 @@ export default async function handler(req: any, res: any) {
         const signatureBytes = Buffer.from(signature, 'base64');
         const publicKeyBytes = bs58.decode(parsedMessage.address);
 
-        // Create a KeyObject from the raw public key bytes, which is the correct
-        // way to prepare the key for the crypto.verify function.
-        // FIX: The `crypto.createPublicKey` function expects a Buffer for the 'key' property,
-        // but `bs58.decode` returns a Uint8Array. This converts it to the required type.
+        // Prepend the standard SPKI prefix to the raw public key to create a
+        // DER-encoded key that the native crypto module can understand unambiguously.
+        const derEncodedPublicKey = Buffer.concat([spkiPrefix, Buffer.from(publicKeyBytes)]);
+        
+        // Import the key using the standard 'der' and 'spki' formats.
         const publicKey = createPublicKey({
-            key: Buffer.from(publicKeyBytes),
-            format: 'raw',
-            type: 'ed25519'
+            key: derEncodedPublicKey,
+            format: 'der',
+            type: 'spki',
         });
 
         const isVerified = verifySignature(undefined, messageBytes, publicKey, signatureBytes);
