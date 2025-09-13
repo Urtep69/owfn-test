@@ -52,7 +52,7 @@ export default async function handler(req: any, res: any) {
         // supported by the Node.js runtime. Casting the configuration object to `any`
         // bypasses this TypeScript error, allowing the valid runtime code to execute.
         const publicKey = createPublicKey({
-            key: Buffer.from(publicKeyBytes),
+            key: publicKeyBytes,
             format: 'raw',
             type: 'ed25519'
         } as any);
