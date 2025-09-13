@@ -61,10 +61,8 @@ export default async function handler(req: any, res: any) {
             return res.status(405).json({ error: 'Method Not Allowed' });
         }
 
-        // FIX: Per coding guidelines, the API key must be sourced from process.env.API_KEY.
         const apiKey = process.env.API_KEY;
         if (!apiKey) {
-            // FIX: Updated error message to reference the correct environment variable.
             console.error("CRITICAL: API_KEY environment variable is not set.");
             return res.status(500).json({ error: "Server configuration error. The site administrator needs to configure the API key." });
         }
