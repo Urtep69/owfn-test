@@ -1,4 +1,4 @@
-import { verify as verifySignature, createPublicKey } from 'crypto';
+import { verify as verifySignature } from 'crypto';
 import bs58 from 'bs58';
 import { createSessionCookie, getSession, clearSessionCookie } from './session.js';
 
@@ -47,17 +47,16 @@ export default async function handler(req: any, res: any) {
         const signatureBytes = Buffer.from(signature, 'base64');
         const publicKeyBytes = bs58.decode(parsedMessage.address);
 
-        // FIX: The type definitions for `crypto.createPublicKey` in `@types/node` may not
-        // correctly include the 'raw' format for 'ed25519' keys, even though it is
-        // supported by the Node.js runtime. Casting the configuration object to `any`
-        // bypasses this TypeScript error, allowing the valid runtime code to execute.
-        const publicKey = createPublicKey({
+        // Directly use a key object configuration for verification instead of creating a KeyObject first.
+        // This is a more direct and robust method that avoids potential subtle issues with createPublicKey
+        // in some serverless environments.
+        const keyObjectForVerify = {
             key: publicKeyBytes,
             format: 'raw',
             type: 'ed25519'
-        } as any);
+        };
 
-        const isVerified = verifySignature(null, messageBytes, publicKey, signatureBytes);
+        const isVerified = verifySignature(undefined, messageBytes, keyObjectForVerify as any, signatureBytes);
 
         if (!isVerified) {
             return res.status(401).json({ error: 'Signature verification failed.' });
@@ -75,6 +74,7 @@ export default async function handler(req: any, res: any) {
         res.status(200).json(userSession);
 
     } catch (error) {
+        console.error("Error during SIWS verification:", error);
         res.status(500).json({ error: (error as Error).message });
     }
 }
