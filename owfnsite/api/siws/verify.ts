@@ -1,4 +1,4 @@
-import { createPublicKey, verify as verifySignature } from 'crypto';
+import { verify } from '@noble/ed25519';
 import bs58 from 'bs58';
 import { createSessionCookie, getSession } from './session.js';
 
@@ -19,13 +19,6 @@ function parseSiwsMessage(message: string): { domain: string, address: string, n
         return null;
     }
 }
-
-// Standard DER prefix for an Ed25519 public key in SPKI format.
-// This is required for Node.js's native crypto module to correctly interpret the raw key.
-const spkiPrefix = Buffer.from([
-    0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00,
-]);
-
 
 export default async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
@@ -49,23 +42,12 @@ export default async function handler(req: any, res: any) {
             return res.status(401).json({ error: 'Nonce mismatch.' });
         }
 
-        // Verify the Solana signature
+        // Verify the Solana signature using @noble/ed25519
         const messageBytes = new TextEncoder().encode(message);
-        const signatureBytes = Buffer.from(signature, 'base64');
-        const publicKeyBytes = bs58.decode(parsedMessage.address);
+        const signatureBytes = Buffer.from(signature, 'base64'); // Buffer is a Uint8Array subclass
+        const publicKeyBytes = bs58.decode(parsedMessage.address); // This is a Uint8Array
 
-        // Prepend the standard SPKI prefix to the raw public key to create a
-        // DER-encoded key that the native crypto module can understand unambiguously.
-        const derEncodedPublicKey = Buffer.concat([spkiPrefix, Buffer.from(publicKeyBytes)]);
-        
-        // Import the key using the standard 'der' and 'spki' formats.
-        const publicKey = createPublicKey({
-            key: derEncodedPublicKey,
-            format: 'der',
-            type: 'spki',
-        });
-
-        const isVerified = verifySignature(undefined, messageBytes, publicKey, signatureBytes);
+        const isVerified = await verify(signatureBytes, messageBytes, publicKeyBytes);
 
         if (!isVerified) {
             return res.status(401).json({ error: 'Signature verification failed.' });
