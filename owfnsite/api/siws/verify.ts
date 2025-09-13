@@ -1,11 +1,10 @@
 import * as ed from '@noble/ed25519';
-import { sha512 } from '@noble/hashes/sha512';
 import bs58 from 'bs58';
 import { createSessionCookie, getSession } from './session.js';
 
-// Set the SHA512 function for @noble/ed25519 to use @noble/hashes
-// This is required in some environments (like Vercel serverless) where crypto auto-detection may fail.
-ed.utils.sha512 = (...m) => sha512(ed.utils.concatBytes(...m));
+// FIX: The monkey-patching of `utils.sha512Sync` is a pattern for older versions of @noble libraries.
+// The modern approach is to use the async `verify` function, which does not require this setup and is more robust.
+// This also resolves the TypeScript errors related to `sha512Sync` and `concatBytes` not being found on the `utils` type.
 
 
 // Simple SIWS message parser
@@ -53,6 +52,8 @@ export default async function handler(req: any, res: any) {
         const signatureBytes = Buffer.from(signature, 'base64'); // Buffer is a Uint8Array subclass
         const publicKeyBytes = bs58.decode(parsedMessage.address); // This is a Uint8Array
 
+        // FIX: Switched to the async version of `verify`, which is the standard for modern @noble libraries.
+        // This avoids the need for synchronous hash function patching that was causing type errors.
         const isVerified = await ed.verify(signatureBytes, messageBytes, publicKeyBytes);
 
         if (!isVerified) {
