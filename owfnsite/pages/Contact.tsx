@@ -1,10 +1,9 @@
-
 import React, { useState, useRef } from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
 import { Link } from 'wouter';
 import { Info, Handshake, Newspaper, Wrench, Loader2, CheckCircle, HelpCircle, Mail, Twitter, Send } from 'lucide-react';
-import { DiscordIcon } from '../components/IconComponents.tsx';
-import { PROJECT_LINKS } from '../constants.ts';
+import { DiscordIcon } from '../components/IconComponents.js';
+import { PROJECT_LINKS } from '../lib/constants.js';
 
 interface ContactCardProps {
     icon: React.ReactNode;
@@ -62,7 +61,7 @@ const SocialLinkCard = ({ icon, title, description, href }: { icon: React.ReactN
 
 
 export default function Contact() {
-    const { t } = useAppContext();
+    const { t, currentLanguage } = useAppContext();
     const formRef = useRef<HTMLElement>(null);
 
     const reasonOptions = [
@@ -92,7 +91,7 @@ export default function Contact() {
             const response = await fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, reason, message }),
+                body: JSON.stringify({ name, email, reason, message, langCode: currentLanguage.code }),
             });
             const data = await response.json();
             if (response.ok && data.success) {

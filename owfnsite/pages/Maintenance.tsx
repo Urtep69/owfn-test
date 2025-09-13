@@ -1,10 +1,10 @@
 import React from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
 import { Wrench, Twitter, Send } from 'lucide-react';
-import { PROJECT_LINKS } from '../constants.ts';
-import { LanguageSwitcher } from '../components/LanguageSwitcher.tsx';
-import { DiscordIcon } from '../components/IconComponents.tsx';
-import { ThemeSwitcher } from '../components/ThemeSwitcher.tsx';
+import { PROJECT_LINKS } from '../lib/constants.js';
+import { LanguageSwitcher } from '../components/LanguageSwitcher.js';
+import { DiscordIcon } from '../components/IconComponents.js';
+import { ThemeSwitcher } from '../components/ThemeSwitcher.js';
 
 const socialLinks = [
   { href: PROJECT_LINKS.x, icon: <Twitter className="w-6 h-6" />, name: 'X' },

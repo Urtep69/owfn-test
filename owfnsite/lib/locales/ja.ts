@@ -1,4 +1,3 @@
-
 export const ja = {
     // Navigation
     home: `ホーム`,
@@ -125,6 +124,7 @@ export const ja = {
     token_extensions: `アクティブな拡張機能`,
     
     // Presale Page
+    presale_info: `プレセール情報`,
     presale_join_title: `プレセールに参加`,
     presale_ends_in: `プレセール終了まで`,
     progress: `進捗`,
@@ -174,6 +174,30 @@ export const ja = {
     presale_you_can_buy: `あなたはさらに {amount} SOL まで貢献できます。`,
     presale_bonus_offer: `{threshold} SOL 以上の購入で {percentage}% ボーナス！`,
     presale_checking_contribution: `あなたの貢献を確認しています...`,
+    bonus_tiers_title: `ボーナスレベル`,
+    bonus_tier_copper: `カッパーレベル`,
+    bonus_tier_bronze: `ブロンズレベル`,
+    bonus_tier_silver: `シルバーレベル`,
+    bonus_tier_gold: `ゴールドレベル`,
+    bonus_amount: `ボーナス額`,
+    total_to_receive: `合計受取額`,
+
+    // Presale Stages Page
+    presale_stages_title: `プレセール段階`,
+    presale_stages_subtitle: `資金調達フェーズの透明な概要。`,
+    public_presale: `公開プレセール`,
+    phase_1: `フェーズ1`,
+    phase_2: `フェーズ2`,
+    status_completed: `完了`,
+    status_active: `アクティブ`,
+    status_upcoming: `近日公開`,
+    period: `期間`,
+    token_price: `トークン価格`,
+    bonuses: `ボーナス`,
+    total_raised: `総調達額`,
+    live_progress: `ライブ進捗`,
+    participate_now: `今すぐ参加`,
+    bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) から {maxPercentage}% ({maxThreshold} SOL+)`,
     
     // Donations Page
     make_donation: `寄付する`,
@@ -264,7 +288,7 @@ export const ja = {
     case_update_1: `資材が現場に到着しました。来週から建設が始まります！`,
     case_update_2: `建築計画が最終決定され、地方自治体の承認を得ました。`,
     case_update_3: `プロジェクトの資金調達が正式に開始されました。OWFNコミュニティからの第一波の支援に感謝します。`,
-
+    
     // Partnerships Page
     partnerships_title: `パートナーシップと将来の協力`,
     partnerships_focus_title: `現在の焦点`,
@@ -320,15 +344,10 @@ export const ja = {
     faq_q14: `トークンが2%のAPYを持つ「利付」であるとはどういう意味ですか？どのように機能しますか？`,
     faq_a15: `この手数料は、私たちの使命の長期的な資金調達のための重要なメカニズムです。プレセール期間終了後*に*OWFNトークンとのすべての取引に0.5%の手数料が適用されます。この手数料から集められた資金は、私たちの社会プロジェクトを継続的に資金提供するために自動的にインパクト基金に送られます。したがって、すべての取引が共通の善に貢献します。`,
     faq_q16: `このプロジェクトになぜSolanaブロックチェーンを選んだのですか？`,
-    faq_a16: `私たちは、その卓越した速度、非常に低い取引コスト、および高いスケーラビリティのためにSolanaを選びました。これらの特徴は、私たちのようなグローバルプロジェクトにとって不可欠であり、効率的なマイクロトランザクションを可能にし、すべてのユーザー（寄付者、購入者、トレーダー）に迅速でアクセスしやすい体験を保証します。`,
-    faq_q17: `私の寄付があなたが支援する目的に届くことをどうやって確認できますか？`,
-    faq_a17: `透明性は私たちにとって基本的なものです。すべての資金は、ウォレットアドレスが公開されているインパクト基金を通じて管理されます。SolscanなどのSolanaブロックエクスプローラーですべての入出金取引を監視できます。さらに、インパクトポータルでは、資金提供されたプロジェクトに関する定期的な更新と詳細なレポートを提供します。`,
-    faq_q18: `OWFNが資金提供する社会的なケースや目的を提案できますか？`,
-    faq_a18: `初期段階では、プロジェクトは私たちのチームによってインパクトと実現可能性の厳格な基準に基づいて選択されます。プロジェクトが進行するにつれて、コミュニティメンバーが将来のイニシアチブを提案し、投票できるガバナンスシステム（DAO）を実装し、資金の方向性に直接的な役割を果たせるようにします。`,
-    faq_q19: `OWFNプロジェクトの背後には誰がいますか？チームは匿名ですか？`,
-    faq_a19: `私たちのチームのビジョンと価値観に関する詳細はウェブサイトに掲載されています。公開ローンチに近づくにつれて、プロジェクトの成功に貢献する主要メンバーとアドバイザーに関する透明性を高めますが、彼らの安全とプライバシーを尊重します。`,
-    faq_q20: `プロジェクトと投資家の資金を保護するためにどのようなセキュリティ対策を講じていますか？`,
-    faq_a20: `セキュリティは私たちの最優先事項です。重要な資金の管理にはマルチシグネチャウォレットを使用しており、これは単一の人物が取引を承認できないことを意味します。トークンのスマートコントラクトは、ローンチ前に潜在的な脆弱性を特定し修正するために、評判の良いセキュリティ会社によって監査されます。`,
+    faq_a17: `私たちは、その卓越した速度、非常に低い取引コスト、および高いスケーラビリティのためにSolanaを選びました。これらの特徴は、私たちのようなグローバルプロジェクトにとって不可欠であり、効率的なマイクロトランザクションを可能にし、すべてのユーザー（寄付者、購入者、トレーダー）に迅速でアクセスしやすい体験を保証します。`,
+    faq_q18: `私の寄付があなたが支援する目的に届くことをどうやって確認できますか？`,
+    faq_a19: `透明性は私たちにとって基本的なものです。すべての資金は、ウォレットアドレスが公開されているインパクト基金を通じて管理されます。SolscanなどのSolanaブロックエクスプローラーですべての入出金取引を監視できます。さらに、インパクトポータルでは、資金提供されたプロジェクトに関する定期的な更新と詳細なレポートを提供します。`,
+    faq_q20: `OWFNが資金提供する社会的なケースや目的を提案できますか？`,
 
     // Chatbot
     chatbot_title: `OWFNアシスタント`,
@@ -461,7 +480,7 @@ export const ja = {
     airdrop_not_eligible: `対象外`,
     airdrop_not_eligible_message: `申し訳ありませんが、このウォレットアドレスは現在のエアドロップの対象外です。今後の機会のためにコミュニティで活動を続けてください！`,
     airdrop_info_box_title: `このエアドロップについて`,
-    airdrop_info_box_desc: `このエアドロップは、早期支援者とアクティブなコミュニティメンバーを報酬するために設計されています。資格は、プレセールへの参加やコミュニティイベントへの参加などの要因に基づいています。`,
+    airdrop_info_box_desc: `このエアドロップは、早期支援者とアクティブなコミュニティメンバーを報奨するために設計されています。資格は、プレセールへの参加やコミュニティイベントへの関与などの要因に基づいています。`,
     
     // Governance
     governance_title: `ガバナンス`,
@@ -477,9 +496,9 @@ export const ja = {
     votes_for: `賛成`,
     votes_against: `反対`,
     ends_in: `終了まで`,
-    status_active: `進行中`,
-    status_passed: `可決`,
-    status_failed: `否決`,
+    governance_status_active: `進行中`,
+    governance_status_passed: `可決`,
+    governance_status_failed: `否決`,
     you_voted: `投票済み`,
     no_active_proposals: `現在、進行中の提案はありません。`,
     no_past_proposals: `表示する過去の提案はありません。`,
@@ -566,13 +585,13 @@ export const ja = {
     contact_required_fields: `アスタリスク（*）が付いている項目は必須です。`,
     contact_disclaimer_title: `コミュニケーションポリシーに関する注意`,
     contact_disclaimer_message: `チームがコミュニティを効果的にサポートし、プロジェクトを推進できるようにするため、公式ワールドファミリーネットワークに直接関連する問い合わせを優先します。トピック外、スパム、または未承諾の勧誘メッセージには返信しない場合があります。ご理解とご協力に感謝し、私たちの使命に集中できるようご協力ください。`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `リアルタイムの更新、ニュース、お知らせについては、フォローしてください。`,
-    contact_social_telegram_channel_title: `Telegramチャンネル`,
-    contact_social_telegram_channel_desc: `重要なお知らせや公式ニュースについては、購読してください。`,
-    contact_social_telegram_group_title: `Telegramグループ`,
-    contact_social_telegram_group_desc: `他のメンバーと議論し、交流するためにコミュニティグループに参加してください。`,
-    contact_social_discord_title: `Discordサーバー`,
-    contact_social_discord_desc: `議論やサポートのために、活発なコミュニティの一員になりましょう。`,
     send_direct_message: `ダイレクトメッセージを送信`,
+    contact_social_x_title: `Xで私たちを見つけてください`,
+    contact_social_x_desc: `公式アカウントをフォローして、最新のニュースやお知らせを入手してください。`,
+    contact_social_telegram_channel_title: `テレグラムチャンネル`,
+    contact_social_telegram_channel_desc: `重要な更新情報やプロジェクトニュースについては、私たちのチャンネルを購読してください。`,
+    contact_social_telegram_group_title: `テレグラムグループ`,
+    contact_social_telegram_group_desc: `私たちのコミュニティグループに参加して、チャットしたり、質問したり、交流したりしましょう。`,
+    contact_social_discord_title: `Discordサーバー`,
+    contact_social_discord_desc: `詳細な議論のために、私たちのDiscordコミュニティの一員になりましょう。`,
 };

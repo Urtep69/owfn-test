@@ -1,5 +1,5 @@
-import type { TokenDetails } from '../types.ts';
-import { MOCK_TOKEN_DETAILS } from '../constants.ts';
+import type { TokenDetails } from '../lib/types.js';
+import { MOCK_TOKEN_DETAILS } from '../lib/constants.js';
 
 const HELIUS_API_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
 

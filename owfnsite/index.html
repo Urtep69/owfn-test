@@ -91,6 +91,7 @@
               'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
               'slide-in': 'slideIn 0.5s ease-out forwards',
               'glow': 'glow 1.5s ease-in-out infinite alternate',
+              'active-glow': 'activeGlow 2.5s ease-in-out infinite alternate',
             },
             keyframes: {
               fadeInUp: {
@@ -104,6 +105,10 @@
               glow: {
                 'from': { 'box-shadow': '0 0 5px -5px #fbbf24' },
                 'to': { 'box-shadow': '0 0 5px 5px #fbbf24' }
+              },
+              activeGlow: {
+                'from': { 'box-shadow': '0 0 10px -5px #fbbf24, inset 0 0 5px -5px #fbbf24' },
+                'to': { 'box-shadow': '0 0 20px 2px #fbbf24, inset 0 0 10px 0px #fbbf24' }
               }
             },
           },
@@ -115,12 +120,24 @@
             /* Reduce base font size to make UI text smaller across the site */
             font-size: 15px;
         }
+        .presale-card {
+            transform-style: preserve-3d;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .presale-card:hover {
+            transform: perspective(1000px) rotateY(-5deg) scale(1.03);
+        }
+        .dark .presale-card:hover {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        }
+        .light .presale-card:hover {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
     </style>
     <link rel="stylesheet" href="https://esm.sh/@solana/wallet-adapter-react-ui@^0.9.39/styles.css" />
 <script type="importmap">
 {
   "imports": {
-    "@google/genai": "https://esm.sh/@google/genai@^1.13.0",
     "@solana/spl-token": "https://esm.sh/@solana/spl-token@^0.4.13",
     "@solana/wallet-adapter-base": "https://esm.sh/@solana/wallet-adapter-base@^0.9.27",
     "@solana/wallet-adapter-phantom": "https://esm.sh/@solana/wallet-adapter-phantom@^0.9.28",
@@ -135,7 +152,14 @@
     "react/": "https://esm.sh/react@18.3.1/",
     "recharts": "https://esm.sh/recharts@^3.1.2?deps=react@18.3.1,react-dom@18.3.1",
     "wouter": "https://esm.sh/wouter@^3.7.1?deps=react@18.3.1",
-    "@vercel/analytics/": "https://aistudiocdn.com/@vercel/analytics@^1.5.0/"
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0",
+    "@vercel/analytics/": "https://aistudiocdn.com/@vercel/analytics@^1.5.0/",
+    "cookie": "https://aistudiocdn.com/cookie@^1.0.2",
+    "bs58": "https://aistudiocdn.com/bs58@^6.0.0",
+    "crypto": "https://aistudiocdn.com/crypto@^1.0.1",
+    "buffer": "https://esm.sh/buffer@6.0.3",
+    "@noble/ed25519": "https://aistudiocdn.com/@noble/ed25519@^3.0.0",
+    "@noble/hashes/": "https://aistudiocdn.com/@noble/hashes@^2.0.0/"
   }
 }
 </script>

@@ -1,7 +1,7 @@
 import React from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
-import { ComingSoon } from './ComingSoon.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
+import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
+import { ComingSoon } from './ComingSoon.js';
 
 interface ComingSoonWrapperProps {
     children: React.ReactNode;

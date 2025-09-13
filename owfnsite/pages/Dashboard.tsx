@@ -1,11 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { DISTRIBUTION_WALLETS } from '../constants.ts';
-import type { Wallet, Token } from '../types.ts';
-import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.tsx';
-import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import { formatNumber } from '../lib/utils.ts';
+import { useAppContext } from '../contexts/AppContext.js';
+import { DISTRIBUTION_WALLETS } from '../lib/constants.js';
+import type { Wallet, Token } from '../lib/types.js';
+import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.js';
+import { AddressDisplay } from '../components/AddressDisplay.js';
+import { formatNumber } from '../lib/utils.js';
 
 const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'> }) => {
     const { t, solana } = useAppContext();

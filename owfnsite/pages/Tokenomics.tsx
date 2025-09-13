@@ -1,10 +1,9 @@
 
-
 import React from 'react';
-import { AllocationChart } from '../components/AllocationChart.tsx';
-import { TOKEN_DETAILS, TOKEN_ALLOCATIONS } from '../constants.ts';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { OwfnIcon } from '../components/IconComponents.tsx';
+import { AllocationChart } from '../components/AllocationChart.js';
+import { TOKEN_DETAILS, TOKEN_ALLOCATIONS } from '../lib/constants.js';
+import { useAppContext } from '../contexts/AppContext.js';
+import { OwfnIcon } from '../components/IconComponents.js';
 
 const DetailItem = ({ label, value }: { label: string, value: React.ReactNode }) => (
     <div className="flex justify-between items-center py-3 border-b border-primary-200 dark:border-darkPrimary-700">

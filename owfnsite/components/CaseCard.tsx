@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import type { SocialCase } from '../types.ts';
-import { ProgressBar } from './ProgressBar.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
+import type { SocialCase } from '../lib/types.js';
+import { ProgressBar } from './ProgressBar.js';
 
 export const CaseCard = ({ socialCase }: { socialCase: SocialCase }) => {
     const { t, currentLanguage } = useAppContext();

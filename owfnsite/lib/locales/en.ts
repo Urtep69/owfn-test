@@ -1,4 +1,3 @@
-
 export const en = {
     // Navigation
     home: `Home`,
@@ -125,6 +124,7 @@ export const en = {
     token_extensions: `Active Extensions`,
     
     // Presale Page
+    presale_info: `Presale Info`,
     presale_join_title: `Join the Presale`,
     presale_ends_in: `Presale ends in`,
     progress: `Progress`,
@@ -174,7 +174,31 @@ export const en = {
     presale_you_can_buy: `You can contribute up to {amount} more SOL.`,
     presale_bonus_offer: `{percentage}% BONUS on purchases of {threshold} SOL or more!`,
     presale_checking_contribution: `Checking your contribution...`,
+    bonus_tiers_title: `Bonus Tiers`,
+    bonus_tier_copper: `Copper Level`,
+    bonus_tier_bronze: `Bronze Level`,
+    bonus_tier_silver: `Silver Level`,
+    bonus_tier_gold: `Gold Level`,
+    bonus_amount: `Bonus Amount`,
+    total_to_receive: `Total To Receive`,
 
+    // Presale Stages Page
+    presale_stages_title: `Presale Stages`,
+    presale_stages_subtitle: `A transparent overview of our funding phases.`,
+    public_presale: `Public Presale`,
+    phase_1: `Phase 1`,
+    phase_2: `Phase 2`,
+    status_completed: `Completed`,
+    status_active: `Active`,
+    status_upcoming: `Upcoming`,
+    period: `Period`,
+    token_price: `Token Price`,
+    bonuses: `Bonuses`,
+    total_raised: `Total Raised`,
+    live_progress: `Live Progress`,
+    participate_now: `Participate Now`,
+    bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) to {maxPercentage}% ({maxThreshold} SOL+)`,
+    
     // Donations Page
     make_donation: `Make a Donation`,
     donation_desc: `Support our social impact initiatives by donating crypto. All funds go directly to the Impact Treasury.`,
@@ -318,8 +342,6 @@ export const en = {
     faq_q13: 'Why is there a maximum purchase limit (Max Buy) in the presale?',
     faq_a13: 'The maximum purchase limit is an important measure to ensure the fairest possible distribution of tokens and to prevent a small number of large investors ("whales") from controlling a significant portion of the supply. This promotes a healthier and more decentralized community in the long run.',
     faq_q14: 'What does it mean that the token is "Interest-Bearing" with 2% APY? How does it work?',
-    faq_a14: 'It means the OWFN token is programmed to automatically generate interest. Just by holding the tokens in your Solana-compatible wallet, the amount of your tokens will increase over time, with a 2% Annual Percentage Yield (APY). You do not need to stake them or take any additional action; the rewards accumulate automatically.',
-    faq_q15: 'What is the 0.5% transfer fee and when will it be activated?',
     faq_a15: 'This fee is a key mechanism for the long-term funding of our mission. A 0.5% fee will apply to all transactions with the OWFN token *after* the presale period concludes. The funds collected from this fee are automatically directed to the Impact Treasury to continuously fund our social projects. Thus, every transaction contributes to the common good.',
     faq_q16: 'Why did you choose the Solana blockchain for this project?',
     faq_a16: 'We chose Solana for its exceptional speed, very low transaction costs, and high scalability. These features are essential for a global project like ours, allowing for efficient micro-transactions and ensuring a fast and accessible experience for all users, whether they are donating, buying, or trading tokens.',
@@ -339,6 +361,10 @@ export const en = {
     chatbot_loading_1: `Connecting to my circuits...`,
     chatbot_loading_2: `Analyzing your question...`,
     chatbot_loading_3: `Formulating a response...`,
+    chatbot_welcome_message: `Hello! I'm the OWFN Assistant. How can I help you learn about our mission today?`,
+    chatbot_suggestion_1: `What is OWFN?`,
+    chatbot_suggestion_2: `How do I buy?`,
+    chatbot_suggestion_3: `Tell me about bonuses.`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -463,7 +489,7 @@ export const en = {
     airdrop_not_eligible: `Not Eligible`,
     airdrop_not_eligible_message: `Sorry, this wallet address is not eligible for the current airdrop. Stay active in our community for future opportunities!`,
     airdrop_info_box_title: `About this Airdrop`,
-    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors like participation in the presale and engagement in community events.`,
+    airdrop_info_box_desc: `This airdrop is designed to reward early supporters and active community members. Eligibility is based on factors such as presale participation and engagement in community events.`,
     
     // Governance
     governance_title: `Governance`,
@@ -479,9 +505,9 @@ export const en = {
     votes_for: `For`,
     votes_against: `Against`,
     ends_in: `Ends in`,
-    status_active: `Active`,
-    status_passed: `Passed`,
-    status_failed: `Failed`,
+    governance_status_active: `Active`,
+    governance_status_passed: `Passed`,
+    governance_status_failed: `Failed`,
     you_voted: `You Voted`,
     no_active_proposals: `There are currently no active proposals.`,
     no_past_proposals: `There are no past proposals to display.`,
@@ -568,13 +594,13 @@ export const en = {
     contact_required_fields: `Fields marked with an asterisk (*) are required.`,
     contact_disclaimer_title: `A Note on Our Communication Policy`,
     contact_disclaimer_message: `To ensure our team can effectively support the community and advance the project, we prioritize inquiries directly related to the Official World Family Network. Messages that are off-topic, spam, or unsolicited solicitations may not receive a response. Thank you for your understanding and for helping us stay focused on our mission.`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Follow us for real-time updates, news, and announcements.`,
-    contact_social_telegram_channel_title: `Telegram Channel`,
-    contact_social_telegram_channel_desc: `Subscribe for important announcements and official news.`,
-    contact_social_telegram_group_title: `Telegram Group`,
-    contact_social_telegram_group_desc: `Join our community group to discuss and engage with other members.`,
-    contact_social_discord_title: `Discord Server`,
-    contact_social_discord_desc: `Become part of our active community for discussions and support.`,
     send_direct_message: `Send a Direct Message`,
+    contact_social_x_title: `Find Us on X`,
+    contact_social_x_desc: `Follow our official account for real-time updates, news, and announcements.`,
+    contact_social_telegram_channel_title: `Telegram Channel`,
+    contact_social_telegram_channel_desc: `Subscribe to our channel for important updates and project news.`,
+    contact_social_telegram_group_title: `Telegram Group`,
+    contact_social_telegram_group_desc: `Join our community group to chat, ask questions, and interact with us.`,
+    contact_social_discord_title: `Discord Server`,
+    contact_social_discord_desc: `Become part of our Discord community for in-depth discussions.`,
 };

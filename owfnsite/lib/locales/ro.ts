@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,
@@ -125,6 +124,7 @@ export const ro = {
     token_extensions: `Extensii Active`,
     
     // Presale Page
+    presale_info: `Info Prevânzare`,
     presale_join_title: `Alătură-te Prevânzării`,
     presale_ends_in: `Prevânzarea se încheie în`,
     progress: `Progres`,
@@ -174,6 +174,30 @@ export const ro = {
     presale_you_can_buy: `Puteți contribui cu până la încă {amount} SOL.`,
     presale_bonus_offer: `BONUS {percentage}% la achiziții de {threshold} SOL sau mai mult!`,
     presale_checking_contribution: `Se verifică contribuția...`,
+    bonus_tiers_title: `Niveluri de Bonus`,
+    bonus_tier_copper: `Nivel Cupru`,
+    bonus_tier_bronze: `Nivel Bronz`,
+    bonus_tier_silver: `Nivel Argint`,
+    bonus_tier_gold: `Nivel Aur`,
+    bonus_amount: `Sumă Bonus`,
+    total_to_receive: `Total de Primit`,
+
+    // Presale Stages Page
+    presale_stages_title: `Etapele Prevânzării`,
+    presale_stages_subtitle: `O prezentare transparentă a etapelor noastre de finanțare.`,
+    public_presale: `Prevânzare Publică`,
+    phase_1: `Faza 1`,
+    phase_2: `Faza 2`,
+    status_completed: `Finalizat`,
+    status_active: `Activ`,
+    status_upcoming: `Urmează`,
+    period: `Perioadă`,
+    token_price: `Preț Token`,
+    bonuses: `Bonusuri`,
+    total_raised: `Total Strâns`,
+    live_progress: `Progres Live`,
+    participate_now: `Participă Acum`,
+    bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) la {maxPercentage}% ({maxThreshold} SOL+)`,
 
     // Donations Page
     make_donation: `Fă o Donație`,
@@ -318,8 +342,6 @@ export const ro = {
     faq_q13: `De ce există o limită maximă de cumpărare (Max Buy) în prevânzare?`,
     faq_a13: `Limita maximă de cumpărare este o măsură importantă pentru a asigura o distribuție cât mai echitabilă a tokenilor și pentru a preveni ca un număr mic de investitori mari ("whales") să controleze o parte semnificativă din ofertă. Acest lucru promovează o comunitate mai sănătoasă și mai descentralizată pe termen lung.`,
     faq_q14: `Ce înseamnă că tokenul este "Purtător de Dobândă" (Interest-Bearing) cu 2% APY? Cum funcționează?`,
-    faq_a14: `Înseamnă că tokenul OWFN este programat să genereze automat o dobândă. Doar prin deținerea tokenilor în portofelul dumneavoastră compatibil cu Solana, cantitatea de tokeni va crește în timp, cu un randament procentual anual (APY) de 2%. Nu este necesar să îi puneți în staking sau să faceți vreo acțiune suplimentară; recompensele se acumulează automat.`,
-    faq_q15: `Ce este taxa de transfer de 0.5% și când se va activa?`,
     faq_a15: `Această taxă este un mecanism cheie pentru finanțarea pe termen lung a misiunii noastre. O taxă de 0.5% se va aplica tuturor tranzacțiilor cu tokenul OWFN *după* finalizarea perioadei de prevânzare. Fondurile colectate din această taxă sunt direcționate automat către Trezoreria de Impact pentru a finanța continuu proiectele noastre sociale. Astfel, fiecare tranzacție contribuie la binele comun.`,
     faq_q16: `De ce ați ales blockchain-ul Solana pentru acest proiect?`,
     faq_a16: `Am ales Solana datorită vitezei sale excepționale, costurilor de tranzacție foarte scăzute și scalabilității ridicate. Aceste caracteristici sunt esențiale pentru un proiect global ca al nostru, permițând micro-tranzacții eficiente și asigurând o experiență rapidă și accesibilă pentru toți utilizatorii, fie că donează, cumpără sau tranzacționează tokeni.`,
@@ -339,6 +361,10 @@ export const ro = {
     chatbot_loading_1: `Mă conectez la circuitele mele...`,
     chatbot_loading_2: `Analizez întrebarea...`,
     chatbot_loading_3: `Formulez un răspuns...`,
+    chatbot_welcome_message: `Salut! Sunt Asistentul OWFN. Cum te pot ajuta astăzi să afli mai multe despre misiunea noastră?`,
+    chatbot_suggestion_1: `Ce este OWFN?`,
+    chatbot_suggestion_2: `Cum cumpăr?`,
+    chatbot_suggestion_3: `Spune-mi despre bonusuri.`,
     
     // Whitepaper
     whitepaper_title: `Whitepaper OWFN`,
@@ -392,6 +418,7 @@ export const ro = {
     token_distribution: `Distribuție Token`,
     is_mintable: `Se poate crea?`,
     is_freezable: `Se poate îngheța?`,
+
     deployer: `Creator`,
     lp_burned: `LP Ars`,
     enabled: `Activat`,
@@ -479,9 +506,9 @@ export const ro = {
     votes_for: `Pentru`,
     votes_against: `Împotrivă`,
     ends_in: `Se termină în`,
-    status_active: `Activă`,
-    status_passed: `Aprobată`,
-    status_failed: `Respinsă`,
+    governance_status_active: `Activă`,
+    governance_status_passed: `Aprobată`,
+    governance_status_failed: `Respinsă`,
     you_voted: `Ai Votat`,
     no_active_proposals: `Momentan nu există propuneri active.`,
     no_past_proposals: `Nu există propuneri anterioare de afișat.`,
@@ -568,13 +595,13 @@ export const ro = {
     contact_required_fields: `Câmpurile marcate cu asterisc (*) sunt obligatorii.`,
     contact_disclaimer_title: `Notă privind Politica Noastră de Comunicare`,
     contact_disclaimer_message: `Pentru a ne asigura că echipa noastră poate sprijini eficient comunitatea și poate avansa proiectul, prioritizăm solicitările direct legate de Official World Family Network. Mesajele care nu au legătură cu subiectul, sunt spam sau nesolicitate s-ar putea să nu primească un răspuns. Vă mulțumim pentru înțelegere și pentru că ne ajutați să rămânem concentrați pe misiunea noastră.`,
-    contact_social_x_title: `X.com / Twitter`,
-    contact_social_x_desc: `Urmăriți-ne pentru actualizări în timp real, știri și anunțuri.`,
-    contact_social_telegram_channel_title: `Canal Telegram`,
-    contact_social_telegram_channel_desc: `Abonați-vă pentru anunțuri importante și știri oficiale.`,
-    contact_social_telegram_group_title: `Grup Telegram`,
-    contact_social_telegram_group_desc: `Alăturați-vă grupului nostru comunitar pentru a discuta și interacționa cu alți membri.`,
-    contact_social_discord_title: `Server Discord`,
-    contact_social_discord_desc: `Deveniți parte a comunității noastre active pentru discuții și suport.`,
     send_direct_message: 'Trimite un Mesaj Direct',
+    contact_social_x_title: `Găsește-ne pe X.com / Twitter`,
+    contact_social_x_desc: `Urmărește-ne pentru actualizări în timp real, știri și anunțuri.`,
+    contact_social_telegram_channel_title: `Canal Telegram`,
+    contact_social_telegram_channel_desc: `Abonează-te pentru anunțuri importante și știri oficiale.`,
+    contact_social_telegram_group_title: `Grup Telegram`,
+    contact_social_telegram_group_desc: `Alătură-te grupului nostru comunitar pentru a discuta și a interacționa cu alți membri.`,
+    contact_social_discord_title: `Server Discord`,
+    contact_social_discord_desc: `Devino parte a comunității noastre active pentru discuții și suport.`,
 };

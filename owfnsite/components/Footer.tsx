@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Twitter, Send } from 'lucide-react';
-import { PROJECT_LINKS } from '../constants.ts';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { DiscordIcon } from './IconComponents.tsx';
+import { PROJECT_LINKS } from '../lib/constants.js';
+import { useAppContext } from '../contexts/AppContext.js';
+import { DiscordIcon } from './IconComponents.js';
 
 const socialLinks = [
   { href: PROJECT_LINKS.x, icon: <Twitter className="w-6 h-6" />, name: 'X' },

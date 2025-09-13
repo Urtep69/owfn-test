@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useRoute } from 'wouter';
 import { 
@@ -6,9 +5,9 @@ import {
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
     Heart, TrendingUp, Lock, Award, User, Vote, Shield
 } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.tsx';
-import { OwfnIcon } from './IconComponents.tsx';
-import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import { useAppContext } from '../contexts/AppContext.js';
+import { OwfnIcon } from './IconComponents.js';
+import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -66,6 +65,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             title: t('sidebar_finance'),
             links: [
                 { to: '/presale', label: t('presale'), icon: <ShoppingCart size={20} /> },
+                { to: '/presale-info', label: t('presale_info'), icon: <Briefcase size={20} /> },
                 { to: '/tokenomics', label: t('tokenomics'), icon: <PieChart size={20} /> },
                 { to: '/donations', label: t('donations'), icon: <Gift size={20} /> },
                 { to: '/dashboard', label: t('dashboard'), icon: <BarChart2 size={20} /> },

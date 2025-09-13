@@ -1,20 +1,19 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useAppContext } from '../contexts/AppContext.tsx';
+import { useAppContext } from '../contexts/AppContext.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction, getAccount, ACCOUNT_SIZE } from '@solana/spl-token';
 
 import { 
     DISTRIBUTION_WALLETS, 
-    PRESALE_DETAILS,
+    PRESALE_STAGES,
     OWFN_MINT_ADDRESS,
     TOKEN_DETAILS,
-} from '../constants.ts';
+} from '../lib/constants.js';
 import { Loader2, RefreshCw, Download, Send, AlertTriangle, FileText, CheckCircle, XCircle, User, PieChart, RotateCcw } from 'lucide-react';
-import { SolIcon } from '../components/IconComponents.tsx';
-import { AddressDisplay } from '../components/AddressDisplay.tsx';
-import type { Token } from '../types.ts';
+import { SolIcon } from '../components/IconComponents.js';
+import { AddressDisplay } from '../components/AddressDisplay.js';
+import type { Token, PresaleStage } from '../lib/types.js';
 
 interface PresaleTx {
     signature: string;
@@ -30,6 +29,8 @@ interface AggregatedContributor {
     totalSol: number;
     totalOwfn: bigint; // Use BigInt for precision
 }
+
+const currentStage: PresaleStage = PRESALE_STAGES.find(s => s.status === 'active') || PRESALE_STAGES[0];
 
 const StatCard = ({ title, value, icon }: { title: string, value: string | number, icon: React.ReactNode }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-md flex items-center space-x-4">
@@ -76,7 +77,7 @@ export default function AdminPresale() {
         setLoading(true);
         try {
             const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
-            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
             
             let allSignatures: ConfirmedSignatureInfo[] = [];
             let lastSignature: string | undefined = undefined;
@@ -115,7 +116,7 @@ export default function AdminPresale() {
                                     signature: batchSignatures[index],
                                     from: inst.parsed.info.source,
                                     solAmount: inst.parsed.info.lamports / LAMPORTS_PER_SOL,
-                                    owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
+                                    owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
                                     timestamp: tx.blockTime,
                                     lamports: inst.parsed.info.lamports,
                                 });
@@ -145,38 +146,43 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
-        // A map to store the final aggregated data for each contributor.
-        const contributorMap = new Map<string, { totalLamports: bigint; totalOwfn: bigint }>();
-
-        const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
-        const bonusThresholdLamports = BigInt(Math.round(PRESALE_DETAILS.bonusThreshold * LAMPORTS_PER_SOL));
+        const contributorMap = new Map<string, { totalSol: number; totalOwfn: bigint }>();
+        const presaleRateBigInt = BigInt(currentStage.rate);
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
-
-        // Process each transaction individually to calculate the correct OWFN amount with bonus.
-        transactions.forEach(tx => {
+        const sortedTiers = [...currentStage.bonusTiers].sort((a, b) => b.threshold - a.threshold);
+    
+        for (const tx of transactions) {
             const lamports = BigInt(tx.lamports);
-            
+            const solAmount = tx.solAmount;
+    
             // Calculate base OWFN for this single transaction
-            let owfnForThisTx = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
-
-            // Check if this single transaction qualifies for a bonus
-            if (lamports >= bonusThresholdLamports) {
-                const bonusAmount = (owfnForThisTx * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
-                owfnForThisTx += bonusAmount;
+            const baseOwfn = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
+    
+            // Find bonus ONLY for this single transaction
+            const applicableTier = sortedTiers.find(tier => solAmount >= tier.threshold);
+            let bonusOwfn = 0n;
+            if (applicableTier) {
+                bonusOwfn = (baseOwfn * BigInt(applicableTier.percentage)) / 100n;
             }
-
-            // Aggregate the results for the contributor.
-            const existing = contributorMap.get(tx.from) ?? { totalLamports: 0n, totalOwfn: 0n };
-            existing.totalLamports += lamports;
-            existing.totalOwfn += owfnForThisTx;
-            contributorMap.set(tx.from, existing);
-        });
-
-        // Convert the map to the final array structure.
-        return Array.from(contributorMap.entries()).map(([address, data]) => {
-            const totalSol = Number(data.totalLamports) / LAMPORTS_PER_SOL;
-            return { address, totalSol, totalOwfn: data.totalOwfn };
-        });
+    
+            const totalOwfnForTx = baseOwfn + bonusOwfn;
+    
+            // Aggregate results for the contributor
+            const currentData = contributorMap.get(tx.from) || { totalSol: 0, totalOwfn: 0n };
+            currentData.totalSol += solAmount;
+            currentData.totalOwfn += totalOwfnForTx;
+            contributorMap.set(tx.from, currentData);
+        }
+    
+        const results: AggregatedContributor[] = [];
+        for (const [address, data] of contributorMap.entries()) {
+            results.push({
+                address,
+                totalSol: data.totalSol,
+                totalOwfn: data.totalOwfn,
+            });
+        }
+        return results;
     }, [transactions]);
 
 
