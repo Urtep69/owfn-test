@@ -29,6 +29,9 @@ interface AppContextType {
   isAdmin: boolean;
   setWalletModalOpen: (open: boolean) => void;
   presaleProgress: PresaleProgress;
+  favorites: string[];
+  addFavorite: (mint: string) => void;
+  removeFavorite: (mint: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -42,6 +45,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
+  const [favorites, setFavorites] = useState<string[]>(() => {
+      try {
+        const saved = window.localStorage.getItem('owfn-favorites');
+        return saved ? JSON.parse(saved) : [];
+      } catch (error) {
+        return [];
+      }
+  });
   
   const isAdmin = useMemo(() => solana.address === ADMIN_WALLET_ADDRESS, [solana.address]);
   const isMaintenanceActive = useMemo(() => MAINTENANCE_MODE_ACTIVE && !isAdmin, [isAdmin]);
@@ -52,6 +63,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     contributors: 0,
     isLoading: true,
   });
+  
+  useEffect(() => {
+    try {
+        window.localStorage.setItem('owfn-favorites', JSON.stringify(favorites));
+    } catch (error) {
+        console.warn("Could not save favorites to localStorage", error);
+    }
+  }, [favorites]);
+
+  const addFavorite = useCallback((mint: string) => {
+    setFavorites(prev => [...new Set([...prev, mint])]);
+  }, []);
+
+  const removeFavorite = useCallback((mint: string) => {
+    setFavorites(prev => prev.filter(fav => fav !== mint));
+  }, []);
 
   const fetchPresaleProgress = useCallback(async () => {
     if (new Date() < new Date(currentStage.startDate)) {
@@ -189,6 +216,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isAdmin,
     setWalletModalOpen,
     presaleProgress,
+    favorites,
+    addFavorite,
+    removeFavorite,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

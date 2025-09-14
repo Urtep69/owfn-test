@@ -65,34 +65,37 @@ export interface TokenExtension {
     state: TokenExtensionState;
 }
 
+export interface LiquidityPool {
+    exchange: 'Raydium' | 'Orca' | 'Meteora' | 'Unknown';
+    lpMintAddress: string;
+    url: string;
+}
+
 export interface TokenDetails extends Token {
     description?: string;
     links?: Record<string, string>;
     marketCap?: number;
     volume24h?: number;
-    price24hChange?: number;
     holders?: number;
     totalSupply: number;
     circulatingSupply?: number;
     
-    priceSol?: number;
-    liquidity?: number;
-    pairAddress?: string;
-    fdv?: number;
-    poolCreatedAt?: number; // Timestamp
-    txns?: {
-        h24: { buys: number, sells: number };
-    };
-    dexId?: string;
-
-    // On-chain technical details
+    // Technical Details
     creatorAddress?: string;
+    createdAt?: number; // Unix timestamp
     mintAuthority?: string | null;
     freezeAuthority?: string | null;
-    updateAuthority?: string | null;
+    updateAuthority?: string | null; // This is the metadata update authority
     tokenStandard?: 'SPL Token' | 'Token-2022' | string;
-    tokenExtensions?: TokenExtension[];
+    extensions?: TokenExtension[];
+
+    // Market data
+    liquidityPools?: LiquidityPool[];
+
+    // User-specific state
+    isFavorite?: boolean;
 }
+
 
 export interface LiveTransaction {
     id: string;

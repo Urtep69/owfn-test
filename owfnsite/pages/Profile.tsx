@@ -1,10 +1,9 @@
-
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
-import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2, Star } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
-import type { ImpactBadge, ImpactNFT } from '../lib/types.js';
+import type { ImpactBadge, Token } from '../lib/types.js';
 import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.js';
 import { formatNumber } from '../lib/utils.js';
@@ -25,8 +24,89 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
     </div>
 );
 
+const FavoriteTokenRow = ({ mintAddress }: { mintAddress: string }) => {
+    const { solana } = useAppContext();
+    const [tokenInfo, setTokenInfo] = React.useState<Token | null>(null);
+
+    React.useEffect(() => {
+        const fetchTokenInfo = async () => {
+            // This is a simplified fetch; in a real app, this might be batched
+            // or use a more efficient price API. For now, we simulate fetching.
+            try {
+                const res = await fetch('/api/token-prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mints: [mintAddress] }),
+                });
+                if (res.ok) {
+                    const priceData = await res.json();
+                    const data = priceData[mintAddress];
+                    if (data) {
+                        setTokenInfo({
+                            mintAddress: mintAddress,
+                            name: data.name,
+                            symbol: data.symbol,
+                            pricePerToken: data.price,
+                            logo: data.logoURI,
+                            balance: 0, // Not relevant here
+                            usdValue: 0, // Not relevant here
+                            decimals: data.decimals,
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to fetch favorite token info", e);
+            }
+        };
+        fetchTokenInfo();
+    }, [mintAddress]);
+
+    if (!tokenInfo) {
+        return (
+            <div className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg bg-primary-100/50 dark:bg-darkPrimary-700/50 animate-pulse">
+                <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 rounded-full bg-primary-200 dark:bg-darkPrimary-600"></div>
+                    <div>
+                        <div className="h-4 w-16 bg-primary-200 dark:bg-darkPrimary-600 rounded"></div>
+                        <div className="h-3 w-10 bg-primary-200 dark:bg-darkPrimary-600 rounded mt-1"></div>
+                    </div>
+                </div>
+                <div className="text-right font-mono">
+                    <div className="h-4 w-20 bg-primary-200 dark:bg-darkPrimary-600 rounded ml-auto"></div>
+                </div>
+                <div className="text-right font-mono">
+                    <div className="h-4 w-24 bg-primary-200 dark:bg-darkPrimary-600 rounded ml-auto"></div>
+                </div>
+            </div>
+        );
+    }
+    
+    return (
+        <Link to={`/dashboard/token/${tokenInfo.mintAddress}?from=/profile`}>
+            <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors duration-200 cursor-pointer">
+                 <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                        <img src={tokenInfo.logo as string} alt={tokenInfo.name} className="w-full h-full rounded-full" />
+                    </div>
+                    <div>
+                        <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{tokenInfo.symbol}</p>
+                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{tokenInfo.name}</p>
+                    </div>
+                </div>
+                <div className="text-right font-mono">
+                    <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">${tokenInfo.pricePerToken.toPrecision(4)}</p>
+                </div>
+                <div className="text-right">
+                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 inline-block"/>
+                </div>
+            </a>
+        </Link>
+    );
+};
+
+
 export default function Profile() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana, setWalletModalOpen, favorites } = useAppContext();
     const { connected, address, userTokens, loading, userStats } = solana;
     
     const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
@@ -65,110 +145,94 @@ export default function Profile() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                <h2 className="text-2xl font-bold mb-4">{t('my_tokens')}</h2>
-                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
-                    <div>
-                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('token_types')}</p>
-                        <p className="text-2xl font-bold">{loading ? '-' : userTokens.length}</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
-                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                            {loading ? '-' : `$${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                        </p>
-                    </div>
-                </div>
-                
-                {loading ? (
-                    <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
-                        <Loader2 className="w-6 h-6 animate-spin" />
-                        <span>{t('profile_loading_tokens')}</span>
-                    </div>
-                ) : userTokens.length > 0 ? (
-                    <div className="space-y-2">
-                        {/* Header */}
-                        <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
-                            <span>{t('asset')}</span>
-                            <span className="text-right">{t('balance')}</span>
-                            <span className="text-right">{t('value_usd')}</span>
+            <div className="grid lg:grid-cols-5 gap-8">
+                <div className="lg:col-span-3 bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h2 className="text-2xl font-bold mb-4">{t('my_tokens')}</h2>
+                    <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
+                        <div>
+                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('token_types')}</p>
+                            <p className="text-2xl font-bold">{loading ? '-' : userTokens.length}</p>
                         </div>
-                        {/* Token List */}
-                        {userTokens.map(token => (
-                           <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
-                                <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors duration-200 cursor-pointer">
-                                    {/* Column 1: Asset Info */}
-                                    <div className="flex items-center space-x-4">
-                                        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                                            {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
-                                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Column 2: Balance */}
-                                    <div className="text-right font-mono">
-                                        <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
-                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
-                                    </div>
-
-                                    {/* Column 3: Value */}
-                                    <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
-                                        ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                                    </div>
-                                </a>
-                            </Link>
-                        ))}
-                    </div>
-                ) : (
-                     <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400">
-                        <p>{t('profile_no_tokens')}</p>
-                    </div>
-                )}
-            </div>
-            
-            <ComingSoonWrapper>
-                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                    <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
-                    <div className="grid md:grid-cols-3 gap-4">
-                        <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
-                        <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
-                        <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
-                    </div>
-                </div>
-            </ComingSoonWrapper>
-
-            <div className="grid lg:grid-cols-2 gap-8">
-                <ComingSoonWrapper showMessage={false}>
-                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h2 className="text-2xl font-bold mb-4">{t('impact_trophies_nfts')}</h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                           {/* Live NFT data would be populated here */}
+                        <div className="text-right">
+                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
+                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                {loading ? '-' : `$${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                            </p>
                         </div>
                     </div>
-                </ComingSoonWrapper>
-                 <ComingSoonWrapper showMessage={false}>
-                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h2 className="text-2xl font-bold mb-4">{t('impact_badges')}</h2>
-                         <div className="flex flex-wrap gap-4">
-                            {MOCK_BADGES.map(badge => (
-                                 <div key={badge.id} className="group relative flex flex-col items-center text-center w-24">
-                                    <div className="bg-primary-100 dark:bg-darkPrimary-700 rounded-full p-4 text-accent-500 dark:text-darkAccent-400 group-hover:scale-110 transition-transform">
-                                        {React.cloneElement(badge.icon as React.ReactElement<{ size: number }>, { size: 32 })}
-                                    </div>
-                                    <p className="text-sm font-semibold mt-2">{t(badge.titleKey)}</p>
-                                    <div className="absolute bottom-full mb-2 w-48 bg-primary-900 text-white dark:bg-darkPrimary-950 text-xs rounded py-1 px-2 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                        {t(badge.descriptionKey)}
-                                        <svg className="absolute text-primary-900 dark:text-darkPrimary-950 h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon className="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
-                                    </div>
-                                </div>
+                    
+                    {loading ? (
+                        <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                            <span>{t('profile_loading_tokens')}</span>
+                        </div>
+                    ) : userTokens.length > 0 ? (
+                        <div className="space-y-2">
+                            {/* Header */}
+                            <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
+                                <span>{t('asset')}</span>
+                                <span className="text-right">{t('balance')}</span>
+                                <span className="text-right">{t('value_usd')}</span>
+                            </div>
+                            {/* Token List */}
+                            {userTokens.map(token => (
+                               <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
+                                    <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors duration-200 cursor-pointer">
+                                        <div className="flex items-center space-x-4">
+                                            <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                                                {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
+                                                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right font-mono">
+                                            <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
+                                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
+                                        </div>
+                                        <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
+                                            ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                        </div>
+                                    </a>
+                                </Link>
                             ))}
                         </div>
+                    ) : (
+                         <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400">
+                            <p>{t('profile_no_tokens')}</p>
+                        </div>
+                    )}
+                </div>
+
+                 <div className="lg:col-span-2 space-y-8">
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <h2 className="text-2xl font-bold mb-4">{t('favorite_tokens_title', { defaultValue: 'Favorite Tokens' })}</h2>
+                        {favorites.length > 0 ? (
+                             <div className="space-y-2">
+                                {favorites.map(mint => <FavoriteTokenRow key={mint} mintAddress={mint} />)}
+                             </div>
+                        ) : (
+                            <div className="text-center py-8 text-primary-500 dark:text-darkPrimary-400">
+                                <Star className="w-10 h-10 mx-auto mb-2"/>
+                                <p>{t('no_favorite_tokens_desc', { defaultValue: 'You haven\'t added any favorite tokens yet.' })}</p>
+                            </div>
+                        )}
                     </div>
-                </ComingSoonWrapper>
+
+                    <ComingSoonWrapper>
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                            <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
+                            <div className="grid gap-4">
+                                <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
+                                <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
+                                <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
+                            </div>
+                        </div>
+                    </ComingSoonWrapper>
+                 </div>
             </div>
+            
         </div>
     );
 }
