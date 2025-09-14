@@ -5,7 +5,7 @@
   "type": "module",
   "description": "A global network united by the vision to build a better world through technology and humanity.",
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && cp index.html dist/ && copyfiles -u 1 \"public/**/*\" dist && esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.ts=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"'"
+    "build": "rm -rf dist && mkdir -p dist && cp index.html dist/ && copyfiles -u 1 \"public/**/*\" dist && esbuild index.tsx --bundle --outfile=dist/bundle.js --loader:.ts=tsx --jsx=automatic --define:process.env.NODE_ENV='\"production\"' --external:lightweight-charts"
   },
   "author": "OWFN",
   "license": "UNLICENSED",
