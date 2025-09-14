@@ -1,280 +1,208 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useRoute, Link, useLocation } from 'wouter';
+
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, Link, useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
-import type { TokenDetails, TokenExtension, LiquidityPool } from '../lib/types.js';
+import type { TokenDetails } from '../lib/types.js';
 import { 
-    ArrowLeft, Loader2, AlertTriangle, Info, BarChart2, ShieldCheck, CheckCircle, XCircle, 
-    Globe, Twitter, Send, Star, Share2, Layers, BookOpen, Key, Coins, Percent, EyeOff, 
-    UserCheck, Ban, Zap, TrendingUp, TrendingDown, ExternalLink
+    Loader2, ArrowLeft, Star, StarOff, AlertTriangle, ExternalLink, BarChart2, Briefcase, 
+    ShieldCheck, Info, Globe, Twitter, Send
 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
+import { GenericTokenIcon } from '../components/IconComponents.js';
 import { formatNumber } from '../lib/utils.js';
-import { DiscordIcon } from '../components/IconComponents.js';
 
-// --- Sub-components for better organization ---
+const StatCard = ({ title, value, change }: { title: string; value: string; change?: number }) => {
+    const changeColor = change === undefined ? '' : change >= 0 ? 'text-green-500' : 'text-red-500';
+    return (
+        <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg">
+            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+            <p className="text-2xl font-bold font-mono">{value}</p>
+            {change !== undefined && (
+                 <p className={`text-sm font-semibold ${changeColor}`}>
+                    {change >= 0 ? '+' : ''}{change.toFixed(2)}% (24h)
+                </p>
+            )}
+        </div>
+    );
+};
 
-const InfoCard = ({ title, icon, children, gridCols = 1 }: { title: string, icon: React.ReactNode, children?: React.ReactNode, gridCols?: number }) => (
-    <div className="bg-darkPrimary-800 p-6 rounded-2xl shadow-3d border border-darkPrimary-700/50">
-        <div className="flex items-center gap-3 mb-4 text-darkPrimary-100">
-            {icon}
-            <h2 className="text-xl font-bold">{title}</h2>
-        </div>
-        <div className={`space-y-3 grid grid-cols-1 md:grid-cols-${gridCols} gap-x-6`}>
-            {children}
-        </div>
+const DetailRow = ({ label, value }: { label: React.ReactNode; value: React.ReactNode }) => (
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50 last:border-b-0">
+        <span className="text-primary-600 dark:text-darkPrimary-400 font-medium mb-1 sm:mb-0">{label}</span>
+        <div className="font-semibold text-primary-800 dark:text-darkPrimary-100 text-left sm:text-right break-all w-full sm:w-auto">{value}</div>
     </div>
 );
 
-const DetailItem = ({ label, value, children }: { label: string, value?: React.ReactNode, children?: React.ReactNode }) => (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2.5 border-b border-darkPrimary-700/50 last:border-b-0">
-        <span className="text-darkPrimary-400 mb-1 sm:mb-0 text-sm">{label}</span>
-        <div className="font-semibold text-darkPrimary-100 text-left sm:text-right break-all w-full sm:w-auto text-sm">
-            {value ?? children}
-        </div>
+const Section = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-3">
+            {icon} {title}
+        </h2>
+        <div className="space-y-1">{children}</div>
     </div>
 );
-
-const AuthorityStatus = ({ label, address }: { label: string, address: string | null | undefined }) => {
-    const { t } = useAppContext();
-    const isRevoked = !address;
-    return (
-        <DetailItem label={label}>
-            <div className="flex items-center gap-2">
-                {isRevoked ? (
-                    <>
-                        <CheckCircle className="w-4 h-4 text-green-400" />
-                        <span className="font-bold text-green-400">{t('revoked')}</span>
-                    </>
-                ) : (
-                    <>
-                        <XCircle className="w-4 h-4 text-red-400" />
-                        <AddressDisplay address={address!} />
-                    </>
-                )}
-            </div>
-        </DetailItem>
-    );
-};
-
-const TokenExtensionDisplay = ({ extension }: { extension: TokenExtension }) => {
-    const extensionIcons: { [key: string]: React.ReactNode } = {
-        'transferFeeConfig': <Percent size={16} />,
-        'interestBearingConfig': <Zap size={16} />,
-        'permanentDelegate': <UserCheck size={16} />,
-        'nonTransferable': <Ban size={16} />,
-        'confidentialTransferMint': <EyeOff size={16} />,
-        'defaultAccountState': <BookOpen size={16} />,
-        'mintCloseAuthority': <Key size={16} />,
-    };
-    
-    return (
-        <div className="p-3 bg-darkPrimary-700/50 rounded-lg text-xs">
-            <div className="flex items-center gap-2 font-bold mb-1">
-                {extensionIcons[extension.extension] || <Layers size={16} />}
-                <span>{extension.extension.replace(/([A-Z])/g, ' $1').trim()}</span>
-            </div>
-            <pre className="text-darkPrimary-400 whitespace-pre-wrap text-[10px] bg-darkPrimary-900/50 p-2 rounded">
-                <code>{JSON.stringify(extension.state, null, 2)}</code>
-            </pre>
-        </div>
-    );
-};
-
-const LiquidityPoolDisplay = ({ pool }: { pool: LiquidityPool }) => {
-    return (
-        <DetailItem label={pool.exchange}>
-            <a href={pool.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:underline text-darkAccent-400">
-                <AddressDisplay address={pool.lpMintAddress} />
-                <ExternalLink size={14} />
-            </a>
-        </DetailItem>
-    );
-};
-
-// --- Main Component ---
 
 export default function TokenDetail() {
     const { t, favorites, addFavorite, removeFavorite } = useAppContext();
-    const [match, params] = useRoute<{ mint: string }>("/dashboard/token/:mint");
+    const { mint } = useParams();
     const [location] = useLocation();
-    const mintAddress = match && params ? params.mint : undefined;
-
-    const [tokenDetails, setTokenDetails] = useState<TokenDetails | null>(null);
+    
+    const [tokenData, setTokenData] = useState<TokenDetails | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [shareCopied, setShareCopied] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const fromPath = new URLSearchParams(location.split('?')[1] || '').get('from') || '/dashboard';
-    const isFavorite = mintAddress ? favorites.includes(mintAddress) : false;
+    const fromPath = useMemo(() => {
+        const params = new URLSearchParams(location.search);
+        return params.get('from') || '/dashboard';
+    }, [location.search]);
 
-    const fetchTokenDetails = useCallback(async () => {
-        if (!mintAddress) {
-            setError('No mint address provided.');
+    useEffect(() => {
+        if (!mint) {
+            setError(t('token_not_found'));
             setLoading(false);
             return;
         }
-
-        try {
-            const response = await fetch(`/api/token-info?mint=${mintAddress}`);
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to fetch token details.');
+        setLoading(true);
+        setError(null);
+        
+        const fetchTokenData = async () => {
+            try {
+                const res = await fetch(`/api/token-info?mint=${mint}`);
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || `Failed to fetch token data with status ${res.status}`);
+                }
+                const data: TokenDetails = await res.json();
+                setTokenData(data);
+            } catch (err) {
+                setError((err as Error).message);
+                console.error(err);
+            } finally {
+                setLoading(false);
             }
-            const data: TokenDetails = await response.json();
-            setTokenDetails(data);
-            setError('');
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            if(loading) setLoading(false);
-        }
-    }, [mintAddress, loading]);
+        };
 
-    useEffect(() => {
-        fetchTokenDetails(); // Initial fetch
-        const interval = setInterval(fetchTokenDetails, 5000); // Poll every 5 seconds
-        return () => clearInterval(interval);
-    }, [fetchTokenDetails]);
-    
-    const handleFavoriteToggle = useCallback(() => {
-        if (!mintAddress) return;
+        fetchTokenData();
+    }, [mint, t]);
+
+    const isFavorite = useMemo(() => favorites.includes(mint ?? ''), [favorites, mint]);
+
+    const toggleFavorite = () => {
+        if (!mint) return;
         if (isFavorite) {
-            removeFavorite(mintAddress);
+            removeFavorite(mint);
         } else {
-            addFavorite(mintAddress);
+            addFavorite(mint);
         }
-    }, [mintAddress, isFavorite, addFavorite, removeFavorite]);
-
-    const handleShare = () => {
-        navigator.clipboard.writeText(window.location.href);
-        setShareCopied(true);
-        setTimeout(() => setShareCopied(false), 2000);
     };
+    
+    const backButtonText = fromPath === '/profile' ? t('back_to_profile') : t('back_to_dashboard');
 
     if (loading) {
-        return <div className="flex justify-center items-center py-20"><Loader2 className="w-12 h-12 animate-spin text-darkAccent-500" /></div>;
+        return <div className="flex justify-center items-center h-64"><Loader2 className="w-12 h-12 animate-spin text-accent-500"/></div>;
     }
 
-    if (error) {
+    if (error || !tokenData) {
         return (
-            <div className="text-center py-10 bg-darkPrimary-800 rounded-lg">
-                <AlertTriangle className="mx-auto w-12 h-12 text-red-500 mb-4" />
-                <h2 className="text-2xl font-bold text-red-400">{t('token_not_found')}</h2>
-                <p className="text-darkPrimary-400 mt-2">{error}</p>
-                <Link to={fromPath} className="mt-6 inline-flex items-center gap-2 text-darkAccent-400 hover:underline">
-                    <ArrowLeft size={16} /> {t(fromPath.includes('dashboard') ? 'back_to_dashboard' : 'back_to_profile')}
+            <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d">
+                <AlertTriangle className="mx-auto w-16 h-16 text-red-500 mb-4" />
+                <h1 className="text-2xl font-bold mb-2">{error || t('token_not_found')}</h1>
+                <Link to={fromPath}>
+                    <a className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline mt-4">
+                        <ArrowLeft size={16} /> {backButtonText}
+                    </a>
                 </Link>
             </div>
         );
     }
     
-    if (!tokenDetails) return null;
-    
-    const socialIcons: {[key: string]: React.ReactNode} = {
-        'website': <Globe size={18}/>,
-        'twitter': <Twitter size={18}/>,
-        'telegram': <Send size={18}/>,
-        'discord': <DiscordIcon className="w-[18px] h-[18px]"/>
-    };
-    
-    const priceChange = tokenDetails.price24hChange ?? 0;
-    const isPriceUp = priceChange >= 0;
-
     return (
-        <div className="animate-fade-in-up space-y-6 text-darkPrimary-200">
-            <Link to={fromPath} className="inline-flex items-center gap-2 text-darkAccent-400 hover:underline mb-2">
-                <ArrowLeft size={16} /> {t(fromPath.includes('dashboard') ? 'back_to_dashboard' : 'back_to_profile')}
-            </Link>
-
-            {/* --- Header --- */}
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                {tokenDetails.logo && <img src={tokenDetails.logo as string} alt={tokenDetails.name} className="w-16 h-16 rounded-full border-2 border-darkPrimary-700" />}
-                <div className="flex-grow">
-                    <h1 className="text-4xl font-bold text-white">{tokenDetails.name}</h1>
-                    <span className="text-lg font-mono text-darkPrimary-400">{tokenDetails.symbol}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    {tokenDetails.links && Object.entries(tokenDetails.links).map(([key, value]) => 
-                        socialIcons[key] && value && (
-                            <a key={key} href={value} target="_blank" rel="noopener noreferrer" className="p-2.5 bg-darkPrimary-800 hover:bg-darkPrimary-700 rounded-full transition-colors border border-darkPrimary-700/50">
-                                {socialIcons[key]}
-                            </a>
-                        )
-                    )}
-                    <button onClick={handleFavoriteToggle} className="p-2.5 bg-darkPrimary-800 hover:bg-darkPrimary-700 rounded-full transition-colors border border-darkPrimary-700/50">
-                        <Star className={`transition-colors ${isFavorite ? 'text-yellow-400 fill-yellow-400' : ''}`} size={18} />
-                    </button>
-                    <button onClick={handleShare} className="p-2.5 bg-darkPrimary-800 hover:bg-darkPrimary-700 rounded-full transition-colors border border-darkPrimary-700/50">
-                       {shareCopied ? <CheckCircle size={18} className="text-green-400"/> : <Share2 size={18} />}
-                    </button>
-                </div>
-            </div>
-            
-            <div className="bg-darkPrimary-800 p-4 rounded-xl flex flex-col md:flex-row items-center gap-4 border border-darkPrimary-700/50">
-                <div className="flex-1 text-center md:text-left">
-                    <p className="text-sm text-darkPrimary-400">{t('price_per_token')}</p>
-                    <div className="flex items-center gap-3">
-                        <p className="text-4xl font-bold text-white">${tokenDetails.pricePerToken > 0.0001 ? tokenDetails.pricePerToken.toLocaleString(undefined, { maximumFractionDigits: 6 }) : tokenDetails.pricePerToken.toPrecision(4)}</p>
-                        <div className={`flex items-center gap-1 text-lg font-bold ${isPriceUp ? 'text-green-400' : 'text-red-400'}`}>
-                           {isPriceUp ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-                           {priceChange.toFixed(2)}%
+        <div className="space-y-8 animate-fade-in-up">
+            {/* Header */}
+            <div>
+                <Link to={fromPath}>
+                    <a className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline mb-4">
+                        <ArrowLeft size={16} /> {backButtonText}
+                    </a>
+                </Link>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        {tokenData.logo ? <img src={tokenData.logo as string} alt={tokenData.name} className="w-16 h-16 rounded-full" /> : <GenericTokenIcon className="w-16 h-16" />}
+                        <div>
+                            <h1 className="text-3xl font-bold">{tokenData.name}</h1>
+                            <p className="text-lg text-primary-600 dark:text-darkPrimary-400">{tokenData.symbol}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                         <button onClick={toggleFavorite} className="p-3 rounded-full bg-primary-100 dark:bg-darkPrimary-700 hover:bg-primary-200 dark:hover:bg-darkPrimary-600 transition-colors">
+                            {isFavorite ? <StarOff size={20} /> : <Star size={20} className="text-yellow-500" />}
+                        </button>
+                        <div className="text-right">
+                             <p className="text-3xl font-bold font-mono">${tokenData.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })}</p>
+                             <p className={`text-sm font-semibold ${tokenData.price24hChange && tokenData.price24hChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                {tokenData.price24hChange && tokenData.price24hChange >= 0 ? '+' : ''}{tokenData.price24hChange?.toFixed(2)}% (24h)
+                            </p>
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 w-full md:w-auto">
-                    <div className="h-24 bg-darkPrimary-700/50 rounded-lg flex items-center justify-center font-bold text-darkPrimary-500">{t('swap')} {t('coming_soon_title')}</div>
-                </div>
             </div>
-            
-            <div className="grid lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="h-96 bg-darkPrimary-800 rounded-2xl flex items-center justify-center font-bold text-darkPrimary-500 border border-darkPrimary-700/50">Price Chart (TradingView) {t('coming_soon_title')}</div>
-                    
-                    {tokenDetails.description && (
-                        <InfoCard title={t('token_description_title')} icon={<Info />}>
-                            <p className="text-darkPrimary-300 text-sm leading-relaxed">{tokenDetails.description}</p>
-                        </InfoCard>
+
+            {/* Stats Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard title={t('market_cap')} value={`$${formatNumber(tokenData.marketCap ?? 0)}`} />
+                <StatCard title={t('volume_24h')} value={`$${formatNumber(tokenData.volume24h ?? 0)}`} />
+                <StatCard title={t('circulating_supply')} value={`${formatNumber(tokenData.circulatingSupply ?? 0)}`} />
+                <StatCard title={t('holders')} value={formatNumber(tokenData.holders ?? 0)} />
+            </div>
+
+            {/* Details Grid */}
+            <div className="grid lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                    {tokenData.description && (
+                         <Section title={t('token_description_title')} icon={<Info />}>
+                            <p className="text-primary-600 dark:text-darkPrimary-400">{tokenData.description}</p>
+                        </Section>
                     )}
-                     {tokenDetails.liquidityPools && tokenDetails.liquidityPools.length > 0 && (
-                        <InfoCard title={t('liquidity')} icon={<Layers />}>
-                            {tokenDetails.liquidityPools.map(pool => <LiquidityPoolDisplay key={pool.lpMintAddress} pool={pool} />)}
-                        </InfoCard>
-                    )}
+                    <Section title={t('market_stats')} icon={<BarChart2 />}>
+                        <DetailRow label={t('total_supply')} value={formatNumber(tokenData.totalSupply)} />
+                        <DetailRow label={t('fully_diluted_valuation')} value={`$${formatNumber(tokenData.pricePerToken * tokenData.totalSupply)}`} />
+                        <DetailRow label={t('creatorAddress')} value={tokenData.creatorAddress ? <AddressDisplay address={tokenData.creatorAddress} /> : 'N/A'} />
+                        <DetailRow label={t('pool_age')} value={tokenData.createdAt ? new Date(tokenData.createdAt * 1000).toLocaleDateString() : 'N/A'} />
+                    </Section>
                 </div>
-
-                <div className="lg:col-span-1 space-y-6">
-                    <InfoCard title={t('market_stats')} icon={<BarChart2 />}>
-                         <DetailItem label={t('market_cap')} value={`$${formatNumber(tokenDetails.marketCap ?? 0)}`} />
-                         <DetailItem label={t('volume_24h')} value={`$${formatNumber(tokenDetails.volume24h ?? 0)}`} />
-                         <DetailItem label={t('total_supply')} value={formatNumber(tokenDetails.totalSupply)} />
-                         <DetailItem label={t('circulating_supply')} value={formatNumber(tokenDetails.circulatingSupply ?? 0)} />
-                         <DetailItem label={t('holders')} value={formatNumber(tokenDetails.holders ?? 0)} />
-                    </InfoCard>
-
-                    <InfoCard title={t('on_chain_security')} icon={<ShieldCheck />}>
-                        <AuthorityStatus label={t('is_mintable')} address={tokenDetails.mintAuthority} />
-                        <AuthorityStatus label={t('is_freezable')} address={tokenDetails.freezeAuthority} />
-                        <AuthorityStatus label={t('update_authority')} address={tokenDetails.updateAuthority} />
-                        <DetailItem label={t('creatorAddress', { defaultValue: 'Creator Address' })}>
-                           {tokenDetails.creatorAddress ? <AddressDisplay address={tokenDetails.creatorAddress} /> : 'N/A'}
-                        </DetailItem>
-                    </InfoCard>
-
-                    <InfoCard title={t('technical_details_title', { defaultValue: 'Technical Details' })} icon={<Coins />}>
-                        <DetailItem label={t('token_standard')} value={tokenDetails.tokenStandard} />
-                        <DetailItem label={t('token_decimals')} value={tokenDetails.decimals} />
-                        <DetailItem label={t('creation_date_title', { defaultValue: 'Creation Date' })}>
-                           {tokenDetails.createdAt ? new Date(tokenDetails.createdAt).toLocaleString() : 'N/A'}
-                        </DetailItem>
-                    </InfoCard>
-                    
-                    {tokenDetails.extensions && tokenDetails.extensions.length > 0 && (
-                        <InfoCard title="Token-2022 Extensions" icon={<Zap />}>
-                            <div className="space-y-2">
-                                {tokenDetails.extensions.map(ext => <TokenExtensionDisplay key={ext.extension} extension={ext} />)}
+                <div className="lg:col-span-1 space-y-8">
+                     <Section title={t('on_chain_security')} icon={<ShieldCheck />}>
+                        <DetailRow label={t('mint_authority')} value={tokenData.mintAuthority ? <AddressDisplay address={tokenData.mintAuthority}/> : <span className="text-green-500 font-bold">{t('revoked')}</span>} />
+                        <DetailRow label={t('freeze_authority')} value={tokenData.freezeAuthority ? <AddressDisplay address={tokenData.freezeAuthority}/> : <span className="text-green-500 font-bold">{t('revoked')}</span>} />
+                        <DetailRow label={t('update_authority')} value={tokenData.updateAuthority ? <AddressDisplay address={tokenData.updateAuthority}/> : 'N/A'} />
+                     </Section>
+                     <Section title={t('pool_info')} icon={<Briefcase />}>
+                        {tokenData.liquidityPools && tokenData.liquidityPools.length > 0 ? (
+                            tokenData.liquidityPools.map(pool => (
+                                <DetailRow 
+                                    key={pool.lpMintAddress} 
+                                    label={pool.exchange} 
+                                    value={
+                                        <a href={pool.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:underline">
+                                            <AddressDisplay address={pool.lpMintAddress} />
+                                            <ExternalLink size={14} />
+                                        </a>
+                                    } 
+                                />
+                            ))
+                        ) : (
+                            <p className="text-sm text-primary-500 dark:text-darkPrimary-500 text-center">No liquidity pools found.</p>
+                        )}
+                     </Section>
+                     {tokenData.links && (Object.values(tokenData.links).some(l => l)) && (
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                            <div className="flex justify-center items-center gap-4">
+                                {tokenData.links.website && <a href={tokenData.links.website} target="_blank" rel="noopener noreferrer" aria-label="Website"><Globe/></a>}
+                                {tokenData.links.twitter && <a href={tokenData.links.twitter} target="_blank" rel="noopener noreferrer" aria-label="Twitter"><Twitter/></a>}
+                                {tokenData.links.telegram && <a href={tokenData.links.telegram} target="_blank" rel="noopener noreferrer" aria-label="Telegram"><Send/></a>}
                             </div>
-                        </InfoCard>
-                    )}
+                        </div>
+                     )}
                 </div>
             </div>
         </div>
