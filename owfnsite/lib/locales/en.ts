@@ -447,6 +447,8 @@ export const en = {
     risk_factors_found: `Potential risks detected. Please proceed with caution.`,
     swap: `Swap`,
     revoked: `Revoked`,
+    technical_details_title: 'Technical Details',
+    swap_coming_soon: 'Swap Coming Soon',
     
     // Staking & Vesting
     staking_title: `Stake OWFN, Earn Rewards`,

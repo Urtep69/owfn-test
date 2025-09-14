@@ -199,7 +199,7 @@ export const de = {
     live_progress: `Live-Fortschritt`,
     participate_now: `Jetzt teilnehmen`,
     bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) bis {maxPercentage}% ({maxThreshold} SOL+)`,
-
+    
     // Donations Page
     make_donation: `Spenden`,
     donation_desc: `Unterstützen Sie unsere sozialen Impact-Initiativen durch eine Krypto-Spende. Alle Gelder fließen direkt in die Impact Treasury.`,
@@ -353,22 +353,14 @@ export const de = {
     faq_q10: `Gibt es spezielle Anweisungen für die Spende von USDC oder USDT?`,
     faq_a10: `Ja, das ist von entscheidender Bedeutung. Alle USDC- und USDT-Spenden müssen *ausschließlich* vom Solana-Blockchain gesendet werden. Senden Sie nicht von einem anderen Netzwerk (z.B. Ethereum), da die Gelder verloren gehen und ihr Ziel nicht erreichen. Diese Information wird auch auf der Spendenseite deutlich angezeigt.`,
     faq_q11: `Was genau passiert, nachdem ich Token im Vorverkauf gekauft habe? Muss ich etwas tun?`,
-    faq_a11: `Nein, nachdem Sie den Kauf von OWFN-Token während des Vorverkaufs erfolgreich abgeschlossen haben, ist von Ihrer Seite keine weitere Aktion erforderlich. Die Token werden automatisch für Ihre Wallet-Adresse reserviert. Am Ende des Vorverkaufszeitraums werden alle Token automatisch an die Wallets der Käufer verteilt (per Airdrop).`,
-    faq_q12: `Wann und wo kann ich nach dem Vorverkauf OWFN-Token handeln (verkaufen/kaufen)?`,
     faq_a12: `Gemäß unserer Roadmap werden wir nach dem erfolgreichen Abschluss des Vorverkaufs mit der offiziellen Notierung des $OWFN-Tokens an dezentralen Börsen (DEXs) innerhalb des Solana-Ökosystems fortfahren. Das genaue Datum und die Plattformen werden auf unseren offiziellen Kanälen bekannt gegeben.`,
     faq_q13: `Warum gibt es im Vorverkauf ein maximales Kauflimit (Max Buy)?`,
-    faq_a13: `Das maximale Kauflimit ist eine wichtige Maßnahme, um eine möglichst faire Verteilung der Token zu gewährleisten und zu verhindern, dass eine kleine Anzahl großer Investoren ("Wale") einen erheblichen Teil des Angebots kontrolliert. Dies fördert langfristig eine gesündere und dezentralere Gemeinschaft.`,
-    faq_q14: `Was bedeutet es, dass der Token "zinstragend" mit 2% APY ist? Wie funktioniert das?`,
-    faq_a15: `Diese Gebühr ist ein Schlüsselmechanismus für die langfristige Finanzierung unserer Mission. Eine Gebühr von 0,5% wird auf alle Transaktionen mit dem OWFN-Token *nach* Abschluss des Vorverkaufszeitraums erhoben. Die aus dieser Gebühr gesammelten Mittel werden automatisch an die Impact Treasury weitergeleitet, um unsere sozialen Projekte kontinuierlich zu finanzieren. So trägt jede Transaktion zum Gemeinwohl bei.`,
-    faq_q16: `Warum haben Sie die Solana-Blockchain für dieses Projekt gewählt?`,
+    faq_a14: `Diese Gebühr ist ein Schlüsselmechanismus für die langfristige Finanzierung unserer Mission. Eine Gebühr von 0,5% wird auf alle Transaktionen mit dem OWFN-Token *nach* Abschluss des Vorverkaufszeitraums erhoben. Die aus dieser Gebühr gesammelten Mittel werden automatisch an die Impact Treasury weitergeleitet, um unsere sozialen Projekte kontinuierlich zu finanzieren. So trägt jede Transaktion zum Gemeinwohl bei.`,
+    faq_q15: `Warum haben Sie die Solana-Blockchain für dieses Projekt gewählt?`,
     faq_a16: `Wir haben uns für Solana wegen seiner außergewöhnlichen Geschwindigkeit, sehr niedrigen Transaktionskosten und hohen Skalierbarkeit entschieden. Diese Eigenschaften sind für ein globales Projekt wie unseres unerlässlich und ermöglichen effiziente Mikrotransaktionen und eine schnelle und zugängliche Erfahrung für alle Benutzer, egal ob sie spenden, kaufen oder Token handeln.`,
-    faq_q17: `Wie kann ich sicher sein, dass meine Spenden die von Ihnen unterstützten Zwecke erreichen?`,
-    faq_a17: `Transparenz ist für uns von grundlegender Bedeutung. Alle für soziale Zwecke bestimmten Mittel werden über die Impact Treasury verwaltet, deren Wallet-Adresse öffentlich ist. Sie können alle eingehenden und ausgehenden Transaktionen auf einem Solana-Block-Explorer wie Solscan verfolgen. Darüber hinaus werden wir auf dem Impact-Portal regelmäßige Updates und detaillierte Berichte über die finanzierten Projekte bereitstellen.`,
-    faq_q18: `Kann ich einen sozialen Fall oder einen Zweck vorschlagen, der von OWFN finanziert werden soll?`,
+    faq_a17: `Wie kann ich sicher sein, dass meine Spenden die von Ihnen unterstützten Zwecke erreichen?`,
     faq_a18: `In der Anfangsphase werden Projekte von unserem Team nach strengen Kriterien für Wirkung und Machbarkeit ausgewählt. Im weiteren Verlauf des Projekts werden wir ein Governance-System (DAO) implementieren, das es den Community-Mitgliedern ermöglicht, zukünftige Initiativen vorzuschlagen und darüber abzustimmen, wodurch Sie eine direkte Rolle bei der Lenkung der Mittel erhalten.`,
-    faq_q19: `Wer steckt hinter dem OWFN-Projekt? Ist das Team anonym?`,
-    faq_a19: `Details zur Vision und den Werten unseres Teams werden auf der Website vorgestellt. Je näher wir der öffentlichen Einführung kommen, desto mehr Transparenz werden wir über die wichtigsten Mitglieder und Berater schaffen, die zum Erfolg des Projekts beitragen, unter Wahrung ihrer Sicherheit und Privatsphäre.`,
-    faq_q20: `Welche Sicherheitsmaßnahmen haben Sie getroffen, um die Gelder des Projekts und der Investoren zu schützen?`,
+    faq_a19: `Wer steckt hinter dem OWFN-Projekt? Ist das Team anonym?`,
     faq_a20: `Sicherheit hat für uns oberste Priorität. Wir verwenden Multi-Signatur-Wallets zur Verwaltung kritischer Gelder, was bedeutet, dass keine einzelne Transaktion von einer Person genehmigt werden kann. Der Smart Contract des Tokens wird von renommierten Sicherheitsfirmen geprüft, um potenzielle Schwachstellen vor der Einführung zu identifizieren und zu beheben.`,
 
     // Chatbot
@@ -447,6 +439,8 @@ export const de = {
     risk_factors_found: `Potenzielle Risiken erkannt. Bitte gehen Sie mit Vorsicht vor.`,
     swap: `Tauschen`,
     revoked: `Widerrufen`,
+    technical_details_title: 'Technische Details',
+    swap_coming_soon: 'Tausch bald verfügbar',
     
     // Staking & Vesting
     staking_title: `Staken Sie OWFN, verdienen Sie Belohnungen`,

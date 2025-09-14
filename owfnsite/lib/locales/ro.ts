@@ -199,7 +199,7 @@ export const ro = {
     live_progress: `Progres Live`,
     participate_now: `Participă Acum`,
     bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) la {maxPercentage}% ({maxThreshold} SOL+)`,
-
+    
     // Donations Page
     make_donation: `Fă o Donație`,
     donation_desc: `Susține inițiativele noastre de impact social donând crypto. Toate fondurile merg direct către Trezoreria de Impact.`,
@@ -448,6 +448,8 @@ export const ro = {
     risk_factors_found: `Riscuri potențiale detectate. Vă rugăm să procedați cu prudență.`,
     swap: `Schimbă`,
     revoked: `Revocat`,
+    technical_details_title: 'Detalii Tehnice',
+    swap_coming_soon: 'Swap în curând',
     
     // Staking & Vesting
     staking_title: `Depune OWFN, Câștigă Recompense`,
