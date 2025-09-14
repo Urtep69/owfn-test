@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext.js';
-import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 import { ComingSoon } from './ComingSoon.js';
 
 interface ComingSoonWrapperProps {
@@ -9,8 +8,7 @@ interface ComingSoonWrapperProps {
 }
 
 export const ComingSoonWrapper: React.FC<ComingSoonWrapperProps> = ({ children, showMessage = true }) => {
-    const { solana } = useAppContext();
-    const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
+    const { isAdmin } = useAppContext();
     
     if (isAdmin) {
         return <>{children}</>;

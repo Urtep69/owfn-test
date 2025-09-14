@@ -90,7 +90,7 @@ export interface TokenDetails extends Token {
     mintAuthority?: string | null;
     freezeAuthority?: string | null;
     updateAuthority?: string | null;
-    tokenStandard?: 'SPL Token' | 'Token-2022';
+    tokenStandard?: 'SPL Token' | 'Token-2022' | string;
     tokenExtensions?: TokenExtension[];
 }
 
@@ -189,4 +189,12 @@ export interface PresaleProgress {
   owfnSold: number;
   contributors: number;
   isLoading: boolean;
+}
+
+export interface DonationTransaction {
+  id: string;
+  address: string;
+  amount: number;
+  tokenSymbol: string;
+  time: Date;
 }

@@ -45,6 +45,7 @@ export const ro = {
     connect_wallet_first: `Vă rugăm să vă conectați mai întâi portofelul.`,
     yes: `Da`,
     no: `Nu`,
+    token: `Token`,
 
     // Time Units
     time_days: `Zile`,
@@ -214,11 +215,27 @@ export const ro = {
     select_token: `Selectează Token`,
     amount: `Sumă`,
     donations_form_title: `Formular de Donație`,
-    donations_stats_title: `Statistici Donații Live (Simulat)`,
+    donations_stats_title: `Statistici Donații Live`,
     donated: `Donat`,
     donation_success_alert: `Donație reușită! Vă mulțumim pentru contribuția de {amount} {tokenSymbol}.`,
     donation_no_token_balance: `Nu dețineți niciun {symbol}.`,
-
+    live_donation_feed: `Feed Donații Live`,
+    amount_donated: `Suma Donată`,
+    donations_no_recent_donations: `Nu s-au găsit donații recente.`,
+    donations_no_recent_donations_for_token: `Nicio donație recentă în {token}.`,
+    donations_today: `Astăzi`,
+    donations_last_week: `Ultima Săptămână`,
+    donations_last_month: `Ultima Lună`,
+    donations_all_time: `Total`,
+    donations_sol_stats_title: `Statistici Donații SOL`,
+    donations_usdc_stats_title: `Statistici Donații USDC`,
+    donations_usdt_stats_title: `Statistici Donații USDT`,
+    donations_owfn_stats_title: `Statistici Donații OWFN`,
+    max_button: `MAX`,
+    time_minutes_ago: `acum {minutes}m`,
+    time_hours_ago: `acum {hours}o`,
+    time_days_ago: `acum {days}z`,
+    
     // Dashboard
     wallet_monitor: `Dashboard Monitorizare Portofele`,
     wallet_monitor_desc: `Monitorizare în timp real a portofelelor oficiale ale proiectului pentru transparență totală.`,

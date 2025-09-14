@@ -45,6 +45,8 @@ export const hu = {
     connect_wallet_first: `Kérjük, először csatlakoztassa a pénztárcáját.`,
     yes: `Igen`,
     no: `Nem`,
+    token: `Token`,
+    balance: `Egyenleg`,
     
     // Time Units
     time_days: `Nap`,
@@ -214,11 +216,26 @@ export const hu = {
     select_token: `Token Kiválasztása`,
     amount: `Összeg`,
     donations_form_title: `Adományozási Űrlap`,
-    donations_stats_title: `Élő Adományozási Statisztikák (Szimulált)`,
+    donations_stats_title: `Élő Adományozási Statisztikák`,
     donated: `Adományozva`,
     donation_success_alert: `Sikeres adományozás! Köszönjük a(z) {amount} {tokenSymbol} hozzájárulását.`,
     donation_no_token_balance: `Önnek nincs {symbol} tokenje.`,
-    
+    live_donation_feed: `Élő Adományozási Hírcsatorna`,
+    amount_donated: `Adományozott Összeg`,
+    donations_no_recent_donations_for_token: `Nincs friss {token} adomány.`,
+    donations_today: `Ma`,
+    donations_last_week: `Múlt Hét`,
+    donations_last_month: `Múlt Hónap`,
+    donations_all_time: `Összesen`,
+    donations_sol_stats_title: `SOL Adományozási Statisztikák`,
+    donations_usdc_stats_title: `USDC Adományozási Statisztikák`,
+    donations_usdt_stats_title: `USDT Adományozási Statisztikák`,
+    donations_owfn_stats_title: `OWFN Adományozási Statisztikák`,
+    max_button: `MAX`,
+    time_minutes_ago: `{minutes} perce`,
+    time_hours_ago: `{hours} órája`,
+    time_days_ago: `{days} napja`,
+
     // Dashboard
     wallet_monitor: `Pénztárca Figyelő Irányítópult`,
     wallet_monitor_desc: `A hivatalos projekt pénztárcák valós idejű megfigyelése a teljes átláthatóság érdekében.`,
@@ -361,6 +378,10 @@ export const hu = {
     chatbot_loading_1: `Csatlakozás az áramköreimhez...`,
     chatbot_loading_2: `A kérdés elemzése...`,
     chatbot_loading_3: `Válasz megfogalmazása...`,
+    chatbot_welcome_message: `Üdvözlöm! Én vagyok az OWFN Asszisztens. Hogyan segíthetek ma megismerni a küldetésünket?`,
+    chatbot_suggestion_1: `Mi az az OWFN?`,
+    chatbot_suggestion_2: `Hogyan vásárolhatok?`,
+    chatbot_suggestion_3: `Meséljen a bónuszokról.`,
     
     // Whitepaper
     whitepaper_title: `OWFN Whitepaper`,
@@ -435,7 +456,6 @@ export const hu = {
     my_staked_balance: `Stakelt Egyenlegem`,
     stake: `Stakelés`,
     unstake: `Unstake`,
-    balance: `Egyenleg`,
     stake_owfn: `OWFN Stakelés`,
     unstake_owfn: `OWFN Unstake`,
     my_rewards: `Jutalmaim`,

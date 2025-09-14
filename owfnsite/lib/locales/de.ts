@@ -45,6 +45,7 @@ export const de = {
     connect_wallet_first: `Bitte verbinden Sie zuerst Ihre Wallet.`,
     yes: `Ja`,
     no: `Nein`,
+    token: `Token`,
 
     // Time Units
     time_days: `Tage`,
@@ -214,11 +215,27 @@ export const de = {
     select_token: `Token auswählen`,
     amount: `Betrag`,
     donations_form_title: `Spendenformular`,
-    donations_stats_title: `Live-Spendenstatistiken (simuliert)`,
+    donations_stats_title: `Live-Spendenstatistiken`,
     donated: `Gespendet`,
     donation_success_alert: `Spende erfolgreich! Vielen Dank für Ihren Beitrag von {amount} {tokenSymbol}.`,
     donation_no_token_balance: `Sie besitzen keine {symbol}.`,
-
+    live_donation_feed: `Live-Spenden-Feed`,
+    amount_donated: `Gespendeter Betrag`,
+    donations_no_recent_donations: `Keine aktuellen Spenden gefunden.`,
+    donations_no_recent_donations_for_token: `Keine aktuellen {token}-Spenden.`,
+    donations_today: `Heute`,
+    donations_last_week: `Letzte Woche`,
+    donations_last_month: `Letzter Monat`,
+    donations_all_time: `Insgesamt`,
+    donations_sol_stats_title: `SOL-Spendenstatistiken`,
+    donations_usdc_stats_title: `USDC-Spendenstatistiken`,
+    donations_usdt_stats_title: `USDT-Spendenstatistiken`,
+    donations_owfn_stats_title: `OWFN-Spendenstatistiken`,
+    max_button: `MAX`,
+    time_minutes_ago: `vor {minutes}m`,
+    time_hours_ago: `vor {hours}h`,
+    time_days_ago: `vor {days}T`,
+    
     // Dashboard
     wallet_monitor: `Wallet-Überwachungs-Dashboard`,
     wallet_monitor_desc: `Echtzeitüberwachung der offiziellen Projekt-Wallets für volle Transparenz.`,
@@ -344,11 +361,16 @@ export const de = {
     faq_q14: `Was bedeutet es, dass der Token "zinstragend" mit 2% APY ist? Wie funktioniert das?`,
     faq_a15: `Diese Gebühr ist ein Schlüsselmechanismus für die langfristige Finanzierung unserer Mission. Eine Gebühr von 0,5% wird auf alle Transaktionen mit dem OWFN-Token *nach* Abschluss des Vorverkaufszeitraums erhoben. Die aus dieser Gebühr gesammelten Mittel werden automatisch an die Impact Treasury weitergeleitet, um unsere sozialen Projekte kontinuierlich zu finanzieren. So trägt jede Transaktion zum Gemeinwohl bei.`,
     faq_q16: `Warum haben Sie die Solana-Blockchain für dieses Projekt gewählt?`,
-    faq_a17: `Wir haben uns für Solana wegen seiner außergewöhnlichen Geschwindigkeit, sehr niedrigen Transaktionskosten und hohen Skalierbarkeit entschieden. Diese Eigenschaften sind für ein globales Projekt wie unseres unerlässlich und ermöglichen effiziente Mikrotransaktionen und eine schnelle und zugängliche Erfahrung für alle Benutzer, egal ob sie spenden, kaufen oder Token handeln.`,
-    faq_q18: `Wie kann ich sicher sein, dass meine Spenden die von Ihnen unterstützten Zwecke erreichen?`,
-    faq_a19: `Transparenz ist für uns von grundlegender Bedeutung. Alle für soziale Zwecke bestimmten Mittel werden über die Impact Treasury verwaltet, deren Wallet-Adresse öffentlich ist. Sie können alle eingehenden und ausgehenden Transaktionen auf einem Solana-Block-Explorer wie Solscan verfolgen. Darüber hinaus werden wir auf dem Impact-Portal regelmäßige Updates und detaillierte Berichte über die finanzierten Projekte bereitstellen.`,
-    faq_q20: `Kann ich einen sozialen Fall oder einen Zweck vorschlagen, der von OWFN finanziert werden soll?`,
-    
+    faq_a16: `Wir haben uns für Solana wegen seiner außergewöhnlichen Geschwindigkeit, sehr niedrigen Transaktionskosten und hohen Skalierbarkeit entschieden. Diese Eigenschaften sind für ein globales Projekt wie unseres unerlässlich und ermöglichen effiziente Mikrotransaktionen und eine schnelle und zugängliche Erfahrung für alle Benutzer, egal ob sie spenden, kaufen oder Token handeln.`,
+    faq_q17: `Wie kann ich sicher sein, dass meine Spenden die von Ihnen unterstützten Zwecke erreichen?`,
+    faq_a17: `Transparenz ist für uns von grundlegender Bedeutung. Alle für soziale Zwecke bestimmten Mittel werden über die Impact Treasury verwaltet, deren Wallet-Adresse öffentlich ist. Sie können alle eingehenden und ausgehenden Transaktionen auf einem Solana-Block-Explorer wie Solscan verfolgen. Darüber hinaus werden wir auf dem Impact-Portal regelmäßige Updates und detaillierte Berichte über die finanzierten Projekte bereitstellen.`,
+    faq_q18: `Kann ich einen sozialen Fall oder einen Zweck vorschlagen, der von OWFN finanziert werden soll?`,
+    faq_a18: `In der Anfangsphase werden Projekte von unserem Team nach strengen Kriterien für Wirkung und Machbarkeit ausgewählt. Im weiteren Verlauf des Projekts werden wir ein Governance-System (DAO) implementieren, das es den Community-Mitgliedern ermöglicht, zukünftige Initiativen vorzuschlagen und darüber abzustimmen, wodurch Sie eine direkte Rolle bei der Lenkung der Mittel erhalten.`,
+    faq_q19: `Wer steckt hinter dem OWFN-Projekt? Ist das Team anonym?`,
+    faq_a19: `Details zur Vision und den Werten unseres Teams werden auf der Website vorgestellt. Je näher wir der öffentlichen Einführung kommen, desto mehr Transparenz werden wir über die wichtigsten Mitglieder und Berater schaffen, die zum Erfolg des Projekts beitragen, unter Wahrung ihrer Sicherheit und Privatsphäre.`,
+    faq_q20: `Welche Sicherheitsmaßnahmen haben Sie getroffen, um die Gelder des Projekts und der Investoren zu schützen?`,
+    faq_a20: `Sicherheit hat für uns oberste Priorität. Wir verwenden Multi-Signatur-Wallets zur Verwaltung kritischer Gelder, was bedeutet, dass keine einzelne Transaktion von einer Person genehmigt werden kann. Der Smart Contract des Tokens wird von renommierten Sicherheitsfirmen geprüft, um potenzielle Schwachstellen vor der Einführung zu identifizieren und zu beheben.`,
+
     // Chatbot
     chatbot_title: `OWFN-Assistent`,
     chatbot_placeholder: `Stellen Sie eine Frage...`,
@@ -356,6 +378,10 @@ export const de = {
     chatbot_loading_1: `Verbindung zu meinen Schaltkreisen...`,
     chatbot_loading_2: `Analyse Ihrer Frage...`,
     chatbot_loading_3: `Formulierung einer Antwort...`,
+    chatbot_welcome_message: `Hallo! Ich bin der OWFN-Assistent. Wie kann ich Ihnen heute helfen, mehr über unsere Mission zu erfahren?`,
+    chatbot_suggestion_1: `Was ist OWFN?`,
+    chatbot_suggestion_2: `Wie kaufe ich?`,
+    chatbot_suggestion_3: `Erzählen Sie mir von Boni.`,
     
     // Whitepaper
     whitepaper_title: `OWFN-Whitepaper`,

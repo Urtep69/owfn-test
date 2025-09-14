@@ -1,4 +1,3 @@
-
 export const es = {
     // Navigation
     home: `Inicio`,
@@ -46,6 +45,7 @@ export const es = {
     connect_wallet_first: `Por favor, conecte su billetera primero.`,
     yes: `Sí`,
     no: `No`,
+    token: `Token`,
 
     // Time Units
     time_days: `Días`,
@@ -215,10 +215,26 @@ export const es = {
     select_token: `Seleccionar Token`,
     amount: `Cantidad`,
     donations_form_title: `Formulario de Donación`,
-    donations_stats_title: `Estadísticas de Donaciones en Vivo (Simulado)`,
+    donations_stats_title: `Estadísticas de Donaciones en Vivo`,
     donated: `Donado`,
     donation_success_alert: `¡Donación exitosa! Gracias por su contribución de {amount} {tokenSymbol}.`,
     donation_no_token_balance: `No posees ningún {symbol}.`,
+    live_donation_feed: `Feed de Donaciones en Vivo`,
+    amount_donated: `Cantidad Donada`,
+    donations_no_recent_donations: `No se encontraron donaciones recientes.`,
+    donations_no_recent_donations_for_token: `No hay donaciones recientes de {token}.`,
+    donations_today: `Hoy`,
+    donations_last_week: `Última Semana`,
+    donations_last_month: `Último Mes`,
+    donations_all_time: `Todo el Tiempo`,
+    donations_sol_stats_title: `Estadísticas de Donaciones de SOL`,
+    donations_usdc_stats_title: `Estadísticas de Donaciones de USDC`,
+    donations_usdt_stats_title: `Estadísticas de Donaciones de USDT`,
+    donations_owfn_stats_title: `Estadísticas de Donaciones de OWFN`,
+    max_button: `MÁX`,
+    time_minutes_ago: `hace {minutes}m`,
+    time_hours_ago: `hace {hours}h`,
+    time_days_ago: `hace {days}d`,
     
     // Dashboard
     wallet_monitor: `Dashboard de Monitoreo de Billeteras`,
@@ -364,6 +380,10 @@ export const es = {
     chatbot_loading_1: `Conectando a mis circuitos...`,
     chatbot_loading_2: `Analizando tu pregunta...`,
     chatbot_loading_3: `Formulando una respuesta...`,
+    chatbot_welcome_message: `¡Hola! Soy el Asistente de OWFN. ¿Cómo puedo ayudarte a aprender sobre nuestra misión hoy?`,
+    chatbot_suggestion_1: `¿Qué es OWFN?`,
+    chatbot_suggestion_2: `¿Cómo compro?`,
+    chatbot_suggestion_3: `Háblame de las bonificaciones.`,
     
     // Whitepaper
     whitepaper_title: `Whitepaper de OWFN`,
