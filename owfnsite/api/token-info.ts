@@ -1,7 +1,6 @@
 import type { TokenDetails } from '../lib/types.js';
 
 const HELIUS_API_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
-const BIRDEYE_API_URL = `https://public-api.birdeye.so`;
 
 const DEX_PROGRAM_URLS: Record<string, { name: 'Raydium' | 'Orca' | 'Meteora' | 'Unknown'; urlPattern: string }> = {
     '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': { name: 'Raydium', urlPattern: 'https://raydium.io/liquidity/pool-info/?ammId={address}' },
@@ -22,13 +21,13 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Mint address is required." });
     }
     
-    if (!process.env.HELIUS_API_KEY || !process.env.BIRDEYE_API_KEY) {
-        console.error("API keys for Helius or Birdeye are not configured.");
+    if (!process.env.HELIUS_API_KEY) {
+        console.error("API key for Helius is not configured.");
         return res.status(500).json({ error: "Server API key configuration error." });
     }
 
     try {
-        const heliusPromise = fetch(HELIUS_API_URL, {
+        const assetPromise = fetch(HELIUS_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -37,35 +36,30 @@ export default async function handler(req: any, res: any) {
             }),
         });
 
-        const birdeyePromise = fetch(`${BIRDEYE_API_URL}/defi/price?address=${mintAddress}`, {
-            headers: { 'X-API-KEY': process.env.BIRDEYE_API_KEY },
+        const pairsPromise = fetch(`${HELIUS_API_URL}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0', id: 'owfn-token-pairs',
+                method: 'getFungibleTokenRating', params: { mint: mintAddress },
+            }),
         });
+        
+        const [assetRes, pairsRes] = await Promise.all([assetPromise, pairsPromise]);
 
-        const [heliusRes, birdeyeRes] = await Promise.all([heliusPromise, birdeyePromise]);
 
-        if (!heliusRes.ok) {
-            throw new Error(`Helius API Error: ${await heliusRes.text()}`);
+        if (!assetRes.ok) {
+            throw new Error(`Helius getAsset API Error: ${await assetRes.text()}`);
         }
         
-        const heliusJson = await heliusRes.json();
-        const asset = heliusJson.result;
+        const assetJson = await assetRes.json();
+        const asset = assetJson.result;
 
         if (!asset) {
             return res.status(404).json({ error: `No data found for mint: ${mintAddress}.` });
         }
         
-        let birdeyeData: any = {};
-        if (birdeyeRes.ok) {
-            const birdeyeJson = await birdeyeRes.json();
-            if (birdeyeJson.data) {
-                birdeyeData = {
-                    price: birdeyeJson.data.value,
-                    price24hChange: birdeyeJson.data.priceChange24h,
-                };
-            }
-        } else {
-             console.warn(`Birdeye price API failed with status ${birdeyeRes.status}. Price will be 0.`);
-        }
+        const price = asset.token_info?.price_info?.price_per_token || 0;
 
         const ownership = asset.ownership || {};
         const content = asset.content || {};
@@ -90,13 +84,13 @@ export default async function handler(req: any, res: any) {
                 telegram: links.telegram,
                 discord: links.discord,
             },
-            pricePerToken: birdeyeData.price || 0,
-            price24hChange: birdeyeData.price24hChange || 0,
+            pricePerToken: price,
+            price24hChange: 0, // Not available from Helius, default to 0
             decimals: decimals,
             totalSupply: totalSupply,
             circulatingSupply: circulatingSupply,
             holders: ownership.owner_count || 0,
-            marketCap: (birdeyeData.price || 0) * circulatingSupply,
+            marketCap: price * circulatingSupply,
             creatorAddress: asset.grouping?.[0]?.group_value,
             createdAt: asset.created_at,
             mintAuthority: authorities.find((auth: any) => auth.scopes?.includes('mint'))?.address || null,
@@ -104,33 +98,9 @@ export default async function handler(req: any, res: any) {
             updateAuthority: authorities.find((auth: any) => auth.scopes?.includes('metadata_write'))?.address || null,
             tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
             extensions: asset.spl_token_2022_info?.extensions?.map((ext: any) => ({ extension: ext.extension, state: ext.state })) || [],
-            volume24h: 0, 
+            volume24h: 0, // Not available from Helius, default to 0
             liquidityPools: [],
         };
-
-        const birdeyeOverviewPromise = fetch(`${BIRDEYE_API_URL}/defi/token_overview?address=${mintAddress}`, {
-             headers: { 'X-API-KEY': process.env.BIRDEYE_API_KEY },
-        });
-
-        const pairsPromise = fetch(`${HELIUS_API_URL}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jsonrpc: '2.0', id: 'owfn-token-pairs',
-                method: 'getFungibleTokenRating', params: { mint: mintAddress },
-            }),
-        });
-
-        const [birdeyeOverviewRes, pairsRes] = await Promise.all([birdeyeOverviewPromise, pairsPromise]);
-
-        if (birdeyeOverviewRes.ok) {
-            const overviewJson = await birdeyeOverviewRes.json();
-            if (overviewJson.data?.volume24h) {
-                responseData.volume24h = overviewJson.data.volume24h;
-            }
-        } else {
-             console.warn(`Birdeye overview API failed with status ${birdeyeOverviewRes.status}.`);
-        }
         
         if (pairsRes.ok) {
             const pairsJson = await pairsRes.json();
