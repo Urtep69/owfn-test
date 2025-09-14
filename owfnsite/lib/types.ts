@@ -76,6 +76,7 @@ export interface TokenDetails extends Token {
     links?: Record<string, string>;
     marketCap?: number;
     volume24h?: number;
+    price24hChange?: number;
     holders?: number;
     totalSupply: number;
     circulatingSupply?: number;

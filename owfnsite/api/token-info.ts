@@ -1,25 +1,18 @@
-import type { TokenDetails, TokenExtension, LiquidityPool } from '../lib/types.js';
+import type { TokenDetails } from '../lib/types.js';
 
 const HELIUS_API_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
+const BIRDEYE_API_URL = `https://public-api.birdeye.so`;
 
-function calculateMarketCap(price: number, supply: number): number {
-    if (!price || !supply) return 0;
-    return price * supply;
-}
+const DEX_PROGRAM_URLS: Record<string, { name: 'Raydium' | 'Orca' | 'Meteora' | 'Unknown'; urlPattern: string }> = {
+    '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': { name: 'Raydium', urlPattern: 'https://raydium.io/liquidity/pool-info/?ammId={address}' },
+    '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbcz2j81LuW9jCV': { name: 'Raydium', urlPattern: 'https://raydium.io/liquidity/pool-info/?ammId={address}' },
+    'whirLbMiF6mS2i5sS4GD53devN822iH2p9tPqXhdGL': { name: 'Orca', urlPattern: 'https://www.orca.so/whirlpools/view/{address}' },
+    'METEORA_PROGRAM_ID_PLACEHOLDER': { name: 'Meteora', urlPattern: 'https://app.meteora.ag/pools/{address}' },
+};
 
-// Helper to map DEX program IDs to names and build URLs
-const getDexInfo = (programId: string, address: string): { name: 'Raydium' | 'Orca' | 'Meteora' | 'Unknown'; url: string } => {
-    switch (programId) {
-        case '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': // Raydium CLMM
-        case '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbcz2j81LuW9jCV': // Raydium Liquidity Pool V4
-            return { name: 'Raydium', url: `https://raydium.io/liquidity/pool-info/?ammId=${address}` };
-        case 'whirLbMiF6mS2i5sS4GD53devN822iH2p9tPqXhdGL': // Orca Whirlpools
-            return { name: 'Orca', url: `https://www.orca.so/whirlpools/view/${address}` };
-        case 'METEORA_PROGRAM_ID_PLACEHOLDER': // Replace with Meteora's actual program ID if available
-            return { name: 'Meteora', url: `https://app.meteora.ag/pools/${address}` };
-        default:
-            return { name: 'Unknown', url: `https://solscan.io/account/${address}` };
-    }
+const getDexInfo = (programId: string, address: string) => {
+    const dex = DEX_PROGRAM_URLS[programId] || { name: 'Unknown', urlPattern: 'https://solscan.io/account/{address}' };
+    return { name: dex.name, url: dex.urlPattern.replace('{address}', address) };
 };
 
 export default async function handler(req: any, res: any) {
@@ -29,54 +22,61 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Mint address is required." });
     }
     
-    if (!process.env.HELIUS_API_KEY) {
-        console.error("Helius API key is not configured.");
-        return res.status(500).json({ error: "Server configuration error for Helius API." });
+    if (!process.env.HELIUS_API_KEY || !process.env.BIRDEYE_API_KEY) {
+        console.error("API keys for Helius or Birdeye are not configured.");
+        return res.status(500).json({ error: "Server API key configuration error." });
     }
 
     try {
-        const response = await fetch(HELIUS_API_URL, {
+        const heliusPromise = fetch(HELIUS_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                jsonrpc: '2.0',
-                id: 'owfn-token-info',
-                method: 'getAsset',
-                params: {
-                    id: mintAddress,
-                    displayOptions: {
-                        showFungible: true,
-                    }
-                },
+                jsonrpc: '2.0', id: 'owfn-token-info', method: 'getAsset',
+                params: { id: mintAddress, displayOptions: { showFungible: true } },
             }),
         });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Helius API error for getAsset: ${response.status}`, errorText);
-            return res.status(response.status).json({ error: `Helius API Error: ${errorText}` });
+
+        const birdeyePromise = fetch(`${BIRDEYE_API_URL}/defi/price?address=${mintAddress}`, {
+            headers: { 'X-API-KEY': process.env.BIRDEYE_API_KEY },
+        });
+
+        const [heliusRes, birdeyeRes] = await Promise.all([heliusPromise, birdeyePromise]);
+
+        if (!heliusRes.ok) {
+            throw new Error(`Helius API Error: ${await heliusRes.text()}`);
         }
         
-        const jsonResponse = await response.json();
-        const asset = jsonResponse.result;
-        
+        const heliusJson = await heliusRes.json();
+        const asset = heliusJson.result;
+
         if (!asset) {
-            return res.status(404).json({ error: `No data could be found for mint: ${mintAddress}.` });
+            return res.status(404).json({ error: `No data found for mint: ${mintAddress}.` });
         }
         
-        // Defensively access nested properties
+        let birdeyeData: any = {};
+        if (birdeyeRes.ok) {
+            const birdeyeJson = await birdeyeRes.json();
+            if (birdeyeJson.data) {
+                birdeyeData = {
+                    price: birdeyeJson.data.value,
+                    price24hChange: birdeyeJson.data.priceChange24h,
+                };
+            }
+        } else {
+             console.warn(`Birdeye price API failed with status ${birdeyeRes.status}. Price will be 0.`);
+        }
+
         const ownership = asset.ownership || {};
         const content = asset.content || {};
         const metadata = content.metadata || {};
         const links = content.links || {};
         const authorities = asset.authorities || [];
         const tokenInfo = asset.token_info || {};
-        const priceInfo = tokenInfo.price_info || {};
         const supply = tokenInfo.supply ? BigInt(tokenInfo.supply) : 0n;
-        const decimals = tokenInfo.decimals ?? 9;
-        const price = priceInfo.price_per_token || 0;
-        
+        const decimals = tokenInfo.decimals ?? 0;
         const totalSupply = Number(supply) / (10 ** decimals);
+        const circulatingSupply = tokenInfo.circulating_supply ? Number(tokenInfo.circulating_supply) / (10 ** decimals) : totalSupply;
 
         const responseData: Partial<TokenDetails> = {
             mintAddress: asset.id,
@@ -84,59 +84,65 @@ export default async function handler(req: any, res: any) {
             symbol: metadata.symbol || `${asset.id.slice(0, 4)}...`,
             logo: links.image || null,
             description: metadata.description || undefined,
-            links: links,
-            
-            pricePerToken: price,
+            links: {
+                website: links.website,
+                twitter: links.twitter,
+                telegram: links.telegram,
+                discord: links.discord,
+            },
+            pricePerToken: birdeyeData.price || 0,
+            price24hChange: birdeyeData.price24hChange || 0,
             decimals: decimals,
             totalSupply: totalSupply,
-            holders: ownership.delegated ? ownership.owner_count + 1 : ownership.owner_count,
-            marketCap: calculateMarketCap(price, totalSupply),
-            
+            circulatingSupply: circulatingSupply,
+            holders: ownership.owner_count || 0,
+            marketCap: (birdeyeData.price || 0) * circulatingSupply,
             creatorAddress: asset.grouping?.[0]?.group_value,
             createdAt: asset.created_at,
-
             mintAuthority: authorities.find((auth: any) => auth.scopes?.includes('mint'))?.address || null,
             freezeAuthority: authorities.find((auth: any) => auth.scopes?.includes('freeze'))?.address || null,
             updateAuthority: authorities.find((auth: any) => auth.scopes?.includes('metadata_write'))?.address || null,
-            
             tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
             extensions: asset.spl_token_2022_info?.extensions?.map((ext: any) => ({ extension: ext.extension, state: ext.state })) || [],
-
-            // Placeholder, requires another API call to a DEX aggregator
             volume24h: 0, 
             liquidityPools: [],
         };
 
-        // --- Fetch Liquidity Pool Info ---
-        try {
-            const pairsResponse = await fetch(HELIUS_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    jsonrpc: '2.0',
-                    id: 'owfn-token-pairs',
-                    method: 'getFungibleTokenRating',
-                    params: {
-                        mint: mintAddress,
-                    },
-                }),
-            });
-            if (pairsResponse.ok) {
-                const pairsJson = await pairsResponse.json();
-                const markets = pairsJson.result?.markets;
-                if (Array.isArray(markets)) {
-                    responseData.liquidityPools = markets.map((market: any) => {
-                        const dex = getDexInfo(market.program_id, market.address);
-                        return {
-                            exchange: dex.name,
-                            lpMintAddress: market.address,
-                            url: dex.url,
-                        };
-                    });
-                }
+        const birdeyeOverviewPromise = fetch(`${BIRDEYE_API_URL}/defi/token_overview?address=${mintAddress}`, {
+             headers: { 'X-API-KEY': process.env.BIRDEYE_API_KEY },
+        });
+
+        const pairsPromise = fetch(`${HELIUS_API_URL}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                jsonrpc: '2.0', id: 'owfn-token-pairs',
+                method: 'getFungibleTokenRating', params: { mint: mintAddress },
+            }),
+        });
+
+        const [birdeyeOverviewRes, pairsRes] = await Promise.all([birdeyeOverviewPromise, pairsPromise]);
+
+        if (birdeyeOverviewRes.ok) {
+            const overviewJson = await birdeyeOverviewRes.json();
+            if (overviewJson.data?.volume24h) {
+                responseData.volume24h = overviewJson.data.volume24h;
             }
-        } catch (pairError) {
-            console.warn("Could not fetch liquidity pair info:", pairError);
+        } else {
+             console.warn(`Birdeye overview API failed with status ${birdeyeOverviewRes.status}.`);
+        }
+        
+        if (pairsRes.ok) {
+            const pairsJson = await pairsRes.json();
+            const markets = pairsJson.result?.markets;
+            if (Array.isArray(markets)) {
+                responseData.liquidityPools = markets.map((market: any) => {
+                    const dex = getDexInfo(market.program_id, market.address);
+                    return { exchange: dex.name, lpMintAddress: market.address, url: dex.url };
+                });
+            }
+        } else {
+            console.warn(`Helius pairs API failed with status ${pairsRes.status}.`);
         }
         
         return res.status(200).json(responseData);

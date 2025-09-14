@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRoute, Link, useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
-import type { TokenDetails, TokenExtension } from '../lib/types.js';
+import type { TokenDetails, TokenExtension, LiquidityPool } from '../lib/types.js';
 import { 
     ArrowLeft, Loader2, AlertTriangle, Info, BarChart2, ShieldCheck, CheckCircle, XCircle, 
-    Globe, Twitter, Send, Star, Share2, Layers, BookOpen, Key, Coins, Percent, EyeOff, UserCheck, Ban, Zap
+    Globe, Twitter, Send, Star, Share2, Layers, BookOpen, Key, Coins, Percent, EyeOff, 
+    UserCheck, Ban, Zap, TrendingUp, TrendingDown, ExternalLink
 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import { formatNumber } from '../lib/utils.js';
@@ -79,6 +80,16 @@ const TokenExtensionDisplay = ({ extension }: { extension: TokenExtension }) => 
     );
 };
 
+const LiquidityPoolDisplay = ({ pool }: { pool: LiquidityPool }) => {
+    return (
+        <DetailItem label={pool.exchange}>
+            <a href={pool.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:underline text-darkAccent-400">
+                <AddressDisplay address={pool.lpMintAddress} />
+                <ExternalLink size={14} />
+            </a>
+        </DetailItem>
+    );
+};
 
 // --- Main Component ---
 
@@ -96,33 +107,34 @@ export default function TokenDetail() {
     const fromPath = new URLSearchParams(location.split('?')[1] || '').get('from') || '/dashboard';
     const isFavorite = mintAddress ? favorites.includes(mintAddress) : false;
 
-    useEffect(() => {
+    const fetchTokenDetails = useCallback(async () => {
         if (!mintAddress) {
             setError('No mint address provided.');
             setLoading(false);
             return;
         }
 
-        const fetchTokenDetails = async () => {
-            setLoading(true);
-            setError('');
-            try {
-                const response = await fetch(`/api/token-info?mint=${mintAddress}`);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to fetch token details.');
-                }
-                const data: TokenDetails = await response.json();
-                setTokenDetails(data);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
+        try {
+            const response = await fetch(`/api/token-info?mint=${mintAddress}`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to fetch token details.');
             }
-        };
+            const data: TokenDetails = await response.json();
+            setTokenDetails(data);
+            setError('');
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            if(loading) setLoading(false);
+        }
+    }, [mintAddress, loading]);
 
-        fetchTokenDetails();
-    }, [mintAddress]);
+    useEffect(() => {
+        fetchTokenDetails(); // Initial fetch
+        const interval = setInterval(fetchTokenDetails, 5000); // Poll every 5 seconds
+        return () => clearInterval(interval);
+    }, [fetchTokenDetails]);
     
     const handleFavoriteToggle = useCallback(() => {
         if (!mintAddress) return;
@@ -164,6 +176,9 @@ export default function TokenDetail() {
         'telegram': <Send size={18}/>,
         'discord': <DiscordIcon className="w-[18px] h-[18px]"/>
     };
+    
+    const priceChange = tokenDetails.price24hChange ?? 0;
+    const isPriceUp = priceChange >= 0;
 
     return (
         <div className="animate-fade-in-up space-y-6 text-darkPrimary-200">
@@ -198,22 +213,31 @@ export default function TokenDetail() {
             <div className="bg-darkPrimary-800 p-4 rounded-xl flex flex-col md:flex-row items-center gap-4 border border-darkPrimary-700/50">
                 <div className="flex-1 text-center md:text-left">
                     <p className="text-sm text-darkPrimary-400">{t('price_per_token')}</p>
-                    <p className="text-4xl font-bold text-white">${formatNumber(tokenDetails.pricePerToken)}</p>
+                    <div className="flex items-center gap-3">
+                        <p className="text-4xl font-bold text-white">${tokenDetails.pricePerToken > 0.0001 ? tokenDetails.pricePerToken.toLocaleString(undefined, { maximumFractionDigits: 6 }) : tokenDetails.pricePerToken.toPrecision(4)}</p>
+                        <div className={`flex items-center gap-1 text-lg font-bold ${isPriceUp ? 'text-green-400' : 'text-red-400'}`}>
+                           {isPriceUp ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                           {priceChange.toFixed(2)}%
+                        </div>
+                    </div>
                 </div>
                 <div className="flex-1 w-full md:w-auto">
-                    {/* Placeholder for SWAP component */}
                     <div className="h-24 bg-darkPrimary-700/50 rounded-lg flex items-center justify-center font-bold text-darkPrimary-500">{t('swap')} {t('coming_soon_title')}</div>
                 </div>
             </div>
             
             <div className="grid lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Placeholder for CHART */}
-                    <div className="h-96 bg-darkPrimary-800 rounded-2xl flex items-center justify-center font-bold text-darkPrimary-500 border border-darkPrimary-700/50">Price Chart {t('coming_soon_title')}</div>
+                    <div className="h-96 bg-darkPrimary-800 rounded-2xl flex items-center justify-center font-bold text-darkPrimary-500 border border-darkPrimary-700/50">Price Chart (TradingView) {t('coming_soon_title')}</div>
                     
                     {tokenDetails.description && (
                         <InfoCard title={t('token_description_title')} icon={<Info />}>
                             <p className="text-darkPrimary-300 text-sm leading-relaxed">{tokenDetails.description}</p>
+                        </InfoCard>
+                    )}
+                     {tokenDetails.liquidityPools && tokenDetails.liquidityPools.length > 0 && (
+                        <InfoCard title={t('liquidity')} icon={<Layers />}>
+                            {tokenDetails.liquidityPools.map(pool => <LiquidityPoolDisplay key={pool.lpMintAddress} pool={pool} />)}
                         </InfoCard>
                     )}
                 </div>
@@ -223,6 +247,7 @@ export default function TokenDetail() {
                          <DetailItem label={t('market_cap')} value={`$${formatNumber(tokenDetails.marketCap ?? 0)}`} />
                          <DetailItem label={t('volume_24h')} value={`$${formatNumber(tokenDetails.volume24h ?? 0)}`} />
                          <DetailItem label={t('total_supply')} value={formatNumber(tokenDetails.totalSupply)} />
+                         <DetailItem label={t('circulating_supply')} value={formatNumber(tokenDetails.circulatingSupply ?? 0)} />
                          <DetailItem label={t('holders')} value={formatNumber(tokenDetails.holders ?? 0)} />
                     </InfoCard>
 
@@ -239,7 +264,7 @@ export default function TokenDetail() {
                         <DetailItem label={t('token_standard')} value={tokenDetails.tokenStandard} />
                         <DetailItem label={t('token_decimals')} value={tokenDetails.decimals} />
                         <DetailItem label={t('creation_date_title', { defaultValue: 'Creation Date' })}>
-                           {tokenDetails.createdAt ? new Date(tokenDetails.createdAt * 1000).toLocaleString() : 'N/A'}
+                           {tokenDetails.createdAt ? new Date(tokenDetails.createdAt).toLocaleString() : 'N/A'}
                         </DetailItem>
                     </InfoCard>
                     
