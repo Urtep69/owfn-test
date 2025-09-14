@@ -1,5 +1,3 @@
-import React from 'react';
-
 export interface Token {
   name: string;
   symbol: string;
@@ -71,9 +69,10 @@ export interface LiquidityPool {
     url: string;
 }
 
-export interface TokenDetails extends Token {
+export interface TokenDetails extends Partial<Token> {
+    mintAddress: string;
     description?: string;
-    links?: Record<string, string>;
+    links?: Record<string, string | null>;
     marketCap?: number;
     volume24h?: number;
     price24hChange?: number;

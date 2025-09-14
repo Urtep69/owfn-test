@@ -1,16 +1,16 @@
 import type { TokenDetails } from '../lib/types.js';
 
-const HELIUS_API_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
+const HELIUS_RPC_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
 
 const DEX_PROGRAM_URLS: Record<string, { name: 'Raydium' | 'Orca' | 'Meteora' | 'Unknown'; urlPattern: string }> = {
     '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': { name: 'Raydium', urlPattern: 'https://raydium.io/liquidity/pool-info/?ammId={address}' },
     '58oQChx4yWmvKdwLLZzBi4ChoCc2fqbcz2j81LuW9jCV': { name: 'Raydium', urlPattern: 'https://raydium.io/liquidity/pool-info/?ammId={address}' },
     'whirLbMiF6mS2i5sS4GD53devN822iH2p9tPqXhdGL': { name: 'Orca', urlPattern: 'https://www.orca.so/whirlpools/view/{address}' },
-    'METEORA_PROGRAM_ID_PLACEHOLDER': { name: 'Meteora', urlPattern: 'https://app.meteora.ag/pools/{address}' },
+    'METEORA_PROGRAM_ID_PLACEHOLDER': { name: 'Meteora', urlPattern: 'https://app.meteora.ag/pools/{address}' }, // Placeholder, needs actual ID
 };
 
 const getDexInfo = (programId: string, address: string) => {
-    const dex = DEX_PROGRAM_URLS[programId] || { name: 'Unknown', urlPattern: 'https://solscan.io/account/{address}' };
+    const dex = DEX_PROGRAM_URLS[programId] || { name: 'Unknown', urlPattern: `https://solscan.io/account/${address}` };
     return { name: dex.name, url: dex.urlPattern.replace('{address}', address) };
 };
 
@@ -27,7 +27,7 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
-        const assetPromise = fetch(HELIUS_API_URL, {
+        const assetPromise = fetch(HELIUS_RPC_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -36,7 +36,7 @@ export default async function handler(req: any, res: any) {
             }),
         });
 
-        const pairsPromise = fetch(`${HELIUS_API_URL}`, {
+        const pairsPromise = fetch(HELIUS_RPC_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -59,8 +59,11 @@ export default async function handler(req: any, res: any) {
             return res.status(404).json({ error: `No data found for mint: ${mintAddress}.` });
         }
         
-        const price = asset.token_info?.price_info?.price_per_token || 0;
-
+        const priceInfo = asset.token_info?.price_info || {};
+        const price = priceInfo.price_per_token || 0;
+        const price24hChange = priceInfo.price_change_24hr || 0;
+        const volume24h = priceInfo.volume_24hr || 0;
+        
         const ownership = asset.ownership || {};
         const content = asset.content || {};
         const metadata = content.metadata || {};
@@ -72,33 +75,33 @@ export default async function handler(req: any, res: any) {
         const totalSupply = Number(supply) / (10 ** decimals);
         const circulatingSupply = tokenInfo.circulating_supply ? Number(tokenInfo.circulating_supply) / (10 ** decimals) : totalSupply;
 
-        const responseData: Partial<TokenDetails> = {
+        const responseData: TokenDetails = {
             mintAddress: asset.id,
             name: metadata.name || 'Unknown Token',
             symbol: metadata.symbol || `${asset.id.slice(0, 4)}...`,
             logo: links.image || null,
             description: metadata.description || undefined,
             links: {
-                website: links.website,
-                twitter: links.twitter,
-                telegram: links.telegram,
-                discord: links.discord,
+                website: links.website || null,
+                twitter: links.twitter || null,
+                telegram: links.telegram || null,
+                discord: links.discord || null,
             },
             pricePerToken: price,
-            price24hChange: 0, // Not available from Helius, default to 0
+            price24hChange: price24hChange,
             decimals: decimals,
             totalSupply: totalSupply,
             circulatingSupply: circulatingSupply,
             holders: ownership.owner_count || 0,
             marketCap: price * circulatingSupply,
-            creatorAddress: asset.grouping?.[0]?.group_value,
+            creatorAddress: asset.grouping?.find((g: any) => g.group_key === 'collection')?.group_value || asset.creators?.[0]?.address,
             createdAt: asset.created_at,
             mintAuthority: authorities.find((auth: any) => auth.scopes?.includes('mint'))?.address || null,
             freezeAuthority: authorities.find((auth: any) => auth.scopes?.includes('freeze'))?.address || null,
             updateAuthority: authorities.find((auth: any) => auth.scopes?.includes('metadata_write'))?.address || null,
             tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
             extensions: asset.spl_token_2022_info?.extensions?.map((ext: any) => ({ extension: ext.extension, state: ext.state })) || [],
-            volume24h: 0, // Not available from Helius, default to 0
+            volume24h: volume24h,
             liquidityPools: [],
         };
         
