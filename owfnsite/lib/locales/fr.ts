@@ -55,7 +55,7 @@ export const fr = {
     
     // Home Page
     home_title: `Le Réseau Familial Mondial Officiel`,
-    home_subtitle: `Un réseau mondial uni par la vision de construire un monde meilleur grâce à la technologie et à l'humanité. Nous construisons un mouvement qui connecte les familles du monde entier via la blockchain pour contribuer à un impact social réel.`,
+    home_subtitle: `Un réseau mondial uni par la vision de construire un monde meilleur grâce à la technologie et à l'humanité. Nous construisons un mouvement qui connecte les familles du monde entier via la blockchain pour contribuir à un impact social réel.`,
     core_message_title: `Un mouvement que nous construisons ensemble`,
     home_message: `La grande vision de ce projet ne peut être réalisée qu'avec le soutien de l'humanité. En achetant notre jeton et en le promouvant auprès de vos amis, de votre famille et de vos collègues, vous devenez un élément essentiel d'un mouvement mondial pour le changement. Ce n'est pas seulement un projet ; c'est une force vivante et agissante pour le bien que nous construisons ensemble.`,
     home_feature_impact_title: `Impact Réel`,
@@ -498,10 +498,8 @@ export const fr = {
     airdrop_checking: `Vérification de l'éligibilité...`,
     airdrop_connect_prompt: `Connectez votre portefeuille pour vérifier si vous êtes éligible à l'airdrop.`,
     airdrop_congratulations: `Félicitations !`,
-    airdrop_eligible_message: `Votre portefeuille est éligible ! Vous recevrez {amount} jetons OWFN lors de la prochaine distribution.`,
-    // FIX: Corrected a syntax error where 'airdrop' and 'not_eligible' were on separate lines,
-    // which caused a javascript error. It has been combined into the correct property 'airdrop_not_eligible'.
     airdrop_not_eligible: `Non Éligible`,
+    airdrop_eligible_message: `Votre portefeuille est éligible ! Vous recevrez {amount} jetons OWFN lors de la prochaine distribution.`,
     airdrop_not_eligible_message: `Désolé, cette adresse de portefeuille n'est pas éligible pour l'airdrop actuel. Restez actif dans notre communauté pour de futures opportunités !`,
     airdrop_info_box_title: `À propos de cet Airdrop`,
     airdrop_info_box_desc: `Cet airdrop est conçu pour récompenser les premiers supporters et les membres actifs de la communauté. L'éligibilité est basée sur des facteurs tels que la participation à la prévente et l'engagement dans les événements communautaires.`,
@@ -526,7 +524,7 @@ export const fr = {
     you_voted: `Vous avez voté`,
     no_active_proposals: `Il n'y a actuellement aucune proposition active.`,
     no_past_proposals: `Il n'y a aucune proposition passée à afficher.`,
-    no_active_cases_in_category: `Il n'y a actuellement aucun cas actif dans cette catégorie.`,
+    no_active_cases_in_category: `Il n'y a currently aucun cas actif dans cette catégorie.`,
     
     // Maintenance
     maintenance_heading: `Nous améliorons les choses !`,

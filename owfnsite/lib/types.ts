@@ -90,7 +90,7 @@ export interface TokenDetails extends Token {
     mintAuthority?: string | null;
     freezeAuthority?: string | null;
     updateAuthority?: string | null;
-    tokenStandard?: 'SPL Token' | 'Token-2022';
+    tokenStandard?: 'SPL Token' | 'Token-2022' | string;
     tokenExtensions?: TokenExtension[];
 }
 

@@ -345,7 +345,6 @@ export default function Donations() {
                                 ) : (
                                     <div className="text-center py-3 px-4 bg-accent-100/20 dark:bg-darkAccent-900/20 border border-accent-400/30 dark:border-darkAccent-500/30 rounded-lg">
                                         <div className="flex items-center justify-center space-x-2 text-accent-700 dark:text-darkAccent-200">
-                                            {/* FIX: Add generic type to React.cloneElement to inform TypeScript about the `className` prop. */}
                                             {React.cloneElement(tokens.find(t => t.symbol === selectedToken)!.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                                             <p className="font-semibold">{t('donation_no_token_balance', { symbol: selectedToken })}</p>
                                         </div>

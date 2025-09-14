@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useRoute, Link, useLocation } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
@@ -30,9 +29,6 @@ const InfoCard = ({ title, icon, children }: { title: string, icon: React.ReactN
 
 export default function TokenDetail() {
     const { t } = useAppContext();
-    // FIX: The `useRoute` hook was not correctly inferring the type for `params`, resulting in a `never` type.
-    // By providing an explicit generic type `<{ mint: string }>`, we ensure `params` is correctly typed as `{ mint: string } | null`,
-    // which resolves the TypeScript error when accessing `params.mint`.
     const [match, params] = useRoute<{ mint: string }>("/dashboard/token/:mint");
     const [location] = useLocation();
     const mintAddress = match && params ? params.mint : undefined;
