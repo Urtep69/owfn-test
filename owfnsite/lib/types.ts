@@ -1,3 +1,5 @@
+import React from 'react';
+
 export interface Token {
   name: string;
   symbol: string;
@@ -63,16 +65,9 @@ export interface TokenExtension {
     state: TokenExtensionState;
 }
 
-export interface LiquidityPool {
-    exchange: 'Raydium' | 'Orca' | 'Meteora' | 'Unknown';
-    lpMintAddress: string;
-    url: string;
-}
-
-export interface TokenDetails extends Partial<Token> {
-    mintAddress: string;
+export interface TokenDetails extends Token {
     description?: string;
-    links?: Record<string, string | null>;
+    links?: Record<string, string>;
     marketCap?: number;
     volume24h?: number;
     price24hChange?: number;
@@ -80,22 +75,24 @@ export interface TokenDetails extends Partial<Token> {
     totalSupply: number;
     circulatingSupply?: number;
     
-    // Technical Details
+    priceSol?: number;
+    liquidity?: number;
+    pairAddress?: string;
+    fdv?: number;
+    poolCreatedAt?: number; // Timestamp
+    txns?: {
+        h24: { buys: number, sells: number };
+    };
+    dexId?: string;
+
+    // On-chain technical details
     creatorAddress?: string;
-    createdAt?: number; // Unix timestamp
     mintAuthority?: string | null;
     freezeAuthority?: string | null;
-    updateAuthority?: string | null; // This is the metadata update authority
+    updateAuthority?: string | null;
     tokenStandard?: 'SPL Token' | 'Token-2022' | string;
-    extensions?: TokenExtension[];
-
-    // Market data
-    liquidityPools?: LiquidityPool[];
-
-    // User-specific state
-    isFavorite?: boolean;
+    tokenExtensions?: TokenExtension[];
 }
-
 
 export interface LiveTransaction {
     id: string;
