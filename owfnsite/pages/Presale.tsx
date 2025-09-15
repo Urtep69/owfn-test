@@ -11,11 +11,13 @@ import {
     OWFN_LOGO_URL, 
     TOKEN_ALLOCATIONS, 
     ROADMAP_DATA,
+    DISTRIBUTION_WALLETS,
     QUICKNODE_RPC_URL,
     QUICKNODE_WSS_URL,
 } from '../lib/constants.js';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import type { PresaleTransaction, PresaleStage } from '../lib/types.js';
+import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
 
 // Get the current (and only) presale stage for this page to use.
@@ -121,6 +123,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         const tx = data.params.result.transaction;
                         const signature = tx.signatures[0];
 
+                        // Look for native SOL transfers to our presale wallet
                         const nativeTransfer = tx.message.instructions.find((inst: any) => 
                             inst.program === 'system' && 
                             inst.parsed?.type === 'transfer' &&
@@ -133,12 +136,14 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                                 address: nativeTransfer.parsed.info.source,
                                 solAmount: nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL,
                                 owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
-                                time: new Date(),
+                                time: new Date(), // Use current time for live feed
                             };
 
                             if (isMounted) {
                                 setTransactions(prev => {
-                                    if (prev.some(t => t.id === newTx.id)) return prev;
+                                    if (prev.some(t => t.id === newTx.id)) {
+                                        return prev; // Already have this one
+                                    }
                                     return [newTx, ...prev.slice(0, 19)];
                                 });
                             }
@@ -150,11 +155,15 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
             };
             
             wsRef.current.onclose = () => {
-                if (isMounted) setTimeout(connectWebSocket, 5000);
+                console.log("WebSocket disconnected. Attempting to reconnect in 5 seconds...");
+                if (isMounted) {
+                    setTimeout(connectWebSocket, 5000);
+                }
             };
 
             wsRef.current.onerror = (error) => {
-                wsRef.current?.close();
+                console.error("WebSocket error:", error);
+                wsRef.current?.close(); // This will trigger the onclose reconnect logic
             };
         };
 
@@ -164,20 +173,21 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
         return () => {
             isMounted = false;
             if (wsRef.current) {
-                wsRef.current.onclose = null;
+                wsRef.current.onclose = null; // Prevent reconnection on unmount
                 wsRef.current.close();
+                console.log("WebSocket disconnected on component unmount.");
             }
         };
     }, []);
 
 
     return (
-        <div className="bg-dextools-card border border-dextools-border rounded-md p-4 h-full flex flex-col">
+        <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 h-full flex flex-col">
             <div className="flex items-center gap-2 mb-4">
-                <div className="w-2.5 h-2.5 bg-dextools-accent-green rounded-full animate-pulse"></div>
-                <h3 className="text-dextools-text-primary font-bold">{t('live_presale_feed')}</h3>
+                <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
+                <h3 className="text-primary-900 dark:text-darkPrimary-100 font-bold">{t('live_presale_feed')}</h3>
             </div>
-            <div className="grid grid-cols-4 gap-2 text-xs text-dextools-text-secondary pb-2 border-b border-dextools-border font-semibold">
+            <div className="grid grid-cols-4 gap-2 text-xs text-primary-500 dark:text-darkPrimary-400 pb-2 border-b border-primary-200 dark:border-darkPrimary-700 font-semibold">
                 <span className="col-span-2">{t('wallet')}</span>
                 <span className="text-right">{t('sol_spent')}</span>
                 <span className="text-right">{t('owfn_received')}</span>
@@ -185,10 +195,10 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
             <div className="flex-grow overflow-y-auto space-y-1 pr-1 -mr-2 mt-2">
                 {loading ? (
                      <div className="flex justify-center items-center h-full">
-                        <Loader2 className="w-6 h-6 animate-spin text-dextools-accent-blue" />
+                        <Loader2 className="w-6 h-6 animate-spin text-accent-500 dark:text-darkAccent-500" />
                     </div>
                 ) : transactions.length > 0 ? transactions.map((tx) => (
-                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in ${tx.time.getTime() > Date.now() - 10000 ? 'bg-dextools-special/10' : ''}`}>
+                    <div key={tx.id} className={`grid grid-cols-4 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 10000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
                         <div className="col-span-2 flex items-center gap-2">
                            <AddressDisplay address={tx.address} className="text-xs" />
                         </div>
@@ -209,16 +219,16 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
 const AccordionSection = ({ title, children, isOpen: defaultIsOpen = false }: { title: string, children: React.ReactNode, isOpen?: boolean }) => {
   const [isOpen, setIsOpen] = useState(defaultIsOpen);
   return (
-    <div className="border border-dextools-border bg-dextools-background rounded-lg">
+    <div className="border border-accent-400/20 dark:border-darkAccent-500/20 bg-primary-100/30 dark:bg-darkPrimary-800/30 rounded-lg">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center p-4"
       >
-        <h3 className="font-bold text-md text-dextools-text-primary">{title}</h3>
-        <ChevronDown className={`w-5 h-5 text-dextools-text-secondary transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <h3 className="font-bold text-md text-primary-900 dark:text-darkPrimary-100">{title}</h3>
+        <ChevronDown className={`w-5 h-5 text-primary-500 dark:text-darkPrimary-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       {isOpen && (
-        <div className="px-4 pb-4 text-dextools-text-secondary animate-fade-in" style={{animationDuration: '300ms'}}>
+        <div className="px-4 pb-4 text-primary-600 dark:text-darkPrimary-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
           {children}
         </div>
       )}
@@ -227,9 +237,9 @@ const AccordionSection = ({ title, children, isOpen: defaultIsOpen = false }: { 
 };
 
 const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNode }) => (
-  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-dextools-border/50">
-    <span className="text-dextools-text-secondary mb-1 sm:mb-0">{label}</span>
-    <div className="font-semibold text-dextools-text-primary text-left sm:text-right break-all w-full sm:w-auto">{value}</div>
+  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50">
+    <span className="text-primary-500 dark:text-darkPrimary-400 mb-1 sm:mb-0">{label}</span>
+    <div className="font-semibold text-primary-800 dark:text-darkPrimary-100 text-left sm:text-right break-all w-full sm:w-auto">{value}</div>
   </div>
 );
 
@@ -265,10 +275,12 @@ const MedalIcon = ({ nameKey }: { nameKey: string }) => {
 
     return (
         <div className="relative">
+            {/* Ribbon */}
             <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-6 h-8 z-0">
                 <div className={`absolute left-0 bottom-0 w-1/2 h-full ${ribbonStyle.part1} transform -skew-x-[20deg] origin-bottom-right rounded-sm`}></div>
                 <div className={`absolute right-0 bottom-0 w-1/2 h-full ${ribbonStyle.part2} transform skew-x-[20deg] origin-bottom-left rounded-sm`}></div>
             </div>
+            {/* Medal */}
             <div style={medalStyle} className="relative w-10 h-10 rounded-full flex items-center justify-center shadow-lg">
                 <span className={`font-black text-xl ${numberStyle}`} style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}>{rank}</span>
             </div>
@@ -281,19 +293,19 @@ const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bo
     const displayTiers = [...tiers].sort((a, b) => b.threshold - a.threshold);
 
     return (
-        <div className="bg-dextools-background p-4 rounded-lg">
-            <h3 className="text-md font-bold text-center text-dextools-text-primary mb-3">{t('bonus_tiers_title')}</h3>
+        <div className="bg-primary-50 dark:bg-darkPrimary-800/50 p-4 rounded-lg">
+            <h3 className="text-md font-bold text-center text-primary-800 dark:text-darkPrimary-200 mb-3">{t('bonus_tiers_title')}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {displayTiers.map((tier) => {
                     const isActive = activeThreshold >= tier.threshold;
                     return (
-                        <div key={tier.threshold} className={`p-3 rounded-lg border-2 text-center transition-all duration-300 ${isActive ? 'bg-dextools-special/20 border-dextools-accent-blue scale-105 shadow-lg' : 'bg-dextools-card border-transparent'}`}>
+                        <div key={tier.threshold} className={`p-3 rounded-lg border-2 text-center transition-all duration-300 ${isActive ? 'bg-accent-100 dark:bg-darkAccent-900 border-accent-500 dark:border-darkAccent-400 scale-105 shadow-lg' : 'bg-primary-100 dark:bg-darkPrimary-800 border-transparent'}`}>
                             <div className="mb-2 h-14 pt-2 flex items-center justify-center">
                                 <MedalIcon nameKey={tier.nameKey} />
                             </div>
-                            <p className="font-bold text-xs text-dextools-text-primary">{t(tier.nameKey)}</p>
-                            <p className="text-xs text-dextools-text-secondary">{tier.threshold} SOL+</p>
-                            <p className="text-sm font-bold text-dextools-accent-green mt-1">+{tier.percentage}%</p>
+                            <p className="font-bold text-xs text-primary-900 dark:text-darkPrimary-100">{t(tier.nameKey)}</p>
+                            <p className="text-xs text-primary-600 dark:text-darkPrimary-400">{tier.threshold} SOL+</p>
+                            <p className="text-sm font-bold text-green-600 dark:text-green-400 mt-1">+{tier.percentage}%</p>
                         </div>
                     );
                 })}
@@ -376,6 +388,9 @@ export default function Presale() {
         try {
             const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
             const userPublicKey = new PublicKey(solana.address);
+            // This is complex to get ALL signatures for a user to a specific address.
+            // For this UI feature, we can simplify by checking the user's recent transactions.
+            // A full, accurate accounting should be done on a backend or at the airdrop stage.
             const signatures = await connection.getSignaturesForAddress(userPublicKey, { limit: 200 });
             const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
             const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
@@ -406,20 +421,27 @@ export default function Presale() {
     };
 
     fetchUserContribution();
-  }, [solana.connected, solana.address, latestPurchase]);
+  }, [solana.connected, solana.address, latestPurchase]); // Refetch on new purchase
 
   const maxAllowedBuy = Math.max(0, currentStage.maxBuy - userContribution);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/[eE,+]|(\..*){2,}/.test(value)) return;
+
+    // Prevent scientific notation and other non-numeric characters except for one dot.
+    if (/[eE,+]|(\..*){2,}/.test(value)) {
+        return;
+    }
 
     const numValue = parseFloat(value);
+
+    // Auto-correct if value exceeds maximum allowed
     if (numValue > maxAllowedBuy) {
         setSolAmount(maxAllowedBuy.toFixed(6).replace(/\.?0+$/, ""));
         setError(t('presale_amount_error', { min: currentStage.minBuy, max: maxAllowedBuy.toFixed(2) }));
     } else {
         setSolAmount(value);
+        // Show error if value is below minimum, but don't auto-correct on change
         if (value !== '' && !isNaN(numValue) && numValue > 0 && numValue < currentStage.minBuy) {
              setError(t('presale_amount_error', { min: currentStage.minBuy, max: maxAllowedBuy.toFixed(2) }));
         } else if (value === '' || isNaN(numValue) || numValue >= currentStage.minBuy) {
@@ -442,48 +464,81 @@ export default function Presale() {
     if (isNaN(numAmount) || numAmount <= 0) {
         return { base: 0, bonus: 0, total: 0, appliedBonusPercentage: 0 };
     }
+
     try {
         const LAMPORTS_PER_SOL_BIGINT = 1000000000n;
         const owfnDecimals = BigInt(TOKEN_DETAILS.decimals);
         const owfnDecimalsMultiplier = 10n ** owfnDecimals;
+
         const parts = solAmount.split('.');
         const integerPart = BigInt(parts[0] || '0');
         const fractionalPart = (parts[1] || '').slice(0, 9).padEnd(9, '0');
         const lamports = integerPart * LAMPORTS_PER_SOL_BIGINT + BigInt(fractionalPart);
-        const applicableTier = [...currentStage.bonusTiers].sort((a, b) => b.threshold - a.threshold).find(tier => numAmount >= tier.threshold);
+
+        const applicableTier = [...currentStage.bonusTiers]
+            .sort((a, b) => b.threshold - a.threshold)
+            .find(tier => numAmount >= tier.threshold);
+
         const presaleRateBigInt = BigInt(currentStage.rate);
         const baseOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
         
         let bonusOwfnSmallestUnit = 0n;
         let appliedBonusPercentage = 0;
+
         if (applicableTier) {
             appliedBonusPercentage = applicableTier.percentage;
             bonusOwfnSmallestUnit = (baseOwfnSmallestUnit * BigInt(applicableTier.percentage)) / 100n;
         }
+
         const totalOwfnSmallestUnit = baseOwfnSmallestUnit + bonusOwfnSmallestUnit;
         const toDisplayAmount = (amountInSmallestUnit: bigint) => Number(amountInSmallestUnit) / Number(owfnDecimalsMultiplier);
         
-        return { base: toDisplayAmount(baseOwfnSmallestUnit), bonus: toDisplayAmount(bonusOwfnSmallestUnit), total: toDisplayAmount(totalOwfnSmallestUnit), appliedBonusPercentage };
+        return {
+            base: toDisplayAmount(baseOwfnSmallestUnit),
+            bonus: toDisplayAmount(bonusOwfnSmallestUnit),
+            total: toDisplayAmount(totalOwfnSmallestUnit),
+            appliedBonusPercentage: appliedBonusPercentage,
+        };
     } catch (e) {
+        console.error("Error calculating OWFN amount:", e);
         return { base: 0, bonus: 0, total: 0, appliedBonusPercentage: 0 };
     }
   }, [solAmount]);
+
 
   const saleProgress = (presaleProgress.soldSOL / currentStage.hardCap) * 100;
   const numSolAmount = parseFloat(solAmount);
   const isAmountInvalid = isNaN(numSolAmount) || numSolAmount < currentStage.minBuy || numSolAmount > maxAllowedBuy;
 
+
   const handleBuy = async () => {
-    if (!solana.connected) { setWalletModalOpen(true); return; }
+    if (!solana.connected) {
+        setWalletModalOpen(true);
+        return;
+    }
+
     const regularUserIsInvalid = isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active';
-    if (!isAdmin && (solana.loading || regularUserIsInvalid)) return;
-    if (isAdmin && (solana.loading || isNaN(numSolAmount) || numSolAmount <= 0)) return;
+    if (!isAdmin && (solana.loading || regularUserIsInvalid)) {
+        return;
+    }
+    if (isAdmin && (solana.loading || isNaN(numSolAmount) || numSolAmount <= 0)) {
+        return; // Admin still needs to enter a valid number
+    }
 
     const result = await solana.sendTransaction(currentStage.distributionWallet, numSolAmount, 'SOL');
 
     if (result.success && result.signature) {
-        alert(t('presale_purchase_success_alert', { amount: numSolAmount.toFixed(2), owfnAmount: calculation.total.toLocaleString() }));
-        const newTx: PresaleTransaction = { id: result.signature, address: solana.address!, solAmount: numSolAmount, owfnAmount: numSolAmount * currentStage.rate, time: new Date() };
+        alert(t('presale_purchase_success_alert', { 
+            amount: numSolAmount.toFixed(2), 
+            owfnAmount: calculation.total.toLocaleString() 
+        }));
+        const newTx: PresaleTransaction = {
+            id: result.signature,
+            address: solana.address!,
+            solAmount: numSolAmount,
+            owfnAmount: numSolAmount * currentStage.rate, // Store base amount, bonus is calculated later
+            time: new Date(),
+        };
         setLatestPurchase(newTx);
         setSolAmount('');
     } else {
@@ -500,58 +555,81 @@ export default function Presale() {
   const isBuyButtonDisabled = useMemo(() => {
     if (solana.loading || isCheckingContribution) return true;
     if (isAdmin) {
+        // For admin, only disable if the amount is not a positive number.
         const numericAmount = parseFloat(solAmount);
         return isNaN(numericAmount) || numericAmount <= 0;
     }
-    if (!solana.connected) return false;
+    // For regular users, apply all restrictions.
+    if (!solana.connected) return false; // Will show connect wallet text
     return isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active';
   }, [solana.loading, isCheckingContribution, isAdmin, solana.connected, isAmountInvalid, maxAllowedBuy, presaleStatus, solAmount]);
 
-  const formatSaleDate = (dateStr: string) => new Date(dateStr).toUTCString().replace('GMT', 'UTC');
+
+  const formatSaleDate = (dateStr: string) => {
+    return new Date(dateStr).toUTCString().replace('GMT', 'UTC');
+  };
   
+  const saleStartDate = new Date(currentStage.startDate);
+
   return (
-    <div className="animate-fade-in">
-        <div className="bg-dextools-card rounded-md p-6 md:p-8 border border-dextools-border">
+    <div className="bg-primary-50 dark:bg-darkPrimary-950 text-primary-700 dark:text-darkPrimary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
+      <div className="w-full max-w-screen-2xl">
+        <div className="mb-4">
+            <Link to="/" className="text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400 transition-colors">
+                <ArrowLeft size={24} />
+            </Link>
+        </div>
+        
+        <div className="bg-primary-100 dark:bg-darkPrimary-900 rounded-xl p-6 md:p-10 border border-primary-200 dark:border-darkPrimary-700/50 shadow-3d-lg">
+            
+            {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <img src={OWFN_LOGO_URL} alt="Token Logo" className="w-20 h-20 rounded-full border-2 border-dextools-accent-blue"/>
+                <img src={OWFN_LOGO_URL} alt="Token Logo" className="w-20 h-20 rounded-full border-2 border-accent-400 dark:border-darkAccent-400"/>
                 <div className="flex-grow">
-                    <h1 className="text-2xl font-bold text-dextools-text-primary">{t('presale_join_title')}</h1>
-                    <h2 className="text-lg text-dextools-text-secondary">{t('presale_header_subtitle')}</h2>
+                    <h1 className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">{t('presale_join_title')}</h1>
+                    <h2 className="text-lg text-primary-700 dark:text-darkPrimary-300">{t('presale_header_subtitle')}</h2>
                 </div>
-                <div className="flex items-center gap-3 text-dextools-text-secondary">
-                    <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-dextools-border transition-colors"><Twitter size={20}/></a>
-                    <a href={PROJECT_LINKS.telegramGroup} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-dextools-border transition-colors"><Send size={20}/></a>
-                    <a href={PROJECT_LINKS.website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-dextools-border transition-colors"><Globe size={20}/></a>
+                <div className="flex items-center gap-3 text-primary-500 dark:text-darkPrimary-400">
+                    <a href={PROJECT_LINKS.x} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"><Twitter size={20}/></a>
+                    <a href={PROJECT_LINKS.telegramGroup} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"><Send size={20}/></a>
+                    <a href={PROJECT_LINKS.website} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-primary-200 dark:hover:bg-darkPrimary-700 transition-colors"><Globe size={20}/></a>
                 </div>
             </div>
-            <p className="text-dextools-text-secondary text-sm leading-relaxed mt-4">{t('about_mission_desc')}</p>
+
+            {/* Description */}
+            <p className="text-primary-600 dark:text-darkPrimary-400 text-sm leading-relaxed mt-4">{t('about_mission_desc')}</p>
+            
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mt-6">
+                {/* Left Column: Info */}
                 <div className="lg:col-span-3 space-y-6">
-                    <div>
-                        <div className="text-dextools-text-primary text-sm mb-1">
+                    {/* Progress Bar */}
+                    <div className="w-full">
+                        <div className="text-primary-800 dark:text-darkPrimary-100 text-sm mb-1">
                             <span>{t('presale_sold_progress', { progress: saleProgress.toFixed(2) })}</span>
                         </div>
-                        <div className="w-full bg-dextools-background rounded-full h-2.5 border border-dextools-border">
-                            <div className="bg-dextools-special h-full rounded-full" style={{width: `${saleProgress}%`}}></div>
+                        <div className="w-full bg-accent-200/70 dark:bg-darkAccent-900/70 rounded-full h-2.5">
+                            <div className="bg-accent-400 dark:bg-darkAccent-400 h-2.5 rounded-full" style={{width: `${saleProgress}%`}}></div>
                         </div>
-                        <div className="flex justify-between mt-1 text-sm text-dextools-text-secondary">
+                        <div className="flex justify-between mt-1 text-sm text-primary-700 dark:text-darkPrimary-300">
                             <span>{presaleProgress.soldSOL.toFixed(2)} SOL</span>
                             <span>{currentStage.hardCap.toFixed(2)} SOL</span>
                         </div>
                     </div>
+
+                    {/* Timers */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-dextools-card border border-dextools-border rounded-lg p-4 text-center">
-                            <p className="text-dextools-text-secondary text-sm">{t('presale_whitelist_finished')}</p>
-                            <p className="text-dextools-text-primary text-2xl font-mono font-bold">--:--:--:--</p>
+                        <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 text-center">
+                            <p className="text-primary-500 dark:text-darkPrimary-400 text-sm">{t('presale_whitelist_finished')}</p>
+                            <p className="text-primary-800 dark:text-darkPrimary-100 text-2xl font-mono font-bold">--:--:--:--</p>
                         </div>
-                        <div className="bg-dextools-card border border-dextools-border rounded-lg p-4 text-center">
-                            <p className="text-dextools-text-secondary text-sm">
+                        <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-4 text-center">
+                            <p className="text-primary-500 dark:text-darkPrimary-400 text-sm">
                                 {presaleStatus === 'pending' && t('presale_sale_starts_in')}
                                 {presaleStatus === 'active' && t('presale_public_ending_in')}
                                 {presaleStatus === 'ended' && endReason === 'hardcap' && t('presale_ended_hardcap')}
                                 {presaleStatus === 'ended' && endReason !== 'hardcap' && t('presale_sale_ended')}
                             </p>
-                            <p className="text-dextools-text-primary text-2xl font-mono font-bold">
+                            <p className="text-primary-800 dark:text-darkPrimary-100 text-2xl font-mono font-bold">
                                 {presaleStatus !== 'ended' ? 
                                     `${String(timeLeft.days).padStart(2, '0')}:${String(timeLeft.hours).padStart(2, '0')}:${String(timeLeft.minutes).padStart(2, '0')}:${String(timeLeft.seconds).padStart(2, '0')}`
                                     : '--:--:--:--'
@@ -559,49 +637,156 @@ export default function Presale() {
                             </p>
                         </div>
                     </div>
+                     {/* Accordions */}
                      <div className="space-y-4">
                         <AccordionSection title={t('presale_project_info_title')} isOpen={true}>
                             <div className="space-y-1 text-sm">
                                 <ProjectInfoRow label={t('token_name_label')} value="Official World Family Network" />
-                                <ProjectInfoRow label={t('token_symbol_label')} value={<div className="flex items-center gap-2 justify-start sm:justify-end"><OwfnIcon className="w-5 h-5" /><span>$OWFN</span></div>} />
-                                <ProjectInfoRow label={t('token_supply_label')} value={<div className="flex items-center gap-2 justify-start sm:justify-end"><span>{TOKEN_DETAILS.totalSupply.toLocaleString('de-DE')}</span><OwfnIcon className="w-5 h-5" /><span>OWFN</span></div>} />
+                                <ProjectInfoRow 
+                                    label={t('token_symbol_label')} 
+                                    value={
+                                        <div className="flex items-center gap-2 justify-start sm:justify-end">
+                                            <OwfnIcon className="w-5 h-5" />
+                                            <span>$OWFN</span>
+                                        </div>
+                                    } 
+                                />
+                                <ProjectInfoRow 
+                                    label={t('token_supply_label')}
+                                    value={
+                                        <div className="flex items-center gap-2 justify-start sm:justify-end">
+                                            <span>{TOKEN_DETAILS.totalSupply.toLocaleString('de-DE')}</span>
+                                            <OwfnIcon className="w-5 h-5" />
+                                            <span>OWFN</span>
+                                        </div>
+                                    } 
+                                />
                                 <ProjectInfoRow label={t('presale_sale_rate_label')} value={`1 SOL = ${currentStage.rate.toLocaleString()} $OWFN`} />
                                 <ProjectInfoRow label={t('presale_listing_rate_label')} value={TOKEN_DETAILS.dexLaunchPrice} />
                                 <ProjectInfoRow label={t('presale_softcap_label')} value={`${currentStage.softCap} SOL`} />
                                 <ProjectInfoRow label={t('presale_hardcap_label')} value={`${currentStage.hardCap} SOL`} />
                                 <ProjectInfoRow label={t('token_decimals')} value={TOKEN_DETAILS.decimals} />
-                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-dextools-border/50"><span className="text-dextools-text-secondary mb-1 sm:mb-0">{t('presale_token_address_label')}</span><AddressDisplay address={OWFN_MINT_ADDRESS} type="token" /></div>
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50">
+                                    <span className="text-primary-500 dark:text-darkPrimary-400 mb-1 sm:mb-0">{t('presale_token_address_label')}</span>
+                                    <AddressDisplay address={OWFN_MINT_ADDRESS} type="token" />
+                                </div>
                                 <ProjectInfoRow label={t('presale_start_time_label')} value={formatSaleDate(currentStage.startDate)} />
                                 <ProjectInfoRow label={t('presale_end_time_label')} value={formatSaleDate(currentStage.endDate)} />
                             </div>
                         </AccordionSection>
-                        <AccordionSection title={t('tokenomics_allocation_title')}><div className="space-y-2">{TOKEN_ALLOCATIONS.map(alloc => (<div key={alloc.name} className="flex items-center space-x-3"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: alloc.color }}></div><span className="text-sm text-dextools-text-secondary">{alloc.name} ({alloc.percentage}%)</span></div>))}<Link to="/tokenomics" className="text-dextools-accent-blue hover:underline pt-2 inline-block">{t('view_full_details')}</Link></div></AccordionSection>
-                        <AccordionSection title={t('roadmap_title')}><div className="space-y-3">{ROADMAP_DATA.map(phase => (<div key={phase.key_prefix}><h4 className="font-bold text-dextools-text-primary">{t(`${phase.key_prefix}_title`)} ({phase.quarter})</h4><p className="text-sm text-dextools-text-secondary">{t(`${phase.key_prefix}_description`)}</p></div>))}<Link to="/roadmap" className="text-dextools-accent-blue hover:underline pt-2 inline-block">{t('view_full_details')}</Link></div></AccordionSection>
-                        <AccordionSection title={t('presale_dyor_nfa_title')}><p>{t('presale_dyor_nfa_desc')}</p></AccordionSection>
+                        <AccordionSection title={t('tokenomics_allocation_title')}>
+                            <div className="space-y-2">
+                                {TOKEN_ALLOCATIONS.map(alloc => (
+                                    <div key={alloc.name} className="flex items-center space-x-3">
+                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: alloc.color }}></div>
+                                        <span className="text-sm text-primary-700 dark:text-darkPrimary-300">{alloc.name} ({alloc.percentage}%)</span>
+                                    </div>
+                                ))}
+                                <Link to="/tokenomics" className="text-accent-600 dark:text-darkAccent-400 hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
+                            </div>
+                        </AccordionSection>
+                        <AccordionSection title={t('roadmap_title')}>
+                            <div className="space-y-3">
+                                {ROADMAP_DATA.map(phase => (
+                                    <div key={phase.key_prefix}>
+                                        <h4 className="font-bold text-primary-800 dark:text-darkPrimary-100">{t(`${phase.key_prefix}_title`)} ({phase.quarter})</h4>
+                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t(`${phase.key_prefix}_description`)}</p>
+                                    </div>
+                                ))}
+                                <Link to="/roadmap" className="text-accent-600 dark:text-darkAccent-400 hover:underline pt-2 inline-block">{t('view_full_details')}</Link>
+                            </div>
+                        </AccordionSection>
+                        <AccordionSection title={t('presale_dyor_nfa_title')}>
+                            <p>{t('presale_dyor_nfa_desc')}</p>
+                        </AccordionSection>
                     </div>
                 </div>
+
+                {/* Right Column: Buy & Feed */}
                 <div className="lg:col-span-2 space-y-6 flex flex-col">
-                    <div className="bg-dextools-card border border-dextools-border rounded-lg p-6 space-y-4">
+                    {/* Buy Section */}
+                    <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6 space-y-4">
                         <BonusTiersDisplay tiers={currentStage.bonusTiers} activeThreshold={parseFloat(solAmount) || 0} />
-                        <p className="text-sm text-dextools-text-secondary text-center">{t('presale_buy_info', { min: currentStage.minBuy, max: currentStage.maxBuy.toFixed(2) })}</p>
-                        {solana.connected && (<div className="text-center text-xs text-dextools-text-secondary p-2 bg-dextools-background rounded-md">{isCheckingContribution ? (<div className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /><span>{t('presale_checking_contribution')}</span></div>) : (<><span>{t('presale_you_contributed', { amount: userContribution.toFixed(6) })}</span><br/><span className="font-semibold">{t('presale_you_can_buy', { amount: maxAllowedBuy.toFixed(6) })}</span></>)}</div>)}
+
+                        <p className="text-sm text-primary-700 dark:text-darkPrimary-300 text-center">
+                            {t('presale_buy_info', { min: currentStage.minBuy, max: currentStage.maxBuy.toFixed(2) })}
+                        </p>
+                        {solana.connected && (
+                            <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
+                                {isCheckingContribution ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>{t('presale_checking_contribution')}</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span>{t('presale_you_contributed', { amount: userContribution.toFixed(6) })}</span>
+                                        <br/>
+                                        <span className="font-semibold">{t('presale_you_can_buy', { amount: maxAllowedBuy.toFixed(6) })}</span>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                        
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10"><SolIcon className="w-6 h-6" /></div>
-                            <input id="buy-amount" type="text" inputMode="decimal" value={solAmount} onChange={handleAmountChange} onBlur={handleBlur} className={`w-full bg-dextools-background border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-dextools-text-primary text-right focus:ring-2 placeholder-dextools-text-secondary ${error && !isAdmin ? 'border-dextools-accent-red focus:ring-dextools-accent-red' : 'border-dextools-border focus:ring-dextools-accent-blue'}`} placeholder="0.00" disabled={isCheckingContribution || (!isAdmin && presaleStatus !== 'active')}/>
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                                <SolIcon className="w-6 h-6" />
+                            </div>
+                            <input
+                                id="buy-amount"
+                                type="text"
+                                inputMode="decimal"
+                                value={solAmount}
+                                onChange={handleAmountChange}
+                                onBlur={handleBlur}
+                                className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 text-right focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error && !isAdmin ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
+                                placeholder="0.00"
+                                disabled={isCheckingContribution || (!isAdmin && presaleStatus !== 'active')}
+                            />
                         </div>
-                        {error && !isAdmin && <p className="text-dextools-accent-red text-sm -mt-2 text-center">{error}</p>}
-                        <div className="bg-dextools-background p-4 rounded-lg space-y-2">
-                            <div className="flex justify-between items-center text-sm"><span className="text-dextools-text-secondary">{t('owfn_base_amount')}</span><span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span></div>
-                            {calculation.appliedBonusPercentage > 0 && (<div className="flex justify-between items-center text-sm text-dextools-accent-green animate-fade-in" style={{animationDuration: '300ms'}}><span className="font-bold flex items-center gap-2"><Gift size={16}/> {t('bonus_amount')} ({calculation.appliedBonusPercentage}%)</span><span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span></div>)}
-                            <div className="border-t border-dextools-border my-1"></div>
-                            <div className="flex justify-between items-center text-lg"><span className="font-bold text-dextools-text-primary">{t('total_to_receive')}</span><div className="flex items-center gap-2"><OwfnIcon className="w-6 h-6"/><span className="font-mono font-bold text-2xl text-dextools-accent-blue">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span></div></div>
+
+                        {error && !isAdmin && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
+                        
+                        <div className="bg-primary-100 dark:bg-darkPrimary-800/50 p-4 rounded-lg space-y-2">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-primary-600 dark:text-darkPrimary-400">{t('owfn_base_amount')}</span>
+                                <span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                            </div>
+                            
+                            {calculation.appliedBonusPercentage > 0 && (
+                                <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
+                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> {t('bonus_amount')} ({calculation.appliedBonusPercentage}%)</span>
+                                    <span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                                </div>
+                            )}
+
+                            <div className="border-t border-primary-200/80 dark:border-darkPrimary-700/80 my-1"></div>
+                            
+                            <div className="flex justify-between items-center text-lg">
+                                <span className="font-bold text-primary-800 dark:text-darkPrimary-200">{t('total_to_receive')}</span>
+                                <div className="flex items-center gap-2">
+                                    <OwfnIcon className="w-6 h-6"/>
+                                    <span className="font-mono font-bold text-2xl text-accent-600 dark:text-darkAccent-400">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
+                                </div>
+                            </div>
                         </div>
-                        <button onClick={handleBuy} className="w-full bg-dextools-special text-white font-bold py-3 px-8 rounded-lg text-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0" disabled={isBuyButtonDisabled}>{buttonText}</button>
+
+                        <button 
+                            onClick={handleBuy}
+                            className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                            disabled={isBuyButtonDisabled}
+                        >
+                            {buttonText}
+                        </button>
                     </div>
-                    <div className="flex-grow"><LivePresaleFeed newTransaction={latestPurchase} /></div>
+                    {/* Live Feed */}
+                    <div className="flex-grow">
+                        <LivePresaleFeed newTransaction={latestPurchase} />
+                    </div>
                 </div>
             </div>
         </div>
+      </div>
     </div>
   );
 }

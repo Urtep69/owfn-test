@@ -1,13 +1,15 @@
+
+
 import React, { useState, useMemo } from 'react';
 import { ChevronDown, HelpCircle, Search } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.js';
 
 const FaqItem = ({ question, answer, isOpen, onClick }: { question: string, answer: string, isOpen: boolean, onClick: () => void }) => {
     return (
-        <div className="border-b border-dextools-border py-4 last:border-b-0">
+        <div className="border-b border-primary-200 dark:border-darkPrimary-700 py-4 last:border-b-0">
             <button
                 onClick={onClick}
-                className="w-full flex justify-between items-center text-left text-lg font-semibold text-dextools-text-primary"
+                className="w-full flex justify-between items-center text-left text-lg font-semibold text-primary-800 dark:text-darkPrimary-200"
             >
                 <span>{question}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}`} />
@@ -15,7 +17,7 @@ const FaqItem = ({ question, answer, isOpen, onClick }: { question: string, answ
             <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-screen mt-2' : 'max-h-0'}`}
             >
-                <p className="text-dextools-text-secondary leading-relaxed pt-2 whitespace-pre-wrap">
+                <p className="text-primary-600 dark:text-darkPrimary-400 leading-relaxed pt-2 whitespace-pre-wrap">
                     {answer}
                 </p>
             </div>
@@ -84,25 +86,25 @@ export default function FAQ() {
     }, [allFaqData, activeCategory, searchTerm, t]);
 
     return (
-        <div className="animate-fade-in max-w-4xl mx-auto space-y-8">
+        <div className="animate-fade-in-up max-w-4xl mx-auto space-y-8">
             <div className="text-center">
-                <HelpCircle className="mx-auto w-16 h-16 text-dextools-accent-blue mb-4" />
-                <h1 className="text-4xl font-bold text-dextools-accent-blue">{t('faq_title')}</h1>
-                <p className="mt-4 text-lg text-dextools-text-secondary">
+                <HelpCircle className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
+                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('faq_title')}</h1>
+                <p className="mt-4 text-lg text-primary-600 dark:text-darkPrimary-400">
                     {t('faq_subtitle')}
                 </p>
             </div>
 
             <div className="space-y-4">
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-dextools-text-secondary" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400 dark:text-darkPrimary-500" />
                     <input
                         type="text"
                         placeholder={t('faq_search_placeholder')}
                         aria-label={t('faq_search_aria_label')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-dextools-card border border-dextools-border rounded-lg focus:ring-2 focus:ring-dextools-accent-blue focus:outline-none transition-colors"
+                        className="w-full pl-10 pr-4 py-3 bg-white dark:bg-darkPrimary-800 border-2 border-primary-200 dark:border-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:border-transparent focus:outline-none transition-colors"
                     />
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -112,8 +114,8 @@ export default function FAQ() {
                             onClick={() => setActiveCategory(cat.key)}
                             className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-200 ${
                                 activeCategory === cat.key
-                                    ? 'bg-dextools-special text-white'
-                                    : 'bg-dextools-border text-dextools-text-secondary hover:bg-dextools-special/20 hover:text-dextools-text-primary'
+                                    ? 'bg-accent-500 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950'
+                                    : 'bg-primary-100 text-primary-700 hover:bg-primary-200 dark:bg-darkPrimary-700 dark:text-darkPrimary-300 dark:hover:bg-darkPrimary-600'
                             }`}
                         >
                             {t(cat.nameKey)}
@@ -122,7 +124,7 @@ export default function FAQ() {
                 </div>
             </div>
 
-            <div className="bg-dextools-card border border-dextools-border p-8 rounded-lg">
+            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
                 {filteredFaqData.length > 0 ? (
                     filteredFaqData.map((item, index) => (
                         <FaqItem
@@ -134,7 +136,7 @@ export default function FAQ() {
                         />
                     ))
                 ) : (
-                    <p className="text-center text-dextools-text-secondary py-8">
+                    <p className="text-center text-primary-600 dark:text-darkPrimary-400 py-8">
                         {t('faq_no_results')}
                     </p>
                 )}

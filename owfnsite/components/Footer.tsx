@@ -14,10 +14,10 @@ const socialLinks = [
 export const Footer = () => {
   const { t } = useAppContext();
   return (
-    <footer className="bg-dextools-card border-t border-dextools-border">
+    <footer className="bg-surface/50 dark:bg-dark-surface/50 backdrop-blur-sm border-t border-gray-200/20 dark:border-dark-border shadow-inner">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex justify-between items-center">
-          <p className="text-sm text-dextools-text-secondary">
+          <p className="text-sm text-secondary dark:text-dark-secondary">
             {t('footer_copyright', { year: new Date().getFullYear() })}
           </p>
           <div className="flex space-x-6">
@@ -27,7 +27,7 @@ export const Footer = () => {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-dextools-text-secondary hover:text-dextools-accent-blue transition-colors"
+                className="text-secondary dark:text-dark-secondary hover:text-accent dark:hover:text-dark-accent transition-colors"
               >
                 <span className="sr-only">{link.name}</span>
                 {link.icon}

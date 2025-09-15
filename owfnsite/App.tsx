@@ -10,7 +10,7 @@ import { Layout } from './components/Layout.js';
 import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './lib/constants.js';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.js';
 
-import TokenDashboard from './pages/TokenDashboard.js';
+import Home from './pages/Home.js';
 import Presale from './pages/Presale.js';
 import PresaleStages from './pages/PresaleStages.js';
 import About from './pages/About.js';
@@ -88,7 +88,7 @@ const AppContent = () => {
           </Route>
           {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
           <Route path="/maintenance"><Maintenance /></Route>
-          <Route path="/"><TokenDashboard /></Route>
+          <Route path="/"><Home /></Route>
         </Switch>
       </Layout>
     </Router>

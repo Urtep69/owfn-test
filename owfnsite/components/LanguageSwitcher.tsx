@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.js';
@@ -26,7 +28,7 @@ export const LanguageSwitcher = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(prev => !prev)}
-                className="flex items-center space-x-2 p-2 rounded-lg text-dextools-text-secondary hover:bg-dextools-border transition-colors"
+                className="flex items-center space-x-2 p-2 rounded-lg text-primary dark:text-dark-primary hover:bg-gray-200 dark:hover:bg-dark-surface/50 transition-colors"
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 aria-label="Change language"
@@ -37,7 +39,7 @@ export const LanguageSwitcher = () => {
             </button>
             {isOpen && (
                 <div 
-                    className="absolute right-0 mt-2 w-48 bg-dextools-card border border-dextools-border rounded-md shadow-lg py-1 z-20 animate-fade-in" 
+                    className="absolute right-0 mt-2 w-48 bg-surface/90 dark:bg-dark-surface/95 backdrop-blur-lg border border-gray-200/50 dark:border-dark-border rounded-md shadow-glass py-1 z-20 animate-fade-in-up" 
                     style={{ animationDuration: '200ms' }}
                     role="menu"
                 >
@@ -45,7 +47,7 @@ export const LanguageSwitcher = () => {
                         <button
                             key={lang.code}
                             onClick={() => handleSelectLanguage(lang.code)}
-                            className="w-full text-left px-4 py-2 text-sm text-dextools-text-primary hover:bg-dextools-background flex items-center space-x-3"
+                            className="w-full text-left px-4 py-2 text-sm text-primary dark:text-dark-primary hover:bg-gray-100 dark:hover:bg-dark-surface/80 flex items-center space-x-3"
                             role="menuitem"
                         >
                             <span className="text-xl" aria-hidden="true">{lang.flag}</span>
