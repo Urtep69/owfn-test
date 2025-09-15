@@ -97,6 +97,7 @@ export default function TokenDetail() {
             !tokenDetails || 
             !chartContainerRef.current || 
             chartRef.current || 
+            typeof LightweightCharts === 'undefined' ||
             !LightweightCharts?.createChart
         ) return;
         
@@ -209,11 +210,13 @@ export default function TokenDetail() {
                         <DetailItem label={t('volume_24h')} value={`$${formatNumber(tokenDetails.volume24h ?? 0)}`} />
                         <DetailItem label={t('holders')} value={formatNumber(tokenDetails.holders ?? 0)} />
                     </InfoCard>
-                    <InfoCard title={t('pool_info')} icon={<Droplets size={20} />}>
-                        <DetailItem label={`${tokenDetails.poolInfo?.quoteToken?.address === 'So11111111111111111111111111111111111111112' ? 'SOL' : 'Quote'} Amount`} value={formatNumber(tokenDetails.poolInfo?.quoteToken?.amount ?? 0)} />
-                        <DetailItem label={`${tokenDetails.symbol} Amount`} value={formatNumber(tokenDetails.poolInfo?.baseToken?.amount ?? 0)} />
-                        <DetailItem label={t('pair_address')} children={<AddressDisplay address={tokenDetails.pairAddress ?? ''} />} />
-                    </InfoCard>
+                    {tokenDetails.poolInfo && (
+                        <InfoCard title={t('pool_info')} icon={<Droplets size={20} />}>
+                            <DetailItem label={`${tokenDetails.poolInfo.quoteToken?.address === 'So11111111111111111111111111111111111111112' ? 'SOL' : 'Quote'} Amount`} value={formatNumber(tokenDetails.poolInfo.quoteToken?.amount ?? 0)} />
+                            <DetailItem label={`${tokenDetails.symbol} Amount`} value={formatNumber(tokenDetails.poolInfo.baseToken?.amount ?? 0)} />
+                            <DetailItem label={t('pair_address')} children={<AddressDisplay address={tokenDetails.pairAddress ?? ''} />} />
+                        </InfoCard>
+                    )}
                     <InfoCard title={t('on_chain_security')} icon={<ShieldCheck size={20} />}>
                         <DetailItem label={t('is_mintable')}>
                             {tokenDetails.mintAuthority ? <XCircle className="text-red-500" /> : <CheckCircle className="text-green-500" />}
