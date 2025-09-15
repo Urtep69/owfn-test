@@ -5,7 +5,7 @@ import type { TokenDetails, CandlestickData, LiveTransaction } from '../lib/type
 import { ArrowLeft, Loader2, AlertTriangle, Info, BarChart2, ShieldCheck, PieChart, CheckCircle, XCircle, Users, Droplets, RefreshCw, ChevronDown } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import { formatNumber } from '../lib/utils.js';
-import { SolIcon, OwfnIcon } from '../components/IconComponents.js';
+import { GenericTokenIcon } from '../components/IconComponents.js';
 import { DualProgressBar } from '../components/DualProgressBar.js';
 
 declare const LightweightCharts: any;
@@ -97,7 +97,7 @@ export default function TokenDetail() {
             !tokenDetails || 
             !chartContainerRef.current || 
             chartRef.current || 
-            typeof LightweightCharts === 'undefined'
+            !LightweightCharts?.createChart
         ) return;
         
         const chart = LightweightCharts.createChart(chartContainerRef.current, {
@@ -131,16 +131,18 @@ export default function TokenDetail() {
         seriesRef.current = candlestickSeries;
         
         const handleResize = () => {
-            if (chartContainerRef.current) {
-                chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+            if (chartContainerRef.current && chartRef.current) {
+                chartRef.current.applyOptions({ width: chartContainerRef.current.clientWidth });
             }
         };
         window.addEventListener('resize', handleResize);
 
         return () => {
             window.removeEventListener('resize', handleResize);
-            chart.remove();
-            chartRef.current = null;
+            if (chartRef.current) {
+                chartRef.current.remove();
+                chartRef.current = null;
+            }
         };
     }, [loading, tokenDetails]);
 
@@ -177,7 +179,7 @@ export default function TokenDetail() {
             <header className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div className="flex items-center gap-4">
-                        {tokenDetails.logo && <img src={tokenDetails.logo as string} alt={tokenDetails.name} className="w-12 h-12 rounded-full" />}
+                        <GenericTokenIcon uri={tokenDetails.logo as string | undefined} className="w-12 h-12" />
                         <div>
                             <h1 className="text-2xl font-bold">{tokenDetails.name}</h1>
                             <span className="font-mono text-primary-500 dark:text-darkPrimary-400">{tokenDetails.symbol}/SOL</span>
@@ -195,7 +197,7 @@ export default function TokenDetail() {
             <main className="grid grid-cols-12 gap-6">
                 <div className="col-span-12 lg:col-span-9 space-y-6">
                     <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d">
-                        <div ref={chartContainerRef} style={{ aspectRatio: '16 / 9', height: '400px' }}></div>
+                        <div ref={chartContainerRef} style={{ aspectRatio: '16 / 9', minHeight: '400px' }}></div>
                     </div>
                 </div>
 
@@ -208,8 +210,8 @@ export default function TokenDetail() {
                         <DetailItem label={t('holders')} value={formatNumber(tokenDetails.holders ?? 0)} />
                     </InfoCard>
                     <InfoCard title={t('pool_info')} icon={<Droplets size={20} />}>
-                        <DetailItem label={`${tokenDetails.poolInfo?.quoteToken.address === 'So11111111111111111111111111111111111111112' ? 'SOL' : 'Quote'} Amount`} value={formatNumber(tokenDetails.poolInfo?.quoteToken.amount ?? 0)} />
-                        <DetailItem label={`${tokenDetails.symbol} Amount`} value={formatNumber(tokenDetails.poolInfo?.baseToken.amount ?? 0)} />
+                        <DetailItem label={`${tokenDetails.poolInfo?.quoteToken?.address === 'So11111111111111111111111111111111111111112' ? 'SOL' : 'Quote'} Amount`} value={formatNumber(tokenDetails.poolInfo?.quoteToken?.amount ?? 0)} />
+                        <DetailItem label={`${tokenDetails.symbol} Amount`} value={formatNumber(tokenDetails.poolInfo?.baseToken?.amount ?? 0)} />
                         <DetailItem label={t('pair_address')} children={<AddressDisplay address={tokenDetails.pairAddress ?? ''} />} />
                     </InfoCard>
                     <InfoCard title={t('on_chain_security')} icon={<ShieldCheck size={20} />}>
