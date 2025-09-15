@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 
 interface ProgressBarProps {
@@ -13,12 +11,12 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress, label }) => 
   return (
     <div className="w-full">
       {label && <div className="flex justify-between mb-1">
-        <span className="text-base font-medium text-primary-800 dark:text-darkPrimary-200">{label}</span>
-        <span className="text-sm font-medium text-primary-800 dark:text-darkPrimary-200">{clampedProgress.toFixed(2)}%</span>
+        <span className="text-base font-medium text-dextools-text-primary">{label}</span>
+        <span className="text-sm font-medium text-dextools-text-primary">{clampedProgress.toFixed(2)}%</span>
       </div>}
-      <div className="w-full bg-primary-200 dark:bg-darkPrimary-700 rounded-full h-4">
+      <div className="w-full bg-dextools-background rounded-full h-4 border border-dextools-border">
         <div
-          className="bg-gradient-to-r from-accent-500 to-accent-400 dark:from-darkAccent-600 dark:to-darkAccent-400 h-4 rounded-full transition-all duration-500 ease-out"
+          className="bg-dextools-special h-full rounded-full transition-all duration-500 ease-out"
           style={{ width: `${clampedProgress}%` }}
         ></div>
       </div>

@@ -19,7 +19,7 @@ const pageNameToPath: { [key: string]: string } = {
   'Staking': '/staking',
   'Vesting': '/vesting',
   'Donations': '/donations',
-  'Dashboard': '/dashboard',
+  'Dashboard': '/', // Dashboard is the new home
   'Profile': '/profile',
   'Impact Portal': '/impact',
   'Partnerships': '/partnerships',
@@ -57,7 +57,7 @@ const renderMessageContent = (text: string) => {
             const path = pageNameToPath[pageName];
             if (path) {
                 result.push(
-                    <Link key={match.index} href={path} className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80">
+                    <Link key={match.index} href={path} className="text-dextools-accent-blue font-bold underline hover:opacity-80">
                         {pageName}
                     </Link>
                 );
@@ -70,7 +70,7 @@ const renderMessageContent = (text: string) => {
             const icon = socialIconMap[platformName];
             if (url && platformName) {
                  result.push(
-                    <a key={match.index} href={url} target="_blank" rel="noopener noreferrer" className="text-accent-600 dark:text-darkAccent-400 font-bold underline hover:opacity-80 inline-flex items-center gap-1.5">
+                    <a key={match.index} href={url} target="_blank" rel="noopener noreferrer" className="text-dextools-accent-blue font-bold underline hover:opacity-80 inline-flex items-center gap-1.5">
                         {icon} {platformName}
                     </a>
                 );
@@ -93,7 +93,7 @@ const renderMessageContent = (text: string) => {
 const SuggestionChip = ({ text, onSelect }: { text: string; onSelect: (text: string) => void }) => (
     <button
         onClick={() => onSelect(text)}
-        className="px-3 py-1.5 bg-primary-100 dark:bg-darkPrimary-700/80 hover:bg-primary-200 dark:hover:bg-darkPrimary-700 rounded-full text-sm font-medium transition-colors"
+        className="px-3 py-1.5 bg-dextools-background hover:bg-dextools-border rounded-full text-sm font-medium transition-colors border border-dextools-border text-dextools-text-primary"
     >
         {text}
     </button>
@@ -153,9 +153,6 @@ export const Chatbot = () => {
 
     const formatTimestamp = (date: Date) => {
         return date.toLocaleString(currentLanguage.code, {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
         });
@@ -319,7 +316,7 @@ export const Chatbot = () => {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-5 right-5 bg-accent-500 dark:bg-darkAccent-600 text-white p-4 rounded-full shadow-lg hover:bg-accent-600 dark:hover:bg-darkAccent-700 transition-transform transform hover:scale-110"
+                className="fixed bottom-5 right-5 bg-dextools-special text-white p-4 rounded-full shadow-lg hover:opacity-80 transition-transform transform hover:scale-110"
                 aria-label="Open Chatbot"
             >
                 <MessageCircle size={28} />
@@ -328,31 +325,31 @@ export const Chatbot = () => {
     }
 
     const containerClasses = isMaximized
-        ? "fixed inset-0 flex flex-col bg-white dark:bg-darkPrimary-800 z-50 animate-fade-in-up"
-        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d-lg animate-slide-in z-50";
+        ? "fixed inset-0 flex flex-col bg-dextools-card z-50 animate-fade-in"
+        : "fixed bottom-5 right-5 w-full max-w-sm h-full max-h-[70vh] flex flex-col bg-dextools-card/80 backdrop-blur-xl border border-dextools-border rounded-lg shadow-lg animate-fade-in z-50";
 
     const showSuggestions = messages.length === 1; // Only show after the initial welcome message
     const isInputDisabled = isLoading;
 
     return (
-        <div className={containerClasses} style={{ animationDuration: isMaximized ? '200ms' : '500ms' }}>
-            <header className="flex items-center justify-between p-4 bg-accent-500 dark:bg-darkAccent-700 text-white rounded-t-lg">
+        <div className={containerClasses} style={{ animationDuration: '300ms' }}>
+            <header className="flex items-center justify-between p-4 bg-dextools-card text-white border-b border-dextools-border">
                 <div className="flex items-center space-x-2">
                     <OwfnIcon className="w-6 h-6" />
                     <h3 className="font-bold text-lg">{t('chatbot_title')}</h3>
                 </div>
-                <div className="flex items-center space-x-1">
-                    <button onClick={() => setIsEmailFormVisible(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Email conversation">
-                        <Mail size={20} />
+                <div className="flex items-center space-x-1 text-dextools-text-secondary">
+                    <button onClick={() => setIsEmailFormVisible(prev => !prev)} className="p-1.5 hover:bg-dextools-border rounded-full transition-colors" aria-label="Email conversation">
+                        <Mail size={18} />
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Minimize Chat">
-                        <Minus size={20} />
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-dextools-border rounded-full transition-colors" aria-label="Minimize Chat">
+                        <Minus size={18} />
                     </button>
-                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label={isMaximized ? "Restore Chat" : "Maximize Chat"}>
-                        {isMaximized ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+                    <button onClick={() => setIsMaximized(prev => !prev)} className="p-1.5 hover:bg-dextools-border rounded-full transition-colors" aria-label={isMaximized ? "Restore Chat" : "Maximize Chat"}>
+                        {isMaximized ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
                     </button>
-                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Close Chat">
-                        <X size={20} />
+                    <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-dextools-border rounded-full transition-colors" aria-label="Close Chat">
+                        <X size={18} />
                     </button>
                 </div>
             </header>
@@ -361,14 +358,14 @@ export const Chatbot = () => {
                      {messages.map((msg, index) => (
                         <div key={index} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                             <div className={`flex items-center gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                {msg.role === 'model' ? <OwfnIcon className="w-6 h-6" /> : <User className="w-6 h-6 text-accent-500 dark:text-darkAccent-400" />}
+                                {msg.role === 'model' ? <OwfnIcon className="w-6 h-6" /> : <User className="w-6 h-6 text-dextools-accent-blue" />}
                                 {msg.formattedTimestamp && (
-                                    <p className="text-xs text-primary-400 dark:text-darkPrimary-500">
+                                    <p className="text-xs text-dextools-text-secondary">
                                         {msg.formattedTimestamp}
                                     </p>
                                 )}
                             </div>
-                            <div className={`mt-1 max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 rounded-br-none mr-8' : 'bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none ml-8'}`}>
+                            <div className={`mt-1 max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-dextools-special text-white rounded-br-none' : 'bg-dextools-card border border-dextools-border text-dextools-text-primary rounded-bl-none'}`}>
                                 <div className="text-sm whitespace-pre-wrap">
                                     {msg.role === 'model' ? renderMessageContent(msg.parts[0].text) : msg.parts[0].text}
                                 </div>
@@ -378,8 +375,8 @@ export const Chatbot = () => {
                     {isLoading && (
                          <div className="flex items-start gap-3 justify-start">
                             <OwfnIcon className="w-6 h-6 flex-shrink-0 mt-1" />
-                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-primary-100 text-primary-800 dark:bg-darkPrimary-700 dark:text-darkPrimary-200 rounded-bl-none">
-                                <div className="flex items-center space-x-2 text-sm text-primary-600 dark:text-darkPrimary-300">
+                            <div className="max-w-xs md:max-w-sm px-4 py-2 rounded-xl bg-dextools-card border border-dextools-border text-dextools-text-primary rounded-bl-none">
+                                <div className="flex items-center space-x-2 text-sm text-dextools-text-secondary">
                                     <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
                                     <span>{loadingText}</span>
                                 </div>
@@ -390,10 +387,10 @@ export const Chatbot = () => {
                 </div>
             </div>
             {isEmailFormVisible && (
-                <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700 bg-primary-50 dark:bg-darkPrimary-700/50 animate-fade-in-up" style={{animationDuration: '300ms'}}>
-                    <h4 className="font-semibold text-sm mb-2 text-center text-primary-800 dark:text-darkPrimary-200">Email this conversation</h4>
+                <div className="p-4 border-t border-dextools-border bg-dextools-background animate-fade-in" style={{animationDuration: '300ms'}}>
+                    <h4 className="font-semibold text-sm mb-2 text-center text-dextools-text-primary">Email this conversation</h4>
                     {emailStatus === 'success' ? (
-                        <div className="flex items-center justify-center gap-2 text-green-600 dark:text-green-400 font-semibold p-2 bg-green-500/10 rounded-md">
+                        <div className="flex items-center justify-center gap-2 text-dextools-accent-green font-semibold p-2 bg-dextools-accent-green/10 rounded-md">
                             <Check size={18} /> Conversation sent successfully!
                         </div>
                     ) : (
@@ -403,29 +400,29 @@ export const Chatbot = () => {
                                 value={recipientEmail}
                                 onChange={(e) => setRecipientEmail(e.target.value)}
                                 placeholder="Enter your email address..."
-                                className="w-full p-2 text-sm bg-primary-100 dark:bg-darkPrimary-700 rounded-md focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none"
+                                className="w-full p-2 text-sm bg-dextools-background border border-dextools-border rounded-md focus:ring-2 focus:ring-dextools-accent-blue focus:outline-none"
                                 disabled={emailStatus === 'loading'}
                             />
                             <div className="flex gap-2">
-                                <button onClick={() => setIsEmailFormVisible(false)} className="flex-1 text-sm py-2 px-3 rounded-md bg-primary-200 dark:bg-darkPrimary-600 hover:bg-primary-300 dark:hover:bg-darkPrimary-500 transition-colors">Cancel</button>
+                                <button onClick={() => setIsEmailFormVisible(false)} className="flex-1 text-sm py-2 px-3 rounded-md bg-dextools-border hover:opacity-80 transition-opacity">Cancel</button>
                                 <button
                                     onClick={handleSendEmail}
                                     disabled={emailStatus === 'loading' || !recipientEmail}
-                                    className="flex-1 text-sm py-2 px-3 rounded-md bg-accent-500 dark:bg-darkAccent-600 text-white hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 flex items-center justify-center"
+                                    className="flex-1 text-sm py-2 px-3 rounded-md bg-dextools-special text-white hover:opacity-90 disabled:opacity-50 flex items-center justify-center"
                                 >
                                     {emailStatus === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send'}
                                 </button>
                             </div>
                             {emailStatus === 'error' && (
-                                <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1.5"><AlertCircle size={14}/> {emailError}</p>
+                                <p className="text-xs text-dextools-accent-red flex items-center gap-1.5"><AlertCircle size={14}/> {emailError}</p>
                             )}
                         </div>
                     )}
                 </div>
             )}
-            <div className="p-4 border-t border-primary-200 dark:border-darkPrimary-700">
+            <div className="p-4 border-t border-dextools-border">
                  {showSuggestions && (
-                    <div className="flex flex-wrap gap-2 mb-3 animate-fade-in-up">
+                    <div className="flex flex-wrap gap-2 mb-3 animate-fade-in">
                         <SuggestionChip text={t('chatbot_suggestion_1', { defaultValue: 'What is OWFN?' })} onSelect={handleSuggestionClick} />
                         <SuggestionChip text={t('chatbot_suggestion_2', { defaultValue: 'How do I buy?' })} onSelect={handleSuggestionClick} />
                         <SuggestionChip text={t('chatbot_suggestion_3', { defaultValue: 'Tell me about bonuses.' })} onSelect={handleSuggestionClick} />
@@ -439,13 +436,13 @@ export const Chatbot = () => {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={handleKeyPress}
                         placeholder={t('chatbot_placeholder')}
-                        className="w-full p-3 pr-20 bg-primary-100 dark:bg-darkPrimary-700 rounded-lg focus:ring-2 focus:ring-accent-500 dark:focus:ring-darkAccent-500 focus:outline-none disabled:cursor-wait"
+                        className="w-full p-3 pr-20 bg-dextools-background border border-dextools-border rounded-lg focus:ring-2 focus:ring-dextools-accent-blue focus:outline-none disabled:cursor-wait"
                         disabled={isInputDisabled}
                     />
                     <button
                         onClick={() => handleSend()}
                         disabled={isInputDisabled || input.trim() === ''}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-accent-500 dark:bg-darkAccent-600 text-white p-2 rounded-md hover:bg-accent-600 dark:hover:bg-darkAccent-700 disabled:bg-primary-300 dark:disabled:bg-darkPrimary-600 disabled:cursor-not-allowed"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-dextools-special text-white p-2 rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Send message"
                     >
                        {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Send size={20} /> }

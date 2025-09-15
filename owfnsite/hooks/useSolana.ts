@@ -1,14 +1,38 @@
+
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
-// FIX: Import UseSolanaReturn from types.ts to break circular dependency
-import type { Token, UseSolanaReturn } from '../lib/types.js';
+import type { Token } from '../lib/types.js';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL } from '../lib/constants.js';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.js';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
-// FIX: Moved to lib/types.ts to break a circular dependency with AppContextType.
+export interface UseSolanaReturn {
+  connected: boolean;
+  connecting: boolean;
+  address: string | null;
+  userTokens: Token[];
+  loading: boolean;
+  userStats: {
+    totalDonated: number;
+    projectsSupported: number;
+    votesCast: number;
+    donations: any[]; 
+    votedProposalIds: string[];
+  };
+  stakedBalance: number;
+  earnedRewards: number;
+  connection: Connection;
+  disconnectWallet: () => Promise<void>;
+  getWalletBalances: (walletAddress: string) => Promise<Token[]>;
+  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
+  stakeTokens: (amount: number) => Promise<any>;
+  unstakeTokens: (amount: number) => Promise<any>;
+  claimRewards: () => Promise<any>;
+  claimVestedTokens: (amount: number) => Promise<any>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
+}
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
