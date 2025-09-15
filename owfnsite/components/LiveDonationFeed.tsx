@@ -33,7 +33,6 @@ export const LiveDonationFeed = ({ allTransactions, isLoading }: LiveDonationFee
                 categories[tx.tokenSymbol].push(tx);
             }
         }
-        // Ensure lists are always sorted by time
         for (const key in categories) {
             categories[key].sort((a, b) => b.time.getTime() - a.time.getTime());
         }
@@ -56,21 +55,20 @@ export const LiveDonationFeed = ({ allTransactions, isLoading }: LiveDonationFee
     };
 
     return (
-        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d h-full flex flex-col">
+        <div className="bg-dextools-card border border-dextools-border p-6 rounded-md h-full flex flex-col">
             <div className="flex items-center gap-2 mb-4">
-                <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
-                <h3 className="text-primary-900 dark:text-darkPrimary-100 font-bold text-xl">{t('live_donation_feed')}</h3>
+                <div className="w-2.5 h-2.5 bg-dextools-accent-green rounded-full animate-pulse"></div>
+                <h3 className="text-dextools-text-primary font-bold text-xl">{t('live_donation_feed')}</h3>
             </div>
-
-            <div className="border-b border-primary-200 dark:border-darkPrimary-700 mb-4 flex">
+            <div className="border-b border-dextools-border mb-4 flex">
                 {TABS.map(tokenSymbol => (
                     <button
                         key={tokenSymbol}
                         onClick={() => setActiveTab(tokenSymbol)}
                         className={`flex items-center gap-2 py-2 px-4 font-semibold transition-colors text-sm ${
                             activeTab === tokenSymbol 
-                                ? 'border-b-2 border-accent-500 text-accent-600 dark:border-darkAccent-400 dark:text-darkAccent-400' 
-                                : 'text-primary-500 dark:text-darkPrimary-400 hover:bg-primary-100 dark:hover:bg-darkPrimary-700'
+                                ? 'border-b-2 border-dextools-accent-blue text-dextools-text-primary' 
+                                : 'text-dextools-text-secondary hover:bg-dextools-border'
                         }`}
                     >
                         {getTokenIcon(tokenSymbol, 'w-4 h-4')}
@@ -79,7 +77,7 @@ export const LiveDonationFeed = ({ allTransactions, isLoading }: LiveDonationFee
                 ))}
             </div>
 
-            <div className="grid grid-cols-6 gap-2 text-xs text-primary-500 dark:text-darkPrimary-400 pb-2 border-b border-primary-200 dark:border-darkPrimary-700 font-semibold">
+            <div className="grid grid-cols-6 gap-2 text-xs text-dextools-text-secondary pb-2 border-b border-dextools-border font-semibold">
                 <span className="col-span-3">{t('wallet')}</span>
                 <span className="text-right col-span-2">{t('amount_donated')}</span>
                 <span className="text-right">{t('time')}</span>
@@ -88,24 +86,24 @@ export const LiveDonationFeed = ({ allTransactions, isLoading }: LiveDonationFee
             <div className="flex-grow overflow-y-auto space-y-1 pr-1 -mr-2 mt-2 custom-scrollbar">
                 {isLoading ? (
                     <div className="flex justify-center items-center h-full pt-16">
-                        <Loader2 className="w-8 h-8 animate-spin text-accent-500 dark:text-darkAccent-500" />
+                        <Loader2 className="w-8 h-8 animate-spin text-dextools-accent-blue" />
                     </div>
                 ) : transactionsForDisplay.length > 0 ? (
                     transactionsForDisplay.slice(0, 50).map((tx) => (
-                        <div key={tx.id} className={`grid grid-cols-6 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in-up ${tx.time.getTime() > Date.now() - 15000 ? 'bg-accent-100/50 dark:bg-darkAccent-500/10' : ''}`}>
+                        <div key={tx.id} className={`grid grid-cols-6 gap-2 items-center text-sm p-1.5 rounded-md animate-fade-in ${tx.time.getTime() > Date.now() - 15000 ? 'bg-dextools-special/10' : ''}`}>
                             <div className="col-span-3 flex items-center gap-2">
                                 <AddressDisplay address={tx.address} className="text-xs" />
                             </div>
-                            <div className="text-right font-mono col-span-2">
+                            <div className="text-right font-mono col-span-2 text-dextools-text-primary">
                                 {tx.amount.toLocaleString(undefined, { maximumFractionDigits: 4 })}
                             </div>
-                            <div className="text-right text-xs text-primary-500 dark:text-darkPrimary-500">
+                            <div className="text-right text-xs text-dextools-text-secondary">
                                 {renderTimeAgo(tx.time)}
                             </div>
                         </div>
                     ))
                 ) : (
-                    <div className="text-center py-16 text-primary-500 dark:text-darkPrimary-400">
+                    <div className="text-center py-16 text-dextools-text-secondary">
                         <p>{t('donations_no_recent_donations_for_token', { token: activeTab })}</p>
                     </div>
                 )}

@@ -5,53 +5,37 @@ import { CaseCard } from '../components/CaseCard.js';
 import { ArrowLeft, HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
 
 const categoryDetails: { [key: string]: { icon: React.ReactNode, titleKey: string, descKey: string } } = {
-    'Health': {
-        icon: <HeartHandshake className="w-12 h-12 text-accent-500 dark:text-darkAccent-400" />,
-        titleKey: 'about_impact_health_title',
-        descKey: 'about_impact_health_desc'
-    },
-    'Education': {
-        icon: <BookOpen className="w-12 h-12 text-accent-500 dark:text-darkAccent-500" />,
-        titleKey: 'about_impact_education_title',
-        descKey: 'about_impact_education_desc'
-    },
-    'Basic Needs': {
-        icon: <HomeIcon className="w-12 h-12 text-accent-600 dark:text-darkAccent-600" />,
-        titleKey: 'about_impact_needs_title',
-        descKey: 'about_impact_needs_desc'
-    }
+    'Health': { icon: <HeartHandshake className="w-12 h-12 text-dextools-accent-blue" />, titleKey: 'about_impact_health_title', descKey: 'about_impact_health_desc' },
+    'Education': { icon: <BookOpen className="w-12 h-12 text-dextools-accent-blue" />, titleKey: 'about_impact_education_title', descKey: 'about_impact_education_desc' },
+    'Basic Needs': { icon: <HomeIcon className="w-12 h-12 text-dextools-accent-blue" />, titleKey: 'about_impact_needs_title', descKey: 'about_impact_needs_desc' }
 };
 
 export default function ImpactCategory() {
     const { t, socialCases } = useAppContext();
     const params = useParams();
-    // Normalize category name from URL to match data (e.g., 'basic-needs' -> 'Basic Needs')
     const categoryParam = params['category'];
-    const categoryName = categoryParam
-        ? categoryParam.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-        : '';
-        
+    const categoryName = categoryParam ? categoryParam.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : '';
     const filteredCases = socialCases.filter(c => c.category === categoryName);
     const details = categoryDetails[categoryName];
     
     if (!details) {
         return (
-            <div className="text-center py-10 animate-fade-in-up">
-                <h2 className="text-2xl font-bold">Category Not Found</h2>
-                <Link to="/impact" className="text-accent-500 dark:text-darkAccent-500 hover:underline mt-4 inline-block">{t('back_to_all_cases')}</Link>
+            <div className="text-center py-10 animate-fade-in">
+                <h2 className="text-2xl font-bold text-dextools-text-primary">Category Not Found</h2>
+                <Link to="/impact" className="text-dextools-accent-blue hover:underline mt-4 inline-block">{t('back_to_all_cases')}</Link>
             </div>
         );
     }
 
     return (
-        <div className="animate-fade-in-up space-y-8">
-            <Link to="/impact" className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
+        <div className="animate-fade-in space-y-8">
+            <Link to="/impact" className="inline-flex items-center gap-2 text-dextools-accent-blue hover:underline">
                 <ArrowLeft size={16} /> {t('back_to_all_cases')}
             </Link>
-            <div className="text-center p-8 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d">
+            <div className="text-center p-8 bg-dextools-card border border-dextools-border rounded-md">
                 {details.icon}
-                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400 mt-4">{t(details.titleKey)}</h1>
-                <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">
+                <h1 className="text-4xl font-bold text-dextools-accent-blue mt-4">{t(details.titleKey)}</h1>
+                <p className="mt-4 max-w-2xl mx-auto text-lg text-dextools-text-secondary">
                     {t(details.descKey)}
                 </p>
             </div>
@@ -63,8 +47,8 @@ export default function ImpactCategory() {
                     ))}
                 </div>
             ) : (
-                <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-inner-3d">
-                    <p className="text-primary-600 dark:text-darkPrimary-400">{t('no_active_cases_in_category')}</p>
+                <div className="text-center p-12 bg-dextools-card border border-dextools-border rounded-md">
+                    <p className="text-dextools-text-secondary">{t('no_active_cases_in_category')}</p>
                 </div>
             )}
         </div>
