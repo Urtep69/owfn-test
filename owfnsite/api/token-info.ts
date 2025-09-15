@@ -1,5 +1,5 @@
 import type { TokenDetails } from '../lib/types.js';
-import { MOCK_TOKEN_DETAILS } from '../lib/constants.js';
+import { MOCK_TOKEN_DETAILS, PROJECT_LINKS } from '../lib/constants.js';
 
 const HELIUS_API_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
 
@@ -25,7 +25,9 @@ const getMockMarketData = async (mint: string) => {
         poolInfo: {
             baseToken: { address: mint, amount: random(200000000, 220000000) },
             quoteToken: { address: 'So11111111111111111111111111111111111111112', amount: random(1200, 1300) }
-        }
+        },
+        poolCreatedAt: Date.now() - random(1, 30) * 24 * 60 * 60 * 1000, // 1-30 days ago
+        lpBurned: random(95, 100), // 95-100% burned
     };
 };
 
@@ -100,6 +102,8 @@ export default async function handler(req: any, res: any) {
         }
         
         const marketData = await getMockMarketData(mintAddress);
+        
+        const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
 
         const responseData: TokenDetails = {
             mintAddress: asset.id,
@@ -115,6 +119,14 @@ export default async function handler(req: any, res: any) {
             updateAuthority: updateAuthority,
             tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
             
+            description: metadata.description || (mockDetailsKey ? MOCK_TOKEN_DETAILS[mockDetailsKey].description : 'No description available for this token.'),
+            links: {
+                website: links.website || PROJECT_LINKS.website,
+                twitter: links.twitter || PROJECT_LINKS.x,
+                telegram: links.telegram || PROJECT_LINKS.telegramGroup,
+                discord: links.discord || PROJECT_LINKS.discord,
+            },
+
             // Merged market data
             ...marketData,
             fdv: calculateMarketCap(price, supply),
@@ -124,11 +136,6 @@ export default async function handler(req: any, res: any) {
             balance: 0,
             usdValue: 0,
         };
-
-        const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
-        if (mockDetailsKey) {
-            responseData.description = MOCK_TOKEN_DETAILS[mockDetailsKey].description;
-        }
         
         return res.status(200).json(responseData);
 

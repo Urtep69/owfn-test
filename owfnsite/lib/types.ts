@@ -67,7 +67,12 @@ export interface TokenExtension {
 
 export interface TokenDetails extends Token {
     description?: string;
-    links?: Record<string, string>;
+    links?: {
+        website?: string;
+        twitter?: string;
+        telegram?: string;
+        discord?: string;
+    };
     marketCap?: number;
     volume24h?: number;
     price24hChange?: number;
@@ -96,11 +101,12 @@ export interface TokenDetails extends Token {
         baseToken: { address: string, amount: number },
         quoteToken: { address: string, amount: number }
     }
+    lpBurned?: number; 
 }
 
 export interface LiveTransaction {
     id: string; // signature
-    time: number; // timestamp
+    time: Date; 
     type: 'buy' | 'sell';
     priceUsd: number;
     tokenAmount: number;
