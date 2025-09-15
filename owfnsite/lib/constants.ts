@@ -101,6 +101,8 @@ export const KNOWN_TOKEN_MINT_ADDRESSES: { [key: string]: string } = {
   USDT: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
 };
 
+export const MOCK_COMMUNITY_MEMBERS = 12345;
+
 export const MOCK_TOKEN_DETAILS: { [symbol: string]: TokenDetails } = {
     'OWFN': {
         name: 'Official World Family Network',

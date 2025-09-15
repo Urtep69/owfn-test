@@ -92,6 +92,8 @@
               'slide-in': 'slideIn 0.5s ease-out forwards',
               'glow': 'glow 1.5s ease-in-out infinite alternate',
               'active-glow': 'activeGlow 2.5s ease-in-out infinite alternate',
+              'animated-gradient': 'animated-gradient 15s ease infinite',
+              'float': 'float 3s ease-in-out infinite',
             },
             keyframes: {
               fadeInUp: {
@@ -109,7 +111,17 @@
               activeGlow: {
                 'from': { 'box-shadow': '0 0 10px -5px #fbbf24, inset 0 0 5px -5px #fbbf24' },
                 'to': { 'box-shadow': '0 0 20px 2px #fbbf24, inset 0 0 10px 0px #fbbf24' }
-              }
+              },
+              'animated-gradient': {
+                '0%': { 'background-position': '0% 50%' },
+                '50%': { 'background-position': '100% 50%' },
+                '100%': { 'background-position': '0% 50%' },
+              },
+              float: {
+                '0%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-10px)' },
+                '100%': { transform: 'translateY(0px)' },
+              },
             },
           },
         },

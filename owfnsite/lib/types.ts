@@ -1,4 +1,6 @@
 import React from 'react';
+// FIX: Import Connection for UseSolanaReturn interface
+import type { Connection } from '@solana/web3.js';
 
 export interface Token {
   name: string;
@@ -9,6 +11,33 @@ export interface Token {
   usdValue: number;
   decimals: number;
   pricePerToken: number;
+}
+
+// FIX: Moved UseSolanaReturn from hooks/useSolana.ts to break circular dependency
+export interface UseSolanaReturn {
+  connected: boolean;
+  connecting: boolean;
+  address: string | null;
+  userTokens: Token[];
+  loading: boolean;
+  userStats: {
+    totalDonated: number;
+    projectsSupported: number;
+    votesCast: number;
+    donations: any[]; 
+    votedProposalIds: string[];
+  };
+  stakedBalance: number;
+  earnedRewards: number;
+  connection: Connection;
+  disconnectWallet: () => Promise<void>;
+  getWalletBalances: (walletAddress: string) => Promise<Token[]>;
+  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
+  stakeTokens: (amount: number) => Promise<any>;
+  unstakeTokens: (amount: number) => Promise<any>;
+  claimRewards: () => Promise<any>;
+  claimVestedTokens: (amount: number) => Promise<any>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
 
 export interface Wallet {
@@ -190,6 +219,30 @@ export interface PresaleProgress {
   contributors: number;
   isLoading: boolean;
 }
+
+export interface AppContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+  t: (key: string, replacements?: Record<string, string | number>) => string;
+  setLang: (langCode: string) => void;
+  currentLanguage: Language;
+  supportedLanguages: Language[];
+  // FIX: Use the imported UseSolanaReturn interface directly to break circular dependency.
+  solana: UseSolanaReturn;
+  socialCases: SocialCase[];
+  addSocialCase: (newCase: SocialCase) => void;
+  vestingSchedules: VestingSchedule[];
+  addVestingSchedule: (schedule: VestingSchedule) => void;
+  proposals: GovernanceProposal[];
+  addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
+  isMaintenanceActive: boolean;
+  isAdmin: boolean;
+  setWalletModalOpen: (open: boolean) => void;
+  presaleProgress: PresaleProgress;
+  impactTreasuryBalance: number;
+}
+
 
 export interface DonationTransaction {
   id: string;

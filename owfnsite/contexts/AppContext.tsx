@@ -3,33 +3,12 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.js';
 import { useLocalization } from '../hooks/useLocalization.js';
 import { useSolana } from '../hooks/useSolana.js';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, PresaleStage, PresaleProgress } from '../lib/types.js';
-import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, PRESALE_STAGES, QUICKNODE_RPC_URL, ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
+import type { AppContextType, Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, PresaleStage, PresaleProgress } from '../lib/types.js';
+import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, PRESALE_STAGES, QUICKNODE_RPC_URL, ADMIN_WALLET_ADDRESS, DISTRIBUTION_WALLETS } from '../lib/constants.js';
 import { translateText } from '../services/geminiService.js';
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 const currentStage: PresaleStage = PRESALE_STAGES[0];
-
-interface AppContextType {
-  theme: Theme;
-  toggleTheme: () => void;
-  t: (key: string, replacements?: Record<string, string | number>) => string;
-  setLang: (langCode: string) => void;
-  currentLanguage: Language;
-  supportedLanguages: Language[];
-  solana: ReturnType<typeof useSolana>;
-  socialCases: SocialCase[];
-  addSocialCase: (newCase: SocialCase) => void;
-  vestingSchedules: VestingSchedule[];
-  addVestingSchedule: (schedule: VestingSchedule) => void;
-  proposals: GovernanceProposal[];
-  addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
-  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
-  isMaintenanceActive: boolean;
-  isAdmin: boolean;
-  setWalletModalOpen: (open: boolean) => void;
-  presaleProgress: PresaleProgress;
-}
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -42,6 +21,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
+  const [impactTreasuryBalance, setImpactTreasuryBalance] = useState(0);
   
   const isAdmin = useMemo(() => solana.address === ADMIN_WALLET_ADDRESS, [solana.address]);
   const isMaintenanceActive = useMemo(() => MAINTENANCE_MODE_ACTIVE && !isAdmin, [isAdmin]);
@@ -103,11 +83,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
+  const fetchImpactTreasuryBalance = useCallback(async () => {
+    try {
+        const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
+        const impactPublicKey = new PublicKey(DISTRIBUTION_WALLETS.impactTreasury);
+        const solBalance = await connection.getBalance(impactPublicKey);
+        setImpactTreasuryBalance(solBalance / LAMPORTS_PER_SOL);
+    } catch (error) {
+        console.error("Failed to fetch impact treasury balance:", error);
+    }
+  }, []);
+
   useEffect(() => {
-    fetchPresaleProgress(); // Fetch immediately on mount
-    const interval = setInterval(fetchPresaleProgress, 60000); // And then every 60 seconds
-    return () => clearInterval(interval);
-  }, [fetchPresaleProgress]);
+    fetchPresaleProgress();
+    fetchImpactTreasuryBalance();
+    const progressInterval = setInterval(fetchPresaleProgress, 60000);
+    const treasuryInterval = setInterval(fetchImpactTreasuryBalance, 60000);
+    return () => {
+        clearInterval(progressInterval);
+        clearInterval(treasuryInterval);
+    };
+  }, [fetchPresaleProgress, fetchImpactTreasuryBalance]);
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
@@ -189,6 +185,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isAdmin,
     setWalletModalOpen,
     presaleProgress,
+    impactTreasuryBalance,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
