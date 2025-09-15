@@ -92,7 +92,13 @@ export default function TokenDetail() {
     }, [fetchTokenDetails]);
 
     useEffect(() => {
-        if (loading || !tokenDetails || !chartContainerRef.current || chartRef.current) return;
+        if (
+            loading || 
+            !tokenDetails || 
+            !chartContainerRef.current || 
+            chartRef.current || 
+            typeof LightweightCharts === 'undefined'
+        ) return;
         
         const chart = LightweightCharts.createChart(chartContainerRef.current, {
             width: chartContainerRef.current.clientWidth,
@@ -124,7 +130,11 @@ export default function TokenDetail() {
         chartRef.current = chart;
         seriesRef.current = candlestickSeries;
         
-        const handleResize = () => chart.applyOptions({ width: chartContainerRef.current?.clientWidth });
+        const handleResize = () => {
+            if (chartContainerRef.current) {
+                chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+            }
+        };
         window.addEventListener('resize', handleResize);
 
         return () => {
@@ -185,7 +195,7 @@ export default function TokenDetail() {
             <main className="grid grid-cols-12 gap-6">
                 <div className="col-span-12 lg:col-span-9 space-y-6">
                     <div className="bg-white dark:bg-darkPrimary-800 p-4 rounded-lg shadow-3d">
-                        <div ref={chartContainerRef} style={{ aspectRatio: '16 / 9' }}></div>
+                        <div ref={chartContainerRef} style={{ aspectRatio: '16 / 9', height: '400px' }}></div>
                     </div>
                 </div>
 
