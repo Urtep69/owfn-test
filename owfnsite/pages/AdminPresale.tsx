@@ -146,34 +146,63 @@ export default function AdminPresale() {
     }, [transactions]);
 
     const aggregatedContributors = useMemo<AggregatedContributor[]>(() => {
+        // 1. Group transactions by contributor
+        const txsByContributor = new Map<string, PresaleTx[]>();
+        for (const tx of transactions) {
+            const userTxs = txsByContributor.get(tx.from) || [];
+            userTxs.push(tx);
+            txsByContributor.set(tx.from, userTxs);
+        }
+
         const contributorMap = new Map<string, { totalSol: number; totalOwfn: bigint }>();
         const presaleRateBigInt = BigInt(currentStage.rate);
         const owfnDecimalsMultiplier = 10n ** BigInt(TOKEN_DETAILS.decimals);
         const sortedTiers = [...currentStage.bonusTiers].sort((a, b) => b.threshold - a.threshold);
-    
-        for (const tx of transactions) {
-            const lamports = BigInt(tx.lamports);
-            const solAmount = tx.solAmount;
-    
-            // Calculate base OWFN for this single transaction
-            const baseOwfn = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
-    
-            // Find bonus ONLY for this single transaction
-            const applicableTier = sortedTiers.find(tier => solAmount >= tier.threshold);
-            let bonusOwfn = 0n;
-            if (applicableTier) {
-                bonusOwfn = (baseOwfn * BigInt(applicableTier.percentage)) / 100n;
+        const MAX_CONTRIBUTION_SOL = BigInt(currentStage.maxBuy);
+        const MAX_CONTRIBUTION_LAMPORTS = MAX_CONTRIBUTION_SOL * BigInt(LAMPORTS_PER_SOL);
+
+        // 2. Iterate through each contributor
+        for (const [address, userTxs] of txsByContributor.entries()) {
+            // 3. Sort their transactions chronologically (oldest first)
+            userTxs.sort((a, b) => a.timestamp - b.timestamp);
+
+            let solContributedSoFarLamports = 0n;
+            let totalOwfnCalculated = 0n;
+            let totalSolCalculated = 0;
+
+            // 4. Process transactions chronologically, enforcing the 10 SOL cap
+            for (const tx of userTxs) {
+                if (solContributedSoFarLamports >= MAX_CONTRIBUTION_LAMPORTS) {
+                    break; // Stop processing if cap is already met
+                }
+
+                const roomLeftLamports = MAX_CONTRIBUTION_LAMPORTS - solContributedSoFarLamports;
+                const txLamports = BigInt(tx.lamports);
+                
+                const lamportsToProcess = txLamports > roomLeftLamports ? roomLeftLamports : txLamports;
+                const solToProcess = Number(lamportsToProcess) / LAMPORTS_PER_SOL;
+
+                // Calculate base OWFN for the amount being processed
+                const baseOwfn = (lamportsToProcess * presaleRateBigInt * owfnDecimalsMultiplier) / BigInt(LAMPORTS_PER_SOL);
+                
+                // Determine the bonus based on the ORIGINAL transaction amount
+                const applicableTier = sortedTiers.find(tier => tx.solAmount >= tier.threshold);
+                let bonusOwfn = 0n;
+                if (applicableTier) {
+                    bonusOwfn = (baseOwfn * BigInt(applicableTier.percentage)) / 100n;
+                }
+
+                totalOwfnCalculated += baseOwfn + bonusOwfn;
+                solContributedSoFarLamports += lamportsToProcess;
+                totalSolCalculated += solToProcess;
             }
-    
-            const totalOwfnForTx = baseOwfn + bonusOwfn;
-    
-            // Aggregate results for the contributor
-            const currentData = contributorMap.get(tx.from) || { totalSol: 0, totalOwfn: 0n };
-            currentData.totalSol += solAmount;
-            currentData.totalOwfn += totalOwfnForTx;
-            contributorMap.set(tx.from, currentData);
+
+            contributorMap.set(address, {
+                totalSol: totalSolCalculated,
+                totalOwfn: totalOwfnCalculated,
+            });
         }
-    
+
         const results: AggregatedContributor[] = [];
         for (const [address, data] of contributorMap.entries()) {
             results.push({
@@ -182,12 +211,13 @@ export default function AdminPresale() {
                 totalOwfn: data.totalOwfn,
             });
         }
-        return results;
+        // Sort by largest contributor first for better visibility
+        return results.sort((a, b) => b.totalSol - a.totalSol);
     }, [transactions]);
 
 
     const exportToCsv = useCallback(() => {
-        const headers = ['contributor_address', 'total_sol_spent', 'total_owfn_to_receive'];
+        const headers = ['contributor_address', 'total_sol_spent_capped', 'total_owfn_to_receive'];
         const rows = aggregatedContributors.map(c => {
              const owfnAmount = Number(c.totalOwfn) / (10 ** TOKEN_DETAILS.decimals);
              return [c.address, c.totalSol.toFixed(9), owfnAmount.toFixed(TOKEN_DETAILS.decimals)];

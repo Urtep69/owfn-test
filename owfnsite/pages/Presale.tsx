@@ -427,21 +427,36 @@ export default function Presale() {
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSolAmount(value);
 
-    if (value === '' || isNaN(parseFloat(value))) {
-        setError('');
+    // Prevent scientific notation and other non-numeric characters except for one dot.
+    if (/[eE,+]|(\..*){2,}/.test(value)) {
         return;
     }
 
     const numValue = parseFloat(value);
-    // We check for > 0 because if the user types "0" or "0." we don't want to show an error yet.
-    // The button will be disabled anyway by isAmountInvalid.
-    if ((numValue > 0 && numValue < currentStage.minBuy) || numValue > maxAllowedBuy) {
+
+    // Auto-correct if value exceeds maximum allowed
+    if (numValue > maxAllowedBuy) {
+        setSolAmount(maxAllowedBuy.toFixed(6).replace(/\.?0+$/, ""));
         setError(t('presale_amount_error', { min: currentStage.minBuy, max: maxAllowedBuy.toFixed(2) }));
     } else {
-        setError('');
+        setSolAmount(value);
+        // Show error if value is below minimum, but don't auto-correct on change
+        if (value !== '' && !isNaN(numValue) && numValue > 0 && numValue < currentStage.minBuy) {
+             setError(t('presale_amount_error', { min: currentStage.minBuy, max: maxAllowedBuy.toFixed(2) }));
+        } else if (value === '' || isNaN(numValue) || numValue >= currentStage.minBuy) {
+            setError('');
+        }
     }
+  };
+
+  const handleBlur = () => {
+      if (solAmount === '') return;
+      const numValue = parseFloat(solAmount);
+      if (!isNaN(numValue) && numValue > 0 && numValue < currentStage.minBuy) {
+          setSolAmount(currentStage.minBuy.toString());
+          setError('');
+      }
   };
 
   const calculation = useMemo(() => {
@@ -719,9 +734,11 @@ export default function Presale() {
                             </div>
                             <input
                                 id="buy-amount"
-                                type="number"
+                                type="text"
+                                inputMode="decimal"
                                 value={solAmount}
                                 onChange={handleAmountChange}
+                                onBlur={handleBlur}
                                 className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 text-right focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error && !isAdmin ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
                                 placeholder="0.00"
                                 disabled={isCheckingContribution || (!isAdmin && presaleStatus !== 'active')}
