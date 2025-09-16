@@ -6,6 +6,7 @@ import { Footer } from './Footer.js';
 import { Chatbot } from './Chatbot.js';
 import { Sidebar } from './Sidebar.js';
 import { NotificationSystem } from './NotificationSystem.js';
+import { TransactionTracker } from './TransactionTracker.js';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -24,6 +25,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </div>
       <Chatbot />
       <NotificationSystem />
+      <TransactionTracker />
     </div>
   );
 };

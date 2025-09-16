@@ -1,12 +1,17 @@
 
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'wouter';
 import { HeartHandshake, BookOpen, HomeIcon, Globe, Handshake as HandshakeIcon, Heart, Zap, ShieldCheck, Link as LinkIcon, CheckCircle } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.js';
+import { markJourneyAction } from '../lib/journeyManager.js';
 
 export default function About() {
     const { t } = useAppContext();
+
+    useEffect(() => {
+        markJourneyAction('readAbout');
+    }, []);
 
     return (
         <div className="animate-fade-in-up space-y-12">

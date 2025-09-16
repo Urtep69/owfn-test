@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
@@ -35,7 +34,7 @@ export interface UseSolanaReturn {
   connection: Connection;
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
-  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<SendTransactionResult>;
+  sendTransaction: (to: string, amount: number, tokenSymbol: string, type: 'donation' | 'purchase') => Promise<SendTransactionResult>;
   stakeTokens: (amount: number) => Promise<any>;
   unstakeTokens: (amount: number) => Promise<any>;
   claimRewards: () => Promise<any>;
@@ -212,7 +211,7 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, address, getWalletBalances]);
 
- const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<SendTransactionResult> => {
+ const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string, type: 'donation' | 'purchase'): Promise<SendTransactionResult> => {
     if (!connected || !publicKey || !signTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }

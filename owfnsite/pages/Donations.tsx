@@ -9,6 +9,7 @@ import { LiveDonationFeed } from '../components/LiveDonationFeed.js';
 import type { DonationTransaction } from '../lib/types.js';
 import { AnimatedNumber } from '../components/AnimatedNumber.js';
 import { SkeletonLoader } from '../components/SkeletonLoader.js';
+import { markJourneyAction } from '../lib/journeyManager.js';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -141,7 +142,7 @@ const DonationStats = ({ allTransactions, isLoading }: { allTransactions: Donati
 
 // --- Main Page Component ---
 export default function Donations() {
-    const { t, solana, setWalletModalOpen, addNotification } = useAppContext();
+    const { t, solana, setWalletModalOpen, addNotification, startTrackingTransaction } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('SOL');
 
@@ -277,8 +278,15 @@ export default function Donations() {
             addNotification({ type: 'error', title: t('transaction_failed_title'), message: t('invalid_amount_generic') });
             return;
         }
-        const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
-        if (result.success) {
+        const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken, 'donation');
+        if (result.success && result.signature) {
+            startTrackingTransaction({
+                signature: result.signature,
+                status: 'sending',
+                amount: numAmount,
+                tokenSymbol: selectedToken,
+                type: 'donation'
+            });
             addNotification({
                 type: 'success',
                 title: t('donation_success_title'),
@@ -288,6 +296,7 @@ export default function Donations() {
                 amount: numAmount,
             });
             setAmount('');
+            markJourneyAction('madeDonation');
         } else {
             addNotification({
                 type: 'error',

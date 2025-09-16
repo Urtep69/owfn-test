@@ -1,3 +1,4 @@
+
 export const fr = {
     // Navigation
     home: `Accueil`,
@@ -233,6 +234,10 @@ export const fr = {
     donations_usdc_stats_title: `Statistiques des dons en USDC`,
     donations_usdt_stats_title: `Statistiques des dons en USDT`,
     donations_owfn_stats_title: `Statistiques des dons en OWFN`,
+    max_button: `MAX`,
+    time_minutes_ago: `il y a {minutes}m`,
+    time_hours_ago: `il y a {hours}h`,
+    time_days_ago: `il y a {days}j`,
 
     // Dashboard
     wallet_monitor: `Tableau de bord de surveillance des portefeuilles`,
@@ -360,7 +365,6 @@ export const fr = {
     faq_q14: `Qu'est-ce que cela signifie que le jeton est "porteur d'intérêts" avec un APY de 2% ? Comment ça marche ?`,
     faq_a14: `L'OWFN est un jeton porteur d'intérêts (IBT) qui récompense automatiquement ses détenteurs avec un rendement annuel en pourcentage (APY) de 2%. Cela signifie que vos avoirs en OWFN augmenteront avec le temps simplement en les conservant dans votre portefeuille.`,
     faq_q15: `Quelle est la taxe de transfert de 0,5% et quand s'applique-t-elle ?`,
-    // FIX: Corrected duplicate key 'faq_a14' to 'faq_a15'.
     faq_a15: `Cette taxe est un mécanisme clé pour le financement à long terme de notre mission. Une taxe de 0,5% s'appliquera à toutes les transactions avec le jeton OWFN *après* la fin de la période de prévente. Les fonds collectés grâce à cette taxe sont automatiquement dirigés vers la Trésorerie d'Impact pour financer continuellement nos projets sociaux. Ainsi, chaque transaction contribue au bien commun.`,
     faq_q16: `Pourquoi avez-vous choisi la blockchain Solana pour ce projet ?`,
     faq_a16: `Nous avons choisi Solana pour sa vitesse exceptionnelle, ses très faibles coûts de transaction et sa grande évolutivité. Ces caractéristiques sont essentielles pour un projet mondial comme le nôtre, permettant des micro-transactions efficaces et garantissant une expérience rapide et accessible à tous les utilisateurs, qu'ils fassent des dons, achètent ou échangent des jetons.`,
@@ -463,7 +467,6 @@ export const fr = {
     my_staked_balance: `Mon Solde Staké`,
     stake: `Staker`,
     unstake: `Unstaker`,
-    balance: `Solde`,
     stake_owfn: `Staker de l'OWFN`,
     unstake_owfn: `Unstaker de l'OWFN`,
     my_rewards: `Mes Récompenses`,

@@ -19,6 +19,7 @@ import { AddressDisplay } from '../components/AddressDisplay.js';
 import type { PresaleTransaction, PresaleStage } from '../lib/types.js';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
+import { markJourneyAction } from '../lib/journeyManager.js';
 
 // Get the current (and only) presale stage for this page to use.
 const currentStage: PresaleStage = PRESALE_STAGES[0];
@@ -316,7 +317,7 @@ const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bo
 
 
 export default function Presale() {
-  const { t, solana, setWalletModalOpen, presaleProgress, isAdmin, addNotification } = useAppContext();
+  const { t, solana, setWalletModalOpen, presaleProgress, isAdmin, addNotification, startTrackingTransaction } = useAppContext();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -525,9 +526,16 @@ export default function Presale() {
         return; // Admin still needs to enter a valid number
     }
 
-    const result = await solana.sendTransaction(currentStage.distributionWallet, numSolAmount, 'SOL');
+    const result = await solana.sendTransaction(currentStage.distributionWallet, numSolAmount, 'SOL', 'purchase');
 
     if (result.success && result.signature) {
+        startTrackingTransaction({
+            signature: result.signature,
+            status: 'sending',
+            amount: numSolAmount,
+            tokenSymbol: 'SOL',
+            type: 'purchase'
+        });
         addNotification({
             type: 'success',
             title: t('presale_purchase_success_title'),
@@ -548,6 +556,7 @@ export default function Presale() {
         };
         setLatestPurchase(newTx);
         setSolAmount('');
+        markJourneyAction('madePurchase');
     } else {
         addNotification({
             type: 'error',

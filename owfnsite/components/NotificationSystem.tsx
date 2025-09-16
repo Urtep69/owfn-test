@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.js';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from './IconComponents.js';
-import { X, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
+import { X, CheckCircle, AlertTriangle, ExternalLink, Info } from 'lucide-react';
 
 const getTokenIcon = (symbol: string, className = 'w-8 h-8') => {
     switch (symbol) {
@@ -22,37 +22,45 @@ const NotificationToast = ({ notification }) => {
         return () => clearTimeout(timer);
     }, [id, removeNotification]);
 
-    const isSuccess = type === 'success';
-
     const themeClasses = useMemo(() => {
-        if (isSuccess) {
-            return {
-                icon: <CheckCircle className="w-16 h-16 text-green-400" />,
-                accentColor: 'border-green-400/50',
-                glowColor: 'shadow-[0_0_30px_5px_rgba(34,197,94,0.3)]',
-            };
+        switch(type) {
+            case 'success':
+                 return {
+                    icon: <CheckCircle className="w-16 h-16 text-green-400" />,
+                    accentColor: 'border-green-400/50',
+                    glowColor: 'shadow-[0_0_30px_5px_rgba(34,197,94,0.3)]',
+                };
+            case 'welcome':
+                return {
+                    icon: <OwfnIcon className="w-16 h-16" />,
+                    accentColor: 'border-darkAccent-500/50',
+                    glowColor: 'shadow-[0_0_30px_5px_rgba(210,180,140,0.3)]',
+                };
+            case 'error':
+            default:
+                return {
+                    icon: <AlertTriangle className="w-16 h-16 text-red-400" />,
+                    accentColor: 'border-red-400/50',
+                    glowColor: 'shadow-[0_0_30px_5px_rgba(248,113,113,0.3)]',
+                };
         }
-        return {
-            icon: <AlertTriangle className="w-16 h-16 text-red-400" />,
-            accentColor: 'border-red-400/50',
-            glowColor: 'shadow-[0_0_30px_5px_rgba(248,113,113,0.3)]',
-        };
-    }, [isSuccess]);
+    }, [type]);
 
     return (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in-up" style={{ animationDuration: '300ms' }}>
             <div className="relative w-full max-w-lg">
-                {/* Logo positioned relative to the wrapper to avoid being clipped */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-darkPrimary-800 p-2 rounded-full z-20">
-                     <OwfnIcon className="w-16 h-16" />
-                </div>
+                 {type !== 'welcome' && (
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-darkPrimary-800 p-2 rounded-full z-20">
+                         <OwfnIcon className="w-16 h-16" />
+                    </div>
+                 )}
 
                 <div className={`relative bg-darkPrimary-800 text-darkPrimary-100 rounded-2xl border ${themeClasses.accentColor} ${themeClasses.glowColor}`}>
                     <button onClick={() => removeNotification(id)} className="absolute top-3 right-3 p-2 text-darkPrimary-400 hover:text-white rounded-full transition-colors z-10">
                         <X size={20} />
                     </button>
                     
-                    <div className="pt-14 px-6 md:px-8 pb-4 text-center">
+                    <div className={`${type !== 'welcome' ? 'pt-14' : 'pt-8'} px-6 md:px-8 pb-4 text-center`}>
                         <div className="flex justify-center mb-4">
                             {themeClasses.icon}
                         </div>

@@ -9,6 +9,7 @@ import { ComingSoonWrapper } from '../components/ComingSoonWrapper.js';
 import { formatNumber } from '../lib/utils.js';
 import { AnimatedNumber } from '../components/AnimatedNumber.js';
 import { SkeletonLoader } from '../components/SkeletonLoader.js';
+import { JourneyTracker } from '../components/JourneyTracker.js';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -85,104 +86,108 @@ export default function Profile() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                <h2 className="text-2xl font-bold mb-4">{t('my_tokens')}</h2>
-                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
-                    <div>
-                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('token_types')}</p>
-                        <p className="text-2xl font-bold">{loading ? '-' : userTokens.length}</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
-                        <AnimatedNumber 
-                            value={totalUsdValue}
-                            formatter={(val) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                            className="text-2xl font-bold text-green-600 dark:text-green-400"
-                        />
-                    </div>
-                </div>
-                
-                {loading ? (
-                    <div className="space-y-2">
-                        <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
-                            <span>{t('asset')}</span>
-                            <span className="text-right">{t('balance')}</span>
-                            <span className="text-right">{t('value_usd')}</span>
+            <div className="grid lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h2 className="text-2xl font-bold mb-4">{t('my_tokens')}</h2>
+                    <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
+                        <div>
+                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('token_types')}</p>
+                            <p className="text-2xl font-bold">{loading ? '-' : userTokens.length}</p>
                         </div>
-                        {[...Array(3)].map((_, i) => (
-                            <div key={i} className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg">
-                                <div className="flex items-center space-x-4">
-                                    <SkeletonLoader className="w-10 h-10 rounded-full flex-shrink-0" />
-                                    <div>
-                                        <SkeletonLoader className="h-5 w-16 mb-1" />
-                                        <SkeletonLoader className="h-4 w-24" />
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <SkeletonLoader className="h-5 w-20 ml-auto mb-1" />
-                                    <SkeletonLoader className="h-4 w-24 ml-auto" />
-                                </div>
-                                <div className="text-right">
-                                    <SkeletonLoader className="h-5 w-24 ml-auto" />
-                                </div>
+                        <div className="text-right">
+                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
+                            <AnimatedNumber 
+                                value={totalUsdValue}
+                                formatter={(val) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                className="text-2xl font-bold text-green-600 dark:text-green-400"
+                            />
+                        </div>
+                    </div>
+                    
+                    {loading ? (
+                        <div className="space-y-2">
+                            <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
+                                <span>{t('asset')}</span>
+                                <span className="text-right">{t('balance')}</span>
+                                <span className="text-right">{t('value_usd')}</span>
                             </div>
-                        ))}
-                    </div>
-                ) : userTokens.length > 0 ? (
-                    <div className="space-y-2">
-                        {/* Header */}
-                        <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
-                            <span>{t('asset')}</span>
-                            <span className="text-right">{t('balance')}</span>
-                            <span className="text-right">{t('value_usd')}</span>
-                        </div>
-                        {/* Token List */}
-                        {userTokens.map(token => (
-                           <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
-                                <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors duration-200 cursor-pointer">
-                                    {/* Column 1: Asset Info */}
+                            {[...Array(3)].map((_, i) => (
+                                <div key={i} className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg">
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                                            {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
-                                        </div>
+                                        <SkeletonLoader className="w-10 h-10 rounded-full flex-shrink-0" />
                                         <div>
-                                            <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
-                                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
+                                            <SkeletonLoader className="h-5 w-16 mb-1" />
+                                            <SkeletonLoader className="h-4 w-24" />
                                         </div>
                                     </div>
-
-                                    {/* Column 2: Balance */}
-                                    <div className="text-right font-mono">
-                                        <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
-                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
+                                    <div className="text-right">
+                                        <SkeletonLoader className="h-5 w-20 ml-auto mb-1" />
+                                        <SkeletonLoader className="h-4 w-24 ml-auto" />
                                     </div>
-
-                                    {/* Column 3: Value */}
-                                    <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
-                                        ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                    <div className="text-right">
+                                        <SkeletonLoader className="h-5 w-24 ml-auto" />
                                     </div>
-                                </a>
-                            </Link>
-                        ))}
-                    </div>
-                ) : (
-                     <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400">
-                        <p>{t('profile_no_tokens')}</p>
-                    </div>
-                )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : userTokens.length > 0 ? (
+                        <div className="space-y-2">
+                            {/* Header */}
+                            <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
+                                <span>{t('asset')}</span>
+                                <span className="text-right">{t('balance')}</span>
+                                <span className="text-right">{t('value_usd')}</span>
+                            </div>
+                            {/* Token List */}
+                            {userTokens.map(token => (
+                               <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
+                                    <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors duration-200 cursor-pointer">
+                                        {/* Column 1: Asset Info */}
+                                        <div className="flex items-center space-x-4">
+                                            <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                                                {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
+                                                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Column 2: Balance */}
+                                        <div className="text-right font-mono">
+                                            <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
+                                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
+                                        </div>
+
+                                        {/* Column 3: Value */}
+                                        <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
+                                            ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                        </div>
+                                    </a>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                         <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400">
+                            <p>{t('profile_no_tokens')}</p>
+                        </div>
+                    )}
+                </div>
+                <div className="lg:col-span-1 space-y-8">
+                    <JourneyTracker />
+                    <ComingSoonWrapper>
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                            <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
+                            <div className="space-y-4">
+                                <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
+                                <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
+                                <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
+                            </div>
+                        </div>
+                    </ComingSoonWrapper>
+                </div>
             </div>
             
-            <ComingSoonWrapper>
-                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                    <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
-                    <div className="grid md:grid-cols-3 gap-4">
-                        <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
-                        <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
-                        <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
-                    </div>
-                </div>
-            </ComingSoonWrapper>
-
             <div className="grid lg:grid-cols-2 gap-8">
                 <ComingSoonWrapper showMessage={false}>
                     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.js';
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS, DISTRIBUTION_WALLETS, ROADMAP_DATA, PROJECT_LINKS } from '../lib/constants.js';
 import { AllocationChart } from '../components/AllocationChart.js';
 import { OwfnIcon } from '../components/IconComponents.js';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import { CheckCircle, Users, BarChart2, Map as MapIcon, Star, Link as LinkIcon, FileText } from 'lucide-react';
+import { markJourneyAction } from '../lib/journeyManager.js';
 
 const Section = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
     <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-xl shadow-3d-lg mb-12">
@@ -29,6 +30,10 @@ const DetailItem = ({ label, value }: { label: string, value: React.ReactNode })
 
 export default function Whitepaper() {
     const { t } = useAppContext();
+
+    useEffect(() => {
+        markJourneyAction('readWhitepaper');
+    }, []);
 
     return (
         <div className="animate-fade-in-up">

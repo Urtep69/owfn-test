@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
@@ -21,7 +20,7 @@ const mockUpdates = [
 ];
 
 export default function ImpactCaseDetail() {
-    const { t, solana, currentLanguage, socialCases, setWalletModalOpen, addNotification } = useAppContext();
+    const { t, solana, currentLanguage, socialCases, setWalletModalOpen, addNotification, startTrackingTransaction } = useAppContext();
     const params = useParams();
     const id = params?.['id'];
     const socialCase = socialCases.find(c => c.id === id);
@@ -83,9 +82,17 @@ export default function ImpactCaseDetail() {
             return;
         }
 
-        const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
+        // FIX: Added the missing 'type' argument ('donation') to the sendTransaction call to match its definition.
+        const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken, 'donation');
         
-        if (result.success) {
+        if (result.success && result.signature) {
+            startTrackingTransaction({
+                signature: result.signature,
+                status: 'sending',
+                amount: numAmount,
+                tokenSymbol: selectedToken,
+                type: 'donation'
+            });
             addNotification({
                 type: 'success',
                 title: t('donation_success_title'),
