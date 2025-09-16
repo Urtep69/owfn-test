@@ -6,6 +6,7 @@ import { ProgressBar } from '../components/ProgressBar.js';
 import { ArrowLeft, Heart, CheckCircle, Milestone, Newspaper, AlertTriangle } from 'lucide-react';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.js';
 import { DISTRIBUTION_WALLETS } from '../lib/constants.js';
+import { SEO } from '../components/SEO.js';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -96,8 +97,14 @@ export default function ImpactCaseDetail() {
     const categorySlug = socialCase.category.toLowerCase().replace(/\s+/g, '-');
     const categoryName = t(`category_${socialCase.category.toLowerCase().replace(/\s+/g, '_')}`);
 
+    const seoTitle = t('seo_impact_case_title', { title });
+    // Trim description for meta tags
+    const seoDescription = description.length > 160 ? description.substring(0, 157) + '...' : description;
+
+
     return (
         <div className="animate-fade-in-up space-y-8">
+            <SEO title={seoTitle} description={seoDescription} imageUrl={socialCase.imageUrl} />
             <Link to={`/impact/category/${categorySlug}`} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
                 <ArrowLeft size={16} /> {t('back_to_category_cases', { category: categoryName })}
             </Link>

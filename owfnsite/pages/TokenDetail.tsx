@@ -5,6 +5,7 @@ import type { TokenDetails } from '../lib/types.js';
 import { ArrowLeft, Loader2, AlertTriangle, Info, BarChart2, ShieldCheck, PieChart, CheckCircle, XCircle } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import { formatNumber } from '../lib/utils.js';
+import { SEO } from '../components/SEO.js';
 
 const DetailItem = ({ label, value, children }: { label: string, value?: React.ReactNode, children?: React.ReactNode }) => (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50">
@@ -91,9 +92,14 @@ export default function TokenDetail() {
     if (!tokenDetails) {
         return null;
     }
+    
+    const { name, symbol, logo } = tokenDetails;
+    const seoTitle = t('seo_token_detail_title', { symbol });
+    const seoDescription = t('seo_token_detail_description', { name, symbol });
 
     return (
         <div className="animate-fade-in-up space-y-8">
+            <SEO title={seoTitle} description={seoDescription} imageUrl={logo as string} />
             <div>
                 <Link to={fromPath} className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline mb-4">
                     <ArrowLeft size={16} /> {t(fromPath.includes('dashboard') ? 'back_to_dashboard' : 'back_to_profile')}

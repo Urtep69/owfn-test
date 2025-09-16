@@ -1,195 +1,48 @@
 
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
-import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2, Calendar, Repeat, Zap, Star, ExternalLink, RefreshCw } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
-import type { ParsedTransaction } from '../lib/types.js';
+import type { ImpactBadge, ImpactNFT } from '../lib/types.js';
 import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
+import { ComingSoonWrapper } from '../components/ComingSoonWrapper.js';
 import { formatNumber } from '../lib/utils.js';
-import { SolIcon, GenericTokenIcon } from '../components/IconComponents.js';
-// FIX: Import LAMPORTS_PER_SOL constant from @solana/web3.js to resolve reference error.
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { SEO } from '../components/SEO.js';
 
-const StatCard = ({ icon, title, value, isLoading }: { icon: React.ReactNode, title: string, value: string | number, isLoading: boolean }) => (
-    <div className="bg-[#1C1C1E] dark:bg-darkPrimary-800 p-4 rounded-lg border border-white/10">
-        <p className="text-sm text-gray-400 dark:text-darkPrimary-400 mb-1">{title}</p>
-        {isLoading ? (
-            <div className="h-7 w-24 bg-gray-700 rounded animate-pulse"></div>
-        ) : (
-            <p className="text-xl font-bold font-mono text-white dark:text-darkPrimary-100">{value}</p>
-        )}
+const MOCK_BADGES: ImpactBadge[] = [
+    { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
+    { id: 'badge2', titleKey: 'badge_community_voter', descriptionKey: 'badge_community_voter_desc', icon: <Vote /> },
+    { id: 'badge3', titleKey: 'badge_diverse_donor', descriptionKey: 'badge_diverse_donor_desc', icon: <Gem /> },
+];
+
+const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => (
+    <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg flex items-center space-x-4">
+        <div className="text-accent-500 dark:text-darkAccent-400">{icon}</div>
+        <div>
+            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+            <p className="text-xl font-bold">{value}</p>
+        </div>
     </div>
 );
 
-const KNOWN_PROGRAMS: Record<string, { name: string; icon?: React.ReactNode }> = {
-    'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA': { name: 'Token Program' },
-    'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpLgL': { name: 'Token 2022' },
-    '11111111111111111111111111111111': { name: 'System Program' },
-    'ComputeBudget111111111111111111111111111111': { name: 'Compute Budget' },
-    'AddressLookupTab1e1111111111111111111111111': { name: 'Address Lookup' },
-    'Vote111111111111111111111111111111111111111': { name: 'Vote Program' },
-    'raydium-amm-v4': { name: 'Raydium AMM', icon: <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/8526.png" className="w-5 h-5 rounded-full" /> }, // Placeholder, use actual ID
-    'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s': { name: 'Metaplex', icon: <img src="https://pbs.twimg.com/profile_images/1649155845530124290/Y-QI5h6c_400x400.jpg" className="w-5 h-5 rounded-full" /> },
-};
-
-
-const parseTransaction = (tx: ParsedTransaction, userAddress: string) => {
-    const { transaction, meta } = tx;
-    const mainInstruction = transaction.message.instructions.find(ix => ix.programId.toBase58() !== 'ComputeBudget111111111111111111111111111111');
-    const programId = mainInstruction?.programId.toBase58() || "Unknown";
-    const programInfo = KNOWN_PROGRAMS[programId] || { name: `${programId.slice(0, 4)}...${programId.slice(-4)}` };
-
-    const preBalances = meta?.preTokenBalances?.filter(b => b.owner === userAddress) || [];
-    const postBalances = meta?.postTokenBalances?.filter(b => b.owner === userAddress) || [];
-
-    const changes: { mint: string; change: number; symbol?: string; icon?: React.ReactNode }[] = [];
-    const balanceMap = new Map<string, { pre: number, post: number }>();
-
-    preBalances.forEach(b => balanceMap.set(b.mint, { pre: b.uiTokenAmount.uiAmount || 0, post: 0 }));
-    postBalances.forEach(b => {
-        const existing = balanceMap.get(b.mint) || { pre: 0, post: 0 };
-        balanceMap.set(b.mint, { ...existing, post: b.uiTokenAmount.uiAmount || 0 });
-    });
-
-    for (const [mint, { pre, post }] of balanceMap.entries()) {
-        if (pre !== post) {
-            changes.push({ mint, change: post - pre });
-        }
-    }
-    
-    // Check for SOL changes
-    const preSol = meta?.preBalances.find((b, i) => transaction.message.accountKeys[i].pubkey.toBase58() === userAddress);
-    const postSol = meta?.postBalances.find((b, i) => transaction.message.accountKeys[i].pubkey.toBase58() === userAddress);
-    if(preSol !== undefined && postSol !== undefined && preSol !== postSol) {
-         changes.push({ mint: 'SOL', change: (postSol - preSol - (meta?.fee || 0)) / LAMPORTS_PER_SOL, symbol: 'SOL', icon: <SolIcon className="w-5 h-5"/> });
-    }
-
-    const received = changes.filter(c => c.change > 0);
-    const sent = changes.filter(c => c.change < 0);
-
-    return { programInfo, received, sent };
-};
-
-
-const ActivityTab = () => {
-    const { t, solana } = useAppContext();
-    const { getTransactionHistory, address } = solana;
-    const [history, setHistory] = useState<ParsedTransaction[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [canLoadMore, setCanLoadMore] = useState(true);
-
-    const loadHistory = useCallback(async (before?: string) => {
-        setIsLoading(true);
-        const newTxs = await getTransactionHistory({ limit: 20, before });
-        if (newTxs.length < 20) {
-            setCanLoadMore(false);
-        }
-        setHistory(prev => before ? [...prev, ...newTxs] : newTxs);
-        setIsLoading(false);
-    }, [getTransactionHistory]);
-
-    useEffect(() => {
-        loadHistory();
-    }, [loadHistory]);
-
-    const handleLoadMore = () => {
-        if (history.length > 0) {
-            const lastSignature = history[history.length - 1].signature;
-            loadHistory(lastSignature);
-        }
-    };
-
-    const groupedHistory = useMemo(() => {
-        return history.reduce((acc, tx) => {
-            const date = new Date((tx.blockTime || 0) * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            if (!acc[date]) {
-                acc[date] = [];
-            }
-            acc[date].push(tx);
-            return acc;
-        }, {} as Record<string, ParsedTransaction[]>);
-    }, [history]);
-
-
-    return (
-        <div className="space-y-4">
-             {Object.entries(groupedHistory).map(([date, txs]) => (
-                <div key={date}>
-                    <div className="flex items-center gap-2 mb-2">
-                         <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                         <h4 className="text-sm font-semibold text-gray-400">{date}</h4>
-                    </div>
-                    <div className="bg-[#1C1C1E] dark:bg-darkPrimary-800/50 border border-white/10 rounded-lg p-2 space-y-2">
-                        {txs.map(tx => {
-                            if (!address) return null;
-                            const { programInfo, received, sent } = parseTransaction(tx, address);
-                            return (
-                                <div key={tx.signature} className="grid grid-cols-12 gap-4 items-center p-2 text-sm">
-                                    <div className="col-span-2 text-gray-400">{new Date(tx.blockTime! * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                    <div className="col-span-2 flex items-center gap-2">
-                                        {programInfo.icon || <div className="w-5 h-5 rounded-full bg-gray-600 flex-shrink-0"></div>}
-                                        <span>{programInfo.name}</span>
-                                    </div>
-                                    <div className="col-span-3 space-y-1">
-                                         {received.map((item, i) => (
-                                            <div key={i} className="flex items-center gap-2 text-green-400">
-                                                {item.icon || <GenericTokenIcon className="w-5 h-5"/>}
-                                                <span>+{item.change.toLocaleString(undefined, { maximumFractionDigits: 5 })} {item.symbol || 'tokens'}</span>
-                                            </div>
-                                         ))}
-                                    </div>
-                                    <div className="col-span-3 space-y-1">
-                                         {sent.map((item, i) => (
-                                            <div key={i} className="flex items-center gap-2 text-red-400">
-                                                {item.icon || <GenericTokenIcon className="w-5 h-5"/>}
-                                                <span>{item.change.toLocaleString(undefined, { maximumFractionDigits: 5 })} {item.symbol || 'tokens'}</span>
-                                            </div>
-                                         ))}
-                                    </div>
-                                    <div className="col-span-1 text-xs text-gray-500">Signer</div>
-                                    <div className="col-span-1 text-right">
-                                        <a href={`https://solscan.io/tx/${tx.signature}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
-                                            <ExternalLink size={16} />
-                                        </a>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-             ))}
-             {isLoading && <div className="flex justify-center p-4"><Loader2 className="animate-spin text-gray-400"/></div>}
-             {canLoadMore && !isLoading && (
-                <div className="text-center">
-                    <button onClick={handleLoadMore} className="bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white font-semibold py-2 px-4 rounded-lg">Load More</button>
-                </div>
-             )}
-        </div>
-    );
-};
-
-
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, loading, userStats, onChainStats, loadingStats, getOnChainStats } = solana;
+    const { connected, address, userTokens, loading, userStats } = solana;
     
-    const [activeTab, setActiveTab] = useState<'positions' | 'activity'>('positions');
-    
-    useEffect(() => {
-        if(connected && address) {
-            getOnChainStats();
-        }
-    }, [connected, address, getOnChainStats]);
+    const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
     
     const totalUsdValue = useMemo(() => {
-        if (!userTokens || userTokens.length === 0) return 0;
+        if (!userTokens || userTokens.length === 0) {
+            return 0;
+        }
         return userTokens.reduce((sum, token) => sum + token.usdValue, 0);
     }, [userTokens]);
 
     if (!connected) {
         return (
             <div className="text-center p-12 bg-white dark:bg-darkPrimary-800 rounded-lg shadow-3d animate-fade-in-up">
+                <SEO titleKey="seo_profile_title" descriptionKey="seo_profile_description" />
                 <Wallet className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
                 <h1 className="text-2xl font-bold mb-2">{t('my_profile')}</h1>
                 <p className="text-primary-600 dark:text-darkPrimary-400 mb-6">{t('profile_connect_prompt')}</p>
@@ -205,78 +58,119 @@ export default function Profile() {
     }
     
     return (
-        <div className="animate-fade-in-up space-y-8 bg-[#121212] dark:bg-darkPrimary-950 text-white dark:text-darkPrimary-200 -m-8 p-8 min-h-screen">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold">{t('my_profile')}</h1>
-                    {address && <AddressDisplay address={address} className="text-gray-400" />}
+        <div className="animate-fade-in-up space-y-8">
+            <SEO titleKey="seo_profile_title" descriptionKey="seo_profile_description" />
+            <div>
+                <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('impact_dashboard_title')}</h1>
+                <div className="flex items-center space-x-2 mt-2">
+                    <span className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('connected_as')}:</span>
+                    {address && <AddressDisplay address={address} />}
                 </div>
-                <button onClick={() => getOnChainStats(true)} disabled={loadingStats} className="p-2 rounded-full hover:bg-white/10">
-                    <RefreshCw size={18} className={loadingStats ? 'animate-spin' : ''} />
-                </button>
             </div>
 
-            <div className="bg-[#1C1C1E] dark:bg-darkPrimary-800 border border-white/10 rounded-lg p-6">
-                 <p className="text-sm text-gray-400 dark:text-darkPrimary-400">{t('total_value')}</p>
-                 <p className="text-4xl font-bold">
-                    ${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                 </p>
-            </div>
-            
-            <div>
-                 <h2 className="text-xl font-bold mb-4">On-Chain Snapshot</h2>
-                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <StatCard icon={<Calendar size={24} />} title="Wallet Age" value={`${onChainStats.walletAgeDays} days`} isLoading={loadingStats} />
-                    <StatCard icon={<Repeat size={24} />} title="Total Transactions" value={onChainStats.totalTransactions.toLocaleString()} isLoading={loadingStats} />
-                    <StatCard icon={<Zap size={24} />} title="Total Fees Paid" value={`${onChainStats.totalFeesSol.toFixed(5)} SOL`} isLoading={loadingStats} />
-                    <StatCard icon={<Star size={24} />} title="Favorite Program" value={onChainStats.favoriteProgram} isLoading={loadingStats} />
-                 </div>
-            </div>
+            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                <h2 className="text-2xl font-bold mb-4">{t('my_tokens')}</h2>
+                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
+                    <div>
+                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('token_types')}</p>
+                        <p className="text-2xl font-bold">{loading ? '-' : userTokens.length}</p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                            {loading ? '-' : `$${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                        </p>
+                    </div>
+                </div>
+                
+                {loading ? (
+                    <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <span>{t('profile_loading_tokens')}</span>
+                    </div>
+                ) : userTokens.length > 0 ? (
+                    <div className="space-y-2">
+                        {/* Header */}
+                        <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
+                            <span>{t('asset')}</span>
+                            <span className="text-right">{t('balance')}</span>
+                            <span className="text-right">{t('value_usd')}</span>
+                        </div>
+                        {/* Token List */}
+                        {userTokens.map(token => (
+                           <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
+                                <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors duration-200 cursor-pointer">
+                                    {/* Column 1: Asset Info */}
+                                    <div className="flex items-center space-x-4">
+                                        <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                                            {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-primary-900 dark:text-darkPrimary-100">{token.symbol}</p>
+                                            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
+                                        </div>
+                                    </div>
 
-            <div className="border-b border-gray-700 flex space-x-4">
-                 <button onClick={() => setActiveTab('positions')} className={`py-2 px-1 font-semibold transition-colors ${activeTab === 'positions' ? 'text-white border-b-2 border-white' : 'text-gray-400'}`}>Positions</button>
-                 <button onClick={() => setActiveTab('activity')} className={`py-2 px-1 font-semibold transition-colors ${activeTab === 'activity' ? 'text-white border-b-2 border-white' : 'text-gray-400'}`}>Activity</button>
-            </div>
+                                    {/* Column 2: Balance */}
+                                    <div className="text-right font-mono">
+                                        <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
+                                        <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
+                                    </div>
 
-            <div>
-                {activeTab === 'positions' && (
-                     <div className="space-y-2">
-                        {loading ? (
-                            <div className="text-center py-8 text-gray-400 flex items-center justify-center gap-3">
-                                <Loader2 className="w-6 h-6 animate-spin" />
-                                <span>{t('profile_loading_tokens')}</span>
-                            </div>
-                        ) : userTokens.length > 0 ? (
-                            userTokens.map(token => (
-                                <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
-                                    <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-white/5 transition-colors duration-200 cursor-pointer">
-                                        <div className="flex items-center space-x-4">
-                                            <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                                                {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold">{token.symbol}</p>
-                                                <p className="text-sm text-gray-400">{token.name}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right font-mono">
-                                            <p className="font-semibold">{formatNumber(token.balance)}</p>
-                                            <p className="text-sm text-gray-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
-                                        </div>
-                                        <div className="text-right font-semibold font-mono">
-                                            ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                                        </div>
-                                    </a>
-                                </Link>
-                            ))
-                        ) : (
-                            <div className="text-center py-8 text-gray-400">
-                                <p>{t('profile_no_tokens')}</p>
-                            </div>
-                        )}
+                                    {/* Column 3: Value */}
+                                    <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
+                                        ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                    </div>
+                                </a>
+                            </Link>
+                        ))}
+                    </div>
+                ) : (
+                     <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400">
+                        <p>{t('profile_no_tokens')}</p>
                     </div>
                 )}
-                {activeTab === 'activity' && <ActivityTab />}
+            </div>
+            
+            <ComingSoonWrapper>
+                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                    <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
+                    <div className="grid md:grid-cols-3 gap-4">
+                        <StatCard icon={<DollarSign size={24} />} title={t('total_donated')} value={`$${userStats.totalDonated.toFixed(2)}`} />
+                        <StatCard icon={<HandHeart size={24} />} title={t('projects_supported')} value={userStats.projectsSupported} />
+                        <StatCard icon={<Vote size={24} />} title={t('votes_cast')} value={userStats.votesCast} />
+                    </div>
+                </div>
+            </ComingSoonWrapper>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+                <ComingSoonWrapper showMessage={false}>
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <h2 className="text-2xl font-bold mb-4">{t('impact_trophies_nfts')}</h2>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                           {/* Live NFT data would be populated here */}
+                        </div>
+                    </div>
+                </ComingSoonWrapper>
+                 <ComingSoonWrapper showMessage={false}>
+                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                        <h2 className="text-2xl font-bold mb-4">{t('impact_badges')}</h2>
+                         <div className="flex flex-wrap gap-4">
+                            {MOCK_BADGES.map(badge => (
+                                 <div key={badge.id} className="group relative flex flex-col items-center text-center w-24">
+                                    <div className="bg-primary-100 dark:bg-darkPrimary-700 rounded-full p-4 text-accent-500 dark:text-darkAccent-400 group-hover:scale-110 transition-transform">
+                                        {React.cloneElement(badge.icon as React.ReactElement<{ size: number }>, { size: 32 })}
+                                    </div>
+                                    <p className="text-sm font-semibold mt-2">{t(badge.titleKey)}</p>
+                                    <div className="absolute bottom-full mb-2 w-48 bg-primary-900 text-white dark:bg-darkPrimary-950 text-xs rounded py-1 px-2 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                        {t(badge.descriptionKey)}
+                                        <svg className="absolute text-primary-900 dark:text-darkPrimary-950 h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon className="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </ComingSoonWrapper>
             </div>
         </div>
     );

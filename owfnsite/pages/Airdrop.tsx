@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext.js';
 import { Wallet, CheckCircle, XCircle, Gift, Loader2 } from 'lucide-react';
+import { SEO } from '../components/SEO.js';
 
 const MOCK_AIRDROP_AMOUNT = 5000;
 
@@ -83,6 +84,7 @@ export default function Airdrop() {
 
     return (
         <div className="animate-fade-in-up space-y-8">
+            <SEO titleKey="seo_airdrop_title" descriptionKey="seo_airdrop_description" />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('airdrop_title')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">

@@ -3,6 +3,7 @@ import { useAppContext } from '../contexts/AppContext.js';
 import { Vote, PlusCircle, CheckCircle, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import type { GovernanceProposal } from '../lib/types.js';
+import { SEO } from '../components/SEO.js';
 
 const Countdown = ({ endDate }: { endDate: Date }) => {
     const { t } = useAppContext();
@@ -135,6 +136,7 @@ export default function Governance() {
 
     return (
         <div className="animate-fade-in-up space-y-8">
+            <SEO titleKey="seo_governance_title" descriptionKey="seo_governance_description" />
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="text-center md:text-left">
                     <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('governance_title')}</h1>

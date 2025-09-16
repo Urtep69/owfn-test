@@ -7,6 +7,7 @@ import type { Wallet, Token } from '../lib/types.js';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.js';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import { formatNumber } from '../lib/utils.js';
+import { SEO } from '../components/SEO.js';
 
 const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'> }) => {
     const { t, solana } = useAppContext();
@@ -100,6 +101,7 @@ export default function Dashboard() {
 
     return (
         <div className="animate-fade-in-up space-y-8">
+            <SEO titleKey="seo_dashboard_title" descriptionKey="seo_dashboard_description" />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('wallet_monitor')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">

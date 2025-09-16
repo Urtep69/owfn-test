@@ -19,6 +19,7 @@ import { AddressDisplay } from '../components/AddressDisplay.js';
 import type { PresaleTransaction, PresaleStage } from '../lib/types.js';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
+import { SEO } from '../components/SEO.js';
 
 // Get the current (and only) presale stage for this page to use.
 const currentStage: PresaleStage = PRESALE_STAGES[0];
@@ -573,6 +574,7 @@ export default function Presale() {
 
   return (
     <div className="bg-primary-50 dark:bg-darkPrimary-950 text-primary-700 dark:text-darkPrimary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
+      <SEO titleKey="seo_presale_title" descriptionKey="seo_presale_description" />
       <div className="w-full max-w-screen-2xl">
         <div className="mb-4">
             <Link to="/" className="text-primary-500 dark:text-darkPrimary-400 hover:text-accent-500 dark:hover:text-darkAccent-400 transition-colors">

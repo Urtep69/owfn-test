@@ -2,12 +2,14 @@
 import React from 'react';
 import { ROADMAP_DATA } from '../lib/constants.js';
 import { useAppContext } from '../contexts/AppContext.js';
+import { SEO } from '../components/SEO.js';
 
 export default function Roadmap() {
   const { t } = useAppContext();
 
   return (
     <div className="animate-fade-in-up">
+      <SEO titleKey="seo_roadmap_title" descriptionKey="seo_roadmap_description" />
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('roadmap_title')}</h1>
         <p className="mt-4 text-lg text-primary-600 dark:text-darkPrimary-400">

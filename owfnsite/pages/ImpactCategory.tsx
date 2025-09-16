@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
 import { CaseCard } from '../components/CaseCard.js';
 import { ArrowLeft, HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
+import { SEO } from '../components/SEO.js';
 
 const categoryDetails: { [key: string]: { icon: React.ReactNode, titleKey: string, descKey: string } } = {
     'Health': {
@@ -43,8 +45,15 @@ export default function ImpactCategory() {
         );
     }
 
+    const categoryTitleForSeo = t(`category_${categoryName.toLowerCase().replace(/\s+/g, '_')}`, { defaultValue: categoryName });
+
     return (
         <div className="animate-fade-in-up space-y-8">
+            <SEO 
+                titleKey="seo_impact_category_title" 
+                descriptionKey="seo_impact_category_description"
+                replacements={{ category: categoryTitleForSeo }}
+            />
             <Link to="/impact" className="inline-flex items-center gap-2 text-accent-600 dark:text-darkAccent-400 hover:underline">
                 <ArrowLeft size={16} /> {t('back_to_all_cases')}
             </Link>

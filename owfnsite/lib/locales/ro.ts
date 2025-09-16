@@ -1,4 +1,3 @@
-
 export const ro = {
     // Navigation
     home: `Acasă`,

@@ -4,6 +4,7 @@ import { Link } from 'wouter';
 import { Target, Users, Zap } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.js';
 import { OWFN_LOGO_URL } from '../lib/constants.js';
+import { SEO } from '../components/SEO.js';
 
 const FeatureCard = ({ icon, title, children }: { icon: React.ReactNode, title: string, children: React.ReactNode }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all duration-300 transform">
@@ -20,6 +21,7 @@ export default function Home() {
 
     return (
         <div className="space-y-16 animate-fade-in-up">
+            <SEO titleKey="seo_home_title" descriptionKey="seo_home_description" />
             <section className="text-center bg-gradient-to-br from-white to-primary-200 dark:from-darkPrimary-800 dark:to-darkPrimary-950 rounded-3xl p-8 md:p-16 shadow-3d-lg -mt-8 -mx-8">
                 <div className="relative z-10 flex flex-col items-center">
                     <div className="mb-6 bg-white/20 dark:bg-darkPrimary-950/20 rounded-full w-48 h-48 p-3 shadow-lg backdrop-blur-sm border-2 border-primary-300/30 dark:border-darkPrimary-100/30">

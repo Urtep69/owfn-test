@@ -7,6 +7,7 @@ import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 import { translateText } from '../services/geminiService.js';
 import { SUPPORTED_LANGUAGES } from '../lib/constants.js';
 import { HeartHandshake, BookOpen, HomeIcon } from 'lucide-react';
+import { SEO } from '../components/SEO.js';
 
 const AdminPortal = ({ onAddCase }: { onAddCase: (newCase: SocialCase) => void }) => {
     const { t } = useAppContext();
@@ -127,6 +128,7 @@ export default function ImpactPortal() {
 
     return (
         <div className="animate-fade-in-up space-y-8">
+            <SEO titleKey="seo_impact_portal_title" descriptionKey="seo_impact_portal_description" />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('about_impact_areas_title')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">

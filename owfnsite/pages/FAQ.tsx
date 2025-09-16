@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { ChevronDown, HelpCircle, Search } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.js';
+import { SEO } from '../components/SEO.js';
 
 const FaqItem = ({ question, answer, isOpen, onClick }: { question: string, answer: string, isOpen: boolean, onClick: () => void }) => {
     return (
@@ -87,6 +88,7 @@ export default function FAQ() {
 
     return (
         <div className="animate-fade-in-up max-w-4xl mx-auto space-y-8">
+            <SEO titleKey="seo_faq_title" descriptionKey="seo_faq_description" />
             <div className="text-center">
                 <HelpCircle className="mx-auto w-16 h-16 text-accent-500 dark:text-darkAccent-500 mb-4" />
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('faq_title')}</h1>

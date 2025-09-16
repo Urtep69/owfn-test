@@ -4,12 +4,14 @@ import React from 'react';
 import { Link } from 'wouter';
 import { HeartHandshake, BookOpen, HomeIcon, Globe, Handshake as HandshakeIcon, Heart, Zap, ShieldCheck, Link as LinkIcon, CheckCircle } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext.js';
+import { SEO } from '../components/SEO.js';
 
 export default function About() {
     const { t } = useAppContext();
 
     return (
         <div className="animate-fade-in-up space-y-12">
+            <SEO titleKey="seo_about_title" descriptionKey="seo_about_description" />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('about_title')}</h1>
                 <p className="mt-4 text-lg text-primary-600 dark:text-darkPrimary-400">

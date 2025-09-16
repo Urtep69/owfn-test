@@ -5,6 +5,7 @@ import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 import { ProgressBar } from '../components/ProgressBar.js';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import type { VestingSchedule } from '../lib/types.js';
+import { SEO } from '../components/SEO.js';
 
 
 const ConnectWalletPrompt = () => {
@@ -129,61 +130,74 @@ const AdminPortal = () => {
     };
 
     return (
-        <div className="mt-12 space-y-8">
-            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
-                <h2 className="text-2xl font-bold mb-6 flex items-center"><PlusCircle className="mr-3 text-accent-500 dark:text-darkAccent-400"/>{t('create_vesting_schedule')}</h2>
-                <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
-                    <input type="text" placeholder={t('recipient_address')} value={recipient} onChange={e => setRecipient(e.target.value)} required className="w-full p-3 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
-                    <input type="number" placeholder={t('total_amount_owfn')} value={amount} onChange={e => setAmount(e.target.value)} required className="w-full p-3 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
-                    <input type="number" placeholder={t('vesting_duration_months')} value={duration} onChange={e => setDuration(e.target.value)} required className="w-full p-3 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
-                    <input type="number" placeholder={t('cliff_period_months')} value={cliff} onChange={e => setCliff(e.target.value)} required className="w-full p-3 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
-                    <button type="submit" className="md:col-span-2 w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 py-3 rounded-lg font-bold hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors">{t('create_schedule')}</button>
-                </form>
-            </div>
-            <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d">
-                 <h2 className="text-2xl font-bold mb-6">{t('all_vesting_schedules')}</h2>
-                 <div className="space-y-4">
-                     {vestingSchedules.map(schedule => (
-                         <div key={schedule.recipientAddress} className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg">
-                            <AddressDisplay address={schedule.recipientAddress}/>
-                            <p className="text-sm">{t('total_allocation')}: {schedule.totalAmount.toLocaleString()} OWFN</p>
-                            <p className="text-sm">{t('end_date')}: {new Intl.DateTimeFormat('en-CA').format(schedule.endDate)}</p>
-                         </div>
-                     ))}
-                 </div>
+        <div className="mt-12 space-y-6">
+            <h2 className="text-3xl font-bold text-center">{t('create_vesting_schedule')}</h2>
+            <form onSubmit={handleSubmit} className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d space-y-4 max-w-lg mx-auto">
+                <div>
+                    <label htmlFor="recipient" className="block text-sm font-medium mb-1">{t('recipient_address')}</label>
+                    <input id="recipient" type="text" value={recipient} onChange={e => setRecipient(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
+                </div>
+                 <div>
+                    <label htmlFor="amount" className="block text-sm font-medium mb-1">{t('total_amount_owfn')}</label>
+                    <input id="amount" type="number" value={amount} onChange={e => setAmount(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
+                </div>
+                 <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label htmlFor="duration" className="block text-sm font-medium mb-1">{t('vesting_duration_months')}</label>
+                        <input id="duration" type="number" value={duration} onChange={e => setDuration(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
+                    </div>
+                    <div>
+                        <label htmlFor="cliff" className="block text-sm font-medium mb-1">{t('cliff_period_months')}</label>
+                        <input id="cliff" type="number" value={cliff} onChange={e => setCliff(e.target.value)} required className="w-full p-2 bg-primary-100 dark:bg-darkPrimary-700 rounded-md" />
+                    </div>
+                </div>
+                <button type="submit" className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 py-3 rounded-lg font-bold hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors">
+                    <PlusCircle className="inline-block mr-2" size={20}/>
+                    {t('create_schedule')}
+                </button>
+            </form>
+             <div className="mt-8">
+                <h3 className="text-2xl font-bold text-center mb-4">{t('all_vesting_schedules')}</h3>
+                <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d space-y-4 max-w-lg mx-auto">
+                    {vestingSchedules.length > 0 ? vestingSchedules.map((schedule, index) => (
+                        <div key={index} className="border-b border-primary-200 dark:border-darkPrimary-700 pb-2 last:border-b-0">
+                            <AddressDisplay address={schedule.recipientAddress} />
+                            <p className="text-sm">Total: {schedule.totalAmount.toLocaleString()} OWFN, Claimed: {schedule.claimedAmount.toLocaleString()} OWFN</p>
+                        </div>
+                    )) : <p className="text-center text-sm text-primary-500">No vesting schedules created yet.</p>}
+                </div>
             </div>
         </div>
     );
 };
 
-
 export default function Vesting() {
     const { t, solana, vestingSchedules } = useAppContext();
-
-    const userSchedule = useMemo(() => {
-        if (!solana.connected || !solana.address) return null;
-        return vestingSchedules.find(s => s.recipientAddress === solana.address);
-    }, [solana.connected, solana.address, vestingSchedules]);
-
     const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
+    const userSchedule = useMemo(() => {
+        if (!solana.address) return undefined;
+        return vestingSchedules.find(s => s.recipientAddress === solana.address);
+    }, [vestingSchedules, solana.address]);
 
     return (
         <div className="animate-fade-in-up space-y-8">
+            <SEO titleKey="seo_vesting_title" descriptionKey="seo_vesting_description" />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('vesting_title')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">
                     {t('vesting_subtitle')}
                 </p>
             </div>
-            
-            {!solana.connected && <ConnectWalletPrompt />}
 
-            {solana.connected && userSchedule && <VestingScheduleDetails schedule={userSchedule} />}
-            
-            {solana.connected && !userSchedule && !isAdmin && <NoScheduleInfo />}
+            {!solana.connected ? (
+                <ConnectWalletPrompt />
+            ) : userSchedule ? (
+                <VestingScheduleDetails schedule={userSchedule} />
+            ) : !isAdmin ? (
+                <NoScheduleInfo />
+            ) : null}
 
             {isAdmin && <AdminPortal />}
-
         </div>
     );
 }

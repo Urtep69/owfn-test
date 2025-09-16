@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.js';
 import { Wallet, TrendingUp, Gift, Database, HeartHandshake } from 'lucide-react';
 import { OwfnIcon } from '../components/IconComponents.js';
+import { SEO } from '../components/SEO.js';
 
 const StatCard = ({ icon, title, value, subtext }: { icon: React.ReactNode, title: string, value: string, subtext?: string }) => (
     <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d">
@@ -157,6 +158,7 @@ export default function Staking() {
 
     return (
         <div className="animate-fade-in-up space-y-8">
+            <SEO titleKey="seo_staking_title" descriptionKey="seo_staking_description" />
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('staking_title')}</h1>
                 <p className="mt-4 max-w-2xl mx-auto text-lg text-primary-600 dark:text-darkPrimary-400">

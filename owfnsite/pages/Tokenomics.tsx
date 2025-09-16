@@ -4,6 +4,7 @@ import { AllocationChart } from '../components/AllocationChart.js';
 import { TOKEN_DETAILS, TOKEN_ALLOCATIONS } from '../lib/constants.js';
 import { useAppContext } from '../contexts/AppContext.js';
 import { OwfnIcon } from '../components/IconComponents.js';
+import { SEO } from '../components/SEO.js';
 
 const DetailItem = ({ label, value }: { label: string, value: React.ReactNode }) => (
     <div className="flex justify-between items-center py-3 border-b border-primary-200 dark:border-darkPrimary-700">
@@ -17,6 +18,7 @@ export default function Tokenomics() {
 
     return (
         <div className="animate-fade-in-up">
+            <SEO titleKey="seo_tokenomics_title" descriptionKey="seo_tokenomics_description" />
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-bold text-accent-600 dark:text-darkAccent-400">{t('tokenomics_title')}</h1>
                 <p className="mt-4 text-lg text-primary-600 dark:text-darkPrimary-400">

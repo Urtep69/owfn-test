@@ -5,6 +5,7 @@ import { AllocationChart } from '../components/AllocationChart.js';
 import { OwfnIcon } from '../components/IconComponents.js';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import { CheckCircle, Users, BarChart2, Map as MapIcon, Star, Link as LinkIcon, FileText } from 'lucide-react';
+import { SEO } from '../components/SEO.js';
 
 const Section = ({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) => (
     <section className="bg-white dark:bg-darkPrimary-800 p-8 rounded-xl shadow-3d-lg mb-12">
@@ -32,6 +33,7 @@ export default function Whitepaper() {
 
     return (
         <div className="animate-fade-in-up">
+            <SEO titleKey="seo_whitepaper_title" descriptionKey="seo_whitepaper_description" />
             <header className="text-center mb-16">
                 <FileText className="mx-auto w-20 h-20 text-accent-500 dark:text-darkAccent-500 mb-4" />
                 <h1 className="text-5xl font-extrabold text-accent-600 dark:text-darkAccent-400">{t('whitepaper_title')}</h1>
