@@ -134,7 +134,8 @@ export const ro = {
     you_receive: `Primești`,
     min_buy: `Cumpărare minimă`,
     max_buy: `Cumpărare maximă`,
-    presale_purchase_success_alert: `Cumpărare reușită! Ați contribuit cu {amount} SOL. Tokenurile dumneavoastră de {owfnAmount} OWFN sunt rezervate și vor fi trimise automat prin airdrop în portofelul dumneavoastră la sfârșitul prevânzării.`,
+    presale_purchase_success_title: `Achiziție Reușită!`,
+    presale_purchase_success_alert: `Ați contribuit cu {amount} SOL. Tokenurile dumneavoastră de {owfnAmount} OWFN sunt rezervate și vor fi trimise automat prin airdrop în portofelul dumneavoastră la sfârșitul prevânzării.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Vândut {progress}%`,
     presale_buy_info: `Cumpără (Min: {min} SOL, Max: {max} SOL)`,
@@ -166,6 +167,7 @@ export const ro = {
     presale_amount_error: `Suma trebuie să fie între {min} și {max} SOL.`,
     presale_amount_error_no_min: `Suma trebuie să fie mai mare de 0 și nu mai mult de {max} SOL.`,
     live_presale_feed: `Feed Live Prevânzare`,
+    wallet: `Portofel`,
     sol_spent: `SOL Cheltuit`,
     owfn_received: `OWFN Primit`,
     time: `Oră`,
@@ -198,7 +200,7 @@ export const ro = {
     live_progress: `Progres Live`,
     participate_now: `Participă Acum`,
     bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) la {maxPercentage}% ({maxThreshold} SOL+)`,
-    
+
     // Donations Page
     make_donation: `Fă o Donație`,
     donation_desc: `Susține inițiativele noastre de impact social donând crypto. Toate fondurile merg direct către Trezoreria de Impact.`,
@@ -216,7 +218,8 @@ export const ro = {
     donations_form_title: `Formular de Donație`,
     donations_stats_title: `Statistici Donații Live`,
     donated: `Donat`,
-    donation_success_alert: `Donație reușită! Vă mulțumim pentru contribuția de {amount} {tokenSymbol}.`,
+    donation_success_title: `Donație Reușită!`,
+    donation_success_alert: `Vă mulțumim pentru contribuția de {amount} {tokenSymbol}.`,
     donation_no_token_balance: `Nu dețineți niciun {symbol}.`,
     live_donation_feed: `Feed Donații Live`,
     amount_donated: `Suma Donată`,
@@ -396,10 +399,15 @@ export const ro = {
 
     // Alerts & Messages
     transaction_success_alert: `Tranzacție reușită! Ați trimis {amount} {tokenSymbol}.`,
+    transaction_failed_title: `Tranzacție Eșuată`,
     transaction_failed_alert: `Tranzacție eșuată. Vă rugăm să încercați din nou.`,
     translation_error_alert: `A apărut o eroare în timpul traducerii. Cazul nu a fost creat. Vă rugăm să încercați din nou.`,
     invalid_amount_generic: `Vă rugăm să introduceți o sumă validă.`,
     vote_success_alert: `Votul dumneavoastră a fost înregistrat cu succes!`,
+    transaction_cancelled_title: `Tranzacție Anulată`,
+    transaction_cancelled_message: `Ați anulat tranzacția. Nu au fost trimise fonduri.`,
+    copy_success_title: `Copiat în Clipboard`,
+    copy_success_message: `Adresa a fost copiată cu succes în clipboard.`,
 
     // Footer
     footer_copyright: `© {year} Official World Family Network. Toate drepturile rezervate.`,

@@ -110,7 +110,7 @@ const DonationStats = ({ allTransactions }: { allTransactions: DonationTransacti
 
 // --- Main Page Component ---
 export default function Donations() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana, setWalletModalOpen, addNotification } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('SOL');
 
@@ -243,15 +243,26 @@ export default function Donations() {
         }
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
-            alert(t('invalid_amount_generic'));
+            addNotification({ type: 'error', title: t('transaction_failed_title'), message: t('invalid_amount_generic') });
             return;
         }
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
         if (result.success) {
-            alert(t('donation_success_alert', result.params));
+            addNotification({
+                type: 'success',
+                title: t('donation_success_title'),
+                message: t('donation_success_alert', result.params),
+                txSignature: result.signature,
+                tokenSymbol: selectedToken,
+                amount: numAmount,
+            });
             setAmount('');
         } else {
-            alert(t(result.messageKey, result.params));
+            addNotification({
+                type: 'error',
+                title: result.isCancellation ? t('transaction_cancelled_title') : t('transaction_failed_title'),
+                message: t(result.messageKey, result.params)
+            });
         }
     };
     

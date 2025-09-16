@@ -3,9 +3,18 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
+import { WalletSignTransactionError } from '@solana/wallet-adapter-base';
 import type { Token } from '../lib/types.js';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL } from '../lib/constants.js';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.js';
+
+interface SendTransactionResult {
+  success: boolean;
+  messageKey: string;
+  signature?: string;
+  params?: Record<string, string | number>;
+  isCancellation?: boolean;
+}
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
 export interface UseSolanaReturn {
@@ -26,7 +35,7 @@ export interface UseSolanaReturn {
   connection: Connection;
   disconnectWallet: () => Promise<void>;
   getWalletBalances: (walletAddress: string) => Promise<Token[]>;
-  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
+  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<SendTransactionResult>;
   stakeTokens: (amount: number) => Promise<any>;
   unstakeTokens: (amount: number) => Promise<any>;
   claimRewards: () => Promise<any>;
@@ -203,7 +212,7 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, address, getWalletBalances]);
 
- const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
+ const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<SendTransactionResult> => {
     if (!connected || !publicKey || !signTransaction) {
       return { success: false, messageKey: 'connect_wallet_first' };
     }
@@ -296,13 +305,16 @@ export const useSolana = (): UseSolanaReturn => {
     } catch (error) {
         console.error("Transaction failed:", error);
         setLoading(false);
+         if (error instanceof WalletSignTransactionError && error.message.includes('User rejected the request')) {
+            return { success: false, messageKey: 'transaction_cancelled_message', isCancellation: true };
+        }
         return { success: false, messageKey: 'transaction_failed_alert' };
     }
   }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
-      alert("This feature is coming soon and requires on-chain programs to be deployed.");
+      // alert("This feature is coming soon and requires on-chain programs to be deployed.");
       return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
   }
 

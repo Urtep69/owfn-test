@@ -21,7 +21,7 @@ const mockUpdates = [
 ];
 
 export default function ImpactCaseDetail() {
-    const { t, solana, currentLanguage, socialCases, setWalletModalOpen } = useAppContext();
+    const { t, solana, currentLanguage, socialCases, setWalletModalOpen, addNotification } = useAppContext();
     const params = useParams();
     const id = params?.['id'];
     const socialCase = socialCases.find(c => c.id === id);
@@ -79,17 +79,28 @@ export default function ImpactCaseDetail() {
 
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
-            alert(t('invalid_amount_generic'));
+            addNotification({ type: 'error', title: t('transaction_failed_title'), message: t('invalid_amount_generic') });
             return;
         }
 
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
         
         if (result.success) {
-            alert(t('case_donation_success_alert', { title }));
+            addNotification({
+                type: 'success',
+                title: t('donation_success_title'),
+                message: t('case_donation_success_alert', { title }),
+                txSignature: result.signature,
+                tokenSymbol: selectedToken,
+                amount: numAmount,
+            });
             setAmount('');
         } else {
-            alert(t(result.messageKey, result.params));
+            addNotification({
+                type: 'error',
+                title: result.isCancellation ? t('transaction_cancelled_title') : t('transaction_failed_title'),
+                message: t(result.messageKey, result.params)
+            });
         }
     };
     

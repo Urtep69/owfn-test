@@ -316,7 +316,7 @@ const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bo
 
 
 export default function Presale() {
-  const { t, solana, setWalletModalOpen, presaleProgress, isAdmin } = useAppContext();
+  const { t, solana, setWalletModalOpen, presaleProgress, isAdmin, addNotification } = useAppContext();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -528,10 +528,17 @@ export default function Presale() {
     const result = await solana.sendTransaction(currentStage.distributionWallet, numSolAmount, 'SOL');
 
     if (result.success && result.signature) {
-        alert(t('presale_purchase_success_alert', { 
-            amount: numSolAmount.toFixed(2), 
-            owfnAmount: calculation.total.toLocaleString() 
-        }));
+        addNotification({
+            type: 'success',
+            title: t('presale_purchase_success_title'),
+            message: t('presale_purchase_success_alert', { 
+                amount: numSolAmount.toFixed(4), 
+                owfnAmount: calculation.total.toLocaleString() 
+            }),
+            txSignature: result.signature,
+            tokenSymbol: 'SOL',
+            amount: numSolAmount,
+        });
         const newTx: PresaleTransaction = {
             id: result.signature,
             address: solana.address!,
@@ -542,7 +549,11 @@ export default function Presale() {
         setLatestPurchase(newTx);
         setSolAmount('');
     } else {
-        alert(t(result.messageKey));
+        addNotification({
+            type: 'error',
+            title: result.isCancellation ? t('transaction_cancelled_title') : t('transaction_failed_title'),
+            message: t(result.messageKey)
+        });
     }
   };
 

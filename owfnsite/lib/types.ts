@@ -67,12 +67,7 @@ export interface TokenExtension {
 
 export interface TokenDetails extends Token {
     description?: string;
-    links?: {
-        website?: string;
-        twitter?: string;
-        telegram?: string;
-        discord?: string;
-    };
+    links?: Record<string, string>;
     marketCap?: number;
     volume24h?: number;
     price24hChange?: number;
@@ -97,29 +92,19 @@ export interface TokenDetails extends Token {
     updateAuthority?: string | null;
     tokenStandard?: 'SPL Token' | 'Token-2022' | string;
     tokenExtensions?: TokenExtension[];
-    poolInfo?: {
-        baseToken: { address: string, amount: number },
-        quoteToken: { address: string, amount: number }
-    }
-    lpBurned?: number; 
 }
 
 export interface LiveTransaction {
-    id: string; // signature
-    time: Date; 
+    id: string;
+    time: string;
     type: 'buy' | 'sell';
-    priceUsd: number;
-    tokenAmount: number;
-    solAmount: number;
-    maker: string;
-}
-
-export interface CandlestickData {
-    time: number;
-    open: number;
-    high: number;
-    low: number;
-    close: number;
+    price: number;
+    amount: number;
+    totalUsd?: number;
+    priceSol?: number;
+    amountSol?: number;
+    maker?: string;
+    othersCount?: number;
 }
 
 export interface VestingSchedule {
@@ -132,7 +117,7 @@ export interface VestingSchedule {
 }
 
 export interface GovernanceProposal {
-  id:string;
+  id: string;
   title: Record<string, string>;
   description: Record<string, string>;
   proposer: string;
@@ -212,4 +197,14 @@ export interface DonationTransaction {
   amount: number;
   tokenSymbol: string;
   time: Date;
+}
+
+export interface Notification {
+  id: string;
+  type: 'success' | 'error' | 'info';
+  title: string;
+  message: string;
+  txSignature?: string;
+  tokenSymbol?: string;
+  amount?: number;
 }

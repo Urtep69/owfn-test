@@ -134,7 +134,8 @@ export const en = {
     you_receive: `You Receive`,
     min_buy: `Min buy`,
     max_buy: `Max buy`,
-    presale_purchase_success_alert: `Purchase successful! You contributed {amount} SOL. Your {owfnAmount} OWFN tokens are reserved and will be automatically airdropped to your wallet at the end of the presale.`,
+    presale_purchase_success_title: `Purchase Successful!`,
+    presale_purchase_success_alert: `You contributed {amount} SOL. Your {owfnAmount} OWFN tokens are reserved and will be automatically airdropped to your wallet at the end of the presale.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Sold {progress}%`,
     presale_buy_info: `Buy (Min: {min} SOL, Max: {max} SOL)`,
@@ -166,6 +167,7 @@ export const en = {
     presale_amount_error: `Amount must be between {min} and {max} SOL.`,
     presale_amount_error_no_min: `Amount must be greater than 0 and no more than {max} SOL.`,
     live_presale_feed: `Live Presale Feed`,
+    wallet: `Wallet`,
     sol_spent: `SOL Spent`,
     owfn_received: `OWFN Received`,
     time: `Time`,
@@ -216,7 +218,8 @@ export const en = {
     donations_form_title: `Donation Form`,
     donations_stats_title: `Live Donation Statistics`,
     donated: `Donated`,
-    donation_success_alert: `Donation successful! Thank you for your contribution of {amount} {tokenSymbol}.`,
+    donation_success_title: `Donation Successful!`,
+    donation_success_alert: `Thank you for your contribution of {amount} {tokenSymbol}.`,
     donation_no_token_balance: `You do not own any {symbol}.`,
     live_donation_feed: `Live Donation Feed`,
     amount_donated: `Amount Donated`,
@@ -396,10 +399,15 @@ export const en = {
 
     // Alerts & Messages
     transaction_success_alert: `Transaction successful! You sent {amount} {tokenSymbol}.`,
+    transaction_failed_title: `Transaction Failed`,
     transaction_failed_alert: `Transaction failed. Please try again.`,
     translation_error_alert: `An error occurred during translation. The case was not created. Please try again.`,
     invalid_amount_generic: `Please enter a valid amount.`,
     vote_success_alert: `Your vote has been successfully cast!`,
+    transaction_cancelled_title: `Transaction Cancelled`,
+    transaction_cancelled_message: `You have cancelled the transaction. No funds have been sent.`,
+    copy_success_title: `Copied to Clipboard`,
+    copy_success_message: `The address has been successfully copied to your clipboard.`,
 
     // Footer
     footer_copyright: `© {year} Official World Family Network. All rights reserved.`,
