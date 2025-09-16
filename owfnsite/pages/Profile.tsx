@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
@@ -8,6 +7,8 @@ import type { ImpactBadge, ImpactNFT } from '../lib/types.js';
 import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.js';
 import { formatNumber } from '../lib/utils.js';
+import { AnimatedNumber } from '../components/AnimatedNumber.js';
+import { SkeletonLoader } from '../components/SkeletonLoader.js';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -15,15 +16,34 @@ const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge3', titleKey: 'badge_diverse_donor', descriptionKey: 'badge_diverse_donor_desc', icon: <Gem /> },
 ];
 
-const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => (
-    <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg flex items-center space-x-4">
-        <div className="text-accent-500 dark:text-darkAccent-400">{icon}</div>
-        <div>
-            <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
-            <p className="text-xl font-bold">{value}</p>
+const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string | number }) => {
+    const isCurrency = typeof value === 'string' && value.startsWith('$');
+    const numericValue = typeof value === 'string' ? parseFloat(value.replace(/[^0-9.]/g, '')) : value;
+    
+    const formatter = (val: number) => {
+        const options: Intl.NumberFormatOptions = {
+            minimumFractionDigits: isCurrency ? 2 : 0,
+            maximumFractionDigits: isCurrency ? 2 : 0,
+        };
+        const formatted = val.toLocaleString(undefined, options);
+        return isCurrency ? `$${formatted}` : formatted;
+    };
+
+    return (
+        <div className="bg-primary-100 dark:bg-darkPrimary-700/50 p-4 rounded-lg flex items-center space-x-4">
+            <div className="text-accent-500 dark:text-darkAccent-400">{icon}</div>
+            <div>
+                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+                 <div className="text-xl font-bold">
+                    {typeof numericValue === 'number' && !isNaN(numericValue)
+                        ? <AnimatedNumber value={numericValue} formatter={formatter} />
+                        : <span>{value}</span>
+                    }
+                </div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
@@ -74,16 +94,39 @@ export default function Profile() {
                     </div>
                     <div className="text-right">
                         <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('total_value')}</p>
-                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                            {loading ? '-' : `$${totalUsdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                        </p>
+                        <AnimatedNumber 
+                            value={totalUsdValue}
+                            formatter={(val) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                            className="text-2xl font-bold text-green-600 dark:text-green-400"
+                        />
                     </div>
                 </div>
                 
                 {loading ? (
-                    <div className="text-center py-8 text-primary-600 dark:text-darkPrimary-400 flex items-center justify-center gap-3">
-                        <Loader2 className="w-6 h-6 animate-spin" />
-                        <span>{t('profile_loading_tokens')}</span>
+                    <div className="space-y-2">
+                        <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
+                            <span>{t('asset')}</span>
+                            <span className="text-right">{t('balance')}</span>
+                            <span className="text-right">{t('value_usd')}</span>
+                        </div>
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg">
+                                <div className="flex items-center space-x-4">
+                                    <SkeletonLoader className="w-10 h-10 rounded-full flex-shrink-0" />
+                                    <div>
+                                        <SkeletonLoader className="h-5 w-16 mb-1" />
+                                        <SkeletonLoader className="h-4 w-24" />
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <SkeletonLoader className="h-5 w-20 ml-auto mb-1" />
+                                    <SkeletonLoader className="h-4 w-24 ml-auto" />
+                                </div>
+                                <div className="text-right">
+                                    <SkeletonLoader className="h-5 w-24 ml-auto" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : userTokens.length > 0 ? (
                     <div className="space-y-2">

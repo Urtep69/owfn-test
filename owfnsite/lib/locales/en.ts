@@ -220,6 +220,7 @@ export const en = {
     donated: `Donated`,
     donation_success_title: `Donation Successful!`,
     donation_success_alert: `Thank you for your contribution of {amount} {tokenSymbol}.`,
+    case_donation_success_alert: `Thank you for your donation to "{title}"!`,
     donation_no_token_balance: `You do not own any {symbol}.`,
     live_donation_feed: `Live Donation Feed`,
     amount_donated: `Amount Donated`,
@@ -270,6 +271,7 @@ export const en = {
     badge_diverse_donor: `Diverse Donor`,
     badge_diverse_donor_desc: `Awarded for donating to projects in 3 different categories.`,
     asset: `Asset`,
+    balance: `Balance`,
     value_usd: `Value (USD)`,
 
     // Impact Portal
@@ -292,7 +294,6 @@ export const en = {
     back_to_category_cases: `Back to {category} cases`,
     support_this_cause: `Support this Cause`,
     case_not_found: `Case not found`,
-    case_donation_success_alert: `Thank you for your donation to "{title}"!`,
     admin_saving_case: `Translating & Saving...`,
     admin_fill_fields_alert: `Please fill out all required fields.`,
     category_health: `Health`,
@@ -463,7 +464,6 @@ export const en = {
     my_staked_balance: `My Staked Balance`,
     stake: `Stake`,
     unstake: `Unstake`,
-    balance: `Balance`,
     stake_owfn: `Stake OWFN`,
     unstake_owfn: `Unstake OWFN`,
     my_rewards: `My Rewards`,

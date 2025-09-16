@@ -7,6 +7,8 @@ import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../comp
 import { AlertTriangle, Info, BarChart2, CalendarDays, TrendingUp, History } from 'lucide-react';
 import { LiveDonationFeed } from '../components/LiveDonationFeed.js';
 import type { DonationTransaction } from '../lib/types.js';
+import { AnimatedNumber } from '../components/AnimatedNumber.js';
+import { SkeletonLoader } from '../components/SkeletonLoader.js';
 
 const tokens = [
     { symbol: 'OWFN', icon: <OwfnIcon /> },
@@ -16,6 +18,22 @@ const tokens = [
 ];
 
 // --- New Local Components for this page ---
+const DonationStatsCardSkeleton = () => (
+    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d border border-primary-200 dark:border-darkPrimary-700/50">
+        <div className="flex items-center gap-3 mb-4">
+            <SkeletonLoader className="w-8 h-8 rounded-full" />
+            <SkeletonLoader className="h-6 w-3/4" />
+        </div>
+        <div className="space-y-1 text-sm">
+            {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex justify-between items-center py-2 border-b border-primary-200/50 dark:border-darkPrimary-700/50 last:border-b-0">
+                    <SkeletonLoader className="h-5 w-1/3" />
+                    <SkeletonLoader className="h-5 w-1/4" />
+                </div>
+            ))}
+        </div>
+    </div>
+);
 
 const DonationStatsCard = ({ tokenSymbol, transactions, title }: { tokenSymbol: string, transactions: DonationTransaction[], title: string }) => {
     const { t } = useAppContext();
@@ -43,17 +61,22 @@ const DonationStatsCard = ({ tokenSymbol, transactions, title }: { tokenSymbol: 
         return { totalToday, totalLastWeek, totalLastMonth, totalAllTime };
     }, [transactions]);
 
-    const StatRow = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: number }) => (
-        <div className="flex justify-between items-center py-2 border-b border-primary-200/50 dark:border-darkPrimary-700/50 last:border-b-0">
-            <div className="flex items-center gap-2 text-primary-600 dark:text-darkPrimary-400">
-                {icon}
-                <span>{label}</span>
+    const StatRow = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: number }) => {
+        const numberFormatter = (val: number) => val.toLocaleString(undefined, { maximumFractionDigits: 2 });
+        return (
+            <div className="flex justify-between items-center py-2 border-b border-primary-200/50 dark:border-darkPrimary-700/50 last:border-b-0">
+                <div className="flex items-center gap-2 text-primary-600 dark:text-darkPrimary-400">
+                    {icon}
+                    <span>{label}</span>
+                </div>
+                <AnimatedNumber 
+                    value={value} 
+                    formatter={numberFormatter}
+                    className="font-mono font-semibold text-primary-800 dark:text-darkPrimary-200"
+                />
             </div>
-            <span className="font-mono font-semibold text-primary-800 dark:text-darkPrimary-200">
-                {value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-            </span>
-        </div>
-    );
+        );
+    };
 
     const getTokenIcon = (symbol: string) => {
         switch (symbol) {
@@ -81,7 +104,7 @@ const DonationStatsCard = ({ tokenSymbol, transactions, title }: { tokenSymbol: 
     );
 };
 
-const DonationStats = ({ allTransactions }: { allTransactions: DonationTransaction[] }) => {
+const DonationStats = ({ allTransactions, isLoading }: { allTransactions: DonationTransaction[], isLoading: boolean }) => {
     const { t } = useAppContext();
 
     const categorizedTransactions = useMemo(() => {
@@ -93,15 +116,23 @@ const DonationStats = ({ allTransactions }: { allTransactions: DonationTransacti
         }
         return categories;
     }, [allTransactions]);
+    
+    const shouldShowSkeletons = isLoading && allTransactions.length === 0;
 
     return (
         <div>
             <h2 className="text-3xl font-bold text-center mb-8">{t('donations_stats_title')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <DonationStatsCard tokenSymbol="SOL" transactions={categorizedTransactions.SOL} title={t('donations_sol_stats_title')} />
-                <DonationStatsCard tokenSymbol="USDC" transactions={categorizedTransactions.USDC} title={t('donations_usdc_stats_title')} />
-                <DonationStatsCard tokenSymbol="USDT" transactions={categorizedTransactions.USDT} title={t('donations_usdt_stats_title')} />
-                <DonationStatsCard tokenSymbol="OWFN" transactions={categorizedTransactions.OWFN} title={t('donations_owfn_stats_title')} />
+                 {shouldShowSkeletons ? (
+                    [...Array(4)].map((_, i) => <DonationStatsCardSkeleton key={i} />)
+                ) : (
+                    <>
+                        <DonationStatsCard tokenSymbol="SOL" transactions={categorizedTransactions.SOL} title={t('donations_sol_stats_title')} />
+                        <DonationStatsCard tokenSymbol="USDC" transactions={categorizedTransactions.USDC} title={t('donations_usdc_stats_title')} />
+                        <DonationStatsCard tokenSymbol="USDT" transactions={categorizedTransactions.USDT} title={t('donations_usdt_stats_title')} />
+                        <DonationStatsCard tokenSymbol="OWFN" transactions={categorizedTransactions.OWFN} title={t('donations_owfn_stats_title')} />
+                    </>
+                )}
             </div>
         </div>
     );
@@ -304,7 +335,7 @@ export default function Donations() {
                 <p className="font-semibold">{t('donation_solana_warning')}</p>
             </div>
             
-            <DonationStats allTransactions={allDonations} />
+            <DonationStats allTransactions={allDonations} isLoading={isLoading} />
             
             <div className="grid lg:grid-cols-2 gap-12">
                 <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d lg:sticky top-24">

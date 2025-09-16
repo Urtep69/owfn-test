@@ -220,6 +220,7 @@ export const ro = {
     donated: `Donat`,
     donation_success_title: `Donație Reușită!`,
     donation_success_alert: `Vă mulțumim pentru contribuția de {amount} {tokenSymbol}.`,
+    case_donation_success_alert: `Vă mulțumim pentru donația către "{title}"!`,
     donation_no_token_balance: `Nu dețineți niciun {symbol}.`,
     live_donation_feed: `Feed Donații Live`,
     amount_donated: `Suma Donată`,
@@ -270,6 +271,7 @@ export const ro = {
     badge_diverse_donor: `Donator Divers`,
     badge_diverse_donor_desc: `Acordat pentru donații la proiecte din 3 categorii diferite.`,
     asset: `Activ`,
+    balance: `Sold`,
     value_usd: `Valoare (USD)`,
 
     // Impact Portal
@@ -292,7 +294,6 @@ export const ro = {
     back_to_category_cases: `Înapoi la cazurile {category}`,
     support_this_cause: `Susține această Cauză`,
     case_not_found: `Caz negăsit`,
-    case_donation_success_alert: `Vă mulțumim pentru donația către "{title}"!`,
     admin_saving_case: `Se traduce și se salvează...`,
     admin_fill_fields_alert: `Vă rugăm să completați toate câmpurile obligatorii.`,
     category_health: `Sănătate`,
@@ -464,7 +465,6 @@ export const ro = {
     my_staked_balance: `Soldul Meu Depus`,
     stake: `Depune`,
     unstake: `Retrage`,
-    balance: `Sold`,
     stake_owfn: `Depune OWFN`,
     unstake_owfn: `Retrage OWFN`,
     my_rewards: `Recompensele Mele`,

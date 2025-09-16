@@ -14,7 +14,7 @@ const getTokenIcon = (symbol: string, className = 'w-8 h-8') => {
 };
 
 const NotificationToast = ({ notification }) => {
-    const { removeNotification } = useAppContext();
+    const { removeNotification, t } = useAppContext();
     const { id, type, title, message, txSignature, tokenSymbol, amount } = notification;
 
     useEffect(() => {
@@ -86,7 +86,7 @@ const NotificationToast = ({ notification }) => {
                                className="w-full flex items-center justify-center gap-2 text-center py-2 px-4 rounded-lg bg-darkPrimary-700 hover:bg-darkPrimary-600 transition-colors text-sm font-semibold"
                             >
                                 <ExternalLink size={16} />
-                                View on Solscan
+                                {t('view_on_solscan')}
                             </a>
                         </div>
                     )}

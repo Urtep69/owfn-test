@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
@@ -7,6 +6,8 @@ import type { Wallet, Token } from '../lib/types.js';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.js';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import { formatNumber } from '../lib/utils.js';
+import { SkeletonLoader } from '../components/SkeletonLoader.js';
+import { AnimatedNumber } from '../components/AnimatedNumber.js';
 
 const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'totalUsdValue'> }) => {
     const { t, solana } = useAppContext();
@@ -24,24 +25,52 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
         };
         fetchBalances();
     }, [walletInfo.address, solana.getWalletBalances]);
+    
+    const totalValueFormatter = (value: number) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    if (loading) {
+        return (
+            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                <SkeletonLoader className="h-7 w-3/4 mb-1" />
+                <SkeletonLoader className="h-5 w-1/2 mb-4" />
+                <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
+                    <div>
+                        <SkeletonLoader className="h-4 w-1/2 mb-1" />
+                        <SkeletonLoader className="h-8 w-1/4" />
+                    </div>
+                    <div className="text-right">
+                        <SkeletonLoader className="h-4 w-1/2 ml-auto mb-1" />
+                        <SkeletonLoader className="h-8 w-3/4 ml-auto" />
+                    </div>
+                </div>
+                <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i} className="grid grid-cols-2 gap-4 items-center py-2 px-2">
+                            <div className="flex items-center space-x-3">
+                                <SkeletonLoader className="w-8 h-8 rounded-full flex-shrink-0" />
+                                <div>
+                                    <SkeletonLoader className="h-5 w-16 mb-1" />
+                                    <SkeletonLoader className="h-3 w-12" />
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <SkeletonLoader className="h-5 w-20 ml-auto mb-1" />
+                                <SkeletonLoader className="h-3 w-16 ml-auto" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d hover:shadow-3d-lg hover:scale-105 transition-all transform duration-300">
             <h3 className="text-xl font-bold mb-1">{walletInfo.name}</h3>
             <div className="mb-4">
                 <AddressDisplay address={walletInfo.address} />
             </div>
-            {loading ? (
-                <div className="space-y-3 animate-pulse">
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div className="h-12 bg-primary-200 dark:bg-darkPrimary-700 rounded"></div>
-                        <div className="h-12 bg-primary-200 dark:bg-darkPrimary-700 rounded"></div>
-                    </div>
-                    <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded w-full"></div>
-                    <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded w-full"></div>
-                    <div className="h-8 bg-primary-200 dark:bg-darkPrimary-700 rounded w-full"></div>
-                </div>
-            ) : (
+            
                 <>
                     <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-primary-100 dark:bg-darkPrimary-900/50 rounded-lg">
                         <div>
@@ -50,7 +79,7 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                         </div>
                         <div className="text-right">
                              <p className="text-sm text-primary-500 dark:text-darkPrimary-400">{t('total_value')}</p>
-                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                             <AnimatedNumber value={totalValue} formatter={totalValueFormatter} className="text-2xl font-bold text-green-600 dark:text-green-400" />
                         </div>
                     </div>
 
@@ -82,7 +111,7 @@ const WalletCard = ({ walletInfo }: { walletInfo: Omit<Wallet, 'balances' | 'tot
                         )}
                     </div>
                 </>
-            )}
+            
         </div>
     )
 }

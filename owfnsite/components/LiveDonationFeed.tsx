@@ -3,7 +3,7 @@ import { useAppContext } from '../contexts/AppContext.js';
 import type { DonationTransaction } from '../lib/types.js';
 import { AddressDisplay } from './AddressDisplay.js';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from './IconComponents.js';
-import { Loader2 } from 'lucide-react';
+import { SkeletonLoader } from './SkeletonLoader.js';
 
 const getTokenIcon = (symbol: string, className = 'w-5 h-5') => {
     switch (symbol) {
@@ -19,6 +19,20 @@ interface LiveDonationFeedProps {
     allTransactions: DonationTransaction[];
     isLoading: boolean;
 }
+
+const TransactionSkeletonRow = () => (
+    <div className="grid grid-cols-6 gap-2 items-center text-sm p-1.5 rounded-md">
+        <div className="col-span-3">
+            <SkeletonLoader className="h-5 w-32" />
+        </div>
+        <div className="text-right col-span-2">
+            <SkeletonLoader className="h-5 w-16 ml-auto" />
+        </div>
+        <div className="text-right">
+            <SkeletonLoader className="h-5 w-12 ml-auto" />
+        </div>
+    </div>
+);
 
 export const LiveDonationFeed = ({ allTransactions, isLoading }: LiveDonationFeedProps) => {
     const { t } = useAppContext();
@@ -87,8 +101,8 @@ export const LiveDonationFeed = ({ allTransactions, isLoading }: LiveDonationFee
 
             <div className="flex-grow overflow-y-auto space-y-1 pr-1 -mr-2 mt-2 custom-scrollbar">
                 {isLoading ? (
-                    <div className="flex justify-center items-center h-full pt-16">
-                        <Loader2 className="w-8 h-8 animate-spin text-accent-500 dark:text-darkAccent-500" />
+                    <div className="pt-2">
+                        {[...Array(10)].map((_, i) => <TransactionSkeletonRow key={i} />)}
                     </div>
                 ) : transactionsForDisplay.length > 0 ? (
                     transactionsForDisplay.slice(0, 50).map((tx) => (

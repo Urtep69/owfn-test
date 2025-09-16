@@ -2,21 +2,37 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext.js';
 import { Wallet, TrendingUp, Gift, Database, HeartHandshake } from 'lucide-react';
 import { OwfnIcon } from '../components/IconComponents.js';
+import { AnimatedNumber } from '../components/AnimatedNumber.js';
 
-const StatCard = ({ icon, title, value, subtext }: { icon: React.ReactNode, title: string, value: string, subtext?: string }) => (
-    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d">
-        <div className="flex items-center space-x-4">
-            <div className="bg-primary-100 dark:bg-darkPrimary-700/50 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">
-                {icon}
-            </div>
-            <div>
-                <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
-                <p className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">{value}</p>
-                 {subtext && <p className="text-xs text-primary-500 dark:text-darkPrimary-500">{subtext}</p>}
+const StatCard = ({ icon, title, value, subtext }: { icon: React.ReactNode, title: string, value: string, subtext?: string }) => {
+    const numericValue = parseFloat(value.replace(/[^0-9.]/g, ''));
+    const suffix = value.replace(/[0-9.,]/g, '').trim();
+
+    const formatter = (val: number) => {
+        return `${val.toLocaleString(undefined, {maximumFractionDigits: 0})} ${suffix}`;
+    };
+
+    return (
+        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d">
+            <div className="flex items-center space-x-4">
+                <div className="bg-primary-100 dark:bg-darkPrimary-700/50 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">
+                    {icon}
+                </div>
+                <div>
+                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{title}</p>
+                    <div className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100">
+                         {typeof numericValue === 'number' && !isNaN(numericValue) ? (
+                            <AnimatedNumber value={numericValue} formatter={formatter} />
+                         ) : (
+                            <span>{value}</span>
+                         )}
+                    </div>
+                     {subtext && <p className="text-xs text-primary-500 dark:text-darkPrimary-500">{subtext}</p>}
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 const ConnectWalletPrompt = () => {
     const { t, solana, setWalletModalOpen } = useAppContext();
@@ -44,6 +60,8 @@ const StakingInterface = () => {
     
     const owfnToken = useMemo(() => solana.userTokens.find(t => t.symbol === 'OWFN'), [solana.userTokens]);
     const balance = activeTab === 'stake' ? owfnToken?.balance ?? 0 : solana.stakedBalance;
+    const rewardsFormatter = (val: number) => val.toLocaleString(undefined, {minimumFractionDigits: 4, maximumFractionDigits: 4});
+
 
     const handleAction = async () => {
         const numAmount = parseFloat(amount);
@@ -117,7 +135,11 @@ const StakingInterface = () => {
              <div className="bg-white dark:bg-darkPrimary-800 p-8 rounded-lg shadow-3d flex flex-col justify-center items-center text-center">
                  <Gift size={48} className="text-accent-500 dark:text-darkAccent-500 mb-4" />
                  <h3 className="text-xl font-bold">{t('my_rewards')}</h3>
-                 <p className="text-4xl font-bold my-2 text-accent-600 dark:text-darkAccent-400">{solana.earnedRewards.toLocaleString(undefined, {minimumFractionDigits: 4, maximumFractionDigits: 4})}</p>
+                 <AnimatedNumber 
+                    value={solana.earnedRewards}
+                    formatter={rewardsFormatter}
+                    className="text-4xl font-bold my-2 text-accent-600 dark:text-darkAccent-400"
+                 />
                  <button onClick={handleClaim} disabled={solana.loading || solana.earnedRewards <= 0} className="mt-4 w-full max-w-xs bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50">
                     {solana.loading ? t('processing') : t('claim_rewards')}
                  </button>
@@ -154,6 +176,8 @@ const StakingInterface = () => {
 export default function Staking() {
     const { t, solana } = useAppContext();
     const MOCK_STAKING_INFO = { totalStaked: 0, apy: 0 }; // Placeholder
+    const stakedBalanceFormatter = (val: number) => `${val.toLocaleString(undefined, {maximumFractionDigits: 0})} OWFN`;
+
 
     return (
         <div className="animate-fade-in-up space-y-8">
@@ -169,7 +193,17 @@ export default function Staking() {
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <StatCard icon={<Database size={24} />} title={t('total_staked')} value={`-- OWFN`} />
                         <StatCard icon={<TrendingUp size={24} />} title={t('estimated_apy')} value={`--%`} />
-                        <StatCard icon={<OwfnIcon className="w-6 h-6" />} title={t('my_staked_balance')} value={`${solana.stakedBalance.toLocaleString(undefined, {maximumFractionDigits: 0})} OWFN`} />
+                        <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-xl shadow-3d">
+                            <div className="flex items-center space-x-4">
+                                <div className="bg-primary-100 dark:bg-darkPrimary-700/50 text-accent-500 dark:text-darkAccent-400 rounded-lg p-3">
+                                    <OwfnIcon className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{t('my_staked_balance')}</p>
+                                    <AnimatedNumber value={solana.stakedBalance} formatter={stakedBalanceFormatter} className="text-2xl font-bold text-primary-900 dark:text-darkPrimary-100" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <StakingInterface />
                 </>
