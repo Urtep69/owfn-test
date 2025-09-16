@@ -1,5 +1,6 @@
 
 import React from 'react';
+import type { ParsedTransactionWithMeta as SolanaParsedTx } from '@solana/web3.js';
 
 export interface Token {
   name: string;
@@ -24,7 +25,6 @@ export interface TokenAllocation {
   value: number;
   percentage: number;
   color: string;
-  [key: string]: string | number;
 }
 
 export interface RoadmapPhase {
@@ -201,9 +201,15 @@ export interface DonationTransaction {
   time: Date;
 }
 
-export interface UserOnChainStats {
-  walletAge: string | null;
-  totalTransactions: number;
-  totalFees: number;
-  isLoading: boolean;
+export interface OnChainStats {
+    walletAgeDays: number;
+    totalTransactions: number;
+    totalFeesSol: number;
+    favoriteProgram: string;
+}
+
+export interface ParsedTransaction extends Omit<SolanaParsedTx, 'transaction' | 'meta'> {
+    signature: string;
+    transaction: SolanaParsedTx['transaction'];
+    meta: SolanaParsedTx['meta'];
 }

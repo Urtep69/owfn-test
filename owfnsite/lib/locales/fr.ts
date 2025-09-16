@@ -1,4 +1,3 @@
-
 export const fr = {
     // Navigation
     home: `Accueil`,
@@ -93,7 +92,7 @@ export const fr = {
     about_new_section_access_title: `Simple, Rapide et Accessible`,
     about_new_section_access_desc: `L'OWFN est conçu pour être envoyé directement à toute personne dans le besoin — sans formalités administratives, sans paperasse, sans attente. Que ce soit pour de la nourriture, des médicaments ou un abri, la valeur de l'OWFN peut être utilisée instantanément, offrant un impact réel en temps réel.`,
     about_new_section_transparency_title: `Transparence Totale. Un Engagement à Vie.`,
-    about_new_section_transparency_desc: `Une part importante de l'offre totale sera allouée à un portefeuille public, connu sous le nom de Portefeuille du Trésor d'Impact et des Initiatives Sociales, utilisé exclusivamente pour :`,
+    about_new_section_transparency_desc: `Une part importante de l'offre totale sera allouée à un portefeuille public, connu sous le nom de Portefeuille du Trésor d'Impact et des Initiatives Sociales, utilisé exclusivement pour :`,
     about_new_section_transparency_item1: `Aide humanitaire vérifiée.`,
     about_new_section_transparency_item2: `Réponse aux urgences.`,
     about_new_section_transparency_item3: `Initiatives sociales transparentes qui font vraiment la différence.`,
@@ -232,10 +231,6 @@ export const fr = {
     donations_usdc_stats_title: `Statistiques des dons en USDC`,
     donations_usdt_stats_title: `Statistiques des dons en USDT`,
     donations_owfn_stats_title: `Statistiques des dons en OWFN`,
-    max_button: `MAX`,
-    time_minutes_ago: `il y a {minutes}m`,
-    time_hours_ago: `il y a {hours}h`,
-    time_days_ago: `il y a {days}j`,
 
     // Dashboard
     wallet_monitor: `Tableau de bord de surveillance des portefeuilles`,
@@ -270,10 +265,6 @@ export const fr = {
     badge_diverse_donor_desc: `Décerné pour avoir fait des dons à des projets dans 3 catégories différentes.`,
     asset: `Actif`,
     value_usd: `Valeur (USD)`,
-    on_chain_snapshot_title: `Aperçu On-Chain`,
-    wallet_age_title: `Âge du Portefeuille (Première Transaction)`,
-    total_transactions_title: `Transactions (1k dernières)`,
-    total_fees_title: `Total des Frais Payés (1k derniers)`,
 
     // Impact Portal
     social_cases: `Cas Sociaux`,
@@ -340,7 +331,7 @@ export const fr = {
     faq_q1: `Qu'est-ce que l'OWFN ?`,
     faq_a1: `L'OWFN (Official World Family Network) est un jeton basé sur Solana conçu pour unir les familles du monde entier grâce à la technologie blockchain, en se concentrant sur l'impact social, l'éducation, la santé et l'aide humanitaire avec une transparence totale.`,
     faq_q2: `Comment puis-je acheter des jetons OWFN ?`,
-    faq_a2: `Vous pouvez participer à la prévente de jetons OWFN directamente via le lien fourni dans la section "Prévente" de notre site web. Assurez-vous d'avoir des SOL (Solana) dans votre portefeuille pour effectuer l'achat.`,
+    faq_a2: `Vous pouvez participer à la prévente de jetons OWFN directement via le lien fourni dans la section "Prévente" de notre site web. Assurez-vous d'avoir des SOL (Solana) dans votre portefeuille pour effectuer l'achat.`,
     faq_q3: `Quelle est l'offre totale de jetons OWFN ?`,
     faq_a3: `L'offre totale de jetons OWFN est de 18 000 000 000 (18 milliards) OWFN.`,
     faq_q4: `Comment l'OWFN garantit-elle la transparence de ses initiatives à impact social ?`,
@@ -350,9 +341,9 @@ export const fr = {
     faq_q6: `Où puis-je trouver le Livre Blanc de l'OWFN ?`,
     faq_a6: `Vous pouvez trouver le Livre Blanc détaillé de l'OWFN en cliquant sur le bouton "Livre Blanc" dans l'en-tête ou la section principale de notre site web.`,
     faq_q7: `Comment l'OWFN fait-il une différence dans le monde réel ?`,
-    faq_a7: `L'OWFN finance directamente des initiatives dans des domaines critiques comme la santé (par ex. couvrir les frais de chirurgie, moderniser les hôpitaux), l'éducation (par ex. construire et rénover des écoles, des jardins d'enfants) et les besoins de base (par ex. fournir de la nourriture, un abri, des vêtements aux sans-abri, créer des maisons de retraite). Nous répondons également aux secours en cas de catastrophe et investissons dans des projets de développement communautaire durable. Chaque jeton contribue à ces actions concrets, garantissant un soutien 100% réel à l'humanité.`,
+    faq_a7: `L'OWFN finance directement des initiatives dans des domaines critiques comme la santé (par ex. couvrir les frais de chirurgie, moderniser les hôpitaux), l'éducation (par ex. construire et rénover des écoles, des jardins d'enfants) et les besoins de base (par ex. fournir de la nourriture, un abri, des vêtements aux sans-abri, créer des maisons de retraite). Nous répondons également aux secours en cas de catastrophe et investissons dans des projets de développement communautaire durable. Chaque jeton contribue à ces actions concrets, garantissant un soutien 100% réel à l'humanité.`,
     faq_q8: `Comment ma contribution, en achetant des jetons, aide-t-elle réellement ?`,
-    faq_a8: `Votre contribution aide de deux manières fondamentales. Premièrement, lorsque vous achetez des jetons pendant la prévente, une partie importante des fonds va directamente à la Trésorerie d'Impact pour lancer nos projets sociaux. Deuxièmement, pour créer une source de financement durable à long terme, des frais de transfert de 0,5% seront activés sur toutes les transactions *après* la fin de la période de prévente. Ces frais sont conçus comme un micro-don automático à la Trésorerie d'Impact. Cela signifie que chaque fois que le jeton sera utilisé à l'avenir, il générera un soutien continu pour nos causes humanitaires, transformant l'ensemble de l'écosystème en une force perpétuelle pour le bien. Tous ces flux financiers sont entièrement transparents sur la blockchain.`,
+    faq_a8: `Votre contribution aide de deux manières fondamentales. Premièrement, lorsque vous achetez des jetons pendant la prévente, une partie importante des fonds va directement à la Trésorerie d'Impact pour lancer nos projets sociaux. Deuxièmement, pour créer une source de financement durable à long terme, des frais de transfert de 0,5% seront activés sur toutes les transactions *après* la fin de la période de prévente. Ces frais sont conçus comme un micro-don automatique à la Trésorerie d'Impact. Cela signifie que chaque fois que le jeton sera utilisé à l'avenir, il générera un soutien continu pour nos causes humanitaires, transformant l'ensemble de l'écosystème en une force perpétuelle pour le bien. Tous ces flux financiers sont entièrement transparents sur la blockchain.`,
     faq_q9: `En dehors de l'achat de jetons, comment puis-je m'impliquer et aider l'OWFN ?`,
     faq_a9: `Votre implication est cruciale ! Faire connaître l'OWFN est incroyablement puissant. Parlez de notre mission à vos amis, votre famille et vos collègues. Partagez notre vision sur les réseaux sociaux, lors de vos voyages ou au travail. Chaque conversation, chaque partage, aide à sensibiliser et à attirer plus de personnes dans notre famille mondiale, amplifiant notre impact collectif. Rejoignez nos canaux communautaires pour rester à jour et participer aux discussions.`,
     faq_q10: `Y a-t-il des instructions spéciales pour faire un don en USDC ou USDT ?`,
@@ -364,7 +355,7 @@ export const fr = {
     faq_q13: `Pourquoi y a-t-il une limite d'achat maximale (Max Buy) lors de la prévente ?`,
     faq_a13: `La limite d'achat maximale est une mesure importante pour garantir une distribution des jetons aussi équitable que possible et pour empêcher qu'un petit nombre de grands investisseurs ("baleines") ne contrôle une part importante de l'offre. Cela favorise une communauté plus saine et plus décentralisée à long terme.`,
     faq_q14: `Que signifie que le jeton est "porteur d'intérêts" avec un APY de 2% ? Comment cela fonctionne-t-il ?`,
-    faq_a15: `Ces frais sont un mécanisme clé pour le financement à long terme de notre mission. Des frais de 0,5 % s'appliqueront à toutes les transactions avec le jeton OWFN *après* la fin de la période de prévente. Les fonds collectés grâce à ces frais sont automáticamente dirigés vers la Trésorerie d'Impact pour financer continuellement nos projets sociaux. Ainsi, chaque transaction contribue au bien commun.`,
+    faq_a15: `Ces frais sont un mécanisme clé pour le financement à long terme de notre mission. Des frais de 0,5 % s'appliqueront à toutes les transactions avec le jeton OWFN *après* la fin de la période de prévente. Les fonds collectés grâce à ces frais sont automatiquement dirigés vers la Trésorerie d'Impact pour financer continuellement nos projets sociaux. Ainsi, chaque transaction contribue au bien commun.`,
     faq_q16: `Pourquoi avez-vous choisi la blockchain Solana pour ce projet ?`,
     faq_a16: `Nous avons choisi Solana pour sa vitesse exceptionnelle, ses très faibles coûts de transaction et sa grande évolutivité. Ces caractéristiques sont essentielles pour un projet mondial comme le nôtre, permettant des micro-transactions efficaces et garantissant une expérience rapide et accessible à tous les utilisateurs, qu'ils fassent des dons, achètent ou échangent des jetons.`,
     faq_q17: `Comment puis-je être sûr que mes dons parviennent aux causes que vous soutenez ?`,
@@ -615,5 +606,14 @@ export const fr = {
     contact_faq_button: `Voir la FAQ`,
     contact_required_fields: `Les champs marqués d'un astérisque (*) sont obligatoires.`,
     contact_disclaimer_title: `Note sur Notre Politique de Communication`,
-    contact_disclaimer_message: `Pour garantir que notre équipe puisse soutenir efficacement la communauté et faire avancer le projet, nous accordons la priorité aux demandes directement liées à l'Official World Family Network. Les messages hors sujet, le spam ou les sollicitations non sollicitées pourraient ne pas recevoir de réponse. Merci de votre compréhension et de nous aider à rester concentrés sur notre mission.`
+    contact_disclaimer_message: `Afin de garantir que notre équipe puisse soutenir efficacement la communauté et faire avancer le projet, nous accordons la priorité aux demandes directement liées à l'Official World Family Network. Les messages hors sujet, le spam ou les sollicitations non sollicitées pourraient ne pas recevoir de réponse. Merci de votre compréhension et de nous aider à rester concentrés sur notre mission.`,
+    send_direct_message: `Envoyer un Message Direct`,
+    contact_social_x_title: `Retrouvez-nous sur X`,
+    contact_social_x_desc: `Suivez notre compte officiel pour les mises à jour en temps réel, les nouvelles et les annonces.`,
+    contact_social_telegram_channel_title: `Canal Telegram`,
+    contact_social_telegram_channel_desc: `Abonnez-vous à notre canal pour les mises à jour importantes et les nouvelles du projet.`,
+    contact_social_telegram_group_title: `Groupe Telegram`,
+    contact_social_telegram_group_desc: `Rejoignez notre groupe communautaire pour discuter, poser des questions et interagir avec nous.`,
+    contact_social_discord_title: `Serveur Discord`,
+    contact_social_discord_desc: `Devenez membre de notre communauté Discord pour des discussions approfondies.`,
 };

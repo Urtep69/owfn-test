@@ -23,7 +23,9 @@ export const AllocationChart = () => {
       <ResponsiveContainer>
         <PieChart>
           <Pie
-            data={TOKEN_ALLOCATIONS}
+            // FIX: Cast TOKEN_ALLOCATIONS to 'any' to satisfy Recharts' flexible data prop type,
+            // which expects a generic object array with an index signature that TokenAllocation lacks.
+            data={TOKEN_ALLOCATIONS as any}
             cx="50%"
             cy="50%"
             labelLine={false}

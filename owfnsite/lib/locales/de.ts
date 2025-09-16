@@ -1,4 +1,3 @@
-
 export const de = {
     // Navigation
     home: `Startseite`,
@@ -270,10 +269,6 @@ export const de = {
     badge_diverse_donor_desc: `Wird für Spenden an Projekte in 3 verschiedenen Kategorien verliehen.`,
     asset: `Vermögenswert`,
     value_usd: `Wert (USD)`,
-    on_chain_snapshot_title: `On-Chain-Momentaufnahme`,
-    wallet_age_title: `Wallet-Alter (Erste Transaktion)`,
-    total_transactions_title: `Transaktionen (Letzte 1k)`,
-    total_fees_title: `Gezahlte Gebühren (Letzte 1k)`,
 
     // Impact Portal
     social_cases: `Soziale Fälle`,

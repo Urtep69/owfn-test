@@ -270,10 +270,6 @@ export const en = {
     badge_diverse_donor_desc: `Awarded for donating to projects in 3 different categories.`,
     asset: `Asset`,
     value_usd: `Value (USD)`,
-    on_chain_snapshot_title: 'On-Chain Snapshot',
-    wallet_age_title: 'Wallet Age (First Seen)',
-    total_transactions_title: 'Transactions (Last 1k)',
-    total_fees_title: 'Total Fees Paid (Last 1k)',
 
     // Impact Portal
     social_cases: `Social Cases`,

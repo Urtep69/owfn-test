@@ -1,4 +1,3 @@
-
 export const es = {
     // Navigation
     home: `Inicio`,
@@ -270,10 +269,6 @@ export const es = {
     badge_diverse_donor_desc: `Otorgado por donar a proyectos en 3 categorías diferentes.`,
     asset: `Activo`,
     value_usd: `Valor (USD)`,
-    on_chain_snapshot_title: `Instantánea On-Chain`,
-    wallet_age_title: `Antigüedad de la Billetera (Primera Transacción)`,
-    total_transactions_title: `Transacciones (Últimas 1k)`,
-    total_fees_title: `Tasas Totales Pagadas (Últimas 1k)`,
 
     // Impact Portal
     social_cases: `Casos Sociales`,

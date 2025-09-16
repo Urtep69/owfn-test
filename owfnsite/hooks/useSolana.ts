@@ -1,9 +1,9 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction, ParsedTransactionWithMeta, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
-import type { Token, UserOnChainStats } from '../lib/types.js';
+import type { Token, OnChainStats, ParsedTransaction } from '../lib/types.js';
 import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL } from '../lib/constants.js';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.js';
 
@@ -21,7 +21,10 @@ export interface UseSolanaReturn {
     donations: any[]; 
     votedProposalIds: string[];
   };
-  onChainStats: UserOnChainStats;
+  onChainStats: OnChainStats;
+  transactionHistory: ParsedTransaction[];
+  loadingStats: boolean;
+  loadingHistory: boolean;
   stakedBalance: number;
   earnedRewards: number;
   connection: Connection;
@@ -33,9 +36,12 @@ export interface UseSolanaReturn {
   claimRewards: () => Promise<any>;
   claimVestedTokens: (amount: number) => Promise<any>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
+  getOnChainStats: (forceRefresh?: boolean) => Promise<void>;
+  getTransactionHistory: (options: { limit: number; before?: string }) => Promise<ParsedTransaction[]>;
 }
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
+const statsCache = new Map<string, { data: OnChainStats, timestamp: number }>();
 const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
 const isValidSolanaAddress = (address: any): boolean => {
@@ -53,12 +59,16 @@ export const useSolana = (): UseSolanaReturn => {
   const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
-  const [onChainStats, setOnChainStats] = useState<UserOnChainStats>({
-      walletAge: null,
+  
+  const [onChainStats, setOnChainStats] = useState<OnChainStats>({
+      walletAgeDays: 0,
       totalTransactions: 0,
-      totalFees: 0,
-      isLoading: true,
+      totalFeesSol: 0,
+      favoriteProgram: 'N/A',
   });
+  const [transactionHistory, setTransactionHistory] = useState<ParsedTransaction[]>([]);
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
 
@@ -201,63 +211,107 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connection]);
 
+  const getOnChainStats = useCallback(async (forceRefresh = false) => {
+    if (!address) return;
+
+    const cached = statsCache.get(address);
+    if (cached && !forceRefresh && (Date.now() - cached.timestamp < CACHE_DURATION * 5)) { // Longer cache for stats
+        setOnChainStats(cached.data);
+        return;
+    }
+
+    setLoadingStats(true);
+    try {
+        const pubKey = new PublicKey(address);
+        const signatures = await connection.getSignaturesForAddress(pubKey, { limit: 1000 });
+        
+        if (signatures.length === 0) {
+            setOnChainStats({ walletAgeDays: 0, totalTransactions: 0, totalFeesSol: 0, favoriteProgram: 'N/A' });
+            return;
+        }
+
+        const firstTx = signatures[signatures.length - 1];
+        const walletAgeDays = firstTx.blockTime ? Math.floor((Date.now() / 1000 - firstTx.blockTime) / 86400) : 0;
+        const totalTransactions = signatures.length; // Approximation for the first 1000 txs
+
+        const detailedTxs = await connection.getParsedTransactions(signatures.map(s => s.signature), { maxSupportedTransactionVersion: 0 });
+
+        let totalFees = 0;
+        const programCounts: Record<string, number> = {};
+        
+        detailedTxs.forEach(tx => {
+            if (tx) {
+                totalFees += tx.meta?.fee || 0;
+                tx.transaction.message.instructions.forEach(ix => {
+                    programCounts[ix.programId.toBase58()] = (programCounts[ix.programId.toBase58()] || 0) + 1;
+                });
+            }
+        });
+
+        const favoriteProgram = Object.entries(programCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+        const KNOWN_PROGRAMS: Record<string, string> = { '11111111111111111111111111111111': 'System Program' };
+        
+        const newStats = {
+            walletAgeDays,
+            totalTransactions,
+            totalFeesSol: totalFees / LAMPORTS_PER_SOL,
+            favoriteProgram: KNOWN_PROGRAMS[favoriteProgram] || `${favoriteProgram.slice(0,4)}...${favoriteProgram.slice(-4)}`
+        };
+
+        setOnChainStats(newStats);
+        statsCache.set(address, { data: newStats, timestamp: Date.now() });
+
+    } catch (error) {
+        console.error("Failed to get on-chain stats", error);
+    } finally {
+        setLoadingStats(false);
+    }
+  }, [address, connection]);
+
+   const getTransactionHistory = useCallback(async (options: { limit: number; before?: string }): Promise<ParsedTransaction[]> => {
+        if (!address) return [];
+        setLoadingHistory(true);
+        try {
+            const pubKey = new PublicKey(address);
+            const signatures = await connection.getSignaturesForAddress(pubKey, options);
+            if (signatures.length === 0) return [];
+
+            const txs = await connection.getParsedTransactions(signatures.map(s => s.signature), { maxSupportedTransactionVersion: 0 });
+            
+// FIX: Reconstruct ParsedTransaction to include all required fields like 'slot' and match the type definition.
+            const parsedHistory: ParsedTransaction[] = txs
+                .map((tx, i) => {
+                    if (!tx) return null;
+                    // Spread the parsed transaction and add the signature to match the ParsedTransaction type
+                    return {
+                        ...tx,
+                        signature: signatures[i].signature,
+                    };
+                })
+                .filter((tx): tx is ParsedTransaction => tx !== null);
+            
+            return parsedHistory;
+
+        } catch (error) {
+            console.error("Failed to get transaction history", error);
+            return [];
+        } finally {
+            setLoadingHistory(false);
+        }
+   }, [address, connection]);
+
+
   useEffect(() => {
     if (connected && address) {
       getWalletBalances(address).then(setUserTokens);
     } else {
       setUserTokens([]);
       balanceCache.clear();
+      statsCache.clear();
+      setTransactionHistory([]);
+      setOnChainStats({ walletAgeDays: 0, totalTransactions: 0, totalFeesSol: 0, favoriteProgram: 'N/A' });
     }
   }, [connected, address, getWalletBalances]);
-
-  const fetchOnChainStats = useCallback(async (walletAddress: string) => {
-    setOnChainStats({ walletAge: null, totalTransactions: 0, totalFees: 0, isLoading: true });
-    try {
-        const publicKey = new PublicKey(walletAddress);
-        const signatures = await connection.getSignaturesForAddress(publicKey, { limit: 1000 });
-
-        if (signatures.length === 0) {
-            setOnChainStats({ walletAge: 'New Wallet', totalTransactions: 0, totalFees: 0, isLoading: false });
-            return;
-        }
-
-        const firstTx = signatures[signatures.length - 1];
-        const walletAge = firstTx.blockTime ? new Date(firstTx.blockTime * 1000).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown';
-        const totalTransactions = signatures.length;
-        
-        let totalFees = 0;
-        const signatureStrings = signatures.map(s => s.signature);
-        const BATCH_SIZE = 100;
-        for (let i = 0; i < signatureStrings.length; i += BATCH_SIZE) {
-            const batchSignatures = signatureStrings.slice(i, i + BATCH_SIZE);
-            const transactions = await connection.getParsedTransactions(batchSignatures, { maxSupportedTransactionVersion: 0 });
-            transactions.forEach(tx => {
-                if (tx && tx.meta?.fee) {
-                    totalFees += tx.meta.fee;
-                }
-            });
-        }
-        
-        setOnChainStats({
-            walletAge,
-            totalTransactions,
-            totalFees: totalFees / LAMPORTS_PER_SOL,
-            isLoading: false
-        });
-
-    } catch (error) {
-        console.error("Error fetching on-chain stats:", error);
-        setOnChainStats({ walletAge: null, totalTransactions: 0, totalFees: 0, isLoading: false });
-    }
-  }, [connection]);
-
-  useEffect(() => {
-    if (connected && address) {
-        fetchOnChainStats(address);
-    } else {
-         setOnChainStats({ walletAge: null, totalTransactions: 0, totalFees: 0, isLoading: true });
-    }
-  }, [connected, address, fetchOnChainStats]);
 
  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
     if (!connected || !publicKey || !signTransaction) {
@@ -377,6 +431,9 @@ export const useSolana = (): UseSolanaReturn => {
         votedProposalIds: []
     },
     onChainStats,
+    transactionHistory,
+    loadingStats,
+    loadingHistory,
     stakedBalance: 0,
     earnedRewards: 0,
     disconnectWallet: disconnect,
@@ -387,5 +444,7 @@ export const useSolana = (): UseSolanaReturn => {
     claimRewards: notImplemented,
     claimVestedTokens: notImplemented,
     voteOnProposal: notImplemented,
+    getOnChainStats,
+    getTransactionHistory,
   };
 };
