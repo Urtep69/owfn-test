@@ -536,8 +536,8 @@ export default function Presale() {
                 owfnAmount: calculation.total.toLocaleString() 
             }),
             txSignature: result.signature,
-            tokenSymbol: 'SOL',
-            amount: numSolAmount,
+            tokenSymbol: 'OWFN',
+            amount: calculation.total,
         });
         const newTx: PresaleTransaction = {
             id: result.signature,
