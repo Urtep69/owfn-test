@@ -134,8 +134,7 @@ export const ro = {
     you_receive: `Primești`,
     min_buy: `Cumpărare minimă`,
     max_buy: `Cumpărare maximă`,
-    presale_purchase_success_title: `Achiziție Reușită!`,
-    presale_purchase_success_alert: `Ați contribuit cu {amount} SOL. Tokenurile dumneavoastră de {owfnAmount} OWFN sunt rezervate și vor fi trimise automat prin airdrop în portofelul dumneavoastră la sfârșitul prevânzării.`,
+    presale_purchase_success_alert: `Cumpărare reușită! Ați contribuit cu {amount} SOL. Tokenurile dumneavoastră de {owfnAmount} OWFN sunt rezervate și vor fi trimise automat prin airdrop în portofelul dumneavoastră la sfârșitul prevânzării.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `Vândut {progress}%`,
     presale_buy_info: `Cumpără (Min: {min} SOL, Max: {max} SOL)`,
@@ -218,9 +217,7 @@ export const ro = {
     donations_form_title: `Formular de Donație`,
     donations_stats_title: `Statistici Donații Live`,
     donated: `Donat`,
-    donation_success_title: `Donație Reușită!`,
-    donation_success_alert: `Vă mulțumim pentru contribuția de {amount} {tokenSymbol}.`,
-    case_donation_success_alert: `Vă mulțumim pentru donația către "{title}"!`,
+    donation_success_alert: `Donație reușită! Vă mulțumim pentru contribuția de {amount} {tokenSymbol}.`,
     donation_no_token_balance: `Nu dețineți niciun {symbol}.`,
     live_donation_feed: `Feed Donații Live`,
     amount_donated: `Suma Donată`,
@@ -271,7 +268,6 @@ export const ro = {
     badge_diverse_donor: `Donator Divers`,
     badge_diverse_donor_desc: `Acordat pentru donații la proiecte din 3 categorii diferite.`,
     asset: `Activ`,
-    balance: `Sold`,
     value_usd: `Valoare (USD)`,
 
     // Impact Portal
@@ -294,6 +290,7 @@ export const ro = {
     back_to_category_cases: `Înapoi la cazurile {category}`,
     support_this_cause: `Susține această Cauză`,
     case_not_found: `Caz negăsit`,
+    case_donation_success_alert: `Vă mulțumim pentru donația către "{title}"!`,
     admin_saving_case: `Se traduce și se salvează...`,
     admin_fill_fields_alert: `Vă rugăm să completați toate câmpurile obligatorii.`,
     category_health: `Sănătate`,
@@ -400,15 +397,10 @@ export const ro = {
 
     // Alerts & Messages
     transaction_success_alert: `Tranzacție reușită! Ați trimis {amount} {tokenSymbol}.`,
-    transaction_failed_title: `Tranzacție Eșuată`,
     transaction_failed_alert: `Tranzacție eșuată. Vă rugăm să încercați din nou.`,
     translation_error_alert: `A apărut o eroare în timpul traducerii. Cazul nu a fost creat. Vă rugăm să încercați din nou.`,
     invalid_amount_generic: `Vă rugăm să introduceți o sumă validă.`,
     vote_success_alert: `Votul dumneavoastră a fost înregistrat cu succes!`,
-    transaction_cancelled_title: `Tranzacție Anulată`,
-    transaction_cancelled_message: `Ați anulat tranzacția. Nu au fost trimise fonduri.`,
-    copy_success_title: `Copiat în Clipboard`,
-    copy_success_message: `Adresa a fost copiată cu succes în clipboard.`,
 
     // Footer
     footer_copyright: `© {year} Official World Family Network. Toate drepturile rezervate.`,
@@ -465,6 +457,7 @@ export const ro = {
     my_staked_balance: `Soldul Meu Depus`,
     stake: `Depune`,
     unstake: `Retrage`,
+    balance: `Sold`,
     stake_owfn: `Depune OWFN`,
     unstake_owfn: `Retrage OWFN`,
     my_rewards: `Recompensele Mele`,

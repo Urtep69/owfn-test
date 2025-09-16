@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export interface Token {
@@ -23,6 +24,7 @@ export interface TokenAllocation {
   value: number;
   percentage: number;
   color: string;
+  [key: string]: string | number;
 }
 
 export interface RoadmapPhase {
@@ -199,34 +201,9 @@ export interface DonationTransaction {
   time: Date;
 }
 
-export interface Notification {
-  id: string;
-  type: 'success' | 'error' | 'info' | 'welcome';
-  title: string;
-  message: string;
-  txSignature?: string;
-  tokenSymbol?: string;
-  amount?: number;
-}
-
-export type TransactionStatus = 'sending' | 'confirming' | 'finalized' | 'failed';
-
-export interface TrackedTransaction {
-    signature: string;
-    status: TransactionStatus;
-    amount: number;
-    tokenSymbol: string;
-    type: 'donation' | 'purchase';
-}
-
-export type JourneyAction = 
-    | 'walletConnected'
-    | 'readWhitepaper'
-    | 'readAbout'
-    | 'madeDonation'
-    | 'madePurchase';
-
-export interface JourneyItem {
-    id: JourneyAction;
-    titleKey: string;
+export interface UserOnChainStats {
+  walletAge: string | null;
+  totalTransactions: number;
+  totalFees: number;
+  isLoading: boolean;
 }

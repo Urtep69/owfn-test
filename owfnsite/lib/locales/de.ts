@@ -1,3 +1,4 @@
+
 export const de = {
     // Navigation
     home: `Startseite`,
@@ -134,7 +135,6 @@ export const de = {
     you_receive: `Sie erhalten`,
     min_buy: `Mindestkauf`,
     max_buy: `Maximalkauf`,
-    presale_purchase_success_title: `Kauf Erfolgreich!`,
     presale_purchase_success_alert: `Kauf erfolgreich! Sie haben {amount} SOL beigetragen. Ihre {owfnAmount} OWFN-Token sind reserviert und werden am Ende des Vorverkaufs automatisch an Ihre Wallet per Airdrop gesendet.`,
     presale_header_subtitle: `Official World Family Network - $OWFN`,
     presale_sold_progress: `{progress}% verkauft`,
@@ -218,9 +218,7 @@ export const de = {
     donations_form_title: `Spendenformular`,
     donations_stats_title: `Live-Spendenstatistiken`,
     donated: `Gespendet`,
-    donation_success_title: `Spende Erfolgreich!`,
     donation_success_alert: `Spende erfolgreich! Vielen Dank für Ihren Beitrag von {amount} {tokenSymbol}.`,
-    case_donation_success_alert: `Vielen Dank für Ihre Spende an "{title}"!`,
     donation_no_token_balance: `Sie besitzen keine {symbol}.`,
     live_donation_feed: `Live-Spenden-Feed`,
     amount_donated: `Gespendeter Betrag`,
@@ -271,8 +269,11 @@ export const de = {
     badge_diverse_donor: `Vielfältiger Spender`,
     badge_diverse_donor_desc: `Wird für Spenden an Projekte in 3 verschiedenen Kategorien verliehen.`,
     asset: `Vermögenswert`,
-    balance: `Guthaben`,
     value_usd: `Wert (USD)`,
+    on_chain_snapshot_title: `On-Chain-Momentaufnahme`,
+    wallet_age_title: `Wallet-Alter (Erste Transaktion)`,
+    total_transactions_title: `Transaktionen (Letzte 1k)`,
+    total_fees_title: `Gezahlte Gebühren (Letzte 1k)`,
 
     // Impact Portal
     social_cases: `Soziale Fälle`,
@@ -294,6 +295,7 @@ export const de = {
     back_to_category_cases: `Zurück zu den {category}-Fällen`,
     support_this_cause: `Diese Sache unterstützen`,
     case_not_found: `Fall nicht gefunden`,
+    case_donation_success_alert: `Vielen Dank für Ihre Spende an "{title}"!`,
     admin_saving_case: `Übersetzen & Speichern...`,
     admin_fill_fields_alert: `Bitte füllen Sie alle erforderlichen Felder aus.`,
     category_health: `Gesundheit`,
@@ -400,15 +402,10 @@ export const de = {
 
     // Alerts & Messages
     transaction_success_alert: `Transaktion erfolgreich! Sie haben {amount} {tokenSymbol} gesendet.`,
-    transaction_failed_title: `Transaktion Fehlgeschlagen`,
     transaction_failed_alert: `Transaktion fehlgeschlagen. Bitte versuchen Sie es erneut.`,
     translation_error_alert: `Während der Übersetzung ist ein Fehler aufgetreten. Der Fall wurde nicht erstellt. Bitte versuchen Sie es erneut.`,
     invalid_amount_generic: `Bitte geben Sie einen gültigen Betrag ein.`,
     vote_success_alert: `Ihre Stimme wurde erfolgreich abgegeben!`,
-    transaction_cancelled_title: `Transaktion Abgebrochen`,
-    transaction_cancelled_message: `Sie haben die Transaktion abgebrochen. Es wurden keine Gelder gesendet.`,
-    copy_success_title: `In die Zwischenablage kopiert`,
-    copy_success_message: `Die Adresse wurde erfolgreich in die Zwischenablage kopiert.`,
 
     // Footer
     footer_copyright: `© {year} Official World Family Network. Alle Rechte vorbehalten.`,
@@ -464,6 +461,7 @@ export const de = {
     my_staked_balance: `Mein gestaktes Guthaben`,
     stake: `Staken`,
     unstake: `Unstaken`,
+    balance: `Guthaben`,
     stake_owfn: `OWFN staken`,
     unstake_owfn: `OWFN unstaken`,
     my_rewards: `Meine Belohnungen`,
