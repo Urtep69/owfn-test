@@ -1,11 +1,14 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { useTheme } from '../hooks/useTheme.ts';
-import { useLocalization } from '../hooks/useLocalization.ts';
-import { useSolana } from '../hooks/useSolana.ts';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal } from '../types.ts';
-import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE } from '../constants.ts';
-import { translateText } from '../services/geminiService.ts';
+import { useTheme } from '../hooks/useTheme.js';
+import { useLocalization } from '../hooks/useLocalization.js';
+import { useSolana } from '../hooks/useSolana.js';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, PresaleStage, PresaleProgress } from '../lib/types.js';
+import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, PRESALE_STAGES, QUICKNODE_RPC_URL, ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
+import { translateText } from '../services/geminiService.js';
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+
+const currentStage: PresaleStage = PRESALE_STAGES[0];
 
 interface AppContextType {
   theme: Theme;
@@ -23,7 +26,9 @@ interface AppContextType {
   addProposal: (proposal: { title: string; description: string; endDate: Date }) => Promise<void>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => void;
   isMaintenanceActive: boolean;
+  isAdmin: boolean;
   setWalletModalOpen: (open: boolean) => void;
+  presaleProgress: PresaleProgress;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -37,7 +42,72 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
-  const isMaintenanceActive = MAINTENANCE_MODE_ACTIVE;
+  
+  const isAdmin = useMemo(() => solana.address === ADMIN_WALLET_ADDRESS, [solana.address]);
+  const isMaintenanceActive = useMemo(() => MAINTENANCE_MODE_ACTIVE && !isAdmin, [isAdmin]);
+  
+  const [presaleProgress, setPresaleProgress] = useState<PresaleProgress>({
+    soldSOL: 0,
+    owfnSold: 0,
+    contributors: 0,
+    isLoading: true,
+  });
+
+  const fetchPresaleProgress = useCallback(async () => {
+    if (new Date() < new Date(currentStage.startDate)) {
+        setPresaleProgress({ soldSOL: 0, owfnSold: 0, contributors: 0, isLoading: false });
+        return;
+    }
+    
+    setPresaleProgress(prev => ({ ...prev, isLoading: true }));
+
+    try {
+        const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
+        const presalePublicKey = new PublicKey(currentStage.distributionWallet);
+        const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
+
+        const signatures = await connection.getSignaturesForAddress(presalePublicKey, { limit: 1000 });
+        const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
+        
+        let totalContributedSOL = 0;
+        const contributorSet = new Set<string>();
+        
+        if (relevantSignatures.length > 0) {
+             const transactions = await connection.getParsedTransactions(
+                relevantSignatures.map(s => s.signature),
+                { maxSupportedTransactionVersion: 0 }
+            );
+
+            transactions.forEach(tx => {
+                if (tx) {
+                    tx.transaction.message.instructions.forEach(inst => {
+                        if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === currentStage.distributionWallet) {
+                            totalContributedSOL += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
+                            contributorSet.add(inst.parsed.info.source);
+                        }
+                    });
+                }
+            });
+        }
+        
+        setPresaleProgress({
+            soldSOL: totalContributedSOL,
+            owfnSold: totalContributedSOL * currentStage.rate,
+            contributors: contributorSet.size,
+            isLoading: false,
+        });
+
+    } catch (error) {
+        console.error("Failed to fetch presale progress in context:", error);
+        setPresaleProgress(prev => ({ ...prev, isLoading: false })); // Stop loading on error
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPresaleProgress(); // Fetch immediately on mount
+    const interval = setInterval(fetchPresaleProgress, 60000); // And then every 60 seconds
+    return () => clearInterval(interval);
+  }, [fetchPresaleProgress]);
 
   const addSocialCase = (newCase: SocialCase) => {
     setSocialCases(prevCases => [newCase, ...prevCases]);
@@ -116,7 +186,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addProposal,
     voteOnProposal,
     isMaintenanceActive,
+    isAdmin,
     setWalletModalOpen,
+    presaleProgress,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
