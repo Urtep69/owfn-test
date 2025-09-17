@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
-import { Wallet, DollarSign, HandHeart, Award, Gem, Loader2, History, ShoppingCart, Gift } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Award, Gem, Loader2, History, ShoppingCart, Gift, ExternalLink } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import type { ImpactBadge } from '../lib/types.js';
 import { ADMIN_WALLET_ADDRESS, DISTRIBUTION_WALLETS, PRESALE_STAGES, TOKEN_DETAILS, QUICKNODE_RPC_URL } from '../lib/constants.js';
@@ -267,8 +267,20 @@ export default function Profile() {
                                         <p className="text-xs text-primary-500 dark:text-darkPrimary-500">{new Date(tx.timestamp).toLocaleString()}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 font-mono font-semibold">
-                                   <SolIcon className="w-4 h-4" /> {tx.solAmount.toFixed(4)}
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-2 font-mono font-semibold">
+                                        <SolIcon className="w-4 h-4" />
+                                        <span>{tx.solAmount.toFixed(4)}</span>
+                                    </div>
+                                    <a
+                                        href={`https://solscan.io/tx/${tx.signature}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label={`View transaction ${tx.signature.slice(0, 6)} on Solscan`}
+                                        className="text-primary-400 hover:text-accent-500 dark:text-darkPrimary-500 dark:hover:text-darkAccent-400 transition-colors"
+                                    >
+                                        <ExternalLink size={16} />
+                                    </a>
                                 </div>
                             </div>
                         ))}
