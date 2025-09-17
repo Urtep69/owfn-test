@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { ArrowLeft, Twitter, Send, Globe, ChevronDown, Info, Loader2, Gift } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.js';
-import { OwfnIcon, SolIcon } from '../components/IconComponents.js';
+import { useAppContext } from '../contexts/AppContext.tsx';
+import { OwfnIcon, SolIcon } from '../components/IconComponents.tsx';
 import { 
     TOKEN_DETAILS, 
-    PRESALE_STAGES, 
+    PRESALE_DETAILS, 
     OWFN_MINT_ADDRESS, 
     PROJECT_LINKS, 
     OWFN_LOGO_URL, 
@@ -14,14 +14,11 @@ import {
     DISTRIBUTION_WALLETS,
     QUICKNODE_RPC_URL,
     QUICKNODE_WSS_URL,
-} from '../lib/constants.js';
-import { AddressDisplay } from '../components/AddressDisplay.js';
-import type { PresaleTransaction, PresaleStage } from '../lib/types.js';
+} from '../constants.ts';
+import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import type { PresaleTransaction } from '../types.ts';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
-
-// Get the current (and only) presale stage for this page to use.
-const currentStage: PresaleStage = PRESALE_STAGES[0];
 
 const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransaction | null }) => {
     const { t } = useAppContext();
@@ -51,8 +48,8 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
             setLoading(true);
             try {
                 const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
-                const presalePublicKey = new PublicKey(currentStage.distributionWallet);
-                const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
+                const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
+                const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
 
                 const signatures = await connection.getSignaturesForAddress(presalePublicKey, { limit: 100 });
                 const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime > presaleStartTimestamp);
@@ -67,12 +64,12 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                     transactions.forEach((tx, index) => {
                         if (tx && tx.blockTime) {
                             tx.transaction.message.instructions.forEach(inst => {
-                                if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === currentStage.distributionWallet) {
+                                if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === DISTRIBUTION_WALLETS.presale) {
                                     parsedTxs.push({
                                         id: relevantSignatures[index].signature,
                                         address: inst.parsed.info.source,
                                         solAmount: inst.parsed.info.lamports / LAMPORTS_PER_SOL,
-                                        owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
+                                        owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
                                         time: new Date(tx.blockTime! * 1000),
                                     });
                                 }
@@ -106,7 +103,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                     id: 1,
                     method: "transactionSubscribe",
                     params: [{
-                        accountInclude: [currentStage.distributionWallet]
+                        accountInclude: [DISTRIBUTION_WALLETS.presale]
                     }, {
                         commitment: "finalized",
                         encoding: "jsonParsed",
@@ -127,7 +124,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         const nativeTransfer = tx.message.instructions.find((inst: any) => 
                             inst.program === 'system' && 
                             inst.parsed?.type === 'transfer' &&
-                            inst.parsed?.info?.destination === currentStage.distributionWallet
+                            inst.parsed?.info?.destination === DISTRIBUTION_WALLETS.presale
                         );
                         
                         if (nativeTransfer) {
@@ -135,7 +132,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                                 id: signature,
                                 address: nativeTransfer.parsed.info.source,
                                 solAmount: nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL,
-                                owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
+                                owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * PRESALE_DETAILS.rate,
                                 time: new Date(), // Use current time for live feed
                             };
 
@@ -243,83 +240,14 @@ const ProjectInfoRow = ({ label, value }: { label: string, value: React.ReactNod
   </div>
 );
 
-const MedalIcon = ({ nameKey }: { nameKey: string }) => {
-    let rank, medalStyle, ribbonStyle, numberStyle;
-    switch (nameKey) {
-        case 'bonus_tier_gold':
-            rank = 1;
-            medalStyle = { background: 'radial-gradient(circle, #fde047, #f59e0b)', border: '3px solid #b45309'};
-            ribbonStyle = { part1: 'bg-blue-600', part2: 'bg-blue-500' };
-            numberStyle = 'text-yellow-900';
-            break;
-        case 'bonus_tier_silver':
-            rank = 2;
-            medalStyle = { background: 'radial-gradient(circle, #e2e8f0, #94a3b8)', border: '3px solid #64748b'};
-            ribbonStyle = { part1: 'bg-indigo-500', part2: 'bg-indigo-400' };
-            numberStyle = 'text-slate-800';
-            break;
-        case 'bonus_tier_bronze':
-            rank = 3;
-            medalStyle = { background: 'radial-gradient(circle, #fcd34d, #c2410c)', border: '3px solid #9a3412'};
-            ribbonStyle = { part1: 'bg-red-700', part2: 'bg-red-600' };
-            numberStyle = 'text-orange-950';
-            break;
-        case 'bonus_tier_copper':
-            rank = 4;
-            medalStyle = { background: 'radial-gradient(circle, #fb923c, #b45309)', border: '3px solid #92400e'};
-            ribbonStyle = { part1: 'bg-slate-600', part2: 'bg-slate-500' };
-            numberStyle = 'text-orange-950';
-            break;
-        default: return null;
-    }
-
-    return (
-        <div className="relative">
-            {/* Ribbon */}
-            <div className="absolute top-[-4px] left-1/2 -translate-x-1/2 w-6 h-8 z-0">
-                <div className={`absolute left-0 bottom-0 w-1/2 h-full ${ribbonStyle.part1} transform -skew-x-[20deg] origin-bottom-right rounded-sm`}></div>
-                <div className={`absolute right-0 bottom-0 w-1/2 h-full ${ribbonStyle.part2} transform skew-x-[20deg] origin-bottom-left rounded-sm`}></div>
-            </div>
-            {/* Medal */}
-            <div style={medalStyle} className="relative w-10 h-10 rounded-full flex items-center justify-center shadow-lg">
-                <span className={`font-black text-xl ${numberStyle}`} style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}>{rank}</span>
-            </div>
-        </div>
-    );
-};
-
-const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bonusTiers'], activeThreshold: number }) => {
-    const { t } = useAppContext();
-    const displayTiers = [...tiers].sort((a, b) => b.threshold - a.threshold);
-
-    return (
-        <div className="bg-primary-50 dark:bg-darkPrimary-800/50 p-4 rounded-lg">
-            <h3 className="text-md font-bold text-center text-primary-800 dark:text-darkPrimary-200 mb-3">{t('bonus_tiers_title')}</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {displayTiers.map((tier) => {
-                    const isActive = activeThreshold >= tier.threshold;
-                    return (
-                        <div key={tier.threshold} className={`p-3 rounded-lg border-2 text-center transition-all duration-300 ${isActive ? 'bg-accent-100 dark:bg-darkAccent-900 border-accent-500 dark:border-darkAccent-400 scale-105 shadow-lg' : 'bg-primary-100 dark:bg-darkPrimary-800 border-transparent'}`}>
-                            <div className="mb-2 h-14 pt-2 flex items-center justify-center">
-                                <MedalIcon nameKey={tier.nameKey} />
-                            </div>
-                            <p className="font-bold text-xs text-primary-900 dark:text-darkPrimary-100">{t(tier.nameKey)}</p>
-                            <p className="text-xs text-primary-600 dark:text-darkPrimary-400">{tier.threshold} SOL+</p>
-                            <p className="text-sm font-bold text-green-600 dark:text-green-400 mt-1">+{tier.percentage}%</p>
-                        </div>
-                    );
-                })}
-            </div>
-        </div>
-    );
-};
-
 
 export default function Presale() {
-  const { t, solana, setWalletModalOpen, presaleProgress, isAdmin } = useAppContext();
+  const { t, solana, setWalletModalOpen } = useAppContext();
+  const [location, setLocation] = useLocation();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
+  const [soldSOL, setSoldSOL] = useState(0);
   const [userContribution, setUserContribution] = useState(0);
   const [isCheckingContribution, setIsCheckingContribution] = useState(false);
   
@@ -328,16 +256,64 @@ export default function Presale() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const amountFromQuery = params.get('amount');
+    if (amountFromQuery) {
+        setSolAmount(amountFromQuery);
+        // Clean the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [location]);
+
+  const fetchPresaleProgress = useCallback(async () => {
+        if (new Date() < PRESALE_DETAILS.startDate) {
+            setSoldSOL(0);
+            return;
+        }
+
+        try {
+            const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
+            const presalePublicKey = new PublicKey(DISTRIBUTION_WALLETS.presale);
+            // In a real scenario, you'd paginate through all transactions for an exact total.
+            // For a progress bar, fetching recent transactions and summing them up gives a good-enough estimate
+            // without being too resource-intensive on the client. Let's fetch the max allowed (1000).
+            const signatures = await connection.getSignaturesForAddress(presalePublicKey, { limit: 1000 });
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
+            const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
+            
+            let totalContributed = 0;
+            if (relevantSignatures.length > 0) {
+                 const transactions = await connection.getParsedTransactions(
+                    relevantSignatures.map(s => s.signature),
+                    { maxSupportedTransactionVersion: 0 }
+                );
+
+                transactions.forEach(tx => {
+                    if (tx) {
+                        tx.transaction.message.instructions.forEach(inst => {
+                            if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === DISTRIBUTION_WALLETS.presale) {
+                                totalContributed += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
+                            }
+                        });
+                    }
+                });
+            }
+            setSoldSOL(totalContributed);
+        } catch (error) {
+            console.error("Failed to fetch presale progress:", error);
+            // Don't reset to 0 if it fails, keep the last known value
+        }
+    }, []);
+
+  useEffect(() => {
     const calculateState = () => {
         const now = new Date();
-        const startDate = new Date(currentStage.startDate);
-        const endDate = new Date(currentStage.endDate);
-        const { hardCap } = currentStage;
+        const { startDate, endDate, hardCap } = PRESALE_DETAILS;
 
         let newStatus: 'pending' | 'active' | 'ended';
         let newEndReason: 'date' | 'hardcap' | null = null;
         
-        if (presaleProgress.soldSOL >= hardCap) {
+        if (soldSOL >= hardCap) {
             newStatus = 'ended';
             newEndReason = 'hardcap';
         } else if (now.getTime() < startDate.getTime()) {
@@ -376,11 +352,18 @@ export default function Presale() {
     const timer = setInterval(calculateState, 1000);
 
     return () => clearInterval(timer);
-  }, [presaleProgress.soldSOL]);
+  }, [soldSOL]);
+
+
+  useEffect(() => {
+    fetchPresaleProgress();
+    const interval = setInterval(fetchPresaleProgress, 60000);
+    return () => clearInterval(interval);
+  }, [fetchPresaleProgress]);
 
   useEffect(() => {
     const fetchUserContribution = async () => {
-        if (!solana.connected || !solana.address || new Date() < new Date(currentStage.startDate)) {
+        if (!solana.connected || !solana.address || new Date() < PRESALE_DETAILS.startDate) {
             setUserContribution(0);
             return;
         }
@@ -392,7 +375,7 @@ export default function Presale() {
             // For this UI feature, we can simplify by checking the user's recent transactions.
             // A full, accurate accounting should be done on a backend or at the airdrop stage.
             const signatures = await connection.getSignaturesForAddress(userPublicKey, { limit: 200 });
-            const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
+            const presaleStartTimestamp = Math.floor(PRESALE_DETAILS.startDate.getTime() / 1000);
             const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
             
             let totalContributed = 0;
@@ -404,7 +387,7 @@ export default function Presale() {
                  transactions.forEach(tx => {
                     if (tx) {
                         tx.transaction.message.instructions.forEach(inst => {
-                            if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === currentStage.distributionWallet && inst.parsed.info.source === solana.address) {
+                            if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === DISTRIBUTION_WALLETS.presale && inst.parsed.info.source === solana.address) {
                                 totalContributed += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
                             }
                         });
@@ -421,48 +404,33 @@ export default function Presale() {
     };
 
     fetchUserContribution();
-  }, [solana.connected, solana.address, latestPurchase]); // Refetch on new purchase
+  }, [solana.connected, solana.address]);
 
-  const maxAllowedBuy = Math.max(0, currentStage.maxBuy - userContribution);
+  const maxAllowedBuy = Math.max(0, PRESALE_DETAILS.maxBuy - userContribution);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    setSolAmount(value);
 
-    // Prevent scientific notation and other non-numeric characters except for one dot.
-    if (/[eE,+]|(\..*){2,}/.test(value)) {
+    if (value === '' || isNaN(parseFloat(value))) {
+        setError('');
         return;
     }
 
     const numValue = parseFloat(value);
-
-    // Auto-correct if value exceeds maximum allowed
-    if (numValue > maxAllowedBuy) {
-        setSolAmount(maxAllowedBuy.toFixed(6).replace(/\.?0+$/, ""));
-        setError(t('presale_amount_error', { min: currentStage.minBuy, max: maxAllowedBuy.toFixed(2) }));
+    // We check for > 0 because if the user types "0" or "0." we don't want to show an error yet.
+    // The button will be disabled anyway by isAmountInvalid.
+    if ((numValue > 0 && numValue < PRESALE_DETAILS.minBuy) || numValue > maxAllowedBuy) {
+        setError(t('presale_amount_error', { min: PRESALE_DETAILS.minBuy, max: maxAllowedBuy.toFixed(2) }));
     } else {
-        setSolAmount(value);
-        // Show error if value is below minimum, but don't auto-correct on change
-        if (value !== '' && !isNaN(numValue) && numValue > 0 && numValue < currentStage.minBuy) {
-             setError(t('presale_amount_error', { min: currentStage.minBuy, max: maxAllowedBuy.toFixed(2) }));
-        } else if (value === '' || isNaN(numValue) || numValue >= currentStage.minBuy) {
-            setError('');
-        }
+        setError('');
     }
-  };
-
-  const handleBlur = () => {
-      if (solAmount === '') return;
-      const numValue = parseFloat(solAmount);
-      if (!isNaN(numValue) && numValue > 0 && numValue < currentStage.minBuy) {
-          setSolAmount(currentStage.minBuy.toString());
-          setError('');
-      }
   };
 
   const calculation = useMemo(() => {
     const numAmount = parseFloat(solAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
-        return { base: 0, bonus: 0, total: 0, appliedBonusPercentage: 0 };
+        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
     }
 
     try {
@@ -475,40 +443,38 @@ export default function Presale() {
         const fractionalPart = (parts[1] || '').slice(0, 9).padEnd(9, '0');
         const lamports = integerPart * LAMPORTS_PER_SOL_BIGINT + BigInt(fractionalPart);
 
-        const applicableTier = [...currentStage.bonusTiers]
-            .sort((a, b) => b.threshold - a.threshold)
-            .find(tier => numAmount >= tier.threshold);
-
-        const presaleRateBigInt = BigInt(currentStage.rate);
-        const baseOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
+        const presaleRateBigInt = BigInt(PRESALE_DETAILS.rate);
+        const bonusThresholdLamports = BigInt(PRESALE_DETAILS.bonusThreshold) * LAMPORTS_PER_SOL_BIGINT;
         
+        const baseOwfnSmallestUnit = (lamports * presaleRateBigInt * owfnDecimalsMultiplier) / LAMPORTS_PER_SOL_BIGINT;
         let bonusOwfnSmallestUnit = 0n;
-        let appliedBonusPercentage = 0;
+        let isBonus = false;
 
-        if (applicableTier) {
-            appliedBonusPercentage = applicableTier.percentage;
-            bonusOwfnSmallestUnit = (baseOwfnSmallestUnit * BigInt(applicableTier.percentage)) / 100n;
+        if (lamports >= bonusThresholdLamports) {
+            bonusOwfnSmallestUnit = (baseOwfnSmallestUnit * BigInt(PRESALE_DETAILS.bonusPercentage)) / 100n;
+            isBonus = true;
         }
 
         const totalOwfnSmallestUnit = baseOwfnSmallestUnit + bonusOwfnSmallestUnit;
+
         const toDisplayAmount = (amountInSmallestUnit: bigint) => Number(amountInSmallestUnit) / Number(owfnDecimalsMultiplier);
         
         return {
             base: toDisplayAmount(baseOwfnSmallestUnit),
             bonus: toDisplayAmount(bonusOwfnSmallestUnit),
             total: toDisplayAmount(totalOwfnSmallestUnit),
-            appliedBonusPercentage: appliedBonusPercentage,
+            bonusApplied: isBonus,
         };
     } catch (e) {
         console.error("Error calculating OWFN amount:", e);
-        return { base: 0, bonus: 0, total: 0, appliedBonusPercentage: 0 };
+        return { base: 0, bonus: 0, total: 0, bonusApplied: false };
     }
   }, [solAmount]);
 
 
-  const saleProgress = (presaleProgress.soldSOL / currentStage.hardCap) * 100;
+  const saleProgress = (soldSOL / PRESALE_DETAILS.hardCap) * 100;
   const numSolAmount = parseFloat(solAmount);
-  const isAmountInvalid = isNaN(numSolAmount) || numSolAmount < currentStage.minBuy || numSolAmount > maxAllowedBuy;
+  const isAmountInvalid = isNaN(numSolAmount) || numSolAmount < PRESALE_DETAILS.minBuy || numSolAmount > maxAllowedBuy;
 
 
   const handleBuy = async () => {
@@ -517,15 +483,11 @@ export default function Presale() {
         return;
     }
 
-    const regularUserIsInvalid = isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active';
-    if (!isAdmin && (solana.loading || regularUserIsInvalid)) {
+    if (presaleStatus !== 'active' || isAmountInvalid || solana.loading) {
         return;
     }
-    if (isAdmin && (solana.loading || isNaN(numSolAmount) || numSolAmount <= 0)) {
-        return; // Admin still needs to enter a valid number
-    }
 
-    const result = await solana.sendTransaction(currentStage.distributionWallet, numSolAmount, 'SOL');
+    const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.presale, numSolAmount, 'SOL');
 
     if (result.success && result.signature) {
         alert(t('presale_purchase_success_alert', { 
@@ -536,11 +498,14 @@ export default function Presale() {
             id: result.signature,
             address: solana.address!,
             solAmount: numSolAmount,
-            owfnAmount: numSolAmount * currentStage.rate, // Store base amount, bonus is calculated later
+            owfnAmount: numSolAmount * PRESALE_DETAILS.rate, // Store base amount, bonus is calculated later
             time: new Date(),
         };
         setLatestPurchase(newTx);
         setSolAmount('');
+        setUserContribution(prev => prev + numSolAmount);
+        setSoldSOL(prev => prev + numSolAmount);
+        fetchPresaleProgress(); // Re-fetch progress immediately
     } else {
         alert(t(result.messageKey));
     }
@@ -552,24 +517,12 @@ export default function Presale() {
     return t('buy');
   }, [solana.connected, solana.loading, t]);
 
-  const isBuyButtonDisabled = useMemo(() => {
-    if (solana.loading || isCheckingContribution) return true;
-    if (isAdmin) {
-        // For admin, only disable if the amount is not a positive number.
-        const numericAmount = parseFloat(solAmount);
-        return isNaN(numericAmount) || numericAmount <= 0;
-    }
-    // For regular users, apply all restrictions.
-    if (!solana.connected) return false; // Will show connect wallet text
-    return isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active';
-  }, [solana.loading, isCheckingContribution, isAdmin, solana.connected, isAmountInvalid, maxAllowedBuy, presaleStatus, solAmount]);
 
-
-  const formatSaleDate = (dateStr: string) => {
-    return new Date(dateStr).toUTCString().replace('GMT', 'UTC');
+  const formatSaleDate = (date: Date) => {
+    return date.toUTCString().replace('GMT', 'UTC');
   };
   
-  const saleStartDate = new Date(currentStage.startDate);
+  const saleStartDate = PRESALE_DETAILS.startDate;
 
   return (
     <div className="bg-primary-50 dark:bg-darkPrimary-950 text-primary-700 dark:text-darkPrimary-300 min-h-screen -m-8 p-4 md:p-8 flex justify-center font-sans">
@@ -611,8 +564,8 @@ export default function Presale() {
                             <div className="bg-accent-400 dark:bg-darkAccent-400 h-2.5 rounded-full" style={{width: `${saleProgress}%`}}></div>
                         </div>
                         <div className="flex justify-between mt-1 text-sm text-primary-700 dark:text-darkPrimary-300">
-                            <span>{presaleProgress.soldSOL.toFixed(2)} SOL</span>
-                            <span>{currentStage.hardCap.toFixed(2)} SOL</span>
+                            <span>{soldSOL.toFixed(2)} SOL</span>
+                            <span>{PRESALE_DETAILS.hardCap.toFixed(2)} SOL</span>
                         </div>
                     </div>
 
@@ -661,17 +614,17 @@ export default function Presale() {
                                         </div>
                                     } 
                                 />
-                                <ProjectInfoRow label={t('presale_sale_rate_label')} value={`1 SOL = ${currentStage.rate.toLocaleString()} $OWFN`} />
+                                <ProjectInfoRow label={t('presale_sale_rate_label')} value={`1 SOL = ${PRESALE_DETAILS.rate.toLocaleString()} $OWFN`} />
                                 <ProjectInfoRow label={t('presale_listing_rate_label')} value={TOKEN_DETAILS.dexLaunchPrice} />
-                                <ProjectInfoRow label={t('presale_softcap_label')} value={`${currentStage.softCap} SOL`} />
-                                <ProjectInfoRow label={t('presale_hardcap_label')} value={`${currentStage.hardCap} SOL`} />
+                                <ProjectInfoRow label={t('presale_softcap_label')} value={`${PRESALE_DETAILS.softCap} SOL`} />
+                                <ProjectInfoRow label={t('presale_hardcap_label')} value={`${PRESALE_DETAILS.hardCap} SOL`} />
                                 <ProjectInfoRow label={t('token_decimals')} value={TOKEN_DETAILS.decimals} />
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-3 border-b border-primary-200/50 dark:border-darkPrimary-700/50">
                                     <span className="text-primary-500 dark:text-darkPrimary-400 mb-1 sm:mb-0">{t('presale_token_address_label')}</span>
                                     <AddressDisplay address={OWFN_MINT_ADDRESS} type="token" />
                                 </div>
-                                <ProjectInfoRow label={t('presale_start_time_label')} value={formatSaleDate(currentStage.startDate)} />
-                                <ProjectInfoRow label={t('presale_end_time_label')} value={formatSaleDate(currentStage.endDate)} />
+                                <ProjectInfoRow label={t('presale_start_time_label')} value={formatSaleDate(saleStartDate)} />
+                                <ProjectInfoRow label={t('presale_end_time_label')} value={formatSaleDate(PRESALE_DETAILS.endDate)} />
                             </div>
                         </AccordionSection>
                         <AccordionSection title={t('tokenomics_allocation_title')}>
@@ -706,10 +659,8 @@ export default function Presale() {
                 <div className="lg:col-span-2 space-y-6 flex flex-col">
                     {/* Buy Section */}
                     <div className="bg-white dark:bg-darkPrimary-950 border border-primary-200 dark:border-darkPrimary-700/50 rounded-lg p-6 space-y-4">
-                        <BonusTiersDisplay tiers={currentStage.bonusTiers} activeThreshold={parseFloat(solAmount) || 0} />
-
                         <p className="text-sm text-primary-700 dark:text-darkPrimary-300 text-center">
-                            {t('presale_buy_info', { min: currentStage.minBuy, max: currentStage.maxBuy.toFixed(2) })}
+                            {t('presale_buy_info', { min: PRESALE_DETAILS.minBuy, max: PRESALE_DETAILS.maxBuy.toFixed(2) })}
                         </p>
                         {solana.connected && (
                             <div className="text-center text-xs text-primary-600 dark:text-darkPrimary-400 p-2 bg-primary-100 dark:bg-darkPrimary-800/50 rounded-md">
@@ -734,36 +685,34 @@ export default function Presale() {
                             </div>
                             <input
                                 id="buy-amount"
-                                type="text"
-                                inputMode="decimal"
+                                type="number"
                                 value={solAmount}
                                 onChange={handleAmountChange}
-                                onBlur={handleBlur}
-                                className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 text-right focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error && !isAdmin ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
+                                className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 text-right focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
                                 placeholder="0.00"
-                                disabled={isCheckingContribution || (!isAdmin && presaleStatus !== 'active')}
+                                disabled={maxAllowedBuy <= 0 || isCheckingContribution || presaleStatus !== 'active'}
                             />
                         </div>
 
-                        {error && !isAdmin && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
+                        {error && <p className="text-red-500 dark:text-red-400 text-sm -mt-2 text-center">{error}</p>}
                         
-                        <div className="bg-primary-100 dark:bg-darkPrimary-800/50 p-4 rounded-lg space-y-2">
+                        <div className="bg-primary-100 dark:bg-darkPrimary-800/50 p-4 rounded-lg space-y-3">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-primary-600 dark:text-darkPrimary-400">{t('owfn_base_amount')}</span>
                                 <span className="font-mono font-semibold">{calculation.base.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
                             </div>
                             
-                            {calculation.appliedBonusPercentage > 0 && (
+                            {calculation.bonusApplied && (
                                 <div className="flex justify-between items-center text-sm text-green-600 dark:text-green-400 animate-fade-in-up" style={{animationDuration: '300ms'}}>
-                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> {t('bonus_amount')} ({calculation.appliedBonusPercentage}%)</span>
+                                    <span className="font-bold flex items-center gap-2"><Gift size={16}/> Bonus ({PRESALE_DETAILS.bonusPercentage}%)</span>
                                     <span className="font-mono font-bold">+ {calculation.bonus.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
                                 </div>
                             )}
 
-                            <div className="border-t border-primary-200/80 dark:border-darkPrimary-700/80 my-1"></div>
+                            <div className="border-t border-primary-200/80 dark:border-darkPrimary-700/80 my-2"></div>
                             
                             <div className="flex justify-between items-center text-lg">
-                                <span className="font-bold text-primary-800 dark:text-darkPrimary-200">{t('total_to_receive')}</span>
+                                <span className="font-bold text-primary-800 dark:text-darkPrimary-200">{t('you_receive')}</span>
                                 <div className="flex items-center gap-2">
                                     <OwfnIcon className="w-6 h-6"/>
                                     <span className="font-mono font-bold text-2xl text-accent-600 dark:text-darkAccent-400">{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 3 })}</span>
@@ -774,10 +723,16 @@ export default function Presale() {
                         <button 
                             onClick={handleBuy}
                             className="w-full bg-accent-400 text-accent-950 dark:bg-darkAccent-500 dark:text-darkPrimary-950 font-bold py-3 px-8 rounded-lg text-lg hover:bg-accent-500 dark:hover:bg-darkAccent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                            disabled={isBuyButtonDisabled}
+                            disabled={solana.loading || isCheckingContribution || (solana.connected && (isAmountInvalid || maxAllowedBuy <= 0 || presaleStatus !== 'active'))}
                         >
                             {buttonText}
                         </button>
+
+                         <div className="bg-accent-100/50 dark:bg-darkAccent-500/10 border border-accent-400/30 dark:border-darkAccent-500/30 p-3 rounded-lg text-center">
+                            <p className="font-bold text-accent-700 dark:text-darkAccent-200 flex items-center justify-center gap-2">
+                                <Gift size={18} /> {t('presale_bonus_offer', { threshold: PRESALE_DETAILS.bonusThreshold, percentage: PRESALE_DETAILS.bonusPercentage })}
+                            </p>
+                        </div>
                     </div>
                     {/* Live Feed */}
                     <div className="flex-grow">

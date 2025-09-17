@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import type { Theme } from '../lib/types.js';
+import type { Theme } from '../types.ts';
 
 export const useTheme = (): [Theme, () => void] => {
   const [theme, setTheme] = useState<Theme>(() => {

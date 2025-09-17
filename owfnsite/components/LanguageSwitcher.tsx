@@ -1,8 +1,7 @@
 
-
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.js';
+import { useAppContext } from '../contexts/AppContext.tsx';
 
 export const LanguageSwitcher = () => {
     const { currentLanguage, supportedLanguages, setLang } = useAppContext();

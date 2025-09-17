@@ -5,9 +5,9 @@ import {
     ShoppingCart, PieChart, Gift, BarChart2, Briefcase, 
     Heart, TrendingUp, Lock, Award, User, Vote, Shield
 } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.js';
-import { OwfnIcon } from './IconComponents.js';
-import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
+import { useAppContext } from '../contexts/AppContext.tsx';
+import { OwfnIcon } from './IconComponents.tsx';
+import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -65,7 +65,6 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             title: t('sidebar_finance'),
             links: [
                 { to: '/presale', label: t('presale'), icon: <ShoppingCart size={20} /> },
-                { to: '/presale-info', label: t('presale_info'), icon: <Briefcase size={20} /> },
                 { to: '/tokenomics', label: t('tokenomics'), icon: <PieChart size={20} /> },
                 { to: '/donations', label: t('donations'), icon: <Gift size={20} /> },
                 { to: '/dashboard', label: t('dashboard'), icon: <BarChart2 size={20} /> },
@@ -85,8 +84,8 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     ];
 
     return (
-        <aside className={`fixed top-0 left-0 h-full bg-primary-50 dark:bg-darkPrimary-800 shadow-lg z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-             <div className="flex items-center justify-between h-16 px-4 border-b border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
+        <aside className={`fixed top-0 left-0 h-full bg-primary-100/80 dark:bg-darkPrimary-800/80 backdrop-blur-lg border-r border-primary-200/80 dark:border-darkPrimary-700/80 z-50 flex flex-col transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'} md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+             <div className="flex items-center justify-between h-16 px-4 border-b border-primary-200/80 dark:border-darkPrimary-700/80 flex-shrink-0">
                 <Link to="/" onClick={handleLinkClick} className={`flex items-center space-x-3 transition-opacity duration-200 ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
                     <OwfnIcon className="h-9 w-9" />
                     <span className={`font-bold text-xl text-primary-900 dark:text-darkPrimary-100 ${isOpen ? 'inline' : 'hidden'}`}>OWFN</span>
@@ -114,7 +113,7 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 )}
             </nav>
             
-            <div className="px-2 py-4 border-t border-primary-200 dark:border-darkPrimary-700 flex-shrink-0">
+            <div className="px-2 py-4 border-t border-primary-200/80 dark:border-darkPrimary-700/80 flex-shrink-0">
                  <NavItem to="/profile" icon={<User size={20} />} label={t('profile')} isOpen={isOpen} onClick={handleLinkClick} />
             </div>
         </aside>

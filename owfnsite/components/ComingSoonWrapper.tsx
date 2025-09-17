@@ -1,6 +1,7 @@
 import React from 'react';
-import { useAppContext } from '../contexts/AppContext.js';
-import { ComingSoon } from './ComingSoon.js';
+import { useAppContext } from '../contexts/AppContext.tsx';
+import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import { ComingSoon } from './ComingSoon.tsx';
 
 interface ComingSoonWrapperProps {
     children: React.ReactNode;
@@ -8,7 +9,8 @@ interface ComingSoonWrapperProps {
 }
 
 export const ComingSoonWrapper: React.FC<ComingSoonWrapperProps> = ({ children, showMessage = true }) => {
-    const { isAdmin } = useAppContext();
+    const { solana } = useAppContext();
+    const isAdmin = solana.connected && solana.address === ADMIN_WALLET_ADDRESS;
     
     if (isAdmin) {
         return <>{children}</>;
@@ -16,13 +18,13 @@ export const ComingSoonWrapper: React.FC<ComingSoonWrapperProps> = ({ children, 
 
     return (
         <div className="relative rounded-lg overflow-hidden">
-            <div className="blur-md pointer-events-none" aria-hidden="true">
+            <div className="pointer-events-none blur-md" aria-hidden="true">
                 {children}
             </div>
             {showMessage ? (
                 <ComingSoon />
             ) : (
-                <div className="absolute inset-0 bg-primary-100/60 dark:bg-darkPrimary-900/60 z-10"></div>
+                <div className="absolute inset-0 bg-primary-100 dark:bg-darkPrimary-900 z-10"></div>
             )}
         </div>
     );

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Handshake, Building, CheckCircle } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.js';
+import { useAppContext } from '../contexts/AppContext.tsx';
 
 export default function Partnerships() {
     const { t } = useAppContext();

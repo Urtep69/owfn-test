@@ -1,20 +1,20 @@
 
 
-import { en } from './en.js';
-import { ro } from './ro.js';
-import { de } from './de.js';
-import { es } from './es.js';
-import { ja } from './ja.js';
-import { fr } from './fr.js';
-import { pt } from './pt.js';
-import { ru } from './ru.js';
-import { it } from './it.js';
-import { nl } from './nl.js';
-import { hu } from './hu.js';
-import { sr } from './sr.js';
-import { tr } from './tr.js';
-import { ko } from './ko.js';
-import { zh } from './zh.js';
+import { en } from './en.ts';
+import { ro } from './ro.ts';
+import { de } from './de.ts';
+import { es } from './es.ts';
+import { ja } from './ja.ts';
+import { fr } from './fr.ts';
+import { pt } from './pt.ts';
+import { ru } from './ru.ts';
+import { it } from './it.ts';
+import { nl } from './nl.ts';
+import { hu } from './hu.ts';
+import { sr } from './sr.ts';
+import { tr } from './tr.ts';
+import { ko } from './ko.ts';
+import { zh } from './zh.ts';
 
 export const translations: Record<string, Record<string, string>> = {
   en,

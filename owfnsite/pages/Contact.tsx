@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
-import { useAppContext } from '../contexts/AppContext.js';
-import { Link } from 'wouter';
+import React, { useState, useRef, useEffect } from 'react';
+import { useAppContext } from '../contexts/AppContext.tsx';
+import { useLocation, Link } from 'wouter';
 import { Info, Handshake, Newspaper, Wrench, Loader2, CheckCircle, HelpCircle, Mail, Twitter, Send } from 'lucide-react';
-import { DiscordIcon } from '../components/IconComponents.js';
-import { PROJECT_LINKS } from '../lib/constants.js';
+import { DiscordIcon } from '../components/IconComponents.tsx';
+import { PROJECT_LINKS } from '../constants.ts';
 
 interface ContactCardProps {
     icon: React.ReactNode;
@@ -61,7 +61,8 @@ const SocialLinkCard = ({ icon, title, description, href }: { icon: React.ReactN
 
 
 export default function Contact() {
-    const { t, currentLanguage } = useAppContext();
+    const { t } = useAppContext();
+    const [location] = useLocation();
     const formRef = useRef<HTMLElement>(null);
 
     const reasonOptions = [
@@ -79,6 +80,17 @@ export default function Contact() {
     const [message, setMessage] = useState('');
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const reasonFromQuery = params.get('reason');
+        if (reasonFromQuery && reasonOptions.some(opt => opt.key === reasonFromQuery)) {
+            setReason(reasonFromQuery);
+            formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+             // Clean the URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, [location]);
+
     const handleCardButtonClick = (reasonKey: string) => {
         setReason(reasonKey);
         formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -91,7 +103,7 @@ export default function Contact() {
             const response = await fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, reason, message, langCode: currentLanguage.code }),
+                body: JSON.stringify({ name, email, reason, message }),
             });
             const data = await response.json();
             if (response.ok && data.success) {

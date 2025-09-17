@@ -1,8 +1,7 @@
 
-
 import React from 'react';
 import { Sun, Moon } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.js';
+import { useAppContext } from '../contexts/AppContext.tsx';
 
 export const ThemeSwitcher = () => {
     const { theme, toggleTheme } = useAppContext();

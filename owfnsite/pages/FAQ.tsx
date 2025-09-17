@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { ChevronDown, HelpCircle, Search } from 'lucide-react';
-import { useAppContext } from '../contexts/AppContext.js';
+import { useAppContext } from '../contexts/AppContext.tsx';
 
 const FaqItem = ({ question, answer, isOpen, onClick }: { question: string, answer: string, isOpen: boolean, onClick: () => void }) => {
     return (

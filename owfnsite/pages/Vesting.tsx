@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { useAppContext } from '../contexts/AppContext.js';
+import { useAppContext } from '../contexts/AppContext.tsx';
 import { Wallet, Calendar, Lock, Unlock, PlusCircle } from 'lucide-react';
-import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
-import { ProgressBar } from '../components/ProgressBar.js';
-import { AddressDisplay } from '../components/AddressDisplay.js';
-import type { VestingSchedule } from '../lib/types.js';
+import { ADMIN_WALLET_ADDRESS } from '../constants.ts';
+import { ProgressBar } from '../components/ProgressBar.tsx';
+import { AddressDisplay } from '../components/AddressDisplay.tsx';
+import type { VestingSchedule } from '../types.ts';
 
 
 const ConnectWalletPrompt = () => {

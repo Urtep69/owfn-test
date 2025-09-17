@@ -1,5 +1,5 @@
-import type { TokenDetails } from '../lib/types.js';
-import { MOCK_TOKEN_DETAILS } from '../lib/constants.js';
+import type { TokenDetails } from '../types.ts';
+import { MOCK_TOKEN_DETAILS } from '../constants.ts';
 
 const HELIUS_API_URL = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
 
@@ -53,7 +53,6 @@ export default async function handler(req: any, res: any) {
             return res.status(404).json({ error: `No data could be found for mint: ${mintAddress}.` });
         }
         
-        // Defensively access nested properties
         const tokenInfo = asset.token_info || {};
         const content = asset.content || {};
         const metadata = content.metadata || {};
@@ -62,8 +61,33 @@ export default async function handler(req: any, res: any) {
 
         const decimals = tokenInfo.decimals ?? 9;
         const price = priceInfo.price_per_token || 0;
-        const supply = tokenInfo.supply ? Number(BigInt(tokenInfo.supply)) / (10 ** decimals) : 0;
         
+        const rawSupply = tokenInfo.supply;
+        let supply = 0;
+        if (rawSupply !== null && rawSupply !== undefined) {
+            try {
+                const supplyAsString = String(rawSupply);
+                const parsedNum = parseFloat(supplyAsString);
+
+                if (isNaN(parsedNum) || !isFinite(parsedNum)) {
+                    console.warn(`Supply value '${rawSupply}' could not be parsed to a valid number for mint ${mintAddress}. Defaulting to 0.`);
+                    supply = 0;
+                } else {
+                    const calculatedSupply = parsedNum / (10 ** decimals);
+                    if (isFinite(calculatedSupply)) {
+                        supply = calculatedSupply;
+                    } else {
+                        console.warn(`Supply calculation resulted in non-finite number for mint ${mintAddress}. Defaulting to 0.`);
+                        supply = 0;
+                    }
+                }
+            } catch (e) {
+                console.error(`Unexpected error while parsing supply '${rawSupply}' for mint ${mintAddress}:`, e);
+                supply = 0;
+            }
+        }
+
+
         let mintAuthority: string | null = null;
         let freezeAuthority: string | null = null;
         let updateAuthority: string | null = null;
@@ -100,7 +124,6 @@ export default async function handler(req: any, res: any) {
             tokenStandard: asset.interface === 'FungibleToken' ? 'SPL Token' : (asset.interface === 'FungibleAsset' ? 'Token-2022' : asset.interface),
         };
 
-        // Populate description from mock if available
         const mockDetailsKey = Object.keys(MOCK_TOKEN_DETAILS).find(key => MOCK_TOKEN_DETAILS[key].mintAddress === mintAddress);
         if (mockDetailsKey) {
             responseData.description = MOCK_TOKEN_DETAILS[mockDetailsKey].description;

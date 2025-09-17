@@ -7,8 +7,8 @@ export default async function handler(req: any, res: any) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        console.error("CRITICAL: GEMINI_API_KEY environment variable is not set.");
-        return res.status(500).json({ error: "Server configuration error. The site administrator needs to configure the API key." });
+        console.error("API key is not configured in environment variables.");
+        return res.status(500).json({ error: "API key not configured." });
     }
     
     let text: string = '';
@@ -26,18 +26,13 @@ export default async function handler(req: any, res: any) {
         
         const ai = new GoogleGenAI({ apiKey });
 
-        const systemInstructionParts = [
-            'You are a highly skilled translator. Translate any text you receive into ' + targetLanguage + '.',
-            'Respond with ONLY the translated text. Do not add any extra formatting, notes, or explanations.'
-        ];
-        const systemInstruction = systemInstructionParts.join(' ');
-
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: text,
             config: {
-                systemInstruction: systemInstruction,
+                systemInstruction: `You are a highly skilled translator. Translate any text you receive into ${targetLanguage}. Respond with ONLY the translated text. Do not add any extra formatting, notes, or explanations.`,
                 temperature: 0.2,
+                thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for faster, direct translation
             },
         });
         
