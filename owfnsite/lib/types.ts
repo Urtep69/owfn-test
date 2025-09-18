@@ -31,14 +31,18 @@ export interface RoadmapPhase {
 }
 
 export interface SocialCase {
-  id: string;
+  id: string; // From database, will be a number as string
+  case_uuid?: string; // From database
+  submitter_wallet_address?: string; // From database
   title: Record<string, string>;
-  description: Record<string, string>;
+  description: Record<string, string>; // This is the short_description
   category: string;
   imageUrl: string;
-  goal: number;
-  donated: number;
-  details: Record<string, string>;
+  goal: number; // This is funding_goal
+  donated: number; // This will need to be calculated
+  details: Record<string, string>; // This is the detailed_description
+  status?: 'pending_review' | 'approved' | 'rejected' | 'funded';
+  created_at?: string;
 }
 
 export interface Language {
@@ -191,10 +195,38 @@ export interface PresaleProgress {
   isLoading: boolean;
 }
 
+export interface DatabaseDonation {
+  id: number;
+  donor_wallet_address: string;
+  token_mint_address: string;
+  amount: string; // Comes as string from DB
+  usd_value_at_time: string | null; // Comes as string from DB
+  transaction_signature: string;
+  target_case_id: number | null;
+  timestamp: string;
+}
+
+export interface PresaleContribution {
+    id: number;
+    buyer_wallet_address: string;
+    sol_amount: string;
+    owfn_received_with_bonus: string;
+    transaction_signature: string;
+    timestamp: string;
+}
+
+export interface UserProfileData {
+    submittedCases: SocialCase[];
+    presaleContributions: PresaleContribution[];
+    donations: DatabaseDonation[];
+    // governanceVotes will be added in the future
+}
+
 export interface DonationTransaction {
   id: string;
   address: string;
   amount: number;
   tokenSymbol: string;
   time: Date;
+  target_case_id?: number | null;
 }
