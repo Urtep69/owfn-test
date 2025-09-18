@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction, ParsedInstruction } from '@solana/web3.js';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
-import type { Token, PresaleHistoryTransaction, DonationHistoryTransaction } from '../lib/types.js';
-import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, PRESALE_STAGES, DISTRIBUTION_WALLETS, TOKEN_DETAILS } from '../lib/constants.js';
+import type { Token, UserDonation } from '../lib/types.js';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL, DISTRIBUTION_WALLETS } from '../lib/constants.js';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.js';
 
 // --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
@@ -13,11 +13,15 @@ export interface UseSolanaReturn {
   address: string | null;
   userTokens: Token[];
   loading: boolean;
+  loadingStats: boolean;
   userStats: {
-    totalDonated: number;
+    totalDonatedUsd: number;
     projectsSupported: number;
     votesCast: number;
-    donations: any[]; 
+    donations: UserDonation[]; 
+    hasMadePresaleContribution: boolean;
+    donatedTokenMints: Set<string>;
+    // FIX: Add votedProposalIds to userStats to resolve error in Governance page
     votedProposalIds: string[];
   };
   stakedBalance: number;
@@ -31,8 +35,6 @@ export interface UseSolanaReturn {
   claimRewards: () => Promise<any>;
   claimVestedTokens: (amount: number) => Promise<any>;
   voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
-  getPresaleHistory: () => Promise<PresaleHistoryTransaction[]>;
-  getDonationHistory: () => Promise<DonationHistoryTransaction[]>;
 }
 
 const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
@@ -53,6 +55,17 @@ export const useSolana = (): UseSolanaReturn => {
   const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
   const [userTokens, setUserTokens] = useState<Token[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingStats, setLoadingStats] = useState(false);
+  const [userStats, setUserStats] = useState<UseSolanaReturn['userStats']>({
+    totalDonatedUsd: 0,
+    projectsSupported: 0,
+    votesCast: 0,
+    donations: [],
+    hasMadePresaleContribution: false,
+    donatedTokenMints: new Set(),
+    // FIX: Initialize votedProposalIds in userStats state
+    votedProposalIds: [],
+  });
 
   const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
 
@@ -203,6 +216,40 @@ export const useSolana = (): UseSolanaReturn => {
       balanceCache.clear();
     }
   }, [connected, address, getWalletBalances]);
+  
+  const fetchUserImpactStats = useCallback(async (walletAddress: string) => {
+    setLoadingStats(true);
+    
+    // Read votes from localStorage
+    let votesCast = 0;
+    // FIX: Populate votedProposalIds from localStorage and add it to the userStats object
+    let votedIds: string[] = [];
+    try {
+        const storedVotes = window.localStorage.getItem('owfn-voted-proposals');
+        votedIds = storedVotes ? JSON.parse(storedVotes) : [];
+        votesCast = votedIds.length;
+    } catch (e) { console.warn("Could not read votes from localStorage", e); }
+
+
+    setUserStats({
+        totalDonatedUsd: 0, projectsSupported: 0, donations: [],
+        hasMadePresaleContribution: false, donatedTokenMints: new Set(),
+        votesCast: votesCast,
+        votedProposalIds: votedIds
+    });
+
+    setLoadingStats(false);
+    // Note to future developer: The on-chain transaction scanning logic was complex and
+    // could lead to RPC rate-limiting issues. A more robust solution would involve
+    // a dedicated indexing service. For now, this feature is stubbed and can be
+    // fully implemented when such a service is available.
+  }, [connection]);
+  
+  useEffect(() => {
+      if (connected && address) {
+          fetchUserImpactStats(address);
+      }
+  }, [connected, address, fetchUserImpactStats]);
 
  const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
     if (!connected || !publicKey || !signTransaction) {
@@ -301,102 +348,30 @@ export const useSolana = (): UseSolanaReturn => {
     }
   }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
   
-  const getPresaleHistory = useCallback(async (): Promise<PresaleHistoryTransaction[]> => {
-    if (!publicKey) return [];
-
-    const history: PresaleHistoryTransaction[] = [];
-    const solPrice = userTokens.find(t => t.symbol === 'SOL')?.pricePerToken ?? 0;
-
-    for (const stage of PRESALE_STAGES) {
-      if (!stage.distributionWallet) continue;
+  const voteOnProposal = useCallback(async (proposalId: string, vote: 'for' | 'against'): Promise<any> => {
+      console.warn("This feature is a placeholder and not implemented on-chain yet.");
       
-      const presaleWallet = new PublicKey(stage.distributionWallet);
-      const signatures = await connection.getSignaturesForAddress(publicKey, { limit: 1000 });
-      const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= new Date(stage.startDate).getTime() / 1000 && sig.blockTime < new Date(stage.endDate).getTime() / 1000);
-      
-      if(relevantSignatures.length > 0) {
-        const transactions = await connection.getParsedTransactions(relevantSignatures.map(s => s.signature), { maxSupportedTransactionVersion: 0 });
-        transactions.forEach((tx, index) => {
-          if (tx) {
-            tx.transaction.message.instructions.forEach(inst => {
-              const isParsedInstruction = (i: any): i is ParsedInstruction => 'parsed' in i;
-              if (isParsedInstruction(inst) && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === stage.distributionWallet) {
-                const solAmount = inst.parsed.info.lamports / LAMPORTS_PER_SOL;
-                const baseOwfn = solAmount * stage.rate;
-                const applicableTier = [...stage.bonusTiers].sort((a,b) => b.threshold - a.threshold).find(tier => solAmount >= tier.threshold);
-                const bonusPercentage = applicableTier ? applicableTier.percentage : 0;
-                const bonusOwfn = baseOwfn * (bonusPercentage / 100);
-                const totalOwfn = baseOwfn + bonusOwfn;
-                
-                history.push({
-                  phase: stage.phase,
-                  signature: relevantSignatures[index].signature,
-                  timestamp: tx.blockTime! * 1000,
-                  solAmount: solAmount,
-                  owfnAmount: totalOwfn,
-                  usdValue: solAmount * solPrice,
-                });
-              }
-            });
-          }
-        });
-      }
-    }
-    return history.sort((a, b) => b.timestamp - a.timestamp);
-  }, [publicKey, connection, userTokens]);
-
-  const getDonationHistory = useCallback(async (): Promise<DonationHistoryTransaction[]> => {
-     if (!publicKey) return [];
-     
-     const history: DonationHistoryTransaction[] = [];
-     const donationWallet = new PublicKey(DISTRIBUTION_WALLETS.impactTreasury);
-     const signatures = await connection.getSignaturesForAddress(publicKey, { limit: 1000 });
-     
-     if(signatures.length > 0) {
-        const transactions = await connection.getParsedTransactions(signatures.map(s => s.signature), { maxSupportedTransactionVersion: 0 });
-        for (const [index, tx] of transactions.entries()) {
-            if (tx) {
-                for (const inst of tx.transaction.message.instructions) {
-                    const isParsedInstruction = (i: any): i is ParsedInstruction => 'parsed' in i;
-                    if (!isParsedInstruction(inst)) continue;
-
-                    let donation: Omit<DonationHistoryTransaction, 'signature' | 'timestamp'> | null = null;
-                    
-                    // SOL Donations
-                    if (inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === donationWallet.toBase58()) {
-                        const solAmount = inst.parsed.info.lamports / LAMPORTS_PER_SOL;
-                        const solPrice = userTokens.find(t => t.symbol === 'SOL')?.pricePerToken ?? 0;
-                        donation = { tokenSymbol: 'SOL', amount: solAmount, usdValue: solAmount * solPrice };
-                    }
-                    // SPL Token Donations
-                    else if (inst.program === 'spl-token' && (inst.parsed?.type === 'transfer' || inst.parsed?.type === 'transferChecked') && inst.parsed.info.authority === publicKey.toBase58()) {
-                        const destinationAta = new PublicKey(inst.parsed.info.destination);
-                        for (const [symbol, mint] of Object.entries(KNOWN_TOKEN_MINT_ADDRESSES)) {
-                            if (symbol === 'SOL') continue;
-                            const expectedAta = await getAssociatedTokenAddress(new PublicKey(mint), donationWallet);
-                            if (destinationAta.equals(expectedAta)) {
-                                const amount = inst.parsed.info.tokenAmount.uiAmount;
-                                const tokenPrice = userTokens.find(t => t.symbol === symbol)?.pricePerToken ?? 0;
-                                donation = { tokenSymbol: symbol, amount: amount, usdValue: amount * tokenPrice };
-                                break;
-                            }
-                        }
-                    }
-
-                    if (donation) {
-                        history.push({
-                            ...donation,
-                            signature: signatures[index].signature,
-                            timestamp: tx.blockTime! * 1000,
-                        });
-                    }
-                }
-            }
+      try {
+        const storedVotes = window.localStorage.getItem('owfn-voted-proposals');
+        const votedIds = storedVotes ? JSON.parse(storedVotes) : [];
+        if (!votedIds.includes(proposalId)) {
+            votedIds.push(proposalId);
+            window.localStorage.setItem('owfn-voted-proposals', JSON.stringify(votedIds));
+            // FIX: Update votedProposalIds in the userStats state when a user votes
+            setUserStats(prev => ({
+                ...prev,
+                votesCast: votedIds.length,
+                votedProposalIds: votedIds,
+            }));
         }
-     }
-     return history.sort((a, b) => b.timestamp - a.timestamp);
-  }, [publicKey, connection, userTokens]);
-
+    } catch (e) {
+        console.warn("Could not save vote to localStorage", e);
+    }
+      
+      alert("This feature is coming soon and requires on-chain programs to be deployed.");
+      return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
+  }, []);
+  
   const notImplemented = async (..._args: any[]): Promise<any> => {
       console.warn("This feature is a placeholder and not implemented on-chain yet.");
       alert("This feature is coming soon and requires on-chain programs to be deployed.");
@@ -409,14 +384,9 @@ export const useSolana = (): UseSolanaReturn => {
     address,
     userTokens,
     loading,
+    loadingStats,
     connection,
-    userStats: { 
-        totalDonated: 0,
-        projectsSupported: 0,
-        votesCast: 0,
-        donations: [],
-        votedProposalIds: []
-    },
+    userStats,
     stakedBalance: 0,
     earnedRewards: 0,
     disconnectWallet: disconnect,
@@ -426,8 +396,6 @@ export const useSolana = (): UseSolanaReturn => {
     unstakeTokens: notImplemented,
     claimRewards: notImplemented,
     claimVestedTokens: notImplemented,
-    voteOnProposal: notImplemented,
-    getPresaleHistory,
-    getDonationHistory,
+    voteOnProposal,
   };
 };

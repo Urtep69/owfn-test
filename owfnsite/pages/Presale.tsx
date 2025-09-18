@@ -85,7 +85,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         setTransactions(prev => {
                             const existingIds = new Set(prev.map(p => p.id));
                             const uniqueFetched = sortedTxs.filter(p => !existingIds.has(p.id));
-                            return [...prev, ...uniqueFetched].sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 20);
+                            return [...prev, ...uniqueFetched].slice(0, 20);
                         });
                     }
                 }
@@ -104,49 +104,49 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                 wsRef.current?.send(JSON.stringify({
                     jsonrpc: "2.0",
                     id: 1,
-                    method: "logsSubscribe",
-                    params: [
-                        { mentions: [currentStage.distributionWallet] },
-                        { commitment: "finalized" }
-                    ]
+                    method: "transactionSubscribe",
+                    params: [{
+                        accountInclude: [currentStage.distributionWallet]
+                    }, {
+                        commitment: "finalized",
+                        encoding: "jsonParsed",
+                        transactionDetails: "full",
+                        showRewards: false
+                    }]
                 }));
             };
 
-            wsRef.current.onmessage = async (event) => {
+            wsRef.current.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    if (data.method === "logsNotification") {
-                        const signature = data.params.result.value.signature;
-                        if (!isMounted) return;
+                    if (data.method === "transactionNotification") {
+                        const tx = data.params.result.transaction;
+                        const signature = tx.signatures[0];
 
-                        const connection = new Connection(QUICKNODE_RPC_URL, 'finalized');
-                        const tx = await connection.getParsedTransaction(signature, { maxSupportedTransactionVersion: 0 });
+                        // Look for native SOL transfers to our presale wallet
+                        const nativeTransfer = tx.message.instructions.find((inst: any) => 
+                            inst.program === 'system' && 
+                            inst.parsed?.type === 'transfer' &&
+                            inst.parsed?.info?.destination === currentStage.distributionWallet
+                        );
+                        
+                        if (nativeTransfer) {
+                            const newTx: PresaleTransaction = {
+                                id: signature,
+                                address: nativeTransfer.parsed.info.source,
+                                solAmount: nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL,
+                                owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
+                                time: new Date(), // Use current time for live feed
+                            };
 
-                        // FIX: Use type guards ('parsed' in inst) to correctly narrow the instruction type
-                        // from a union to a ParsedInstruction, allowing safe access to `inst.parsed`.
-                        // This resolves TypeScript errors where `parsed` might not exist.
-                        if (tx && tx.blockTime) {
-                            tx.transaction.message.instructions.forEach(inst => {
-                               if (
-                                   'parsed' in inst &&
-                                   inst.program === 'system' &&
-                                   inst.parsed?.type === 'transfer' &&
-                                   inst.parsed?.info?.destination === currentStage.distributionWallet
-                               ) {
-                                   const newTx: PresaleTransaction = {
-                                       id: signature,
-                                       address: inst.parsed.info.source,
-                                       solAmount: inst.parsed.info.lamports / LAMPORTS_PER_SOL,
-                                       owfnAmount: (inst.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
-                                       time: new Date(tx.blockTime * 1000),
-                                   };
-                               
-                                   setTransactions(prev => {
-                                       if (prev.some(t => t.id === newTx.id)) return prev;
-                                       return [newTx, ...prev].sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 20);
-                                   });
-                               }
-                            });
+                            if (isMounted) {
+                                setTransactions(prev => {
+                                    if (prev.some(t => t.id === newTx.id)) {
+                                        return prev; // Already have this one
+                                    }
+                                    return [newTx, ...prev.slice(0, 19)];
+                                });
+                            }
                         }
                     }
                 } catch (e) {
