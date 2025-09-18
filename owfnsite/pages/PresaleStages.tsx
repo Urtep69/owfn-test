@@ -8,7 +8,7 @@ import { Loader2, Calendar, CheckCircle, Clock, PlayCircle } from 'lucide-react'
 import { Connection, PublicKey, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 
 const fetchStageTotal = async (stage: PresaleStage): Promise<number> => {
-    if (stage.status !== 'completed' || !stage.distributionWallet) return 0;
+    if (!stage.distributionWallet) return 0;
     try {
         const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
         const publicKey = new PublicKey(stage.distributionWallet);
@@ -17,28 +17,31 @@ const fetchStageTotal = async (stage: PresaleStage): Promise<number> => {
 
         let allSignatures: ConfirmedSignatureInfo[] = [];
         let lastSignature: string | undefined = undefined;
-        let reachedStart = false;
 
-        while (!reachedStart) {
+        while (true) {
             const signatures = await connection.getSignaturesForAddress(publicKey, { until: lastSignature, limit: 1000 });
             if (signatures.length === 0) break;
             
-            for (const sig of signatures) {
-                if (!sig.blockTime) continue;
-                if (sig.blockTime > presaleEnd) continue; 
-                if (sig.blockTime < presaleStart) {
-                    reachedStart = true;
-                    break;
-                }
-                allSignatures.push(sig);
-            }
-            if (reachedStart || signatures.length < 1000) break;
+            const relevantBatch = signatures.filter(sig => 
+                sig.blockTime && sig.blockTime >= presaleStart && sig.blockTime < presaleEnd
+            );
+            allSignatures.push(...relevantBatch);
+            
             lastSignature = signatures[signatures.length - 1].signature;
+            const lastTxTime = signatures[signatures.length - 1].blockTime;
+
+            // Stop fetching if we've gone past the start date or there are no more signatures
+            if ((lastTxTime && lastTxTime < presaleStart) || signatures.length < 1000) {
+                 break;
+            }
         }
+        
+        if (allSignatures.length === 0) return 0;
 
         let totalContributed = 0;
         const signatureStrings = allSignatures.map(s => s.signature);
         const BATCH_SIZE = 100;
+
         for (let i = 0; i < signatureStrings.length; i += BATCH_SIZE) {
             const batchSignatures = signatureStrings.slice(i, i + BATCH_SIZE);
             const transactionsData = await connection.getParsedTransactions(batchSignatures, { maxSupportedTransactionVersion: 0 });
@@ -62,14 +65,14 @@ const fetchStageTotal = async (stage: PresaleStage): Promise<number> => {
 
 
 const StageCard = ({ stage, index, totalRaised }: { stage: PresaleStage, index: number, totalRaised: number | null }) => {
-    const { t } = useAppContext();
+    const { t, presaleProgress } = useAppContext();
     const isEven = index % 2 === 0;
 
     const [status, setStatus] = useState<'upcoming' | 'active' | 'completed'>('upcoming');
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
     useEffect(() => {
-        const timer = setInterval(() => {
+        const calculateState = () => {
             const now = new Date();
             const startDate = new Date(stage.startDate);
             const endDate = new Date(stage.endDate);
@@ -77,8 +80,10 @@ const StageCard = ({ stage, index, totalRaised }: { stage: PresaleStage, index: 
             let currentStatus: 'upcoming' | 'active' | 'completed' = 'upcoming';
             let difference = 0;
             let targetDate: Date;
-
-            if (now < startDate) {
+            
+            if (stage.status === 'active' && presaleProgress.soldSOL >= stage.hardCap) {
+                 currentStatus = 'completed';
+            } else if (now < startDate) {
                 currentStatus = 'upcoming';
                 targetDate = startDate;
                 difference = +targetDate - +now;
@@ -92,7 +97,7 @@ const StageCard = ({ stage, index, totalRaised }: { stage: PresaleStage, index: 
 
             setStatus(currentStatus);
 
-            if (difference > 0) {
+            if (difference > 0 && currentStatus !== 'completed') {
                 setTimeLeft({
                     days: Math.floor(difference / (1000 * 60 * 60 * 24)),
                     hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
@@ -101,14 +106,14 @@ const StageCard = ({ stage, index, totalRaised }: { stage: PresaleStage, index: 
                 });
             } else {
                 setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-                if (currentStatus === 'completed') {
-                    clearInterval(timer);
-                }
             }
-        }, 1000);
+        };
+
+        calculateState();
+        const timer = setInterval(calculateState, 1000);
 
         return () => clearInterval(timer);
-    }, [stage.startDate, stage.endDate]);
+    }, [stage, presaleProgress]);
 
 
     const StatusBadge = () => {
@@ -181,9 +186,9 @@ const StageCard = ({ stage, index, totalRaised }: { stage: PresaleStage, index: 
             {status !== 'completed' && (
                  <div className="mt-4">
                     <p className="text-sm font-semibold text-primary-700 dark:text-darkPrimary-300 mb-2">{t('live_progress')}</p>
-                    <ProgressBar progress={0} />
+                    <ProgressBar progress={ status === 'active' ? (presaleProgress.soldSOL / stage.hardCap * 100) : 0 } />
                     <div className="flex justify-between mt-1 text-sm text-primary-700 dark:text-darkPrimary-300">
-                        <span>0 SOL</span>
+                        <span>{ status === 'active' ? presaleProgress.soldSOL.toFixed(2) : '0'} SOL</span>
                         <span>{stage.hardCap.toLocaleString()} SOL</span>
                     </div>
                  </div>
@@ -243,7 +248,7 @@ export default function PresaleStages() {
                             
                             {/* Timeline Icon */}
                             <div className="z-10 flex items-center justify-center bg-accent-500 dark:bg-darkAccent-600 shadow-xl w-12 h-12 rounded-full p-2.5 my-4 lg:my-0">
-                               {stage.status === 'completed' && new Date() < new Date(stage.endDate) ? timelineIcons['active'] : timelineIcons[stage.status]}
+                               {new Date() > new Date(stage.endDate) ? timelineIcons['completed'] : (new Date() < new Date(stage.startDate) ? timelineIcons['upcoming'] : timelineIcons['active'])}
                             </div>
                             
                             <StageCard stage={stage} index={index} totalRaised={stageTotals[stage.phase] ?? null} />
