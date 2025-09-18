@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql } from '../../lib/db.js';
 import { Connection, PublicKey, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { PRESALE_STAGES, QUICKNODE_RPC_URL, TOKEN_DETAILS } from '../../lib/constants.js';
 
@@ -69,7 +69,6 @@ export default async function handler(req: any, res: any) {
                             
                             const totalOwfn = baseOwfn + bonusOwfn;
                             
-                            // Convert back to a number string for DB insertion
                             const totalOwfnString = (Number(totalOwfn) / Number(owfnDecimalsMultiplier)).toFixed(TOKEN_DETAILS.decimals);
                             
                             await sql`

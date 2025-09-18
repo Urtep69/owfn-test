@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql } from '../../lib/db.js';
 import type { UserProfileData } from '../../lib/types.js';
 
 export default async function handler(req: any, res: any) {
