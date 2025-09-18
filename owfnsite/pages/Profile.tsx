@@ -1,13 +1,13 @@
-
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
-import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2 } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Gem, Loader2, ChevronDown, Info, ShoppingCart, Gift, HelpCircle } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
-import type { ImpactBadge, ImpactNFT } from '../lib/types.js';
+import type { ImpactBadge, PresaleHistoryTransaction, DonationHistoryTransaction } from '../lib/types.js';
 import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 import { ComingSoonWrapper } from '../components/ComingSoonWrapper.js';
 import { formatNumber } from '../lib/utils.js';
+import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon } from '../components/IconComponents.js';
 
 const MOCK_BADGES: ImpactBadge[] = [
     { id: 'badge1', titleKey: 'badge_first_donation', descriptionKey: 'badge_first_donation_desc', icon: <HandHeart /> },
@@ -25,18 +25,75 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
     </div>
 );
 
+const ActivityAccordion = ({ title, summary, children, defaultOpen = false }: { title: string, summary: React.ReactNode, children: React.ReactNode, defaultOpen?: boolean }) => {
+    const [isOpen, setIsOpen] = useState(defaultOpen);
+    return (
+        <div className="bg-primary-50 dark:bg-darkPrimary-800/50 rounded-lg border border-primary-200 dark:border-darkPrimary-700">
+            <button onClick={() => setIsOpen(!isOpen)} className="w-full flex items-center justify-between p-4 text-left">
+                <div className="flex items-center gap-4">
+                    <span className="text-lg font-bold text-primary-900 dark:text-darkPrimary-100">{title}</span>
+                    <div className="hidden sm:block">{summary}</div>
+                </div>
+                <ChevronDown className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isOpen && (
+                <div className="px-4 pb-4 animate-fade-in-up" style={{ animationDuration: '300ms' }}>
+                    {children}
+                </div>
+            )}
+        </div>
+    );
+};
+
+const ActivitySkeletonLoader = () => (
+    <div className="space-y-4">
+        <div className="h-16 bg-primary-200 dark:bg-darkPrimary-700 rounded-lg animate-pulse"></div>
+        <div className="h-24 bg-primary-200 dark:bg-darkPrimary-700 rounded-lg animate-pulse"></div>
+    </div>
+);
+
+
 export default function Profile() {
     const { t, solana, setWalletModalOpen } = useAppContext();
-    const { connected, address, userTokens, loading, userStats } = solana;
+    const { connected, address, userTokens, loading, userStats, getPresaleHistory, getDonationHistory } = solana;
     
-    const isAdmin = connected && address === ADMIN_WALLET_ADDRESS;
+    const [presaleHistory, setPresaleHistory] = useState<PresaleHistoryTransaction[]>([]);
+    const [donationHistory, setDonationHistory] = useState<DonationHistoryTransaction[]>([]);
+    const [loadingActivity, setLoadingActivity] = useState(true);
+    const [donationTab, setDonationTab] = useState('All');
     
+    useEffect(() => {
+        const fetchActivity = async () => {
+            if (connected) {
+                setLoadingActivity(true);
+                const [presaleData, donationData] = await Promise.all([
+                    getPresaleHistory(),
+                    getDonationHistory()
+                ]);
+                setPresaleHistory(presaleData);
+                setDonationHistory(donationData);
+                setLoadingActivity(false);
+            }
+        };
+        fetchActivity();
+    }, [connected, getPresaleHistory, getDonationHistory]);
+
     const totalUsdValue = useMemo(() => {
-        if (!userTokens || userTokens.length === 0) {
-            return 0;
-        }
+        if (!userTokens || userTokens.length === 0) return 0;
         return userTokens.reduce((sum, token) => sum + token.usdValue, 0);
     }, [userTokens]);
+    
+    const presaleByPhase = useMemo(() => {
+        return presaleHistory.reduce((acc, tx) => {
+            (acc[tx.phase] = acc[tx.phase] || []).push(tx);
+            return acc;
+        }, {} as Record<number, PresaleHistoryTransaction[]>);
+    }, [presaleHistory]);
+
+    const filteredDonations = useMemo(() => {
+        if (donationTab === 'All') return donationHistory;
+        return donationHistory.filter(tx => tx.tokenSymbol === donationTab);
+    }, [donationHistory, donationTab]);
 
     if (!connected) {
         return (
@@ -55,6 +112,9 @@ export default function Profile() {
         );
     }
     
+    const donationTabs = ['All', 'SOL', 'USDC', 'USDT', 'OWFN'];
+    const DONATION_ICONS: { [key: string]: React.ReactNode } = { SOL: <SolIcon />, USDC: <UsdcIcon />, USDT: <UsdtIcon />, OWFN: <OwfnIcon /> };
+
     return (
         <div className="animate-fade-in-up space-y-8">
             <div>
@@ -87,17 +147,14 @@ export default function Profile() {
                     </div>
                 ) : userTokens.length > 0 ? (
                     <div className="space-y-2">
-                        {/* Header */}
                         <div className="grid grid-cols-3 gap-4 px-4 py-2 text-xs text-primary-500 dark:text-darkPrimary-500 font-bold uppercase">
                             <span>{t('asset')}</span>
                             <span className="text-right">{t('balance')}</span>
                             <span className="text-right">{t('value_usd')}</span>
                         </div>
-                        {/* Token List */}
                         {userTokens.map(token => (
                            <Link key={token.mintAddress} to={`/dashboard/token/${token.mintAddress}?from=/profile`}>
                                 <a className="grid grid-cols-3 gap-4 items-center p-4 rounded-lg hover:bg-primary-100 dark:hover:bg-darkPrimary-700/50 transition-colors duration-200 cursor-pointer">
-                                    {/* Column 1: Asset Info */}
                                     <div className="flex items-center space-x-4">
                                         <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
                                             {React.isValidElement(token.logo) ? token.logo : <img src={token.logo as string} alt={token.name} className="w-full h-full rounded-full" />}
@@ -107,14 +164,10 @@ export default function Profile() {
                                             <p className="text-sm text-primary-600 dark:text-darkPrimary-400">{token.name}</p>
                                         </div>
                                     </div>
-
-                                    {/* Column 2: Balance */}
                                     <div className="text-right font-mono">
                                         <p className="font-semibold text-primary-900 dark:text-darkPrimary-100">{formatNumber(token.balance)}</p>
                                         <p className="text-sm text-primary-600 dark:text-darkPrimary-400">@ ${token.pricePerToken > 0.01 ? token.pricePerToken.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 }) : token.pricePerToken.toPrecision(4)}</p>
                                     </div>
-
-                                    {/* Column 3: Value */}
                                     <div className="text-right font-semibold font-mono text-primary-900 dark:text-darkPrimary-100">
                                         ${token.usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                     </div>
@@ -129,6 +182,84 @@ export default function Profile() {
                 )}
             </div>
             
+            <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
+                <h2 className="text-2xl font-bold mb-4">{t('my_activity')}</h2>
+                {loadingActivity ? <ActivitySkeletonLoader /> : (
+                <div className="space-y-6">
+                    {/* Presale Section */}
+                    <div>
+                        <h3 className="text-xl font-semibold mb-3 flex items-center gap-3"><ShoppingCart/> {t('my_presale_contributions')}</h3>
+                        {Object.keys(presaleByPhase).length > 0 ? (
+                        <div className="space-y-3">
+                        {Object.entries(presaleByPhase).map(([phase, txs]) => (
+                            <ActivityAccordion 
+                                key={phase} 
+                                title={`${t('phase_dynamic', { phase })}`}
+                                summary={<span className="text-sm font-semibold bg-primary-200 dark:bg-darkPrimary-700 px-2 py-1 rounded-md">{t('total_contributed_short', { amount: txs.reduce((sum, tx) => sum + tx.solAmount, 0).toFixed(4) })}</span>}
+                            >
+                                <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
+                                    <thead className="text-xs text-primary-500 dark:text-darkPrimary-500">
+                                        <tr>
+                                            <th className="text-left py-2 px-2">{t('date')}</th>
+                                            <th className="text-right py-2 px-2">{t('sol_contributed')}</th>
+                                            <th className="text-right py-2 px-2">{t('owfn_received')}</th>
+                                            {/* FIX: The `title` prop is invalid for lucide-react icons. Wrapped the icon in a `span` with a `title` attribute to show a tooltip on hover. */}
+                                            <th className="text-right py-2 px-2 flex items-center justify-end gap-1">{t('value_usd_current')} <span title={t('value_usd_tooltip')}><HelpCircle size={14} className="cursor-help" /></span></th>
+                                            <th className="text-right py-2 px-2">{t('transaction')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {txs.map(tx => (
+                                        <tr key={tx.signature} className="border-t border-primary-200 dark:border-darkPrimary-700">
+                                            <td className="py-3 px-2">{new Date(tx.timestamp).toLocaleDateString()}</td>
+                                            <td className="text-right py-3 px-2 font-mono">{tx.solAmount.toFixed(4)}</td>
+                                            <td className="text-right py-3 px-2 font-mono">{tx.owfnAmount.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                                            <td className="text-right py-3 px-2 font-mono">${tx.usdValue.toFixed(2)}</td>
+                                            <td className="py-3 px-2 flex justify-end"><AddressDisplay address={tx.signature} type="tx" /></td>
+                                        </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                </div>
+                            </ActivityAccordion>
+                        ))}
+                        </div>
+                        ) : <p className="text-primary-600 dark:text-darkPrimary-400 p-4 bg-primary-100 dark:bg-darkPrimary-700/50 rounded-md">{t('profile_no_presale')}</p> }
+                    </div>
+                    {/* Donation Section */}
+                    <div>
+                        <h3 className="text-xl font-semibold mb-3 flex items-center gap-3"><Gift/> {t('my_donation_history')}</h3>
+                        {donationHistory.length > 0 ? (
+                        <div className="bg-primary-50 dark:bg-darkPrimary-800/50 rounded-lg border border-primary-200 dark:border-darkPrimary-700 p-4">
+                            <div className="border-b border-primary-200 dark:border-darkPrimary-700 flex flex-wrap">
+                                {donationTabs.map(tab => (
+                                <button key={tab} onClick={() => setDonationTab(tab)} className={`px-4 py-2 text-sm font-semibold transition-colors ${donationTab === tab ? 'border-b-2 border-accent-500 text-accent-600 dark:text-darkAccent-400' : 'text-primary-500 dark:text-darkPrimary-400'}`}>{tab}</button>
+                                ))}
+                            </div>
+                            <div className="overflow-x-auto mt-2">
+                            <table className="w-full text-sm">
+                                <thead><tr><th className="text-left py-2 px-2">{t('date')}</th><th className="text-right py-2 px-2">{t('amount_donated')}</th>{/* FIX: The `title` prop is invalid for lucide-react icons. Wrapped the icon in a `span` with a `title` attribute to show a tooltip on hover. */}
+<th className="text-right py-2 px-2 flex items-center justify-end gap-1">{t('value_usd_current')} <span title={t('value_usd_tooltip')}><HelpCircle size={14} className="cursor-help" /></span></th><th className="text-right py-2 px-2">{t('transaction')}</th></tr></thead>
+                                <tbody>
+                                {filteredDonations.length > 0 ? filteredDonations.map(tx => (
+                                    <tr key={tx.signature} className="border-t border-primary-200 dark:border-darkPrimary-700">
+                                    <td className="py-3 px-2">{new Date(tx.timestamp).toLocaleDateString()}</td>
+                                    <td className="text-right py-3 px-2 font-mono flex items-center justify-end gap-2">{tx.amount.toLocaleString(undefined, {maximumFractionDigits: 4})} {DONATION_ICONS[tx.tokenSymbol]}</td>
+                                    <td className="text-right py-3 px-2 font-mono">${tx.usdValue.toFixed(2)}</td>
+                                    <td className="py-3 px-2 flex justify-end"><AddressDisplay address={tx.signature} type="tx" /></td>
+                                    </tr>
+                                )) : <tr><td colSpan={4} className="text-center py-8 text-primary-500">{t('profile_no_donations_token', { token: donationTab })}</td></tr>}
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                        ) : <p className="text-primary-600 dark:text-darkPrimary-400 p-4 bg-primary-100 dark:bg-darkPrimary-700/50 rounded-md">{t('profile_no_donations')}</p> }
+                    </div>
+                </div>
+                )}
+            </div>
+
             <ComingSoonWrapper>
                 <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
                     <h2 className="text-2xl font-bold mb-4">{t('my_impact_stats')}</h2>
@@ -139,36 +270,6 @@ export default function Profile() {
                     </div>
                 </div>
             </ComingSoonWrapper>
-
-            <div className="grid lg:grid-cols-2 gap-8">
-                <ComingSoonWrapper showMessage={false}>
-                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h2 className="text-2xl font-bold mb-4">{t('impact_trophies_nfts')}</h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                           {/* Live NFT data would be populated here */}
-                        </div>
-                    </div>
-                </ComingSoonWrapper>
-                 <ComingSoonWrapper showMessage={false}>
-                    <div className="bg-white dark:bg-darkPrimary-800 p-6 rounded-lg shadow-3d">
-                        <h2 className="text-2xl font-bold mb-4">{t('impact_badges')}</h2>
-                         <div className="flex flex-wrap gap-4">
-                            {MOCK_BADGES.map(badge => (
-                                 <div key={badge.id} className="group relative flex flex-col items-center text-center w-24">
-                                    <div className="bg-primary-100 dark:bg-darkPrimary-700 rounded-full p-4 text-accent-500 dark:text-darkAccent-400 group-hover:scale-110 transition-transform">
-                                        {React.cloneElement(badge.icon as React.ReactElement<{ size: number }>, { size: 32 })}
-                                    </div>
-                                    <p className="text-sm font-semibold mt-2">{t(badge.titleKey)}</p>
-                                    <div className="absolute bottom-full mb-2 w-48 bg-primary-900 text-white dark:bg-darkPrimary-950 text-xs rounded py-1 px-2 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                                        {t(badge.descriptionKey)}
-                                        <svg className="absolute text-primary-900 dark:text-darkPrimary-950 h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon className="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </ComingSoonWrapper>
-            </div>
         </div>
     );
 }

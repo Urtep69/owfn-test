@@ -198,3 +198,20 @@ export interface DonationTransaction {
   tokenSymbol: string;
   time: Date;
 }
+
+export interface PresaleHistoryTransaction {
+  phase: number;
+  signature: string;
+  timestamp: number;
+  solAmount: number;
+  owfnAmount: number;
+  usdValue: number;
+}
+
+export interface DonationHistoryTransaction {
+  signature: string;
+  timestamp: number;
+  tokenSymbol: string;
+  amount: number;
+  usdValue: number;
+}
