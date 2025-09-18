@@ -1,5 +1,3 @@
-
-
 import { en } from './en.js';
 import { ro } from './ro.js';
 import { de } from './de.js';
