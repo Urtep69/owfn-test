@@ -1,13 +1,9 @@
-
 import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
-// FIX: Added Heart to the import list from lucide-react.
-import { Wallet, DollarSign, HandHeart, Vote, Award, ShieldCheck, Gem, Loader2, Landmark, PlusCircle, History, Heart } from 'lucide-react';
+import { Wallet, DollarSign, HandHeart, Vote, Loader2, Landmark, PlusCircle, History, Heart } from 'lucide-react';
 import { AddressDisplay } from '../components/AddressDisplay.js';
-import type { ImpactBadge, UserProfileData, SocialCase, PresaleContribution, DatabaseDonation } from '../lib/types.js';
-import { ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
-import { ComingSoonWrapper } from '../components/ComingSoonWrapper.js';
+import type { UserProfileData } from '../lib/types.js';
 import { formatNumber } from '../lib/utils.js';
 import { AddCaseModal } from '../components/AddCaseModal.js';
 
@@ -72,7 +68,7 @@ export default function Profile() {
             setProfileData(null);
             setIsLoadingProfile(false);
         }
-    }, [connected, address]);
+    }, [connected, address, isAddCaseModalOpen]); // Re-fetch when modal closes
 
     const totalUsdValue = useMemo(() => {
         if (!userTokens || userTokens.length === 0) return 0;

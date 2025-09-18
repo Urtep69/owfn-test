@@ -270,7 +270,7 @@ export default function Donations() {
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
         if (result.success && result.signature) {
             alert(t('donation_success_alert', result.params));
-            recordDonation(result.signature, numAmount);
+            await recordDonation(result.signature, numAmount);
             setAmount('');
         } else {
             alert(t(result.messageKey, result.params));

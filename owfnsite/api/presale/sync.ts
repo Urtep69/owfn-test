@@ -1,5 +1,5 @@
 import { sql } from '@vercel/postgres';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { PRESALE_STAGES, QUICKNODE_RPC_URL, TOKEN_DETAILS } from '../../lib/constants.js';
 
 // This is a special, admin-only endpoint designed to be run ONCE to populate the DB.
@@ -17,19 +17,21 @@ export default async function handler(req: any, res: any) {
         const presalePublicKey = new PublicKey(currentStage.distributionWallet);
         const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
 
-        let allSignatures = [];
-        let lastSignature;
-        let signaturesBatch;
+        let allSignatures: ConfirmedSignatureInfo[] = [];
+        let lastSignature: string | undefined;
 
         // Fetch all signatures for the address since the beginning of time
-        do {
-            signaturesBatch = await connection.getSignaturesForAddress(presalePublicKey, {
+        while(true) {
+            const signaturesBatch = await connection.getSignaturesForAddress(presalePublicKey, {
                 limit: 1000,
                 before: lastSignature,
             });
+            if (signaturesBatch.length === 0) {
+                break;
+            }
             allSignatures.push(...signaturesBatch);
-            lastSignature = signaturesBatch.at(-1)?.signature;
-        } while (signaturesBatch.length === 1000);
+            lastSignature = signaturesBatch[signaturesBatch.length - 1]?.signature;
+        }
 
         const relevantSignatures = allSignatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
         const signatureStrings = relevantSignatures.map(s => s.signature);

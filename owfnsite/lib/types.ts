@@ -36,11 +36,11 @@ export interface SocialCase {
   submitter_wallet_address?: string; // From database
   title: Record<string, string>;
   description: Record<string, string>; // This is the short_description
+  details: Record<string, string>; // This is the detailed_description
   category: string;
   imageUrl: string;
   goal: number; // This is funding_goal
   donated: number; // This will need to be calculated
-  details: Record<string, string>; // This is the detailed_description
   status?: 'pending_review' | 'approved' | 'rejected' | 'funded';
   created_at?: string;
 }
