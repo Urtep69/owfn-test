@@ -18,7 +18,7 @@ import {
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import type { PresaleTransaction, PresaleStage } from '../lib/types.js';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey, LAMPORTS_PER_SOL, Connection, ConfirmedSignatureInfo } from '@solana/web3.js';
+import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
 
 // Get the current (and only) presale stage for this page to use.
 const currentStage: PresaleStage = PRESALE_STAGES[0];
@@ -120,9 +120,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                 try {
                     const data = JSON.parse(event.data);
                     if (data.method === "transactionNotification") {
-                        const txResult = data.params.result;
-                        const tx = txResult.transaction;
-                        const blockTime = txResult.blockTime;
+                        const tx = data.params.result.transaction;
                         const signature = tx.signatures[0];
 
                         // Look for native SOL transfers to our presale wallet
@@ -133,12 +131,13 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                         );
                         
                         if (nativeTransfer) {
+                            const blockTime = data.params.result.blockTime;
                             const newTx: PresaleTransaction = {
                                 id: signature,
                                 address: nativeTransfer.parsed.info.source,
                                 solAmount: nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL,
                                 owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
-                                time: blockTime ? new Date(blockTime * 1000) : new Date(),
+                                time: blockTime ? new Date(blockTime * 1000) : new Date(), // Use blockTime for precision
                             };
 
                             if (isMounted) {
@@ -390,26 +389,14 @@ export default function Presale() {
         try {
             const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
             const userPublicKey = new PublicKey(solana.address);
+            // This is complex to get ALL signatures for a user to a specific address.
+            // For this UI feature, we can simplify by checking the user's recent transactions.
+            // A full, accurate accounting should be done on a backend or at the airdrop stage.
+            const signatures = await connection.getSignaturesForAddress(userPublicKey, { limit: 200 });
             const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
+            const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
             
-            let allSignatures: ConfirmedSignatureInfo[] = [];
-            let lastSignature: string | undefined = undefined;
             let totalContributed = 0;
-
-            // Robust pagination to get all user signatures since the presale started
-            while (true) {
-                const signatures = await connection.getSignaturesForAddress(userPublicKey, { before: lastSignature, limit: 1000 });
-                if (signatures.length === 0) break;
-                
-                allSignatures.push(...signatures);
-                lastSignature = signatures[signatures.length - 1].signature;
-
-                const lastTxTime = signatures[signatures.length - 1].blockTime;
-                if (lastTxTime && lastTxTime < presaleStartTimestamp) break; // Stop when we are past the presale start
-            }
-
-            const relevantSignatures = allSignatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
-            
             if (relevantSignatures.length > 0) {
                  const transactions = await connection.getParsedTransactions(
                     relevantSignatures.map(s => s.signature),
@@ -418,7 +405,6 @@ export default function Presale() {
                  transactions.forEach(tx => {
                     if (tx) {
                         tx.transaction.message.instructions.forEach(inst => {
-                            // Check for transfer *from* the user *to* the presale wallet
                             if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === currentStage.distributionWallet && inst.parsed.info.source === solana.address) {
                                 totalContributed += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
                             }
@@ -443,52 +429,36 @@ export default function Presale() {
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    // Allow only valid number patterns
-    if (value === '' || /^\d*\.?\d*$/.test(value)) {
-        setSolAmount(value);
+    // Prevent scientific notation and other non-numeric characters except for one dot.
+    if (/[eE,+]|(\..*){2,}/.test(value)) {
+        return;
     }
-    
-    // Real-time error messaging
+
     const numValue = parseFloat(value);
-    if (isNaN(numValue) && value.trim() !== '' && value !== '.') {
-        setError('Invalid number format.');
-    } else if (numValue > 0 && numValue < currentStage.minBuy) {
-        setError(t('presale_min_amount_error', { min: currentStage.minBuy }));
-    } else if (numValue > maxAllowedBuy) {
-        setError(t('presale_max_amount_error', { max: currentStage.maxBuy, remaining: maxAllowedBuy.toFixed(6) }));
+
+    // Auto-correct if value exceeds maximum allowed
+    if (numValue > maxAllowedBuy) {
+        setSolAmount(maxAllowedBuy.toFixed(6).replace(/\.?0+$/, ""));
+        setError(t('presale_amount_error', { min: currentStage.minBuy, max: maxAllowedBuy.toFixed(2) }));
     } else {
-        setError('');
+        setSolAmount(value);
+        // Show error if value is below minimum, but don't auto-correct on change
+        if (value !== '' && !isNaN(numValue) && numValue > 0 && numValue < currentStage.minBuy) {
+             setError(t('presale_amount_error', { min: currentStage.minBuy, max: maxAllowedBuy.toFixed(2) }));
+        } else if (value === '' || isNaN(numValue) || numValue >= currentStage.minBuy) {
+            setError('');
+        }
     }
   };
 
   const handleBlur = () => {
-    const numValue = parseFloat(solAmount);
-
-    if (isNaN(numValue) || solAmount.trim() === '') {
-        if(solAmount.trim() === '') setSolAmount('');
-        setError('');
-        return;
-    }
-
-    let correctedValue = numValue;
-    let wasCorrected = false;
-
-    if (numValue > 0 && numValue < currentStage.minBuy) {
-        correctedValue = currentStage.minBuy;
-        wasCorrected = true;
-    } else if (numValue > maxAllowedBuy) {
-        correctedValue = maxAllowedBuy;
-        wasCorrected = true;
-    }
-    
-    if (wasCorrected) {
-        setSolAmount(parseFloat(correctedValue.toFixed(9)).toString());
-    }
-    
-    // Clear any validation error messages after correction on blur
-    setError('');
+      if (solAmount === '') return;
+      const numValue = parseFloat(solAmount);
+      if (!isNaN(numValue) && numValue > 0 && numValue < currentStage.minBuy) {
+          setSolAmount(currentStage.minBuy.toString());
+          setError('');
+      }
   };
-
 
   const calculation = useMemo(() => {
     const numAmount = parseFloat(solAmount);

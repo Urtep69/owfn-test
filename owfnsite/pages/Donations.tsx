@@ -128,8 +128,9 @@ export default function Donations() {
             const results: DonationTransaction[] = [];
             if (!tx || !tx.blockTime) return results;
         
+            const presumedSender = tx.transaction.message.accountKeys[0].pubkey;
+        
             tx.transaction.message.instructions.forEach((inst: any) => {
-                // Process native SOL transfers
                 if (inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === impactPublicKeyString) {
                     results.push({
                         id: signature,
@@ -139,20 +140,16 @@ export default function Donations() {
                         time: new Date(tx.blockTime! * 1000),
                     });
                 }
-                // Process SPL token transfers
                 if (inst.program === 'spl-token' && (inst.parsed?.type === 'transfer' || inst.parsed?.type === 'transferChecked') && knownAtasRef.current[inst.parsed.info.destination]) {
                     const destinationAta = inst.parsed.info.destination;
                     const tokenSymbol = knownAtasRef.current[destinationAta];
-                    const amount = inst.parsed.info.tokenAmount?.uiAmount ?? inst.parsed.info.amount / (10 ** (inst.parsed.info.tokenAmount?.decimals ?? 6));
-                    if (amount > 0) {
-                        results.push({
-                            id: signature,
-                            address: inst.parsed.info.source,
-                            amount: amount,
-                            tokenSymbol,
-                            time: new Date(tx.blockTime! * 1000),
-                        });
-                    }
+                    results.push({
+                        id: signature,
+                        address: inst.parsed.info.source,
+                        amount: inst.parsed.info.tokenAmount.uiAmount,
+                        tokenSymbol,
+                        time: new Date(tx.blockTime! * 1000),
+                    });
                 }
             });
             return results;
@@ -164,41 +161,21 @@ export default function Donations() {
             try {
                 const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
 
-                // Find all Associated Token Accounts (ATAs) for known tokens owned by the treasury.
                 const ataPromises = Object.entries(KNOWN_TOKEN_MINT_ADDRESSES).map(async ([symbol, mint]) => {
                     if (symbol === 'SOL') return;
-                     const ataResponse = await connection.getParsedTokenAccountsByOwner(impactPublicKey, { mint: new PublicKey(mint) });
-                     if(ataResponse.value[0]) {
-                        knownAtasRef.current[ataResponse.value[0].pubkey.toBase58()] = symbol;
+                     const ata = await connection.getParsedTokenAccountsByOwner(impactPublicKey, { mint: new PublicKey(mint) });
+                     if(ata.value[0]) {
+                        knownAtasRef.current[ata.value[0].pubkey.toBase58()] = symbol;
                      }
                 });
                 await Promise.all(ataPromises);
-                
-                // Fetch signatures for the main treasury account (SOL) AND all found ATAs (SPL tokens).
-                const allAddressesToQuery = [impactPublicKeyString, ...Object.keys(knownAtasRef.current)];
-                const signaturePromises = allAddressesToQuery.map(address => 
-                    connection.getSignaturesForAddress(new PublicKey(address), { limit: 100 })
-                );
-                const signatureArrays = await Promise.all(signaturePromises);
-                
-                // Combine, de-duplicate, and sort all signatures to get a unified history.
-                const allSignatures = signatureArrays.flat();
-                const uniqueSignatures = Array.from(new Map(allSignatures.map(s => [s.signature, s])).values());
-                uniqueSignatures.sort((a, b) => (b.blockTime ?? 0) - (a.blockTime ?? 0));
-                
-                const recentSignatures = uniqueSignatures.slice(0, 100); // Process the 100 most recent transactions
 
-                if (recentSignatures.length > 0) {
-                    const fetchedTxs = await connection.getParsedTransactions(recentSignatures.map(s => s.signature), { maxSupportedTransactionVersion: 0 });
-                    const parsedTxs = fetchedTxs.flatMap((tx, i) => tx ? processTransaction(tx, recentSignatures[i].signature) : []);
+                const signatures = await connection.getSignaturesForAddress(impactPublicKey, { limit: 100 });
+                if (signatures.length > 0) {
+                    const fetchedTxs = await connection.getParsedTransactions(signatures.map(s => s.signature), { maxSupportedTransactionVersion: 0 });
+                    const parsedTxs = fetchedTxs.flatMap((tx, i) => tx ? processTransaction(tx, signatures[i].signature) : []);
                     if (isMounted) {
-                        setAllDonations(prev => {
-                            // Merge fetched with any potential WS data received during fetch, and de-duplicate.
-                            const existingIds = new Set(prev.map(p => p.id));
-                            const uniqueFetched = parsedTxs.filter(p => !existingIds.has(p.id));
-                            const combined = [...prev, ...uniqueFetched];
-                            return combined.sort((a, b) => b.time.getTime() - a.time.getTime());
-                        });
+                        setAllDonations(parsedTxs.sort((a, b) => b.time.getTime() - a.time.getTime()));
                     }
                 }
             } catch (error) {
@@ -211,10 +188,9 @@ export default function Donations() {
 
             ws = new WebSocket(QUICKNODE_WSS_URL);
             ws.onopen = () => {
-                const allAddressesToMention = [impactPublicKeyString, ...Object.keys(knownAtasRef.current)];
                 ws?.send(JSON.stringify({
                     jsonrpc: "2.0", id: 1, method: "logsSubscribe",
-                    params: [{ mentions: allAddressesToMention }, { commitment: "finalized" }]
+                    params: [{ mentions: [impactPublicKeyString] }, { commitment: "finalized" }]
                 }));
             };
             ws.onmessage = async (event) => {
@@ -222,21 +198,13 @@ export default function Donations() {
                     const data = JSON.parse(event.data);
                     if (data.method === "logsNotification") {
                         const signature = data.params.result.value.signature;
-                        // Debounce/prevent re-processing if we already have it
-                        if (allDonations.some(tx => tx.id === signature)) return; 
-                        
+                        if (allDonations.some(tx => tx.id === signature)) return;
                         const connection = new Connection(QUICKNODE_RPC_URL, 'finalized');
                         const tx = await connection.getParsedTransaction(signature, { maxSupportedTransactionVersion: 0 });
-                        
                         if (tx) {
                             const newTxs = processTransaction(tx, signature);
                             if (isMounted && newTxs.length > 0) {
-                                setAllDonations(prev => {
-                                    const combined = [...newTxs, ...prev];
-                                    // De-duplicate just in case and re-sort
-                                    const unique = Array.from(new Map(combined.map(t => [t.id, t])).values());
-                                    return unique.sort((a, b) => b.time.getTime() - a.time.getTime());
-                                });
+                                setAllDonations(prev => [...newTxs, ...prev]);
                             }
                         }
                     }

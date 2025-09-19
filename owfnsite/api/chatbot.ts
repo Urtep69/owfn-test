@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import type { ChatMessage } from '../lib/types.js';
 import { PRESALE_STAGES, SUPPORTED_LANGUAGES } from '../lib/constants.js';
@@ -168,7 +167,7 @@ export default async function handler(req: any, res: any) {
             `  - Website: https://www.owfn.org/`,
             `  - X (Twitter): https://x.com/OWFN_Official`,
             `  - Telegram: https://t.me/OWFNOfficial`,
-            `  - Discord: https://discord.gg/DzHm5HCqDW\`,`,
+            `  - Discord: https://discord.gg/DzHm5HCqDW`,
         ];
         
         const systemInstruction = systemInstructionParts.join('\n');
