@@ -6,7 +6,7 @@ import { useSolana } from '../hooks/useSolana.js';
 import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, PresaleStage, PresaleProgress } from '../lib/types.js';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, PRESALE_STAGES, QUICKNODE_RPC_URL, ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 import { translateText } from '../services/geminiService.js';
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, PublicKey, LAMPORTS_PER_SOL, ConfirmedSignatureInfo } from '@solana/web3.js';
 
 const currentStage: PresaleStage = PRESALE_STAGES[0];
 
@@ -66,28 +66,53 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const presalePublicKey = new PublicKey(currentStage.distributionWallet);
         const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
 
-        const signatures = await connection.getSignaturesForAddress(presalePublicKey, { limit: 1000 });
-        const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
+        let allSignatures: ConfirmedSignatureInfo[] = [];
+        let lastSignature: string | undefined = undefined;
+        let reachedStart = false;
+
+        // Loop to fetch all signatures since the presale started, handling pagination
+        while (!reachedStart) {
+            const signatures = await connection.getSignaturesForAddress(presalePublicKey, { before: lastSignature, limit: 1000 });
+            if (signatures.length === 0) break;
+
+            for (const sig of signatures) {
+                if (sig.blockTime && sig.blockTime >= presaleStartTimestamp) {
+                    allSignatures.push(sig);
+                } else {
+                    // We've gone past the start date, so we can stop fetching
+                    reachedStart = true;
+                    break; 
+                }
+            }
+            
+            if (reachedStart || signatures.length < 1000) break;
+            
+            lastSignature = signatures[signatures.length - 1].signature;
+        }
+        
+        const relevantSignatures = allSignatures;
         
         let totalContributedSOL = 0;
         const contributorSet = new Set<string>();
         
         if (relevantSignatures.length > 0) {
-             const transactions = await connection.getParsedTransactions(
-                relevantSignatures.map(s => s.signature),
-                { maxSupportedTransactionVersion: 0 }
-            );
+            const signatureStrings = relevantSignatures.map(s => s.signature);
+            const BATCH_SIZE = 100;
 
-            transactions.forEach(tx => {
-                if (tx) {
-                    tx.transaction.message.instructions.forEach(inst => {
-                        if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === currentStage.distributionWallet) {
-                            totalContributedSOL += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
-                            contributorSet.add(inst.parsed.info.source);
-                        }
-                    });
-                }
-            });
+            for (let i = 0; i < signatureStrings.length; i += BATCH_SIZE) {
+                const batchSignatures = signatureStrings.slice(i, i + BATCH_SIZE);
+                const transactions = await connection.getParsedTransactions(batchSignatures, { maxSupportedTransactionVersion: 0 });
+                transactions.forEach(tx => {
+                    if (tx) {
+                        tx.transaction.message.instructions.forEach(inst => {
+                            if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === currentStage.distributionWallet) {
+                                totalContributedSOL += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
+                                contributorSet.add(inst.parsed.info.source);
+                            }
+                        });
+                    }
+                });
+            }
         }
         
         setPresaleProgress({
