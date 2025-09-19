@@ -1,230 +1,334 @@
-// Fix: Import React to use React.createElement for creating components without JSX.
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey, LAMPORTS_PER_SOL, Transaction, SystemProgram, TransactionInstruction } from '@solana/web3.js';
-import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction, getAccount } from '@solana/spl-token';
-import type { Token, UserStats } from '../lib/types.js';
-import { KNOWN_TOKEN_MINT_ADDRESSES, OWFN_MINT_ADDRESS } from '../lib/constants.js';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, TransactionInstruction, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
+import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createAssociatedTokenAccountInstruction, getAccount } from '@solana/spl-token';
+import type { Token } from '../lib/types.js';
+import { OWFN_MINT_ADDRESS, KNOWN_TOKEN_MINT_ADDRESSES, QUICKNODE_RPC_URL } from '../lib/constants.js';
 import { OwfnIcon, SolIcon, UsdcIcon, UsdtIcon, GenericTokenIcon } from '../components/IconComponents.js';
 
-const MOCK_USER_STATS: UserStats = {
-    stakedBalance: 0,
-    earnedRewards: 0,
-    votedProposalIds: [],
-};
-
-const getTokenIcon = (symbol: string) => {
-    switch (symbol) {
-        // Fix: Replaced JSX with React.createElement to be valid in a .ts file.
-        case 'OWFN': return React.createElement(OwfnIcon);
-        // Fix: Replaced JSX with React.createElement to be valid in a .ts file.
-        case 'SOL': return React.createElement(SolIcon);
-        // Fix: Replaced JSX with React.createElement to be valid in a .ts file.
-        case 'USDC': return React.createElement(UsdcIcon);
-        // Fix: Replaced JSX with React.createElement to be valid in a .ts file.
-        case 'USDT': return React.createElement(UsdtIcon);
-        // Fix: Replaced JSX with React.createElement to be valid in a .ts file.
-        default: return React.createElement(GenericTokenIcon);
-    }
+// --- TYPE DEFINITION FOR THE HOOK'S RETURN VALUE ---
+export interface UseSolanaReturn {
+  connected: boolean;
+  connecting: boolean;
+  address: string | null;
+  userTokens: Token[];
+  loading: boolean;
+  userStats: {
+    totalDonated: number;
+    projectsSupported: number;
+    votesCast: number;
+    donations: any[]; 
+    votedProposalIds: string[];
+  };
+  stakedBalance: number;
+  earnedRewards: number;
+  connection: Connection;
+  disconnectWallet: () => Promise<void>;
+  getWalletBalances: (walletAddress: string) => Promise<Token[]>;
+  sendTransaction: (to: string, amount: number, tokenSymbol: string) => Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number> }>;
+  stakeTokens: (amount: number) => Promise<any>;
+  unstakeTokens: (amount: number) => Promise<any>;
+  claimRewards: () => Promise<any>;
+  claimVestedTokens: (amount: number) => Promise<any>;
+  voteOnProposal: (proposalId: string, vote: 'for' | 'against') => Promise<any>;
 }
 
-export const useSolana = () => {
-    const { connection } = useConnection();
-    const { publicKey, connected, connecting, sendTransaction, disconnect, signTransaction } = useWallet();
-    const [userTokens, setUserTokens] = useState<Token[]>([]);
-    const [totalUsdValue, setTotalUsdValue] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [userStats, setUserStats] = useState<UserStats>(MOCK_USER_STATS);
+const balanceCache = new Map<string, { data: Token[], timestamp: number }>();
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
 
-    const address = useMemo(() => publicKey?.toBase58() || null, [publicKey]);
+const isValidSolanaAddress = (address: any): boolean => {
+    if (typeof address !== 'string') return false;
+    try {
+        new PublicKey(address);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
 
-    const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
-        const walletPublicKey = new PublicKey(walletAddress);
-        const balances: Token[] = [];
-    
-        // 1. Get SOL balance
-        const solBalanceLamports = await connection.getBalance(walletPublicKey);
-        
-        // 2. Get all token accounts
-        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(walletPublicKey, {
-            programId: new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
-        });
+export const useSolana = (): UseSolanaReturn => {  
+  const { connection } = useConnection();
+  const { publicKey, connected, connecting, sendTransaction: walletSendTransaction, signTransaction, disconnect } = useWallet();
+  const [userTokens, setUserTokens] = useState<Token[]>([]);
+  const [loading, setLoading] = useState(false);
 
-        // 3. Create list of all mints (SOL + SPL)
-        const mints = ['So11111111111111111111111111111111111111112', ...tokenAccounts.value.map(acc => acc.account.data.parsed.info.mint)];
-        
-        // 4. Fetch prices for all mints in one go
-        let prices: Record<string, any> = {};
-        try {
-            const priceResponse = await fetch('/api/token-prices', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mints }),
+  const address = useMemo(() => publicKey?.toBase58() ?? null, [publicKey]);
+
+  const getWalletBalances = useCallback(async (walletAddress: string): Promise<Token[]> => {
+    const cached = balanceCache.get(walletAddress);
+    if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
+        return cached.data;
+    }
+      
+    setLoading(true);
+    try {
+        const ownerPublicKey = new PublicKey(walletAddress);
+        let allTokens: Token[] = [];
+        const mintsToFetchPrice = new Set<string>();
+
+        // 1. Fetch native SOL balance and only add it if it's greater than zero.
+        const solBalanceLamports = await connection.getBalance(ownerPublicKey);
+        if (solBalanceLamports > 0) {
+            mintsToFetchPrice.add('So11111111111111111111111111111111111111112');
+            allTokens.push({
+                mintAddress: 'So11111111111111111111111111111111111111112',
+                balance: solBalanceLamports / LAMPORTS_PER_SOL,
+                decimals: 9,
+                name: 'Solana',
+                symbol: 'SOL',
+                logo: React.createElement(SolIcon),
+                pricePerToken: 0,
+                usdValue: 0,
             });
-            if (priceResponse.ok) {
-                prices = await priceResponse.json();
-            }
-        } catch (error) {
-            console.error("Failed to fetch token prices:", error);
         }
 
-        // 5. Process SOL balance
-        const solPriceInfo = prices['So11111111111111111111111111111111111111112'] || { price: 0 };
-        const solBalance = solBalanceLamports / LAMPORTS_PER_SOL;
-        balances.push({
-            mintAddress: 'So11111111111111111111111111111111111111112',
-            symbol: 'SOL',
-            name: 'Solana',
-            balance: solBalance,
-            pricePerToken: solPriceInfo.price,
-            usdValue: solBalance * solPriceInfo.price,
-            // Fix: Replaced JSX with React.createElement to be valid in a .ts file.
-            logo: React.createElement(SolIcon),
-            decimals: 9,
+        // 2. Fetch SPL token accounts for both standards
+        const tokenAccountsPromise = connection.getParsedTokenAccountsByOwner(ownerPublicKey, {
+            programId: TOKEN_PROGRAM_ID,
+        });
+        const token2022AccountsPromise = connection.getParsedTokenAccountsByOwner(ownerPublicKey, {
+            programId: TOKEN_2022_PROGRAM_ID,
         });
 
-        // 6. Process SPL token balances
-        for (const { account } of tokenAccounts.value) {
-            const { mint, tokenAmount } = account.data.parsed.info;
-            const priceInfo = prices[mint] || { price: 0, name: 'Unknown', symbol: mint.slice(0, 4), logoURI: null, decimals: tokenAmount.decimals };
-            const balance = tokenAmount.uiAmount;
-            const usdValue = balance * priceInfo.price;
+        const [tokenAccounts, token2022Accounts] = await Promise.all([
+            tokenAccountsPromise,
+            token2022AccountsPromise,
+        ]);
+        
+        const allTokenAccounts = [...tokenAccounts.value, ...token2022Accounts.value];
+        
+        const splTokens: Token[] = [];
+        allTokenAccounts.forEach(accountInfo => {
+            const parsedInfo = accountInfo.account.data?.parsed?.info;
+            if (!parsedInfo || !isValidSolanaAddress(parsedInfo.mint)) {
+                console.warn('Skipping token account with invalid or missing mint address:', parsedInfo?.mint);
+                return;
+            }
+
+            const rawAmount = BigInt(parsedInfo.tokenAmount.amount);
+            if (rawAmount === 0n) {
+                return;
+            }
+
+            const mintAddress = parsedInfo.mint;
+            mintsToFetchPrice.add(mintAddress);
             
-            balances.push({
-                mintAddress: mint,
-                symbol: priceInfo.symbol,
-                name: priceInfo.name,
+            const decimals = parsedInfo.tokenAmount.decimals;
+            const divisor = 10n ** BigInt(decimals);
+            const balance = Number(rawAmount) / Number(divisor);
+
+            splTokens.push({
+                mintAddress,
                 balance: balance,
-                pricePerToken: priceInfo.price,
-                usdValue,
-                logo: getTokenIcon(priceInfo.symbol),
-                decimals: tokenAmount.decimals,
+                decimals: decimals,
+                name: 'Unknown Token',
+                symbol: `${mintAddress.slice(0, 4)}...`,
+                logo: React.createElement(GenericTokenIcon, { uri: undefined }),
+                pricePerToken: 0,
+                usdValue: 0,
             });
+        });
+
+        allTokens = [...allTokens, ...splTokens];
+
+        // 3. Batch fetch metadata and prices from our server-side API route for reliability
+        let priceData: any = {};
+        if (mintsToFetchPrice.size > 0) {
+            try {
+                const res = await fetch('/api/token-prices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mints: Array.from(mintsToFetchPrice) }),
+                });
+                if (res.ok) {
+                    priceData = await res.json();
+                } else {
+                    console.warn(`Token prices API route failed with status ${res.status}`);
+                }
+            } catch (priceError) {
+                console.error("Could not fetch token prices from API route:", priceError);
+            }
         }
         
-        return balances.sort((a, b) => b.usdValue - a.usdValue);
-    }, [connection]);
-
-    useEffect(() => {
-        const fetchUserBalances = async () => {
-            if (connected && publicKey) {
-                setLoading(true);
-                const balances = await getWalletBalances(publicKey.toBase58());
-                setUserTokens(balances);
-                setTotalUsdValue(balances.reduce((sum, token) => sum + token.usdValue, 0));
-                setLoading(false);
-            } else {
-                setUserTokens([]);
-                setTotalUsdValue(0);
+        // 4. Populate token data with the fetched prices and metadata
+        allTokens.forEach(token => {
+            const data = priceData[token.mintAddress];
+            if (data) {
+                token.name = data.name || 'Unknown Token';
+                token.symbol = data.symbol || `${token.mintAddress.slice(0, 4)}...`;
+                token.logo = React.createElement(GenericTokenIcon, { uri: data.logoURI });
+                token.pricePerToken = data.price || 0;
+                token.usdValue = token.balance * (data.price || 0);
+                token.decimals = data.decimals ?? token.decimals;
             }
+        });
+        
+        // 5. Override with known data for consistency
+         const KNOWN_TOKEN_ICONS: { [mint: string]: React.ReactNode } = {
+            [OWFN_MINT_ADDRESS]: React.createElement(OwfnIcon),
+            'So11111111111111111111111111111111111111112': React.createElement(SolIcon),
+            'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyB7u6a': React.createElement(UsdcIcon),
+            'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB': React.createElement(UsdtIcon),
         };
 
-        fetchUserBalances();
-        const interval = setInterval(fetchUserBalances, 60000); // Refresh every 60 seconds
-        return () => clearInterval(interval);
-
-    }, [connected, publicKey, getWalletBalances]);
-    
-    const disconnectWallet = useCallback(() => {
-        disconnect().catch(e => console.error("Error during disconnect:", e));
-    }, [disconnect]);
-
-    const sendSolanaTransaction = async (to: string, amount: number, tokenSymbol: string) => {
-        if (!publicKey || !signTransaction) {
-            return { success: false, messageKey: 'wallet_not_connected_error' };
-        }
-        setLoading(true);
-        try {
-            const toPublicKey = new PublicKey(to);
-            const transaction = new Transaction();
-            let instructions: TransactionInstruction[] = [];
-
-            if (tokenSymbol === 'SOL') {
-                instructions.push(
-                    SystemProgram.transfer({
-                        fromPubkey: publicKey,
-                        toPubkey: toPublicKey,
-                        lamports: amount * LAMPORTS_PER_SOL,
-                    })
-                );
-            } else {
-                const mintAddress = Object.entries(KNOWN_TOKEN_MINT_ADDRESSES).find(([symbol]) => symbol === tokenSymbol)?.[1];
-                if (!mintAddress) {
-                    return { success: false, messageKey: 'unsupported_token_error', params: { symbol: tokenSymbol } };
-                }
-                const mintPublicKey = new PublicKey(mintAddress);
-                const fromAta = await getAssociatedTokenAddress(mintPublicKey, publicKey);
-                const toAta = await getAssociatedTokenAddress(mintPublicKey, toPublicKey);
-
-                try {
-                    await getAccount(connection, toAta);
-                } catch (error) {
-                    instructions.push(
-                        createAssociatedTokenAccountInstruction(publicKey, toAta, toPublicKey, mintPublicKey)
-                    );
-                }
-                
-                const token = userTokens.find(t => t.symbol === tokenSymbol);
-                const amountInSmallestUnit = BigInt(Math.round(amount * (10 ** (token?.decimals ?? 9))));
-
-                instructions.push(
-                    createTransferInstruction(fromAta, toAta, publicKey, amountInSmallestUnit)
-                );
+        allTokens.forEach(token => {
+            if (KNOWN_TOKEN_ICONS[token.mintAddress]) {
+                token.logo = KNOWN_TOKEN_ICONS[token.mintAddress];
             }
+            if (token.mintAddress === OWFN_MINT_ADDRESS) {
+                token.name = 'Official World Family Network';
+                token.symbol = 'OWFN';
+            }
+        });
+        
+        const sortedTokens = allTokens.sort((a,b) => b.usdValue - a.usdValue);
+        balanceCache.set(walletAddress, { data: sortedTokens, timestamp: Date.now() });
+        return sortedTokens;
 
-            transaction.add(...instructions);
-            const { blockhash } = await connection.getLatestBlockhash();
-            transaction.recentBlockhash = blockhash;
-            transaction.feePayer = publicKey;
-            
-            const signature = await sendTransaction(transaction, connection);
-            await connection.confirmTransaction(signature, 'processed');
-
-            return { success: true, signature, messageKey: 'transaction_successful', params: { signature } };
-        } catch (error: any) {
-            console.error("Transaction error:", error);
-            return { success: false, messageKey: 'transaction_failed_error', params: { error: error.message } };
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    // MOCK FUNCTIONS for features that need a backend/program
-    const mockAction = async (messageKey: string, params?: any) => {
-        setLoading(true);
-        await new Promise(res => setTimeout(res, 1500)); // Simulate async
+    } catch (error) {
+        console.error("Error fetching wallet balances:", error);
+        return [];
+    } finally {
         setLoading(false);
-        return { success: true, messageKey, params };
-    };
+    }
+  }, [connection]);
 
-    const stakeTokens = (amount: number) => mockAction('stake_success_alert', { amount });
-    const unstakeTokens = (amount: number) => mockAction('unstake_success_alert', { amount });
-    const claimRewards = () => mockAction('claim_success_alert', { amount: userStats.earnedRewards });
-    const claimVestedTokens = (amount: number) => mockAction('vesting_claim_success', { amount });
-    const voteOnProposal = (proposalId: string, vote: 'for' | 'against') => {
-        const newStats = { ...userStats, votedProposalIds: [...userStats.votedProposalIds, proposalId] };
-        setUserStats(newStats);
-        return mockAction('vote_success_alert');
-    };
+  useEffect(() => {
+    if (connected && address) {
+      getWalletBalances(address).then(setUserTokens);
+    } else {
+      setUserTokens([]);
+      balanceCache.clear();
+    }
+  }, [connected, address, getWalletBalances]);
 
+ const sendTransaction = useCallback(async (to: string, amount: number, tokenSymbol: string): Promise<{ success: boolean; messageKey: string; signature?: string; params?: Record<string, string | number>}> => {
+    if (!connected || !publicKey || !signTransaction) {
+      return { success: false, messageKey: 'connect_wallet_first' };
+    }
+    setLoading(true);
 
-    return {
-        connected,
-        connecting,
-        address,
-        disconnectWallet,
-        sendTransaction: sendSolanaTransaction,
-        getWalletBalances,
-        userTokens,
-        totalUsdValue,
-        loading,
-        userStats,
-        stakedBalance: userStats.stakedBalance,
-        earnedRewards: userStats.earnedRewards,
-        stakeTokens,
-        unstakeTokens,
-        claimRewards,
-        voteOnProposal,
-        claimVestedTokens,
-    };
+    try {
+        const toPublicKey = new PublicKey(to);
+        const instructions: TransactionInstruction[] = [];
+        
+        if (tokenSymbol === 'SOL') {
+            instructions.push(
+                SystemProgram.transfer({
+                    fromPubkey: publicKey,
+                    toPubkey: toPublicKey,
+                    lamports: Math.round(amount * LAMPORTS_PER_SOL),
+                })
+            );
+        } else {
+            const mintAddress = Object.keys(KNOWN_TOKEN_MINT_ADDRESSES).find(key => key === tokenSymbol && KNOWN_TOKEN_MINT_ADDRESSES[key]);
+            if (!mintAddress) throw new Error(`Unknown token symbol: ${tokenSymbol}`);
+            
+            const mintPublicKey = new PublicKey(KNOWN_TOKEN_MINT_ADDRESSES[tokenSymbol]);
+            const tokenInfo = userTokens.find(t => t.symbol === tokenSymbol);
+            if (!tokenInfo) throw new Error(`Token ${tokenSymbol} not found in user's wallet.`);
+            
+            const decimals = tokenInfo.decimals;
+            const transferAmount = BigInt(Math.round(amount * Math.pow(10, decimals)));
+
+            const fromTokenAccount = await getAssociatedTokenAddress(mintPublicKey, publicKey);
+            const toTokenAccount = await getAssociatedTokenAddress(mintPublicKey, toPublicKey);
+            
+            try {
+                await getAccount(connection, toTokenAccount, 'confirmed');
+            } catch (error) {
+                if (error instanceof Error && (error.name === 'TokenAccountNotFoundError' || error.message.includes('not found'))) {
+                    instructions.push(
+                        createAssociatedTokenAccountInstruction(
+                            publicKey,
+                            toTokenAccount,
+                            toPublicKey,
+                            mintPublicKey
+                        )
+                    );
+                } else {
+                    throw error;
+                }
+            }
+            
+            instructions.push(
+                createTransferInstruction(
+                    fromTokenAccount,
+                    toTokenAccount,
+                    publicKey,
+                    transferAmount
+                )
+            );
+        }
+
+        const latestBlockHash = await connection.getLatestBlockhash('finalized');
+        
+        const messageV0 = new TransactionMessage({
+            payerKey: publicKey,
+            recentBlockhash: latestBlockHash.blockhash,
+            instructions,
+        }).compileToV0Message();
+
+        const transaction = new VersionedTransaction(messageV0);
+
+        const signedTransaction = await signTransaction(transaction);
+
+        const signature = await connection.sendTransaction(signedTransaction, {
+            skipPreflight: false,
+            preflightCommitment: 'finalized',
+        });
+        
+        await connection.confirmTransaction({
+            blockhash: latestBlockHash.blockhash,
+            lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+            signature: signature
+        }, 'finalized');
+
+        console.log(`Transaction successful with signature: ${signature}`);
+        setLoading(false);
+        if (address) {
+            balanceCache.delete(address);
+            getWalletBalances(address).then(setUserTokens);
+        }
+        return { success: true, signature, messageKey: 'transaction_success_alert', params: { amount, tokenSymbol } };
+
+    } catch (error) {
+        console.error("Transaction failed:", error);
+        setLoading(false);
+        return { success: false, messageKey: 'transaction_failed_alert' };
+    }
+  }, [connected, publicKey, connection, signTransaction, userTokens, address, getWalletBalances]);
+  
+  const notImplemented = async (..._args: any[]): Promise<any> => {
+      console.warn("This feature is a placeholder and not implemented on-chain yet.");
+      alert("This feature is coming soon and requires on-chain programs to be deployed.");
+      return Promise.resolve({ success: false, messageKey: 'coming_soon_title'});
+  }
+
+  return {
+    connected,
+    connecting,
+    address,
+    userTokens,
+    loading,
+    connection,
+    userStats: { 
+        totalDonated: 0,
+        projectsSupported: 0,
+        votesCast: 0,
+        donations: [],
+        votedProposalIds: []
+    },
+    stakedBalance: 0,
+    earnedRewards: 0,
+    disconnectWallet: disconnect,
+    getWalletBalances,
+    sendTransaction,
+    stakeTokens: notImplemented,
+    unstakeTokens: notImplemented,
+    claimRewards: notImplemented,
+    claimVestedTokens: notImplemented,
+    voteOnProposal: notImplemented,
+  };
 };
