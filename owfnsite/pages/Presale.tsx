@@ -120,7 +120,9 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                 try {
                     const data = JSON.parse(event.data);
                     if (data.method === "transactionNotification") {
-                        const tx = data.params.result.transaction;
+                        const txResult = data.params.result;
+                        const tx = txResult.transaction;
+                        const blockTime = txResult.blockTime;
                         const signature = tx.signatures[0];
 
                         // Look for native SOL transfers to our presale wallet
@@ -136,7 +138,7 @@ const LivePresaleFeed = ({ newTransaction }: { newTransaction: PresaleTransactio
                                 address: nativeTransfer.parsed.info.source,
                                 solAmount: nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL,
                                 owfnAmount: (nativeTransfer.parsed.info.lamports / LAMPORTS_PER_SOL) * currentStage.rate,
-                                time: new Date(), // Use current time for live feed
+                                time: blockTime ? new Date(blockTime * 1000) : new Date(),
                             };
 
                             if (isMounted) {
