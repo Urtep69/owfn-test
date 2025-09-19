@@ -18,7 +18,7 @@ import {
 import { AddressDisplay } from '../components/AddressDisplay.js';
 import type { PresaleTransaction, PresaleStage } from '../lib/types.js';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey, LAMPORTS_PER_SOL, Connection } from '@solana/web3.js';
+import { PublicKey, LAMPORTS_PER_SOL, Connection, ConfirmedSignatureInfo } from '@solana/web3.js';
 
 // Get the current (and only) presale stage for this page to use.
 const currentStage: PresaleStage = PRESALE_STAGES[0];
@@ -390,14 +390,26 @@ export default function Presale() {
         try {
             const connection = new Connection(QUICKNODE_RPC_URL, 'confirmed');
             const userPublicKey = new PublicKey(solana.address);
-            // This is complex to get ALL signatures for a user to a specific address.
-            // For this UI feature, we can simplify by checking the user's recent transactions.
-            // A full, accurate accounting should be done on a backend or at the airdrop stage.
-            const signatures = await connection.getSignaturesForAddress(userPublicKey, { limit: 200 });
             const presaleStartTimestamp = Math.floor(new Date(currentStage.startDate).getTime() / 1000);
-            const relevantSignatures = signatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
             
+            let allSignatures: ConfirmedSignatureInfo[] = [];
+            let lastSignature: string | undefined = undefined;
             let totalContributed = 0;
+
+            // Robust pagination to get all user signatures since the presale started
+            while (true) {
+                const signatures = await connection.getSignaturesForAddress(userPublicKey, { before: lastSignature, limit: 1000 });
+                if (signatures.length === 0) break;
+                
+                allSignatures.push(...signatures);
+                lastSignature = signatures[signatures.length - 1].signature;
+
+                const lastTxTime = signatures[signatures.length - 1].blockTime;
+                if (lastTxTime && lastTxTime < presaleStartTimestamp) break; // Stop when we are past the presale start
+            }
+
+            const relevantSignatures = allSignatures.filter(sig => sig.blockTime && sig.blockTime >= presaleStartTimestamp);
+            
             if (relevantSignatures.length > 0) {
                  const transactions = await connection.getParsedTransactions(
                     relevantSignatures.map(s => s.signature),
@@ -406,6 +418,7 @@ export default function Presale() {
                  transactions.forEach(tx => {
                     if (tx) {
                         tx.transaction.message.instructions.forEach(inst => {
+                            // Check for transfer *from* the user *to* the presale wallet
                             if ('parsed' in inst && inst.program === 'system' && inst.parsed?.type === 'transfer' && inst.parsed.info.destination === currentStage.distributionWallet && inst.parsed.info.source === solana.address) {
                                 totalContributed += inst.parsed.info.lamports / LAMPORTS_PER_SOL;
                             }
@@ -429,22 +442,53 @@ export default function Presale() {
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSolAmount(value);
 
-    if (value === '' || isNaN(parseFloat(value))) {
-        setError('');
-        return;
+    // Allow only valid number patterns
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        setSolAmount(value);
     }
-
+    
+    // Real-time error messaging
     const numValue = parseFloat(value);
-    // We check for > 0 because if the user types "0" or "0." we don't want to show an error yet.
-    // The button will be disabled anyway by isAmountInvalid.
-    if ((numValue > 0 && numValue < currentStage.minBuy) || numValue > maxAllowedBuy) {
-        setError(t('presale_amount_error', { min: currentStage.minBuy, max: maxAllowedBuy.toFixed(2) }));
+    if (isNaN(numValue) && value.trim() !== '' && value !== '.') {
+        setError('Invalid number format.');
+    } else if (numValue > 0 && numValue < currentStage.minBuy) {
+        setError(t('presale_min_amount_error', { min: currentStage.minBuy }));
+    } else if (numValue > maxAllowedBuy) {
+        setError(t('presale_max_amount_error', { max: currentStage.maxBuy, remaining: maxAllowedBuy.toFixed(6) }));
     } else {
         setError('');
     }
   };
+
+  const handleBlur = () => {
+    const numValue = parseFloat(solAmount);
+
+    if (isNaN(numValue) || solAmount.trim() === '') {
+        if(solAmount.trim() === '') setSolAmount('');
+        setError('');
+        return;
+    }
+
+    let correctedValue = numValue;
+    let wasCorrected = false;
+
+    if (numValue > 0 && numValue < currentStage.minBuy) {
+        correctedValue = currentStage.minBuy;
+        wasCorrected = true;
+    } else if (numValue > maxAllowedBuy) {
+        correctedValue = maxAllowedBuy;
+        wasCorrected = true;
+    }
+    
+    if (wasCorrected) {
+        setSolAmount(parseFloat(correctedValue.toFixed(9)).toString());
+    }
+    
+    // Clear any validation error messages after correction on blur
+    setError('');
+  };
+
 
   const calculation = useMemo(() => {
     const numAmount = parseFloat(solAmount);
@@ -721,9 +765,11 @@ export default function Presale() {
                             </div>
                             <input
                                 id="buy-amount"
-                                type="number"
+                                type="text"
+                                inputMode="decimal"
                                 value={solAmount}
                                 onChange={handleAmountChange}
+                                onBlur={handleBlur}
                                 className={`w-full bg-primary-100 dark:bg-darkPrimary-800 border rounded-lg py-3 pl-11 pr-4 text-lg font-mono text-primary-900 dark:text-darkPrimary-100 text-right focus:ring-2 focus:border-accent-500 placeholder-primary-400 dark:placeholder-darkPrimary-500 ${error && !isAdmin ? 'border-red-500 focus:ring-red-500' : 'border-primary-300 dark:border-darkPrimary-600 focus:ring-accent-500'}`}
                                 placeholder="0.00"
                                 disabled={isCheckingContribution || (!isAdmin && presaleStatus !== 'active')}

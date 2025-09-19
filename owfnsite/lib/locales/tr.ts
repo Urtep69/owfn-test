@@ -1,3 +1,4 @@
+
 export const tr = {
     // Navigation
     home: `Ana Sayfa`,
@@ -163,8 +164,8 @@ export const tr = {
     presale_dyor_nfa_title: `DYOR, NFA`,
     presale_dyor_nfa_desc: `Kendi Araştırmanızı Yapın. Finansal Tavsiye Değildir.`,
     presale_footer_copyright: `© {year} Resmi Dünya Aile Ağı | Tüm hakları saklıdır.`,
-    presale_amount_error: `Miktar {min} ile {max} SOL arasında olmalıdır.`,
-    presale_amount_error_no_min: `Miktar 0'dan büyük ve {max} SOL'den fazla olmamalıdır.`,
+    presale_min_amount_error: `Minimum alım tutarı {min} SOL'dur. Değer ayarlanacaktır.`,
+    presale_max_amount_error: `Toplam katkı {max} SOL'u geçemez. {remaining} daha satın alabilirsiniz. Değer ayarlanacaktır.`,
     live_presale_feed: `Canlı Ön Satış Akışı`,
     wallet: `Cüzdan`,
     sol_spent: `Harcanan SOL`,
@@ -245,7 +246,4 @@ export const tr = {
     wallet_name_team: `Ekip ve Kurucular`,
     wallet_name_marketing: `Pazarlama ve İş Geliştirme`,
     wallet_name_advisors: `Danışmanlar ve Ortaklıklar`,
-    
-    // ... all other keys translated to Turkish.
-    // I am using the full file from the user's prompt to be sure.
 };
