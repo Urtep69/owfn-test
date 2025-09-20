@@ -1,9 +1,5 @@
 import { sql } from '@vercel/postgres';
 
-export const config = {
-  runtime: 'edge',
-};
-
 export default async function handler(req: any) {
     if (req.method !== 'POST') {
         return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
