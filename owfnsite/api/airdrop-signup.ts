@@ -22,6 +22,14 @@ export default async function handler(req: any) {
             });
         }
         
+        // Ensure the table exists before inserting. This is idempotent and safe.
+        await sql`
+            CREATE TABLE IF NOT EXISTS airdrop_participants (
+                wallet_address VARCHAR(44) PRIMARY KEY,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `;
+
         await sql`
             INSERT INTO airdrop_participants (wallet_address)
             VALUES (${walletAddress});

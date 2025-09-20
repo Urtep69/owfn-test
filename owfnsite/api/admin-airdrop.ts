@@ -13,6 +13,14 @@ export default async function handler(req: any) {
   }
   
   try {
+    // Ensure the table exists before querying. This makes the admin page resilient.
+    await sql`
+        CREATE TABLE IF NOT EXISTS airdrop_participants (
+            wallet_address VARCHAR(44) PRIMARY KEY,
+            created_at TIMESTAMPTZ DEFAULT NOW()
+        );
+    `;
+
     const { rows: participants } = await sql`
       SELECT wallet_address, created_at 
       FROM airdrop_participants 
