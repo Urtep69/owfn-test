@@ -9,6 +9,7 @@ import { AppProvider, useAppContext } from './contexts/AppContext.js';
 import { Layout } from './components/Layout.js';
 import { ADMIN_WALLET_ADDRESS, QUICKNODE_RPC_URL } from './lib/constants.js';
 import { ComingSoonWrapper } from './components/ComingSoonWrapper.js';
+import { NotificationModal } from './components/NotificationModal.js';
 
 import Home from './pages/Home.js';
 import Presale from './pages/Presale.js';
@@ -36,62 +37,65 @@ import Contact from './pages/Contact.js';
 import { Analytics } from "@vercel/analytics/react";
 
 const AppContent = () => {
-  const { isMaintenanceActive, isAdmin } = useAppContext();
+  const { isMaintenanceActive, isAdmin, notification } = useAppContext();
 
   if (isMaintenanceActive) {
     return <Maintenance />;
   }
 
   return (
-    <Router>
-      <Layout>
-        <Switch>
-          <Route path="/presale"><Presale /></Route>
-          <Route path="/presale-info"><PresaleStages /></Route>
-          <Route path="/about"><About /></Route>
-          <Route path="/whitepaper"><Whitepaper /></Route>
-          <Route path="/tokenomics"><Tokenomics /></Route>
-          <Route path="/roadmap"><Roadmap /></Route>
-          <Route path="/staking">
-            <ComingSoonWrapper>
-              <Staking />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/vesting">
-            <ComingSoonWrapper>
-              <Vesting />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/airdrop">
-            <ComingSoonWrapper>
-              <Airdrop />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/donations"><Donations /></Route>
-          <Route path="/dashboard/token/:mint">
-            <ComingSoonWrapper>
-              <TokenDetail />
-            </ComingSoonWrapper>
-          </Route>
-          <Route path="/dashboard"><Dashboard /></Route>
-          <Route path="/profile"><Profile /></Route>
-          <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
-          <Route path="/impact/category/:category"><ImpactCategory /></Route>
-          <Route path="/impact"><ImpactPortal /></Route>
-          <Route path="/partnerships"><Partnerships /></Route>
-          <Route path="/faq"><FAQ /></Route>
-          <Route path="/contact"><Contact /></Route>
-          <Route path="/governance">
-            <ComingSoonWrapper>
-              <Governance />
-            </ComingSoonWrapper>
-          </Route>
-          {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
-          <Route path="/maintenance"><Maintenance /></Route>
-          <Route path="/"><Home /></Route>
-        </Switch>
-      </Layout>
-    </Router>
+    <>
+      <Router>
+        <Layout>
+          <Switch>
+            <Route path="/presale"><Presale /></Route>
+            <Route path="/presale-info"><PresaleStages /></Route>
+            <Route path="/about"><About /></Route>
+            <Route path="/whitepaper"><Whitepaper /></Route>
+            <Route path="/tokenomics"><Tokenomics /></Route>
+            <Route path="/roadmap"><Roadmap /></Route>
+            <Route path="/staking">
+              <ComingSoonWrapper>
+                <Staking />
+              </ComingSoonWrapper>
+            </Route>
+            <Route path="/vesting">
+              <ComingSoonWrapper>
+                <Vesting />
+              </ComingSoonWrapper>
+            </Route>
+            <Route path="/airdrop">
+              <ComingSoonWrapper>
+                <Airdrop />
+              </ComingSoonWrapper>
+            </Route>
+            <Route path="/donations"><Donations /></Route>
+            <Route path="/dashboard/token/:mint">
+              <ComingSoonWrapper>
+                <TokenDetail />
+              </ComingSoonWrapper>
+            </Route>
+            <Route path="/dashboard"><Dashboard /></Route>
+            <Route path="/profile"><Profile /></Route>
+            <Route path="/impact/case/:id"><ImpactCaseDetail /></Route>
+            <Route path="/impact/category/:category"><ImpactCategory /></Route>
+            <Route path="/impact"><ImpactPortal /></Route>
+            <Route path="/partnerships"><Partnerships /></Route>
+            <Route path="/faq"><FAQ /></Route>
+            <Route path="/contact"><Contact /></Route>
+            <Route path="/governance">
+              <ComingSoonWrapper>
+                <Governance />
+              </ComingSoonWrapper>
+            </Route>
+            {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
+            <Route path="/maintenance"><Maintenance /></Route>
+            <Route path="/"><Home /></Route>
+          </Switch>
+        </Layout>
+      </Router>
+      {notification && <NotificationModal />}
+    </>
   );
 };
 

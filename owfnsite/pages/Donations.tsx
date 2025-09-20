@@ -110,7 +110,7 @@ const DonationStats = ({ allTransactions }: { allTransactions: DonationTransacti
 
 // --- Main Page Component ---
 export default function Donations() {
-    const { t, solana, setWalletModalOpen } = useAppContext();
+    const { t, solana, setWalletModalOpen, showNotification } = useAppContext();
     const [amount, setAmount] = useState('');
     const [selectedToken, setSelectedToken] = useState('SOL');
 
@@ -243,15 +243,33 @@ export default function Donations() {
         }
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
-            alert(t('invalid_amount_generic'));
+            showNotification({
+                status: 'error',
+                title: t('transaction_failed_title'),
+                messages: [t('invalid_amount_generic')],
+            });
             return;
         }
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
-        if (result.success) {
-            alert(t('donation_success_alert', result.params));
+        if (result.success && result.signature) {
+// Fix: Corrected the type assertion for React.cloneElement to include className.
+             const tokenIcon = React.cloneElement(tokens.find(tok => tok.symbol === selectedToken)!.icon as React.ReactElement<{ className?: string }>, { className: "inline-block w-5 h-5 -mt-1" });
+            showNotification({
+                status: 'success',
+                title: t('donation_success_title'),
+                messages: [
+                    <>{t('donation_success_message_modal', { amount: numAmount.toLocaleString(undefined, { maximumFractionDigits: 4 }), tokenSymbol: selectedToken })} {tokenIcon}</>,
+                    t('donation_thank_you_family_modal'),
+                ],
+                signature: result.signature,
+            });
             setAmount('');
         } else {
-            alert(t(result.messageKey, result.params));
+            showNotification({
+                status: 'error',
+                title: t('transaction_failed_title'),
+                messages: [t(result.messageKey, result.params)],
+            });
         }
     };
     

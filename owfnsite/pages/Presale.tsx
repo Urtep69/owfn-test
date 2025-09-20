@@ -318,7 +318,7 @@ const BonusTiersDisplay = ({ tiers, activeThreshold }: { tiers: PresaleStage['bo
 
 
 export default function Presale() {
-  const { t, solana, setWalletModalOpen, presaleProgress, isAdmin } = useAppContext();
+  const { t, solana, setWalletModalOpen, presaleProgress, isAdmin, showNotification } = useAppContext();
   const [solAmount, setSolAmount] = useState('');
   const [error, setError] = useState('');
   const [latestPurchase, setLatestPurchase] = useState<PresaleTransaction | null>(null);
@@ -530,10 +530,18 @@ export default function Presale() {
     const result = await solana.sendTransaction(currentStage.distributionWallet, numSolAmount, 'SOL');
 
     if (result.success && result.signature) {
-        alert(t('presale_purchase_success_alert', { 
-            amount: numSolAmount.toFixed(2), 
-            owfnAmount: calculation.total.toLocaleString() 
-        }));
+        showNotification({
+            status: 'success',
+            title: t('presale_purchase_success_title'),
+            messages: [
+                <>{t('presale_you_contributed_modal')} <strong>{numSolAmount.toLocaleString(undefined, { maximumFractionDigits: 6 })} <SolIcon className="inline-block w-5 h-5 -mt-1" /> SOL</strong></>,
+                <>{t('presale_you_will_receive_modal')} <strong>{calculation.total.toLocaleString(undefined, { maximumFractionDigits: 2 })} <OwfnIcon className="inline-block w-5 h-5 -mt-1" /> OWFN</strong></>,
+                t('presale_airdrop_info_modal'),
+                t('presale_welcome_family_modal'),
+            ],
+            signature: result.signature,
+        });
+
         const newTx: PresaleTransaction = {
             id: result.signature,
             address: solana.address!,
@@ -544,7 +552,11 @@ export default function Presale() {
         setLatestPurchase(newTx);
         setSolAmount('');
     } else {
-        alert(t(result.messageKey));
+        showNotification({
+            status: 'error',
+            title: t('transaction_failed_title'),
+            messages: [t(result.messageKey)],
+        });
     }
   };
 

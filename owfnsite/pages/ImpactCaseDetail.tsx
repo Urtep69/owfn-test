@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { useAppContext } from '../contexts/AppContext.js';
@@ -21,7 +20,7 @@ const mockUpdates = [
 ];
 
 export default function ImpactCaseDetail() {
-    const { t, solana, currentLanguage, socialCases, setWalletModalOpen } = useAppContext();
+    const { t, solana, currentLanguage, socialCases, setWalletModalOpen, showNotification } = useAppContext();
     const params = useParams();
     const id = params?.['id'];
     const socialCase = socialCases.find(c => c.id === id);
@@ -79,17 +78,35 @@ export default function ImpactCaseDetail() {
 
         const numAmount = parseFloat(amount);
         if (isNaN(numAmount) || numAmount <= 0) {
-            alert(t('invalid_amount_generic'));
+            showNotification({
+                status: 'error',
+                title: t('transaction_failed_title'),
+                messages: [t('invalid_amount_generic')],
+            });
             return;
         }
 
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
         
-        if (result.success) {
-            alert(t('case_donation_success_alert', { title }));
+        if (result.success && result.signature) {
+// Fix: Corrected the type assertion for React.cloneElement to include className.
+            const tokenIcon = React.cloneElement(tokens.find(tok => tok.symbol === selectedToken)!.icon as React.ReactElement<{ className?: string }>, { className: "inline-block w-5 h-5 -mt-1" });
+            showNotification({
+                status: 'success',
+                title: t('donation_success_title'),
+                messages: [
+                     <>{t('donation_success_message_case_modal', { amount: numAmount.toLocaleString(undefined, { maximumFractionDigits: 4 }), tokenSymbol: selectedToken, title: title })} {tokenIcon}</>,
+                     t('donation_thank_you_family_modal'),
+                ],
+                signature: result.signature,
+            });
             setAmount('');
         } else {
-            alert(t(result.messageKey, result.params));
+            showNotification({
+                status: 'error',
+                title: t('transaction_failed_title'),
+                messages: [t(result.messageKey, result.params)],
+            });
         }
     };
     

@@ -198,3 +198,12 @@ export interface DonationTransaction {
   tokenSymbol: string;
   time: Date;
 }
+
+export type NotificationMessage = string | React.ReactNode;
+
+export interface Notification {
+  title: string;
+  messages: NotificationMessage[];
+  signature?: string;
+  status: 'success' | 'error' | 'info';
+}

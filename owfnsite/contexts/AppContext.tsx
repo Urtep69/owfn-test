@@ -3,7 +3,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useTheme } from '../hooks/useTheme.js';
 import { useLocalization } from '../hooks/useLocalization.js';
 import { useSolana } from '../hooks/useSolana.js';
-import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, PresaleStage, PresaleProgress } from '../lib/types.js';
+import type { Theme, Language, SocialCase, Token, VestingSchedule, GovernanceProposal, PresaleStage, PresaleProgress, Notification } from '../lib/types.js';
 import { INITIAL_SOCIAL_CASES, SUPPORTED_LANGUAGES, MAINTENANCE_MODE_ACTIVE, PRESALE_STAGES, QUICKNODE_RPC_URL, ADMIN_WALLET_ADDRESS } from '../lib/constants.js';
 import { translateText } from '../services/geminiService.js';
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
@@ -29,6 +29,9 @@ interface AppContextType {
   isAdmin: boolean;
   setWalletModalOpen: (open: boolean) => void;
   presaleProgress: PresaleProgress;
+  notification: Notification | null;
+  showNotification: (notification: Notification) => void;
+  hideNotification: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -42,6 +45,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [socialCases, setSocialCases] = useState<SocialCase[]>(INITIAL_SOCIAL_CASES);
   const [vestingSchedules, setVestingSchedules] = useState<VestingSchedule[]>([]);
   const [proposals, setProposals] = useState<GovernanceProposal[]>([]);
+  const [notification, setNotification] = useState<Notification | null>(null);
   
   const isAdmin = useMemo(() => solana.address === ADMIN_WALLET_ADDRESS, [solana.address]);
   const isMaintenanceActive = useMemo(() => MAINTENANCE_MODE_ACTIVE && !isAdmin, [isAdmin]);
@@ -52,6 +56,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     contributors: 0,
     isLoading: true,
   });
+
+  const showNotification = useCallback((notificationData: Notification) => {
+    setNotification(notificationData);
+  }, []);
+
+  const hideNotification = useCallback(() => {
+    setNotification(null);
+  }, []);
 
   const fetchPresaleProgress = useCallback(async () => {
     if (new Date() < new Date(currentStage.startDate)) {
@@ -189,6 +201,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isAdmin,
     setWalletModalOpen,
     presaleProgress,
+    notification,
+    showNotification,
+    hideNotification,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
