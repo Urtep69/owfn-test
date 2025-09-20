@@ -134,7 +134,6 @@ export const es = {
     you_receive: `Tú Recibes`,
     min_buy: `Compra mínima`,
     max_buy: `Compra máxima`,
-    presale_purchase_success_alert: `¡Compra exitosa! Contribuiste con {amount} SOL. Tus {owfnAmount} tokens OWFN están reservados y serán enviados automáticamente a tu billetera al final de la preventa.`,
     presale_header_subtitle: `Red Familiar Mundial Oficial - $OWFN`,
     presale_sold_progress: `Vendido {progress}%`,
     presale_buy_info: `Comprar (Mín: {min} SOL, Máx: {max} SOL)`,
@@ -217,7 +216,6 @@ export const es = {
     donations_form_title: `Formulario de Donación`,
     donations_stats_title: `Estadísticas de Donaciones en Vivo`,
     donated: `Donado`,
-    donation_success_alert: `¡Donación exitosa! Gracias por su contribución de {amount} {tokenSymbol}.`,
     donation_no_token_balance: `No posees ningún {symbol}.`,
     live_donation_feed: `Feed de Donaciones en Vivo`,
     amount_donated: `Cantidad Donada`,
@@ -290,7 +288,6 @@ export const es = {
     back_to_category_cases: `Volver a los casos de {category}`,
     support_this_cause: `Apoyar esta Causa`,
     case_not_found: `Caso no encontrado`,
-    case_donation_success_alert: `¡Gracias por su donación a "{title}"!`,
     admin_saving_case: `Traduciendo y Guardando...`,
     admin_fill_fields_alert: `Por favor, rellene todos los campos obligatorios.`,
     category_health: `Salud`,
@@ -403,6 +400,18 @@ export const es = {
     translation_error_alert: `Ocurrió un error durante la traducción. El caso no fue creado. Por favor, inténtelo de nuevo.`,
     invalid_amount_generic: `Por favor, ingrese una cantidad válida.`,
     vote_success_alert: `¡Su voto ha sido emitido con éxito!`,
+
+    // Notification Modals
+    transaction_failed_title: "Transacción Fallida",
+    presale_purchase_success_title: "¡Compra Exitosa!",
+    presale_you_contributed_modal: "Usted contribuyó:",
+    presale_you_will_receive_modal: "Usted recibirá aproximadamente:",
+    presale_airdrop_info_modal: "Sus tokens están reservados y serán distribuidos por airdrop después de la preventa.",
+    presale_welcome_family_modal: "¡Felicitaciones y bienvenido a la familia OWFN!",
+    donation_success_title: "¡Donación Exitosa!",
+    donation_success_message_modal: "Gracias por su generosa donación de {amount} {tokenSymbol} a la Tesorería de Impacto.",
+    donation_success_message_case_modal: "Gracias por su generosa donación de {amount} {tokenSymbol} al caso: {title}.",
+    donation_thank_you_family_modal: "Su apoyo es la base del cambio. ¡Bienvenido a la familia OWFN!",
 
     // Footer
     footer_copyright: `© {year} Red Familiar Mundial Oficial. Todos los derechos reservados.`,

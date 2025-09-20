@@ -355,7 +355,6 @@ export const en = {
     faq_a12: 'According to our Roadmap, after the successful conclusion of the presale, we will proceed with the official listing of the $OWFN token on decentralized exchanges (DEXs) within the Solana ecosystem. The exact date and platforms will be announced on our official channels.',
     faq_q13: 'Why is there a maximum purchase limit (Max Buy) in the presale?',
     faq_a13: 'The maximum purchase limit is an important measure to ensure the fairest possible distribution of tokens and to prevent a small number of large investors ("whales") from controlling a significant portion of the supply. This promotes a healthier and more decentralized community in the long run.',
-// Fix: Corrected syntax error and added missing FAQ translations.
     faq_q14: `What does it mean that the token is 'Interest-Bearing' with 2% APY? How does it work?`,
     faq_a14: `OWFN is an Interest-Bearing Token (IBT) that automatically rewards its holders with a 2% Annual Percentage Yield (APY). This means your OWFN holdings will grow over time simply by holding them in your Solana wallet.`,
     faq_q15: 'What is the 0.5% transfer fee and when does it apply?',
@@ -401,6 +400,18 @@ export const en = {
     translation_error_alert: `An error occurred during translation. The case was not created. Please try again.`,
     invalid_amount_generic: `Please enter a valid amount.`,
     vote_success_alert: `Your vote has been successfully cast!`,
+
+    // Notification Modals
+    transaction_failed_title: "Transaction Failed",
+    presale_purchase_success_title: "Purchase Successful!",
+    presale_you_contributed_modal: "You contributed:",
+    presale_you_will_receive_modal: "You will receive approximately:",
+    presale_airdrop_info_modal: "Your tokens are reserved and will be airdropped after the presale.",
+    presale_welcome_family_modal: "Congratulations and welcome to the OWFN family!",
+    donation_success_title: "Donation Successful!",
+    donation_success_message_modal: "Thank you for your generous donation of {amount} {tokenSymbol} to the Impact Treasury.",
+    donation_success_message_case_modal: "Thank you for your generous donation of {amount} {tokenSymbol} to the case: {title}.",
+    donation_thank_you_family_modal: "Your support is the foundation of change. Welcome to the OWFN family!",
 
     // Footer
     footer_copyright: `© {year} Official World Family Network | All rights reserved.`,
@@ -456,7 +467,6 @@ export const en = {
     my_staked_balance: `My Staked Balance`,
     stake: `Stake`,
     unstake: `Unstake`,
-    balance: `Balance`,
     stake_owfn: `Stake OWFN`,
     unstake_owfn: `Unstake OWFN`,
     my_rewards: `My Rewards`,
@@ -611,7 +621,7 @@ export const en = {
     contact_required_fields: `Fields marked with an asterisk (*) are required.`,
     contact_disclaimer_title: `A Note on Our Communication Policy`,
     contact_disclaimer_message: `To ensure our team can effectively support the community and advance the project, we prioritize inquiries directly related to the Official World Family Network. Off-topic messages, spam, or unsolicited solicitations may not receive a response. Thank you for your understanding and for helping us stay focused on our mission.`,
-    send_direct_message: 'Send a Direct Message',
+    send_direct_message: `Send a Direct Message`,
     contact_social_x_title: `Find us on X`,
     contact_social_x_desc: `Follow our official account for real-time updates, news, and announcements.`,
     contact_social_telegram_channel_title: `Telegram Channel`,

@@ -252,8 +252,9 @@ export default function Donations() {
         }
         const result = await solana.sendTransaction(DISTRIBUTION_WALLETS.impactTreasury, numAmount, selectedToken);
         if (result.success && result.signature) {
-// Fix: Corrected the type assertion for React.cloneElement to include className.
-             const tokenIcon = React.cloneElement(tokens.find(tok => tok.symbol === selectedToken)!.icon as React.ReactElement<{ className?: string }>, { className: "inline-block w-5 h-5 -mt-1" });
+             const iconToClone = tokens.find(tok => tok.symbol === selectedToken)!.icon;
+// FIX: Add a more specific type assertion to React.cloneElement to inform TypeScript that the cloned element accepts a className prop.
+             const tokenIcon = React.cloneElement(iconToClone as React.ReactElement<{ className?: string }>, { className: "inline-block w-5 h-5 -mt-1" });
             showNotification({
                 status: 'success',
                 title: t('donation_success_title'),
@@ -363,6 +364,7 @@ export default function Donations() {
                                 ) : (
                                     <div className="text-center py-3 px-4 bg-accent-100/20 dark:bg-darkAccent-900/20 border border-accent-400/30 dark:border-darkAccent-500/30 rounded-lg">
                                         <div className="flex items-center justify-center space-x-2 text-accent-700 dark:text-darkAccent-200">
+{/* FIX: Add a more specific type assertion to React.cloneElement to inform TypeScript that the cloned element accepts a className prop. */}
                                             {React.cloneElement(tokens.find(t => t.symbol === selectedToken)!.icon as React.ReactElement<{ className?: string }>, { className: "w-6 h-6" })}
                                             <p className="font-semibold">{t('donation_no_token_balance', { symbol: selectedToken })}</p>
                                         </div>
