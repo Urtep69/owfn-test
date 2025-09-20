@@ -630,4 +630,12 @@ export const en = {
     contact_social_telegram_group_desc: `Join our community group to chat, ask questions, and engage with us.`,
     contact_social_discord_title: `Discord Server`,
     contact_social_discord_desc: `Become part of our Discord community for in-depth discussions.`,
+
+    // Admin Airdrop
+    airdrop_admin_title: 'Airdrop Administration',
+    airdrop_admin_subtitle: 'Monitor participants and export data for distribution.',
+    airdrop_total_participants: 'Total Participants',
+    airdrop_participant_list: 'Participant List',
+    wallet_address: 'Wallet Address',
+    registration_date: 'Registration Date',
 };

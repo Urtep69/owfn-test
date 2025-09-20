@@ -198,7 +198,7 @@ export const ro = {
     live_progress: `Progres Live`,
     participate_now: `Participă Acum`,
     bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) la {maxPercentage}% ({maxThreshold} SOL+)`,
-
+    
     // Donations Page
     make_donation: `Fă o Donație`,
     donation_desc: `Susține inițiativele noastre de impact social donând crypto. Toate fondurile merg direct către Trezoreria de Impact.`,
@@ -631,4 +631,12 @@ export const ro = {
     contact_social_telegram_group_desc: `Alătură-te grupului nostru comunitar pentru a discuta și a interacționa cu alți membri.`,
     contact_social_discord_title: `Server Discord`,
     contact_social_discord_desc: `Devino parte a comunității noastre active pentru discuții și suport.`,
+
+    // Admin Airdrop
+    airdrop_admin_title: 'Administrare Airdrop',
+    airdrop_admin_subtitle: 'Monitorizează participanții și exportă datele pentru distribuție.',
+    airdrop_total_participants: 'Total Participanți',
+    airdrop_participant_list: 'Lista Participanților',
+    wallet_address: 'Adresă Portofel',
+    registration_date: 'Data Înregistrării',
 };

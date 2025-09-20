@@ -110,6 +110,13 @@ export const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                             isOpen={isOpen} 
                             onClick={handleLinkClick} 
                         />
+                         <NavItem 
+                            to="/admin/airdrop" 
+                            icon={<Award size={20} />}
+                            label={t('airdrop_admin_title', { defaultValue: 'Airdrop Admin' })} 
+                            isOpen={isOpen} 
+                            onClick={handleLinkClick} 
+                        />
                     </NavGroup>
                 )}
             </nav>

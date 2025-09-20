@@ -33,6 +33,8 @@ export const PROJECT_LINKS = {
   telegramGroup: 'https://t.me/OWFNOfficial',
   telegramChannel: 'https://t.me/OWFN_Official',
   discord: 'https://discord.gg/DzHm5HCqDW',
+  // FIX: Added 'airdropTweet' property to resolve a missing property error in airdrop tasks. It points to the main X profile as a placeholder for a specific tweet.
+  airdropTweet: 'https://x.com/OWFN_Official',
 };
 
 export const TOKEN_ALLOCATIONS: TokenAllocation[] = [

@@ -198,7 +198,7 @@ export const de = {
     live_progress: `Live-Fortschritt`,
     participate_now: `Jetzt teilnehmen`,
     bonus_range_text: `{minPercentage}% ({minThreshold} SOL+) bis {maxPercentage}% ({maxThreshold} SOL+)`,
-
+    
     // Donations Page
     make_donation: `Spenden`,
     donation_desc: `Unterstützen Sie unsere sozialen Impact-Initiativen durch eine Krypto-Spende. Alle Gelder fließen direkt in die Impact Treasury.`,
@@ -356,8 +356,6 @@ export const de = {
     faq_q13: `Warum gibt es im Vorverkauf ein maximales Kauflimit (Max Buy)?`,
     faq_a13: `Das maximale Kauflimit ist eine wichtige Maßnahme, um eine möglichst faire Verteilung der Token zu gewährleisten und zu verhindern, dass eine kleine Anzahl großer Investoren ("Wale") einen erheblichen Teil des Angebots kontrolliert. Dies fördert langfristig eine gesündere und dezentralere Gemeinschaft.`,
     faq_q14: `Was bedeutet es, dass der Token "zinstragend" mit 2% APY ist? Wie funktioniert das?`,
-    faq_a14: `OWFN ist ein zinstragender Token (IBT), der seine Inhaber automatisch mit einer jährlichen prozentualen Rendite (APY) von 2% belohnt. Das bedeutet, dass Ihr OWFN-Bestand im Laufe der Zeit wächst, indem Sie ihn einfach in Ihrer Solana-Wallet behalten.`,
-    faq_q15: `Was ist die Überweisungsgebühr von 0,5% und wann gilt sie?`,
     faq_a15: `Diese Gebühr ist ein Schlüsselmechanismus für die langfristige Finanzierung unserer Mission. Eine Gebühr von 0,5% wird auf alle Transaktionen mit dem OWFN-Token *nach* Abschluss des Vorverkaufszeitraums erhoben. Die aus dieser Gebühr gesammelten Mittel werden automatisch an die Impact Treasury weitergeleitet, um unsere sozialen Projekte kontinuierlich zu finanzieren. So trägt jede Transaktion zum Gemeinwohl bei.`,
     faq_q16: `Warum haben Sie die Solana-Blockchain für dieses Projekt gewählt?`,
     faq_a16: `Wir haben uns für Solana wegen seiner außergewöhnlichen Geschwindigkeit, sehr niedrigen Transaktionskosten und hohen Skalierbarkeit entschieden. Diese Eigenschaften sind für ein globales Projekt wie unseres unerlässlich und ermöglichen effiziente Mikrotransaktionen und eine schnelle und zugängliche Erfahrung für alle Benutzer, egal ob sie spenden, kaufen oder Token handeln.`,
@@ -630,4 +628,12 @@ export const de = {
     contact_social_telegram_group_desc: `Treten Sie unserer Community-Gruppe bei, um zu diskutieren und sich mit anderen Mitgliedern auszutauschen.`,
     contact_social_discord_title: `Discord-Server`,
     contact_social_discord_desc: `Werden Sie Teil unserer aktiven Community für Diskussionen und Unterstützung.`,
+
+    // Admin Airdrop
+    airdrop_admin_title: 'Airdrop-Verwaltung',
+    airdrop_admin_subtitle: 'Teilnehmer überwachen und Daten für die Verteilung exportieren.',
+    airdrop_total_participants: 'Gesamtteilnehmer',
+    airdrop_participant_list: 'Teilnehmerliste',
+    wallet_address: 'Wallet-Adresse',
+    registration_date: 'Registrierungsdatum',
 };

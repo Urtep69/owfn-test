@@ -33,6 +33,7 @@ import Airdrop from './pages/Airdrop.js';
 import Governance from './pages/Governance.js';
 import Maintenance from './pages/Maintenance.js';
 import AdminPresale from './pages/AdminPresale.js';
+import AdminAirdrop from './pages/AdminAirdrop.js';
 import Contact from './pages/Contact.js';
 import { Analytics } from "@vercel/analytics/react";
 
@@ -64,11 +65,7 @@ const AppContent = () => {
                 <Vesting />
               </ComingSoonWrapper>
             </Route>
-            <Route path="/airdrop">
-              <ComingSoonWrapper>
-                <Airdrop />
-              </ComingSoonWrapper>
-            </Route>
+            <Route path="/airdrop"><Airdrop /></Route>
             <Route path="/donations"><Donations /></Route>
             <Route path="/dashboard/token/:mint">
               <ComingSoonWrapper>
@@ -89,6 +86,7 @@ const AppContent = () => {
               </ComingSoonWrapper>
             </Route>
             {isAdmin && <Route path="/admin/presale"><AdminPresale /></Route>}
+            {isAdmin && <Route path="/admin/airdrop"><AdminAirdrop /></Route>}
             <Route path="/maintenance"><Maintenance /></Route>
             <Route path="/"><Home /></Route>
           </Switch>
