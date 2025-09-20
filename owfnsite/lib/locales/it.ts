@@ -402,6 +402,18 @@ export const it = {
     invalid_amount_generic: `Inserisci un importo valido.`,
     vote_success_alert: `Il tuo voto è stato espresso con successo!`,
 
+    // Notification Modals
+    transaction_failed_title: "Transazione Fallita",
+    presale_purchase_success_title: "Acquisto Riuscito!",
+    presale_you_contributed_modal: "Hai contribuito:",
+    presale_you_will_receive_modal: "Riceverai approssimativamente:",
+    presale_airdrop_info_modal: "I tuoi token sono stati riservati e verranno distribuiti tramite airdrop dopo la prevendita.",
+    presale_welcome_family_modal: "Congratulazioni e benvenuto nella famiglia OWFN!",
+    donation_success_title: "Donazione Riuscita!",
+    donation_success_message_modal: "Grazie per la tua generosa donazione di {amount} {tokenSymbol} al Tesoro dell'Impatto.",
+    donation_success_message_case_modal: "Grazie per la tua generosa donazione di {amount} {tokenSymbol} al caso: {title}.",
+    donation_thank_you_family_modal: "Il tuo sostegno è il fondamento del cambiamento. Benvenuto nella famiglia OWFN!",
+
     // Footer
     footer_copyright: `© {year} Official World Family Network. Tutti i diritti riservati.`,
 

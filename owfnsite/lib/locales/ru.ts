@@ -404,6 +404,18 @@ export const ru = {
     invalid_amount_generic: `Пожалуйста, введите действительную сумму.`,
     vote_success_alert: `Ваш голос успешно засчитан!`,
 
+    // Notification Modals
+    transaction_failed_title: "Транзакция не удалась",
+    presale_purchase_success_title: "Покупка успешна!",
+    presale_you_contributed_modal: "Вы внесли:",
+    presale_you_will_receive_modal: "Вы получите примерно:",
+    presale_airdrop_info_modal: "Ваши токены зарезервированы и будут отправлены по аирдропу после предпродажи.",
+    presale_welcome_family_modal: "Поздравляем и добро пожаловать в семью OWFN!",
+    donation_success_title: "Пожертвование успешно!",
+    donation_success_message_modal: "Спасибо за ваше щедрое пожертвование в размере {amount} {tokenSymbol} в Казну Влияния.",
+    donation_success_message_case_modal: "Спасибо за ваше щедрое пожертвование в размере {amount} {tokenSymbol} на дело: {title}.",
+    donation_thank_you_family_modal: "Ваша поддержка — основа перемен. Добро пожаловать в семью OWFN!",
+
     // Footer
     footer_copyright: `© {year} Official World Family Network. Все права защищены.`,
 

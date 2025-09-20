@@ -397,7 +397,6 @@ export const ro = {
     // Alerts & Messages
     transaction_success_alert: `Tranzacție reușită! Ați trimis {amount} {tokenSymbol}.`,
     transaction_failed_alert: `Tranzacție eșuată. Vă rugăm să încercați din nou.`,
-    translation_error_alert: `A apărut o eroare în timpul traducerii. Cazul nu a fost creat. Vă rugăm să încercați din nou.`,
     invalid_amount_generic: `Vă rugăm să introduceți o sumă validă.`,
     vote_success_alert: `Votul dumneavoastră a fost înregistrat cu succes!`,
 

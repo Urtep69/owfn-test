@@ -397,7 +397,6 @@ export const es = {
     // Alerts & Messages
     transaction_success_alert: `¡Transacción exitosa! Enviaste {amount} {tokenSymbol}.`,
     transaction_failed_alert: `Transacción fallida. Por favor, inténtelo de nuevo.`,
-    translation_error_alert: `Ocurrió un error durante la traducción. El caso no fue creado. Por favor, inténtelo de nuevo.`,
     invalid_amount_generic: `Por favor, ingrese una cantidad válida.`,
     vote_success_alert: `¡Su voto ha sido emitido con éxito!`,
 

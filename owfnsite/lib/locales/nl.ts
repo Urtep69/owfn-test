@@ -59,7 +59,7 @@ export const nl = {
     
     // Home Page
     home_title: `Official World Family Network`,
-    home_subtitle: `Een wereldwijd netwerk verenigd door de visie om een betere wereld te bouwen door middel van technologie en menselijkheid. We bouwen aan een beweging die gezinnen wereldwijd verbindt via blockchain om bij te dragen aan echte sociale impact.`,
+    home_subtitle: `Een wereldwijd netwerk verenigd door de visie om een betere wereld te bouwen door middel of technologie en menselijkheid. We bouwen aan een beweging die gezinnen wereldwijd verbindt via blockchain om bij te dragen aan echte sociale impact.`,
     core_message_title: `Een Beweging die we Samen Bouwen`,
     home_message: `De grootse visie van dit project kan alleen worden gerealiseerd met de steun van de mensheid. Door onze token te kopen en deze te promoten bij vrienden, familie en collega's, wordt u een essentieel onderdeel van een wereldwijde beweging voor verandering. Dit is niet zomaar een project; het is een levende, ademende kracht voor het goede die we samen bouwen.`,
     home_feature_impact_title: `Echte Impact`,
@@ -401,6 +401,18 @@ export const nl = {
     translation_error_alert: `Er is een fout opgetreden tijdens de vertaling. Het geval is niet aangemaakt. Probeer het opnieuw.`,
     invalid_amount_generic: `Voer een geldig bedrag in.`,
     vote_success_alert: `Uw stem is succesvol uitgebracht!`,
+
+    // Notification Modals
+    transaction_failed_title: "Transactie Mislukt",
+    presale_purchase_success_title: "Aankoop Succesvol!",
+    presale_you_contributed_modal: "U heeft bijgedragen:",
+    presale_you_will_receive_modal: "U ontvangt ongeveer:",
+    presale_airdrop_info_modal: "Uw tokens zijn gereserveerd en worden na de voorverkoop via airdrop geleverd.",
+    presale_welcome_family_modal: "Gefeliciteerd en welkom bij de OWFN-familie!",
+    donation_success_title: "Donatie Succesvol!",
+    donation_success_message_modal: "Bedankt voor uw gulle donatie van {amount} {tokenSymbol} aan de Impact Treasury.",
+    donation_success_message_case_modal: "Bedankt voor uw gulle donatie van {amount} {tokenSymbol} voor de zaak: {title}.",
+    donation_thank_you_family_modal: "Uw steun is de basis voor verandering. Welkom bij de OWFN-familie!",
 
     // Footer
     footer_copyright: `© {year} Official World Family Network. Alle rechten voorbehouden.`,
